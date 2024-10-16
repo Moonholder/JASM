@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.16.7](https://github.com/Moonholder/JASM/compare/v2.16.6...v2.16.7) (2024-10-16)
+
+
+### Miscellaneous
+
+* 更新构建流程 ([3036862](https://github.com/Moonholder/JASM/commit/303686239eb89f4cf030973a0211f876a77fa5c2))
+* 自动更新程序汉化, 更新地址修改 ([bd2d4e2](https://github.com/Moonholder/JASM/commit/bd2d4e21ead099798ff37a01ff372764db860a4a))
+
 ## [2.16.6](https://github.com/Moonholder/JASM/compare/v2.16.5...v2.16.6) (2024-10-16)
 
 
