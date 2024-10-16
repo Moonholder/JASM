@@ -28,28 +28,28 @@
                 HorizontalAlignment="Left"
                 VerticalAlignment="Top"
                 Style="{ThemeResource TitleTextBlockStyle}"
-                Text="JASM Auto Updater" />
+                Text="JASM 自动更新程序" />
             <TextBlock
                 VerticalAlignment="Center"
                 IsTextSelectionEnabled="True"
-                Text="The Auto updater will delete JASM program files and then download the latest version from GitHub."
+                Text="自动更新程序将删除JASM程序文件，然后从GitHub下载最新版本."
                 TextWrapping="WrapWholeWords" />
             <TextBlock
                 VerticalAlignment="Center"
                 IsTextSelectionEnabled="True"
-                Text="This means that all files in the JASM folder will be deleted. JASM stores all personal settings in AppSettings or in the mods themselves."
+                Text="这意味着JASM文件夹中的所有文件都将被删除。JASM将所有个人设置存储在AppSettings或mod中."
                 TextWrapping="WrapWholeWords" />
             <TextBlock
                 Margin="0,8"
                 IsTextSelectionEnabled="True"
                 Style="{ThemeResource BodyStrongTextBlockStyle}"
-                Text="If you have your mods folder or other personal files inside the JASM folder, move them out or they will be deleted."
+                Text="如果在JASM文件夹中有mods文件夹或其他个人文件，请将它们移出，否则它们将被删除."
                 TextWrapping="WrapWholeWords" />
             <Button
                 Margin="0,16,0,0"
                 HorizontalAlignment="Center"
                 Command="{x:Bind ViewModel.StartUpdateCommand}"
-                Content="Start Update Process" />
+                Content="立即开始更新" />
         </StackPanel>
 
 
@@ -75,7 +75,7 @@
                         Margin="0,16,8,16"
                         HorizontalAlignment="Left"
                         Style="{ThemeResource TitleTextBlockStyle}"
-                        Text="Updating to Version" />
+                        Text="正在更新到最新版本" />
 
                     <TextBlock
                         Margin="0,16,0,16"
@@ -92,7 +92,7 @@
                         NavigateUri="{x:Bind ViewModel.DefaultBrowserUri, Mode=OneWay}">
                         <HyperlinkButton.Content>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Margin="0,0,4,0" Text="Latest Version" />
+                                <TextBlock Margin="0,0,4,0" Text="最新版本" />
                                 <FontIcon Glyph="&#xE8A7;" />
                             </StackPanel>
                         </HyperlinkButton.Content>
@@ -112,19 +112,19 @@
                 IsItemClickEnabled="False"
                 SelectionMode="Multiple">
                 <controls:SegmentedItem
-                    Content="Checking for Latest Version"
+                    Content="检查最新版本"
                     IsHitTestVisible="False"
                     IsSelected="{x:Bind ViewModel.UpdateProgress.CheckingForLatestUpdate, Mode=OneWay}" />
                 <controls:SegmentedItem
-                    Content="Downloading Latest Version"
+                    Content="下载最新版本"
                     IsHitTestVisible="False"
                     IsSelected="{x:Bind ViewModel.UpdateProgress.DownloadingLatestUpdate, Mode=OneWay}" />
                 <controls:SegmentedItem
-                    Content="Unzipping Download"
+                    Content="解压下载文件"
                     IsHitTestVisible="False"
                     IsSelected="{x:Bind ViewModel.UpdateProgress.ExtractingLatestUpdate, Mode=OneWay}" />
                 <controls:SegmentedItem
-                    Content="Installing JASM"
+                    Content="正在安装更新"
                     IsHitTestVisible="False"
                     IsSelected="{x:Bind ViewModel.UpdateProgress.InstallingLatestUpdate, Mode=OneWay}" />
             </controls:Segmented>
@@ -142,14 +142,14 @@
                 Margin="0,16,0,0"
                 HorizontalAlignment="Left"
                 Command="{x:Bind ViewModel.StartUpdateCommand}"
-                Content="Retry" />
+                Content="重试" />
 
             <Button
                 Grid.Row="2"
                 HorizontalAlignment="Center"
                 Background="{ThemeResource AccentFillColorSelectedTextBackgroundBrush}"
                 Command="{x:Bind ViewModel.StartJasmCommand}"
-                Content="Start JASM..."
+                Content="启动 JASM..."
                 Visibility="{x:Bind ViewModel.FinishedSuccessfully, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
 
 
