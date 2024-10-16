@@ -1,5 +1,6 @@
 ﻿using GIMI_ModManager.Core.Contracts.Entities;
 using GIMI_ModManager.Core.Helpers;
+using System.Text.RegularExpressions;
 
 namespace GIMI_ModManager.Core.Entities.Mods.Helpers;
 
@@ -31,8 +32,9 @@ public static class SkinModHelpers
             if (string.IsNullOrWhiteSpace(modName))
                 modName = mod.Name;
 
-            var relativePath = relativeUri.OriginalString.Replace($"{modName}/", "");
-
+            // var relativePath = relativeUri.OriginalString.Replace($"{modName}/", "");
+            var regex = new Regex(Regex.Escape($"{modName}/"));
+            var relativePath = regex.Replace(relativeUri.OriginalString, "", 1);
             return relativePath;
         }
 

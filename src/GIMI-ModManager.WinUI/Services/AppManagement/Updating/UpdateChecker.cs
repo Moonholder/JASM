@@ -20,7 +20,7 @@ public sealed class UpdateChecker
     private bool DisableChecker;
     private CancellationTokenSource _cancellationTokenSource;
 
-    private const string ReleasesApiUrl = "https://api.github.com/repos/Jorixon/JASM/releases?per_page=2";
+    private const string ReleasesApiUrl = "https://api.github.com/repos/Moonholder/JASM/releases?per_page=2";
 
     public UpdateChecker(ILogger logger, ILocalSettingsService localSettingsService,
         Notifications.NotificationManager notificationManager, CancellationToken cancellationToken = default)

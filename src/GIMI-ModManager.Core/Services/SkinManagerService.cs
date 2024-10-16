@@ -402,7 +402,7 @@ public sealed class SkinManagerService : ISkinManagerService
         exportFolder.Create();
 
         if (exportFolder.EnumerateFileSystemInfos().Any())
-            throw new InvalidOperationException("Export folder is not empty");
+            throw new InvalidOperationException("导出文件夹不是空的");
 
 
         var modsToExport = new List<CharacterSkinEntry>();
@@ -443,15 +443,15 @@ public sealed class SkinManagerService : ISkinManagerService
             }
 
             ModExportProgress?.Invoke(this,
-                new ExportProgress(modsProgress += modsProgressIncrement, null, "Removing JASM settings..."));
+                new ExportProgress(modsProgress += modsProgressIncrement, null, "删除JASM设置..."));
             RemoveJASMSettings(removeLocalJasmSettings, exportedMods);
 
             ModExportProgress?.Invoke(this,
-                new ExportProgress(modsProgress += modsProgressIncrement, null, "Setting Mod Status..."));
+                new ExportProgress(modsProgress += modsProgressIncrement, null, "设置Mod状态..."));
             SetModsStatus(setModStatus, exportedMods);
 
             ModExportProgress?.Invoke(this,
-                new ExportProgress(100, null, "Finished"));
+                new ExportProgress(100, null, "导出完成"));
             return;
         }
 
@@ -477,7 +477,7 @@ public sealed class SkinManagerService : ISkinManagerService
 
             if (characterToFolder.Count != _gameService.GetAllModdableObjects().Count - emptyFoldersCount)
                 throw new InvalidOperationException(
-                    "Failed to create character folders in export folder, character mismatch");
+                    "在导出文件夹中创建角色文件夹失败，角色不匹配");
 
             var exportedMods = new List<IMod>();
             foreach (var characterSkinEntry in modsToExport)
@@ -511,15 +511,15 @@ public sealed class SkinManagerService : ISkinManagerService
             }
 
             ModExportProgress?.Invoke(this,
-                new ExportProgress(modsProgress += modsProgressIncrement, null, "Removing JASM settings..."));
+                new ExportProgress(modsProgress += modsProgressIncrement, null, "删除JASM设置......"));
             RemoveJASMSettings(removeLocalJasmSettings, exportedMods);
 
             ModExportProgress?.Invoke(this,
-                new ExportProgress(modsProgress += modsProgressIncrement, null, "Setting Mod Status..."));
+                new ExportProgress(modsProgress += modsProgressIncrement, null, "设置Mod状态......"));
             SetModsStatus(setModStatus, exportedMods);
 
             ModExportProgress?.Invoke(this,
-                new ExportProgress(100, null, "Finished"));
+                new ExportProgress(100, null, "导出完成"));
 
 
             return;
@@ -623,7 +623,7 @@ public sealed class SkinManagerService : ISkinManagerService
             _threeMigotoFolder = new DirectoryInfo(threeMigotoRootfolder);
             _threeMigotoFolder.Refresh();
             if (!_threeMigotoFolder.Exists)
-                throw new InvalidOperationException("3DMigoto folder does not exist");
+                throw new InvalidOperationException("加载器文件夹不存在");
 
             //_userIniWatcher = new FileSystemWatcher(_threeMigotoFolder.FullName, D3DX_USER_INI);
             //_userIniWatcher.Changed += OnUserIniChanged;

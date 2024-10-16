@@ -15,20 +15,20 @@
                 Height="40"
                 Command="{x:Bind PasteButtonCommand, Mode=OneWay}"
                 Icon="Paste"
-                Text="Paste Image" />
+                Text="粘贴图片" />
             <MenuFlyoutSeparator />
             <MenuFlyoutItem
                 Height="40"
                 Command="{x:Bind CopyButtonCommand, Mode=OneWay}"
                 Icon="Copy"
-                Text="Copy Image" />
+                Text="复制图片" />
             <MenuFlyoutSeparator />
             <MenuFlyoutSeparator />
             <MenuFlyoutSeparator />
             <MenuFlyoutItem
                 Command="{x:Bind ClearButtonCommand, Mode=OneWay}"
                 Icon="Delete"
-                Text="Clear image" />
+                Text="移除图片" />
         </MenuFlyout>
     </UserControl.Resources>
 

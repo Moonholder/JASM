@@ -41,8 +41,7 @@
                 Closed="MoveRowFlyout_OnClosed"
                 Opened="ModRowFlyout_OnOpened"
                 Opening="ModRowFlyout_OnOpening"
-                Placement="RightEdgeAlignedBottom"
-                ShouldConstrainToRootBounds="False">
+                Placement="RightEdgeAlignedBottom">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition />
@@ -56,7 +55,7 @@
                                 <TextBlock
                                     Margin="0,0,4,0"
                                     HorizontalAlignment="Left"
-                                    Text="Mods Selected:" />
+                                    Text="选中Mod数量:" />
                                 <TextBlock HorizontalAlignment="Left" Text="{x:Bind ViewModel.MoveModsFlyoutVM.SelectedModsCount, Mode=OneWay}" />
                             </StackPanel>
                             <Button
@@ -78,13 +77,13 @@
                             x:Name="MoveModsButton"
                             Margin="0,8,16,0"
                             Command="{x:Bind ViewModel.MoveModsFlyoutVM.MoveModsCommand}"
-                            Content="Move" />
+                            Content="移动" />
                         <StackPanel>
-                            <TextBlock Text="Move Mods To Another Character: " />
+                            <TextBlock Text="移动到另一个角色: " />
                             <AutoSuggestBox
                                 x:Name="MoveModSearchBox"
                                 ItemsSource="{x:Bind ViewModel.MoveModsFlyoutVM.SuggestedCharacters, Mode=OneWay}"
-                                PlaceholderText="Character Name"
+                                PlaceholderText="角色名"
                                 QuerySubmitted="MoveModSearch_OnQuerySubmitted"
                                 SuggestionChosen="MoveModSearch_OnSuggestionChosen"
                                 TextChanged="MoveModSearch_OnTextChanged"
@@ -96,7 +95,6 @@
                                 </AutoSuggestBox.ItemTemplate>
                             </AutoSuggestBox>
                         </StackPanel>
-
                     </StackPanel>
 
                     <StackPanel
@@ -109,7 +107,7 @@
                             HorizontalAlignment="Stretch"
                             VerticalAlignment="Top"
                             ExpandDirection="Down"
-                            Header="Move Mods to another Skin"
+                            Header="移动mod到另一个皮肤"
                             IsEnabled="{x:Bind ViewModel.MultipleInGameSkins, Mode=OneWay}"
                             IsExpanded="False">
                             <Expander.Content>
@@ -121,13 +119,13 @@
                                             <Button.Content>
                                                 <StackPanel Orientation="Horizontal">
                                                     <FontIcon Margin="0,0,4,0" Glyph="&#xE74E;" />
-                                                    <TextBlock Text="Override" />
+                                                    <TextBlock Text="覆盖" />
                                                 </StackPanel>
                                             </Button.Content>
                                         </Button>
 
                                         <StackPanel Margin="4,0,0,0" Visibility="{x:Bind ViewModel.MoveModsFlyoutVM.SelectedModHasCharacterSkinOverride, Mode=OneWay}">
-                                            <TextBlock Text="Override Skin Set To: " />
+                                            <TextBlock Text="覆盖皮肤设置为: " />
                                             <TextBlock HorizontalAlignment="Center" Text="{x:Bind ViewModel.MoveModsFlyoutVM.SelectedModCharacterSkinOverrideDisplayName, Mode=OneWay}" />
                                         </StackPanel>
                                     </StackPanel>
@@ -148,20 +146,20 @@
                     Height="40"
                     Click="ImageFlyout_PasteImage"
                     Icon="Paste"
-                    Text="Paste Image" />
+                    Text="粘贴图片" />
                 <MenuFlyoutSeparator />
                 <MenuFlyoutItem
                     Height="40"
                     Click="ImageFlyout_CopyImage"
                     Icon="Copy"
-                    Text="Copy Image" />
+                    Text="复制图片" />
                 <MenuFlyoutSeparator />
                 <MenuFlyoutSeparator />
                 <MenuFlyoutSeparator />
                 <MenuFlyoutItem
                     Command="{x:Bind ViewModel.ModPaneVM.ClearImageCommand}"
                     Icon="Delete"
-                    Text="Clear image" />
+                    Text="清除图片" />
             </MenuFlyout>
         </Grid.Resources>
 
@@ -205,7 +203,7 @@
                             <Button
                                 HorizontalAlignment="Center"
                                 Command="{x:Bind ViewModel.GoToModsOverviewCommand}"
-                                ToolTipService.ToolTip="Go to character in Mods Overview">
+                                ToolTipService.ToolTip="在Mods概览中进入角色页">
                                 <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xEA37;" />
                             </Button>
 
@@ -213,7 +211,7 @@
                             <Button
                                 HorizontalAlignment="Right"
                                 Command="{x:Bind ViewModel.GoToCharacterEditScreenCommand}"
-                                ToolTipService.ToolTip="Edit Character">
+                                ToolTipService.ToolTip="编辑角色">
                                 <FontIcon Glyph="&#xE70F;" />
                             </Button>
                         </StackPanel>
@@ -262,7 +260,7 @@
                             Margin="0,0,4,0"
                             VerticalAlignment="Center"
                             Style="{ThemeResource BodyTextStyle}"
-                            Text="Tracked Mods:" />
+                            Text="找到的Mod数量:" />
                         <TextBlock Style="{ThemeResource BodyTextStyle}" Text="{x:Bind ViewModel.ModListVM.Mods.Count, Mode=OneWay}" />
                     </StackPanel>
 
@@ -274,7 +272,7 @@
                         <TextBlock
                             Padding="0,0,0,16"
                             HorizontalAlignment="Center"
-                            Text="Selected In-Game Skin:" />
+                            Text="选择游戏内皮肤:" />
                         <TextBlock
                             HorizontalAlignment="Center"
                             FontFamily="{StaticResource GenshinFont}"
@@ -284,7 +282,7 @@
                         <Button
                             Margin="0,16,0,0"
                             HorizontalAlignment="Center"
-                            Content="Select Skin"
+                            Content="选择皮肤"
                             Flyout="{StaticResource SelectInGameSkin}"
                             IsEnabled="{x:Bind ViewModel.MultipleInGameSkins, Mode=OneWay}">
 
@@ -304,7 +302,7 @@
                     HorizontalAlignment="Center"
                     VerticalAlignment="Bottom"
                     Command="{x:Bind ViewModel.DisableAllModsCommand}"
-                    Content="Disable All Mods" />
+                    Content="禁用所有Mod" />
             </Grid>
 
 
@@ -322,24 +320,24 @@
 
                     <StackPanel Orientation="Horizontal">
                         <MenuBar>
-                            <MenuBarItem Title="Mods">
+                            <MenuBarItem Title="添加">
                                 <MenuBarItem.Items>
                                     <MenuFlyoutItem
                                         Command="{x:Bind ViewModel.AddModFolderCommand}"
-                                        ToolTipService.ToolTip="Add a mod folder"
-                                        Text="Add Mod..." />
+                                        ToolTipService.ToolTip="添加一个mod文件夹"
+                                        Text="添加文件夹..." />
 
                                     <MenuFlyoutItem
                                         Command="{x:Bind ViewModel.AddModArchiveCommand}"
-                                        ToolTipService.ToolTip="Add a mod inside a compressed archive"
-                                        Text="Add Archive...">
+                                        ToolTipService.ToolTip="在压缩归档文件中添加一个mod"
+                                        Text="添加压缩包...">
                                         <MenuFlyoutItem.KeyboardAccelerators>
                                             <KeyboardAccelerator Key="O" Modifiers="Control" />
                                         </MenuFlyoutItem.KeyboardAccelerators>
                                     </MenuFlyoutItem>
 
                                     <MenuFlyoutSeparator />
-                                    <MenuFlyoutItem Command="{x:Bind ViewModel.RefreshModsCommand}" Text="Refresh Mods">
+                                    <MenuFlyoutItem Command="{x:Bind ViewModel.RefreshModsCommand}" Text="刷新Mod列表">
                                         <MenuFlyoutItem.KeyboardAccelerators>
                                             <KeyboardAccelerator Key="F5" />
                                         </MenuFlyoutItem.KeyboardAccelerators>
@@ -347,10 +345,10 @@
                                 </MenuBarItem.Items>
                             </MenuBarItem>
 
-                            <MenuBarItem Title="Folders">
-                                <MenuFlyoutItem Command="{x:Bind ViewModel.OpenModsFolderCommand}" Text="Open Character's Mod folder..." />
+                            <MenuBarItem Title="文件夹">
+                                <MenuFlyoutItem Command="{x:Bind ViewModel.OpenModsFolderCommand}" Text="打开角色的Mod文件夹..." />
                                 <MenuFlyoutSeparator />
-                                <MenuFlyoutItem Command="{x:Bind ViewModel.OpenGIMIRootFolderCommand}" Text="Open 3Dmigoto Root folder..." />
+                                <MenuFlyoutItem Command="{x:Bind ViewModel.OpenGIMIRootFolderCommand}" Text="打开加载器根文件夹..." />
                             </MenuBarItem>
                         </MenuBar>
 
@@ -375,8 +373,8 @@
                         <ToggleSwitch
                             x:Name="ViewToggleSwitch"
                             IsOn="False"
-                            OffContent="Detailed View"
-                            OnContent="Gallery View"
+                            OffContent="详细视图"
+                            OnContent="画廊视图"
                             Toggled="ViewToggleSwitch_OnToggled" />
 
                         <Grid MinWidth="32">
@@ -425,7 +423,7 @@
                                         Width="SizeToHeader"
                                         CanUserResize="False"
                                         CanUserSort="True"
-                                        Header="Enabled"
+                                        Header="是否启用"
                                         Tag="IsEnabled">
 
                                         <controls:DataGridTemplateColumn.CellTemplate>
@@ -491,7 +489,7 @@
                                     <controls:DataGridTemplateColumn
                                         Width="SizeToCells"
                                         CanUserSort="True"
-                                        Header="Mod Name"
+                                        Header="Mod 名称"
                                         IsReadOnly="True"
                                         Tag="Name">
                                         <controls:DataGridTemplateColumn.CellTemplate>
@@ -510,7 +508,7 @@
                                         Width="SizeToCells"
                                         Binding="{Binding FolderName, Mode=OneWay}"
                                         CanUserSort="True"
-                                        Header="Mod Folder Name"
+                                        Header="Mod 文件夹名称"
                                         IsReadOnly="True"
                                         Tag="Folder Name" />
 
@@ -518,14 +516,14 @@
                                         Width="SizeToCells"
                                         Binding="{Binding Author, Mode=OneWay}"
                                         CanUserSort="True"
-                                        Header="Author"
+                                        Header="作者"
                                         IsReadOnly="True"
                                         Tag="Author Name" />
 
                                     <controls:DataGridTemplateColumn
                                         Width="SizeToCells"
                                         CanUserSort="True"
-                                        Header="Date Added"
+                                        Header="添加时间"
                                         IsReadOnly="True"
                                         Tag="Date Added">
                                         <controls:DataGridTemplateColumn.CellTemplate>
@@ -608,7 +606,7 @@
                                     IsEditMode="{x:Bind ViewModel.ModPaneVM.IsEditingModName, Mode=OneWay}"
                                     Style="{ThemeResource SubtitleTextBlockStyle}"
                                     TextAlignment="Center"
-                                    ToolTipService.ToolTip="Change mod display name"
+                                    ToolTipService.ToolTip="更改模组显示名称"
                                     Text="{x:Bind ViewModel.ModPaneVM.SelectedModModel.Name, Mode=TwoWay}" />
 
                                 <SplitButton
@@ -620,13 +618,13 @@
                                         <MenuFlyout Placement="Bottom">
                                             <MenuFlyoutItem
                                                 Command="{x:Bind ViewModel.ModPaneVM.SetModIniFileCommand}"
-                                                ToolTipService.ToolTip="Set the mod .ini file to be read by JASM"
-                                                Text="Set mod .ini file" />
+                                                ToolTipService.ToolTip="设置模组的 .ini 文件给 JASM 读取"
+                                                Text="设置 .ini 文件" />
                                             <MenuFlyoutItem
                                                 Command="{x:Bind ViewModel.ModPaneVM.ClearSetModIniFileCommand}"
                                                 Icon="Clear"
-                                                ToolTipService.ToolTip="JASM will not look for merged.ini/Script.ini file and ignore keyswaps for this mod"
-                                                Text="Ignore .ini file for this mod" />
+                                                ToolTipService.ToolTip="JASM 将不会查找 merged.ini/Script.ini 文件，并会忽略此模组的键位切换(KeySwaps)"
+                                                Text="忽略此模组的 .ini 文件" />
                                         </MenuFlyout>
                                     </SplitButton.Flyout>
 
@@ -640,7 +638,7 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBox
                                     VerticalAlignment="Center"
-                                    Header="Mod Url:"
+                                    Header="Mod 链接:"
                                     IsEnabled="{x:Bind ViewModel.ModPaneVM.IsReadOnlyMode, Mode=OneWay, Converter={StaticResource BoolInverter}}"
                                     Text="{x:Bind ViewModel.ModPaneVM.SelectedModModel.ModUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
@@ -711,7 +709,7 @@
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Top"
                                             TextWrapping="WrapWholeWords"
-                                            Text="Key swap management is disabled for this mod" />
+                                            Text="该模组的键位切换管理已被禁用" />
 
                                     </controls:Case>
                                 </controls:SwitchPresenter>
@@ -732,7 +730,7 @@
                                     <Button.Content>
                                         <StackPanel Orientation="Horizontal">
                                             <FontIcon Margin="0,0,4,0" Glyph="&#xE74E;" />
-                                            <TextBlock Text="Save" />
+                                            <TextBlock Text="保存" />
                                         </StackPanel>
                                     </Button.Content>
                                     <Button.KeyboardAccelerators>
@@ -757,7 +755,7 @@
                                             Padding="4,0"
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Center"
-                                            Text="Mod Enabled" />
+                                            Text="Mod 已启用" />
                                     </Border>
 
                                 </Grid>
@@ -767,7 +765,7 @@
                                     Grid.Column="2"
                                     HorizontalAlignment="Right"
                                     Command="{x:Bind ViewModel.ModPaneVM.OpenModFolderCommand}"
-                                    Content="Open Mod Folder..."
+                                    Content="打开所在文件夹..."
                                     IsEnabled="{x:Bind ViewModel.ModPaneVM.IsReadOnlyMode, Mode=OneWay, Converter={StaticResource BoolInverter}}" />
                             </Grid>
                         </Grid>

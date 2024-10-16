@@ -59,7 +59,7 @@
                 <AppBarButton
                     Command="{x:Bind ViewModel.AddModsToPresetCommand}"
                     Icon="Add"
-                    Label="Add Mod" />
+                    Label="添加 Mod" />
             </CommandBar>
 
             <TextBox
@@ -69,7 +69,7 @@
                 MaxHeight="32"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Center"
-                PlaceholderText="Search Mods..."
+                PlaceholderText="搜索 Mods..."
                 TextChanged="SearchBox_OnTextChanged" />
         </Grid>
 
@@ -152,7 +152,7 @@
                                             Command="{x:Bind ReplaceMissingModCommand}"
                                             CommandParameter="{Binding Mode=OneWay}"
                                             Visibility="{x:Bind IsMissing, Converter={StaticResource BoolToVisibilityConverter}}"
-                                            Text="Find Replacement Mod">
+                                            Text="寻找替代Mod">
                                             <MenuFlyoutItem.Icon>
                                                 <FontIcon Glyph="&#xE8DA;" />
                                             </MenuFlyoutItem.Icon>
@@ -160,9 +160,9 @@
                                         <MenuFlyoutItem
                                             Command="{x:Bind ReadAndSavePreferencesCommand}"
                                             CommandParameter="{Binding Mode=OneWay}"
-                                            ToolTipService.ToolTip="Read current 3Dmigoto user ini for his mod and save preference for this preset"
+                                            ToolTipService.ToolTip="读取当前 3Dmigoto 用户的 ini 文件(d3dxUser.ini)，并为该预设保存偏好设置"
                                             Visibility="{x:Bind IsNotMissing, Converter={StaticResource BoolToVisibilityConverter}}"
-                                            Text="Read and Save Preferences">
+                                            Text="读取并保存首选项">
                                             <MenuFlyoutItem.Icon>
                                                 <FontIcon Glyph="&#xE74E;" />
                                             </MenuFlyoutItem.Icon>
@@ -171,7 +171,7 @@
                                         <MenuFlyoutItem
                                             Command="{x:Bind RemoveModFromPresetCommand}"
                                             CommandParameter="{Binding Mode=OneTime}"
-                                            Text="Remove Mod From Preset">
+                                            Text="从预设中移除Mod">
                                             <MenuFlyoutItem.Icon>
                                                 <FontIcon Glyph="&#xE894;" />
                                             </MenuFlyoutItem.Icon>
@@ -216,7 +216,7 @@
                                     Text="{x:Bind ModUrlName}" />
 
                                 <StackPanel>
-                                    <TextBlock HorizontalAlignment="Center" Text="Added To Preset At:" />
+                                    <TextBlock HorizontalAlignment="Center" Text="预设添加于:" />
                                     <TextBlock HorizontalAlignment="Center" Text="{x:Bind AddedAt}" />
                                 </StackPanel>
 

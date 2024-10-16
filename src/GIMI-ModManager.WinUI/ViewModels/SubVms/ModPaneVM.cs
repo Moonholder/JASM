@@ -139,9 +139,7 @@ public partial class ModPaneVM : ObservableRecipient
         filePicker.CommitButtonText = "Set Image";
         var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
         WinRT.Interop.InitializeWithWindow.Initialize(filePicker, hwnd);
-
         var file = await filePicker.PickSingleFileAsync();
-
         if (file == null) return;
         var imageUri = new Uri(file.Path);
         SelectedModModel!.ImagePath = imageUri;

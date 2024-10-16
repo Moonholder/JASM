@@ -1,4 +1,5 @@
 ﻿using GIMI_ModManager.Core.Entities.Mods.FileModels;
+using System.Text.RegularExpressions;
 
 namespace GIMI_ModManager.Core.Helpers;
 
@@ -23,8 +24,14 @@ public static class IniConfigHelpers
             else if (IsIniKey(line, IniKeySwapSection.TypeIniKey))
                 skinModKeySwap.Type = GetIniValue(line);
 
-            else if (IsIniKey(line, IniKeySwapSection.SwapVarIniKey))
-                skinModKeySwap.SwapVar = GetIniValue(line)?.Split(',');
+            else if (Regex.IsMatch(line, @"^\s*\$\w+\s*=\s*\d+(,\d+)+"))
+            {
+                var value = GetIniValue(line);
+                if (!string.IsNullOrEmpty(value))
+                {
+                    skinModKeySwap.SwapVar = value.Split(',');
+                }
+            }
 
             else if (IsSection(line))
                 break;

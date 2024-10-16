@@ -74,7 +74,7 @@ public sealed partial class PresetDetailsViewModel(
 
         var readOnlyText = isReadOnly ? " (Read-Only)" : string.Empty;
 
-        return $"Preset Details: {PresetName} ({modCountText}){readOnlyText}";
+        return $"预设详情: {PresetName} ({modCountText}){readOnlyText}";
     }
 
     public async void OnNavigatedTo(object parameter)
@@ -404,7 +404,7 @@ public sealed partial class PresetDetailsViewModel(
         var window = new WindowEx()
         {
             SystemBackdrop = new MicaBackdrop(),
-            Title = "Select Mods",
+            Title = "选择 Mods",
             Content = modSelector,
             Width = 1200,
             Height = 750,

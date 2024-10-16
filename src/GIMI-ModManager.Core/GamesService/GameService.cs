@@ -115,11 +115,14 @@ public class GameService : IGameService
     }
 
 
-    public static async Task<GameInfo?> GetGameInfoAsync(SupportedGames game)
+    public async Task<GameInfo?> GetGameInfoAsync(SupportedGames game)
     {
-        var gameAssetDir = Path.Combine(AppContext.BaseDirectory, "Assets", "Games", game.ToString());
+        var currentLanguage = _localizer.CurrentLanguage; 
+        string gameAssetDir = Path.Combine(AppContext.BaseDirectory, "Assets", "Games", game.ToString()), assetDir = gameAssetDir;
+        if (currentLanguage.LanguageCode == "zh-cn") 
+            assetDir = Path.Combine(AppContext.BaseDirectory, "Assets", "Games", game.ToString(), "Languages", "zh-cn");
 
-        var gameFilePath = Path.Combine(gameAssetDir, "game.json");
+        var gameFilePath = Path.Combine(assetDir, "game.json"); 
 
         if (!File.Exists(gameFilePath))
             return null;

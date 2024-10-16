@@ -96,11 +96,30 @@ public class SkinMod : Mod, ISkinMod
 
     private static string? HasMergedInIFile(DirectoryInfo modDirectory)
     {
-        var mergedIniPath = modDirectory.EnumerateFiles("*.ini", SearchOption.TopDirectoryOnly)
-            .FirstOrDefault(iniFiles =>
+            //     var mergedIniPath = modDirectory.EnumerateFiles("*.ini", SearchOption.TopDirectoryOnly)
+            // .FirstOrDefault(iniFiles =>
+            //     Constants.ScriptIniNames.Any(iniNames =>
+            //         iniNames.Equals(iniFiles.Name, StringComparison.OrdinalIgnoreCase)))
+            // ?.FullName;
+
+        // 获取目录及其子目录中的所有 INI 文件
+        var iniFiles = modDirectory.EnumerateFiles("*.ini", SearchOption.AllDirectories).ToList();
+
+        // 如果只有一个 INI 文件，直接返回该文件的路径
+        if (iniFiles.Count == 1)
+        {
+            return iniFiles.First().FullName;
+        }
+
+        // 否则，继续执行原有的逻辑
+        var mergedIniPath = iniFiles
+            .Where(iniFile =>
                 Constants.ScriptIniNames.Any(iniNames =>
-                    iniNames.Equals(iniFiles.Name, StringComparison.OrdinalIgnoreCase)))
-            ?.FullName;
+                    iniNames.Equals(iniFile.Name, StringComparison.OrdinalIgnoreCase)) ||
+                Constants.ScriptIniPrefixes.Any(prefix =>
+                    iniFile.Name.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)))
+            .FirstOrDefault()?.FullName;
+
 
         return mergedIniPath;
     }
@@ -140,6 +159,9 @@ public class SkinMod : Mod, ISkinMod
             await Settings.SaveSettingsAsync(settings).ConfigureAwait(false);
             modIniPath = iniPath;
         }
+
+        // 将路径中的转义字符还原
+        modIniPath = Uri.UnescapeDataString(modIniPath);
 
         if (!File.Exists(modIniPath))
         {

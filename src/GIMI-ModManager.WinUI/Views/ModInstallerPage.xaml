@@ -20,20 +20,20 @@
             <MenuFlyoutItem
                 Command="{x:Bind ViewModel.SetModPreviewImageCommand, Mode=OneWay}"
                 CommandParameter="{Binding}"
-                Text="Set mod preview image" />
+                Text="设置mod预览图" />
         </MenuFlyout>
 
         <MenuFlyout x:Name="FolderFlyout">
             <MenuFlyoutItem
                 Command="{x:Bind ViewModel.SetRootFolderCommand, Mode=OneWay}"
                 CommandParameter="{Binding}"
-                Text="Set Root Mod Folder" />
+                Text="设置Mod根目录" />
             <!--  TODO: Enable Later  -->
             <MenuFlyoutItem
                 Command="{x:Bind ViewModel.SetShaderFixesFolderCommand}"
                 CommandParameter="{Binding}"
                 Visibility="Collapsed"
-                Text="Set ShaderFixes Folder" />
+                Text="设置ShaderFixes文件夹" />
         </MenuFlyout>
 
         <DataTemplate x:Key="RootFolderTemplate" x:DataType="viewModels:RootFolder">
@@ -87,8 +87,8 @@
     <Grid>
         <ContentDialog
             x:Name="DuplicateModDialog"
-            Title="A folder with the same name exists"
-            CloseButtonText="Cancel"
+            Title="存在同名的文件夹"
+            CloseButtonText="取消"
             DefaultButton="Primary"
             IsPrimaryButtonEnabled="{x:Bind ViewModel.CanExecuteDialogCommand, Mode=OneWay}"
             PrimaryButtonCommand="{x:Bind ViewModel.AddModDialogCommand, Mode=OneWay}"
@@ -104,7 +104,7 @@
                     <InfoBar
                         IsClosable="False"
                         IsOpen="True"
-                        Message="1. You can choose to overwrite the old mod, deleting it.&#x0a;Or&#x0a;2. You can rename either the new or the old mod"
+                        Message="1. 你可以选择覆盖旧模组, 从而删除它.&#x0a;Or&#x0a;2. 你可以重命名新模组或旧模组中的任意一个"
                         Severity="Warning" />
 
                     <Grid Grid.Row="1">
@@ -118,13 +118,13 @@
                             <TextBlock Text="New Mod:" />
                             <TextBox
                                 Margin="4"
-                                Header="Custom name"
+                                Header="自定义名称"
                                 IsEnabled="{x:Bind ViewModel.OverwriteExistingMod, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}"
                                 PlaceholderText="CustomName"
                                 Text="{x:Bind ViewModel.CustomName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                             <TextBox
                                 Margin="4"
-                                Header="Folder name"
+                                Header="文件夹名称"
                                 IsEnabled="{x:Bind ViewModel.OverwriteExistingMod, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}"
                                 PlaceholderText="FolderName"
                                 Text="{x:Bind ViewModel.ModFolderName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
@@ -134,13 +134,13 @@
                             <TextBlock Text="Other Mod:" />
                             <TextBox
                                 Margin="4"
-                                Header="Custom name"
+                                Header="自定义名称"
                                 IsEnabled="{x:Bind ViewModel.OverwriteExistingMod, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}"
                                 PlaceholderText="CustomName"
                                 Text="{x:Bind ViewModel.DuplicateModCustomName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                             <TextBox
                                 Margin="4"
-                                Header="Folder name"
+                                Header="文件夹名称"
                                 IsEnabled="{x:Bind ViewModel.OverwriteExistingMod, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}"
                                 PlaceholderText="FolderName"
                                 Text="{x:Bind ViewModel.DuplicateModFolderName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
@@ -152,15 +152,15 @@
                     <StackPanel Grid.Row="2">
                         <CheckBox
                             Margin="4"
-                            Content="Overwrite existing mod"
+                            Content="覆盖现有mod"
                             IsChecked="{x:Bind ViewModel.OverwriteExistingMod, Mode=TwoWay}" />
 
                         <CheckBox
                             Margin="4"
                             Command="{x:Bind ViewModel.ToggleReplaceDuplicateModInPresetCommand}"
                             IsChecked="{x:Bind ViewModel.ReplaceDuplicateModInPreset, Mode=OneWay}"
-                            ToolTipService.ToolTip="The duplicate mod will be replaced in presets by the newly installed mod. This is mutually exclusive with the 'replace old mod in presets' checkbox.">
-                            <TextBlock TextWrapping="WrapWholeWords" Text="Replace duplicate mod in presets with new mod" />
+                            ToolTipService.ToolTip="重复的模组将在预设中被新安装的模组替换。该选项与'在预设中替换旧模组'复选框是互斥的.">
+                            <TextBlock TextWrapping="WrapWholeWords" Text="用新的mod替换预设中重复的mod" />
                         </CheckBox>
                     </StackPanel>
 
@@ -196,7 +196,7 @@
                     VerticalAlignment="Top"
                     Command="{x:Bind ViewModel.ToggleAlwaysOnTopCommand}"
                     IsChecked="{x:Bind ViewModel.AlwaysOnTop, Mode=TwoWay}"
-                    ToolTipService.ToolTip="Keep window always on top">
+                    ToolTipService.ToolTip="保持窗口始终置顶">
                     <FontIcon Glyph="&#xE718;" />
                 </ToggleButton>
                 <controls:CustomImage
@@ -214,7 +214,7 @@
                     HorizontalAlignment="Left"
                     VerticalAlignment="Bottom"
                     Command="{x:Bind ViewModel.ReRetrieveModInfoCommand}"
-                    ToolTipService.ToolTip="Retrieve mod info from the mod page">
+                    ToolTipService.ToolTip="从mod页面检索mod信息">
                     <Button.Content>
                         <FontIcon Glyph="&#xE72C;" />
                     </Button.Content>
@@ -228,28 +228,28 @@
 
                 <TextBox
                     Grid.Row="1"
-                    Header="Mod page url"
+                    Header="Mod页面URL"
                     IsReadOnly="{x:Bind ViewModel.IsRetrievingModInfo, Mode=OneWay}"
                     KeyDown="UrlTextBox_KeyDown"
-                    PlaceholderText="Paste URL to auto populate fields (GameBanana only)"
+                    PlaceholderText="粘贴 URL 以自动填充字段 (仅支持 GameBanana)"
                     Text="{x:Bind ViewModel.ModUrl, Mode=TwoWay}" />
                 <TextBox
                     Grid.Row="2"
-                    Header="Mod Custom Name"
+                    Header="Mod自定义名称"
                     IsReadOnly="{x:Bind ViewModel.IsRetrievingModInfo, Mode=OneWay}"
-                    PlaceholderText="Custom Name display throughout JASM"
+                    PlaceholderText="在整个JASM中显示自定义名称"
                     Text="{x:Bind ViewModel.CustomName, Mode=TwoWay}" />
                 <TextBox
                     Grid.Row="3"
-                    Header="Author"
+                    Header="作者"
                     IsReadOnly="{x:Bind ViewModel.IsRetrievingModInfo, Mode=OneWay}"
                     Text="{x:Bind ViewModel.Author, Mode=TwoWay}" />
                 <TextBox
                     Grid.Row="4"
                     Height="100"
                     AcceptsReturn="True"
-                    Header="Description"
-                    PlaceholderText="The description is currently not shown anywhere in JASM"
+                    Header="描述"
+                    PlaceholderText="该描述目前没有显示在JASM中的任何地方"
                     Text="{x:Bind ViewModel.Description, Mode=TwoWay}" />
             </Grid>
 
@@ -290,7 +290,7 @@
 
                     <StackPanel Margin="0,8,0,12" Orientation="Horizontal">
                         <FontIcon Margin="4,0" Glyph="{x:Bind ViewModel.RootFolderIcon}" />
-                        <TextBlock Margin="4,0" Text="ModFolder:" />
+                        <TextBlock Margin="4,0" Text="解压目录:" />
                         <TextBlock Text="{x:Bind ViewModel.LastSelectedRootFolder.Name, Mode=OneWay, FallbackValue=Unknown}" />
                         <FontIcon Margin="4,0" Glyph="&#xEA62;" />
                         <TextBlock Text="{x:Bind ViewModel.ModCharacterName, Mode=OneWay}" />
@@ -301,7 +301,7 @@
 
                     <StackPanel Orientation="Horizontal">
                         <FontIcon Margin="4,0" Glyph="{x:Bind ViewModel.SelectedImageIcon}" />
-                        <TextBlock Margin="4,0" Text="Preview Image Source:" />
+                        <TextBlock Margin="4,0" Text="预览图片来源:" />
                         <TextBlock Text="{x:Bind ViewModel.ImageSource, Mode=OneWay}" />
                     </StackPanel>
                     <StackPanel
@@ -321,19 +321,19 @@
                         Padding="8"
                         HorizontalAlignment="Left"
                         TextWrapping="WrapWholeWords"
-                        Text="Here you can select the root of the mod folder." />
+                        Text="在这里你可以选择mod文件夹的根目录." />
 
                     <TextBlock
                         Padding="8"
                         HorizontalAlignment="Left"
                         TextWrapping="WrapWholeWords"
-                        Text="This is usually the folder that contains the 'merged.ini/Script.ini' or '.JASM_ModConfig.json'.&#x0a;JASM will automatically detect the mod folder and the merged.ini file. If you want to manually select the mod folder, you can do so by right clicking the folder in the overview above. " />
+                        Text="“这通常是包含 'merged.ini/Script.ini' 或 '.JASM_ModConfig.json' 的文件夹。JASM 会自动检测模组文件夹和 merged.ini 文件。如果你想手动选择模组文件夹，可以通过右键点击上方概述中的文件夹来实现. " />
 
                     <TextBlock
                         Padding="8"
                         HorizontalAlignment="Left"
                         TextWrapping="WrapWholeWords"
-                        Text="You can also manually select image file for the mod preview image. It's usually fine to just press 'Add Mod'" />
+                        Text="你也可以手动选择模组预览图像的图像文件。通常只需按下 '添加Mod' 就可以了" />
 
 
 
@@ -385,17 +385,17 @@
                     <CheckBox
                         Margin="4,0"
                         Command="{x:Bind ViewModel.EnableOnlyToggleCommand}"
-                        Content="Enable this mod and disable others?"
+                        Content="启用此模组并禁用其他模组?"
                         IsChecked="{x:Bind ViewModel.EnableThisMod, Mode=OneWay}"
-                        ToolTipService.ToolTip="This will enable this mod and disable all other mods. If a character then it will only disable for that characters skin" />
+                        ToolTipService.ToolTip="这将启用此模组并禁用所有其他模组。如果是某个角色，则只会禁用该角色的皮肤" />
 
 
                     <CheckBox
                         Grid.Column="1"
                         Command="{x:Bind ViewModel.ToggleReplaceModToUpdateInPresetCommand}"
-                        Content="Replace mod to update with new mod in presets"
+                        Content="在预设中使用新模组替换要更新的模组"
                         IsChecked="{x:Bind ViewModel.ReplaceModToUpdateInPreset, Mode=OneWay}"
-                        ToolTipService.ToolTip="This will replace the old mod with an update with this new installed mod for all presets. This checkbox is separate from the checkbox for when a duplicate mod is detected"
+                        ToolTipService.ToolTip="这将用新安装的模组更新所有预设中的旧模组。该复选框与检测到重复模组时的复选框是分开的"
                         Visibility="{x:Bind ViewModel.IsUpdatingMod, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
 
                     <Button
@@ -403,7 +403,7 @@
                         Margin="4,0"
                         HorizontalAlignment="Right"
                         Command="{x:Bind ViewModel.AddModCommand}"
-                        Content="Add Mod">
+                        Content="添加Mod">
                         <Button.KeyboardAccelerators>
                             <KeyboardAccelerator Key="S" Modifiers="Control" />
                         </Button.KeyboardAccelerators>

@@ -46,7 +46,7 @@
                 <MenuFlyoutItem
                     Command="{x:Bind ViewModel.ClearNotificationsCommand}"
                     CommandParameter="{Binding}"
-                    Text="Clear Notifications">
+                    Text="清除通知">
                     <MenuFlyoutItem.Icon>
                         <FontIcon Glyph="&#xE894;" />
                     </MenuFlyoutItem.Icon>
@@ -62,11 +62,11 @@
 
         <ContentDialog
             x:Name="SelectProcessDialog"
-            Title="Select Process Path"
+            Title="选择启动进程路径"
             DefaultButton="Primary"
             IsPrimaryButtonEnabled="{x:Bind ViewModel.SimpleSelectProcessDialogVM.PathPicker.IsValid, Mode=OneWay}"
-            PrimaryButtonText="Save"
-            SecondaryButtonText="Cancel">
+            PrimaryButtonText="保存"
+            SecondaryButtonText="取消">
             <Grid MinWidth="500" MinHeight="200">
 
                 <Grid.RowDefinitions>
@@ -80,7 +80,7 @@
                         Margin="0,0,0,8"
                         IsTextSelectionEnabled="True"
                         TextWrapping="WrapWholeWords"
-                        Text="Select the path to the process you want to start. Once saved this will be started when pressing the start button. This can be reset on the settings page." />
+                        Text="选择您想要启动的进程的路径。保存后，按下启动按钮时将启动此进程。这可以在设置页面重置." />
 
                     <controls1:FolderSelector
                         Title=""
@@ -97,7 +97,7 @@
                     Grid.Row="1"
                     HorizontalAlignment="Right"
                     Command="{x:Bind ViewModel.SimpleSelectProcessDialogVM.ShowAdvancedDialogCommand}"
-                    Content="Create Advanced Command" />
+                    Content="创建高级命令" />
 
 
             </Grid>
@@ -144,7 +144,7 @@
                     Margin="0,0,8,0"
                     VerticalAlignment="Center"
                     TextWrapping="WrapWholeWords"
-                    Text="Sort by:" />
+                    Text="排序方式:" />
 
                 <ComboBox
                     x:Name="SortingComboBox"
@@ -167,12 +167,12 @@
 
                 <Button
                     Command="{x:Bind ViewModel.RefreshModsInGameCommand}"
-                    Content="Refresh Mods"
+                    Content="刷新 Mods"
                     IsHitTestVisible="True" />
                 <Button
                     Margin="32,0,32,0"
                     Command="{x:Bind ViewModel.Start3DmigotoCommand}"
-                    Content="Start 3Dmigoto">
+                    Content="启动Mod加载器">
                     <ToolTipService.ToolTip>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock TextWrapping="WrapWholeWords" Text="{x:Bind ViewModel.ThreeDMigtoProcessManager.ProcessPath, Mode=OneWay}" />
@@ -218,7 +218,7 @@
                 CornerRadius="8"
                 Orientation="Horizontal">
                 <CommandBar DefaultLabelPosition="Right" IsOpen="False">
-                    <AppBarButton Label="Mod Presets">
+                    <AppBarButton Label="Mod 预设">
                         <AppBarButton.Icon>
                             <FontIcon Glyph="&#xEA41;" />
                         </AppBarButton.Icon>
@@ -226,7 +226,7 @@
                             <Flyout Placement="Bottom">
                                 <ScrollViewer Margin="-4">
                                     <StackPanel Spacing="8">
-                                        <TextBlock Text="Apply Preset:" />
+                                        <TextBlock Text="应用预设:" />
                                         <ItemsRepeater ItemsSource="{x:Bind ViewModel.ModPresets}">
                                             <ItemsRepeater.Layout>
                                                 <StackLayout Orientation="Vertical" Spacing="8" />
@@ -251,7 +251,7 @@
                             </Flyout>
                         </AppBarButton.Flyout>
                     </AppBarButton>
-                    <AppBarButton Icon="Filter" Label="Filters">
+                    <AppBarButton Icon="Filter" Label="筛选">
 
                         <AppBarButton.Flyout>
                             <Flyout>
@@ -316,7 +316,7 @@
                     VerticalAlignment="Center"
                     Style="{ThemeResource SubtitleTextBlockStyle}"
                     TextWrapping="NoWrap"
-                    Text="Drop Here to Auto Detect Mod..." />
+                    Text="拖到这里自动检测Mod..." />
 
             </Grid>
 

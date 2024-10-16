@@ -134,13 +134,13 @@ public partial class CreateCommandViewModel : ObservableObject
 
     private string? SetEffectiveWorkingDirectory()
     {
-        const string prefix = "Effective working directory: ";
+        const string prefix = "有效工作目录: ";
         var jasmWorkingDirectory = App.ROOT_DIR;
         string? workingDirectory = null;
 
         if (!IsValidWorkingDirectory())
         {
-            EffectiveWorkingDirectory = prefix + "Invalid working directory";
+            EffectiveWorkingDirectory = prefix + "无效的工作目录";
             return null;
         }
 

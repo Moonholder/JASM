@@ -134,7 +134,7 @@ public class Character : ICharacter, IEquatable<Character>
         {
             InternalName = new InternalName("Default_" + character.InternalName),
             ModFilesName = character.ModFilesName,
-            DisplayName = "Default",
+            DisplayName = "默认",
             Rarity = character.Rarity,
             ReleaseDate = character.ReleaseDate,
             Character = character,

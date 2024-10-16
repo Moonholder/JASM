@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AppDisplayName" xml:space="preserve">
-    <value>JASM - Just Another Skin Manager</value>
+    <value>JASM - Just Another Skin Manager 汉化版 by Lacus_Temporis</value>
   </data>
   <data name="AppDescription" xml:space="preserve">
     <value>JASM - Just Another Skin Manager</value>
@@ -215,4 +215,8 @@
   <data name="Running" xml:space="preserve">
     <value>运行中</value>
   </data>
+  <data name="Overview" xml:space="preserve">
+    <value>概览</value>
+  </data>
+
 </root>

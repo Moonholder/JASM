@@ -100,7 +100,7 @@
                         TextTrimming="CharacterEllipsis" />
 
                     <Button
-                        Content="Select Skin"
+                        Content="选择皮肤"
                         Flyout="{StaticResource SelectInGameSkin}"
                         IsEnabled="{x:Bind ViewModel.MultipleCharacterSkins, Mode=OneWay}">
                         <Button.KeyboardAccelerators>
@@ -118,7 +118,7 @@
                 <TextBlock
                     Margin="0,0,8,0"
                     VerticalAlignment="Center"
-                    Text="Sort by:"
+                    Text="排序方式:"
                     TextWrapping="WrapWholeWords" />
 
                 <ComboBox
@@ -128,9 +128,9 @@
                     PlaceholderText="Sort Mods..."
                     SelectionChanged="SortingComboBox_OnSelectionChanged"
                     SelectionChangedTrigger="Committed">
-                    <ComboBoxItem Content="Date Added" Tag="DateAdded" />
-                    <ComboBoxItem Content="Folder Name" Tag="FolderName" />
-                    <ComboBoxItem Content="Name" Tag="Name" />
+                    <ComboBoxItem Content="添加时间" Tag="DateAdded" />
+                    <ComboBoxItem Content="文件夹名" Tag="FolderName" />
+                    <ComboBoxItem Content="Mod名称" Tag="Name" />
                 </ComboBox>
 
                 <ToggleButton
@@ -152,11 +152,11 @@
 
 
                 <Button>
-                    <TextBlock Text="View" />
+                    <TextBlock Text="设置" />
                     <Button.Flyout>
                         <Flyout>
                             <StackPanel MinWidth="200" Spacing="8">
-                                <TextBlock Text="Adjust Height:" />
+                                <TextBlock Text="调整网格高度:" />
                                 <Slider
                                     x:Name="GridItemHeightSlider"
                                     Maximum="500"
@@ -164,7 +164,7 @@
                                     SnapsTo="Ticks"
                                     TickFrequency="50"
                                     Value="{x:Bind ViewModel.GridItemHeight, Mode=TwoWay}" />
-                                <TextBlock Text="Adjust Desired Width:" />
+                                <TextBlock Text="调整网格宽度:" />
                                 <Slider
                                     x:Name="GridItemWithSlider"
                                     Maximum="800"
@@ -178,8 +178,8 @@
                                         HorizontalAlignment="Left"
                                         Command="{x:Bind ViewModel.ToggleSingleSelectionCommand}"
                                         IsChecked="{x:Bind ViewModel.IsSingleSelection, Mode=OneWay}"
-                                        ToolTipService.ToolTip="Selecting this will only allow one mod to be enabled at a time.">
-                                        Single Select
+                                        ToolTipService.ToolTip="选择此选项将只允许一次启用一个mod.">
+                                        Mod单选
                                     </CheckBox>
                                 </StackPanel>
                             </StackPanel>
@@ -192,15 +192,15 @@
                     Height="32"
                     MinWidth="200"
                     MaxWidth="320"
-                    PlaceholderText="Search Mods..."
+                    PlaceholderText="搜索 Mods..."
                     TextChanged="ModSearchBox_OnTextChanged" />
 
 
                 <ToggleSwitch
                     x:Name="ViewToggleSwitch"
                     IsOn="True"
-                    OffContent="Detailed View"
-                    OnContent="Gallery View"
+                    OffContent="详细视图"
+                    OnContent="画廊视图"
                     Toggled="ViewToggleSwitch_OnToggled" />
 
                 <Grid MinWidth="32">
@@ -309,7 +309,7 @@
                                                         <MenuFlyoutItem
                                                             Command="{x:Bind OpenModFolderCommand}"
                                                             CommandParameter="{x:Bind Mode=OneWay}"
-                                                            Text="Open Mod Folder...">
+                                                            Text="打开Mod文件夹...">
                                                             <MenuFlyoutItem.Icon>
                                                                 <FontIcon Glyph="&#xE838;" />
                                                             </MenuFlyoutItem.Icon>
@@ -318,7 +318,7 @@
                                                         <MenuFlyoutItem
                                                             Command="{x:Bind OpenModUrlCommand}"
                                                             CommandParameter="{x:Bind Mode=OneWay}"
-                                                            Text="Open Mod Page...">
+                                                            Text="打开Mod网址...">
                                                             <MenuFlyoutItem.Icon>
                                                                 <FontIcon Glyph="&#xE8A7;" />
                                                             </MenuFlyoutItem.Icon>
@@ -326,7 +326,7 @@
                                                         <MenuFlyoutItem
                                                             Command="{x:Bind DeleteModCommand}"
                                                             CommandParameter="{x:Bind Mode=OneWay}"
-                                                            Text="Delete Mod">
+                                                            Text="删除此Mod">
                                                             <MenuFlyoutItem.Icon>
                                                                 <FontIcon Glyph="&#xE74D;" />
                                                             </MenuFlyoutItem.Icon>
@@ -363,7 +363,7 @@
                                                 VerticalAlignment="Center"
                                                 Orientation="Horizontal"
                                                 Spacing="8">
-                                                <TextBlock Text="Author:" />
+                                                <TextBlock Text="作者:" />
                                                 <TextBlock
                                                     IsTextSelectionEnabled="True"
                                                     Text="{x:Bind Author, Mode=OneWay}"
@@ -379,7 +379,7 @@
                                                 VerticalAlignment="Center"
                                                 Orientation="Horizontal"
                                                 Spacing="4">
-                                                <TextBlock Text="Added:" />
+                                                <TextBlock Text="添加时间:" />
                                                 <TextBlock Text="{x:Bind TimeSinceFormated, Mode=OneWay}" ToolTipService.ToolTip="{x:Bind DateAddedView, Mode=OneWay}" />
                                             </StackPanel>
 

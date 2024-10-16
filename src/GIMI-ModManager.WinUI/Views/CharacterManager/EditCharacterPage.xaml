@@ -30,7 +30,7 @@
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
             <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal">
-                <TextBlock VerticalAlignment="Center" Text="Mod Folder Path:" />
+                <TextBlock VerticalAlignment="Center" Text="角色模组文件夹:" />
                 <controls:LinkButton
                     Link="{x:Bind ViewModel.ModFolderUri, Mode=TwoWay}"
                     Text="{x:Bind ViewModel.ModFolderString, Mode=TwoWay}"
@@ -42,18 +42,18 @@
                 Grid.Column="1"
                 HorizontalAlignment="Right"
                 Command="{x:Bind ViewModel.DisableCharacterCommand, Mode=OneWay}"
-                Content="Disable Character"
+                Content="禁用角色"
                 IsEnabled="{x:Bind ViewModel.CharacterStatus.IsEnabled, Mode=OneWay}"
-                ToolTipService.ToolTip="Opens a popup first with more information"
+                ToolTipService.ToolTip="首先打开一个弹出窗口，显示更多信息"
                 Visibility="{x:Bind ViewModel.CharacterStatus.IsEnabled, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
 
             <Button
                 Grid.Column="1"
                 HorizontalAlignment="Right"
                 Command="{x:Bind ViewModel.EnableCharacterCommand, Mode=OneWay}"
-                Content="Enable Character"
+                Content="启用角色"
                 IsEnabled="{x:Bind ViewModel.CharacterStatus.IsDisabled, Mode=OneWay}"
-                ToolTipService.ToolTip="Opens a popup first with more information"
+                ToolTipService.ToolTip="首先打开一个弹出窗口，显示更多信息"
                 Visibility="{x:Bind ViewModel.CharacterStatus.IsDisabled, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
 
 
@@ -84,7 +84,7 @@
                         Margin="0,4"
                         Background="{ThemeResource ControlFillColorSecondaryBrush}"
                         Orientation="Horizontal">
-                        <TextBlock Margin="0,0,16,0" Text="Internal Name (Id): " />
+                        <TextBlock Margin="0,0,16,0" Text="内部名称 (Id): " />
                         <TextBlock IsTextSelectionEnabled="True" Text="{x:Bind ViewModel.CharacterVm.InternalName}" />
                     </StackPanel>
 
@@ -92,7 +92,7 @@
                     <TextBlock
                         Grid.Row="2"
                         Margin="0,8,0,8"
-                        Text="Set Display Name:" />
+                        Text="设置显示名称:" />
                     <TextBox
                         Grid.Row="3"
                         MaxWidth="300"
@@ -110,7 +110,7 @@
                     Margin="8,0"
                     HorizontalAlignment="Right"
                     Orientation="Horizontal">
-                    <TextBlock Text="Total Mods:" />
+                    <TextBlock Text="已安装模组数:" />
                     <TextBlock
                         Margin="8,0,0,0"
                         FontSize="20"
@@ -139,18 +139,18 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock FontSize="16" Text="Character Search Keys" />
+                    <TextBlock FontSize="16" Text="角色搜索键值:" />
                     <TextBox
                         Grid.Column="1"
                         IsEnabled="False"
-                        PlaceholderText="New Key Name..."
+                        PlaceholderText="新的搜索键..."
                         Text="{x:Bind ViewModel.KeyToAddInput, Mode=TwoWay}" />
                     <Button
                         Grid.Column="2"
                         Margin="0,0,10,0"
                         HorizontalAlignment="Right"
                         Command="{x:Bind ViewModel.AddKeyCommand}"
-                        Content="Add Search Key"
+                        Content="添加搜索键"
                         IsEnabled="False" />
                 </Grid>
 
@@ -179,7 +179,7 @@
                                     HorizontalAlignment="Right"
                                     Command="{Binding ElementName=EditCharacterPageRoot, Path=ViewModel.RemoveKeyCommand, Mode=OneWay}"
                                     CommandParameter="{Binding Mode=OneWay}"
-                                    Content="Remove"
+                                    Content="删除"
                                     IsEnabled="False" />
                             </Grid>
                         </DataTemplate>
@@ -207,16 +207,16 @@
                     Margin="0,16"
                     HorizontalAlignment="Center"
                     Command="{x:Bind ViewModel.RevertChangesCommand}"
-                    Content="Undo changes"
-                    ToolTipService.ToolTip="Reverts changes not saved" />
+                    Content="撤消修改"
+                    ToolTipService.ToolTip="恢复未保存的更改" />
                 <Button
                     Grid.Row="1"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Bottom"
                     Background="{ThemeResource AccentFillColorDefaultBrush}"
                     Command="{x:Bind ViewModel.DummySaveCommand}"
-                    Content="Save changes"
-                    ToolTipService.ToolTip="Saves changes to disk">
+                    Content="保存修改"
+                    ToolTipService.ToolTip="将更改保存到磁盘">
                     <Button.Flyout>
                         <Flyout Placement="Bottom">
                             <Button Command="{x:Bind ViewModel.SaveChangesCommand}" Content="Save" />
@@ -258,7 +258,7 @@
                     HorizontalAlignment="Stretch"
                     Command="{x:Bind ViewModel.ShowCharacterModelCommand}">
                     <Button.Content>
-                        <TextBlock Text="Show Character Data Model..." TextWrapping="WrapWholeWords" />
+                        <TextBlock Text="显示角色配置数据..." TextWrapping="WrapWholeWords" />
                     </Button.Content>
                 </Button>
 
@@ -271,11 +271,11 @@
                 Width="200"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Bottom"
-                Content="Reset Character"
-                ToolTipService.ToolTip="Resets Character values to their default">
+                Content="重置角色"
+                ToolTipService.ToolTip="将角色数据重置为默认值">
                 <Button.Flyout>
                     <Flyout>
-                        <Button Command="{x:Bind ViewModel.ResetCharacterToDefaultCommand}" Content="Reset Character Settings" />
+                        <Button Command="{x:Bind ViewModel.ResetCharacterToDefaultCommand}" Content="重置角色设置" />
                     </Flyout>
                 </Button.Flyout>
             </Button>

@@ -45,8 +45,8 @@ public partial class SimpleSelectProcessDialogVM : ObservableObject
         await processManager.CheckStatus();
         PlaceHolderText = type switch
         {
-            StartType.Game => "Select the game executable",
-            StartType.ModelImporter => "Select the model importer executable",
+            StartType.Game => "选择游戏可执行文件",
+            StartType.ModelImporter => "选择可执行的Mod加载器exe程序",
             _ => throw new ArgumentOutOfRangeException()
         };
 

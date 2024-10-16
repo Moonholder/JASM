@@ -188,7 +188,7 @@ public partial class MoveModsFlyoutVM : ObservableRecipient
 
         var MoveToRecycleBinCheckBox = new CheckBox()
         {
-            Content = "Move to Recycle Bin?",
+            Content = "移动到回收站?",
             IsChecked = true
         };
         var mods = new ListView()
@@ -214,10 +214,10 @@ public partial class MoveModsFlyoutVM : ObservableRecipient
         };
         var dialog = new ContentDialog()
         {
-            Title = $"Delete These {selectedModsCount} Mods?",
+            Title = $"删除这{selectedModsCount}个模组?",
             Content = stackPanel,
-            PrimaryButtonText = "Delete",
-            SecondaryButtonText = "Cancel",
+            PrimaryButtonText = "删除",
+            SecondaryButtonText = "取消",
             DefaultButton = ContentDialogButton.Primary
         };
 
@@ -351,7 +351,6 @@ public partial class MoveModsFlyoutVM : ObservableRecipient
         SuggestedCharacters.Clear();
         SearchText = string.Empty;
     }
-
     public bool SelectCharacter(IModdableObject? characterVM)
     {
         if (_noCharacterFound.Equals(characterVM) || characterVM is null) return false;

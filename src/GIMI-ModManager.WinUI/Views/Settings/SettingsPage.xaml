@@ -133,19 +133,19 @@
                     </StackPanel>
 
                     <StackPanel Margin="0,8,0,0">
-                        <TextBlock Text="Window" />
+                        <TextBlock Text="窗口" />
                         <CheckBox
                             Command="{x:Bind ViewModel.WindowSizePositionToggleCommand}"
                             CommandParameter="size"
-                            Content="Remember window size"
+                            Content="记住窗口大小"
                             IsChecked="{x:Bind ViewModel.PersistWindowSize, Mode=OneWay}"
-                            ToolTipService.ToolTip="If checked then the main window size is saved when JASM exits" />
+                            ToolTipService.ToolTip="如果选中，则在JASM退出时保存主窗口大小" />
                         <CheckBox
                             Command="{x:Bind ViewModel.WindowSizePositionToggleCommand}"
                             CommandParameter="position"
-                            Content="Remember window position"
+                            Content="记住窗口位置"
                             IsChecked="{x:Bind ViewModel.PersistWindowPosition, Mode=OneWay}"
-                            ToolTipService.ToolTip="If checked then the main window position is saved when JASM exits" />
+                            ToolTipService.ToolTip="如果选中，则在JASM退出时保存主窗口位置" />
                     </StackPanel>
 
                 </StackPanel>
@@ -184,7 +184,7 @@
                     <TextBlock
                         Margin="0,0,0,8"
                         IsTextSelectionEnabled="True"
-                        Text="Settings are saved independently for each selected game." />
+                        Text="为每个选定的游戏独立保存设置." />
 
                     <ComboBox
                         x:Name="GameSelectorComboBox"
@@ -268,8 +268,8 @@
                 <TextBlock Style="{ThemeResource SubtitleTextBlockStyle}" Text="Commands" />
                 <controls1:SettingsCard
                     Command="{x:Bind ViewModel.NavigateToCommandsSettingsCommand}"
-                    Description="Commands (scripts) can be defined and then be run on specified mods"
-                    Header="Create Custom Commands"
+                    Description="可以定义命令(脚本), 然后在指定的mod上运行"
+                    Header="创建自定义命令"
                     HeaderIcon="{ui:FontIcon Glyph=&#xE716;}"
                     IsClickEnabled="True" />
 
@@ -299,29 +299,29 @@
                         l:Uids.Uid="/Settings/ModsFolderSelector" />
 
                     <StackPanel Orientation="Horizontal">
-                        <Button Command="{x:Bind ViewModel.SaveSettingsCommand}" ToolTipService.ToolTip="Update folder path(s)?">Update</Button>
+                        <Button Command="{x:Bind ViewModel.SaveSettingsCommand}" ToolTipService.ToolTip="更新文件夹路径?">更新路径</Button>
                         <Button
                             Margin="40,0,0,0"
                             Command="{x:Bind ViewModel.ReorganizeModsCommand}"
-                            Content="Reorganize Mods" />
+                            Content="整理 Mods" />
                         <Button
                             Margin="40,0,0,0"
                             Command="{x:Bind ViewModel.ShowCleanModsFolderDialogCommand}"
-                            Content="Clean Mods folder" />
+                            Content="清理mod文件夹" />
                     </StackPanel>
 
                     <StackPanel Margin="0,16,0,0" Orientation="Horizontal">
                         <Button
                             Margin="0,0,8,0"
                             Command="{x:Bind ViewModel.Reset3DmigotoPathCommand}"
-                            Content="Reset 3Dmigoto Exe Path">
+                            Content="重置加载器 Exe路径">
                             <ToolTipService.ToolTip>
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock TextWrapping="WrapWholeWords" Text="{x:Bind ViewModel.ThreeDMigtoProcessManager.ProcessPath, Mode=OneWay}" />
                                 </StackPanel>
                             </ToolTipService.ToolTip>
                         </Button>
-                        <Button Command="{x:Bind ViewModel.ResetGenshinExePathCommand}" Content="Reset Genshin Exe Path">
+                        <Button Command="{x:Bind ViewModel.ResetGenshinExePathCommand}" Content="重置游戏 Exe路径">
                             <ToolTipService.ToolTip>
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock TextWrapping="WrapWholeWords" Text="{x:Bind ViewModel.GenshinProcessManager.ProcessPath, Mode=OneWay}" />
@@ -334,7 +334,7 @@
                     <StackPanel Margin="0,16,0,0" Orientation="Horizontal">
                         <CheckBox
                             Command="{x:Bind ViewModel.ToggleCharacterSkinsAsCharactersCommand}"
-                            Content="Treat Character Skins as separate characters"
+                            Content="将角色皮肤视为独立的角色"
                             IsChecked="{x:Bind ViewModel.CharacterAsSkinsCheckbox, Mode=TwoWay}" />
                     </StackPanel>
 
@@ -344,7 +344,7 @@
                             HorizontalAlignment="Left"
                             IsTextSelectionEnabled="True"
                             TextWrapping="WrapWholeWords"
-                            Text="When using JASM to download mods, it automatically caches the archives or zip files. You can specify a maximum limit in gigabytes for the cache directory, and JASM will keep the cache size under the limit when starting up." />
+                            Text="当使用JASM下载mod时，它会自动缓存存档或zip文件。您可以为缓存目录指定以gb为单位的最大限制，JASM将在启动时将缓存大小保持在限制之下." />
 
                         <StackPanel Orientation="Horizontal" Spacing="16">
 
@@ -359,7 +359,7 @@
 
 
                     <TextBlock IsTextSelectionEnabled="True">
-                        <Run Text="Current Size of Mod Cache for" />
+                        <Run Text="当前Mod文件缓存的大小" />
                         <Run Text="{x:Bind ViewModel.SelectedGame, Mode=OneWay}" />
                         <Run Text=":" />
                         <Run Text="{x:Bind ViewModel.ModCacheSizeGB, Mode=OneWay}" />
@@ -380,7 +380,7 @@
                             <TextBlock
                                 Margin="0,0,8,0"
                                 VerticalAlignment="Center"
-                                Text="Export Mods"
+                                Text="导出Mod"
                                 l:Uids.Uid="Settings_Export_Button" />
                             <FontIcon
                                 VerticalAlignment="Bottom"
@@ -417,8 +417,12 @@
                         l:Uids.Uid="Settings_AboutDescription" />
                     <HyperlinkButton
                         Margin="{StaticResource SettingsPageHyperlinkButtonMargin}"
-                        Content="Just Another Skin Manager Github"
+                        Content="Just Another Skin Manager 原版 Github"
                         NavigateUri="https://github.com/Jorixon/JASM" />
+                    <HyperlinkButton
+                        Margin="{StaticResource SettingsPageHyperlinkButtonMargin}"
+                        Content="Just Another Skin Manager 汉化版 Github"
+                        NavigateUri="https://github.com/Moonholder/JASM" />
                     <HyperlinkButton
                         Margin="{StaticResource SettingsPageHyperlinkButtonMargin}"
                         Content="Just Another Skin Manager GameBanana"
@@ -431,7 +435,7 @@
                             VerticalAlignment="Center"
                             Text="{x:Bind ViewModel.LatestVersion, Mode=OneWay}" />
 
-                        <controls:LinkButton Link="https://github.com/Jorixon/JASM/releases/latest" Text="See what's new in the latest release" />
+                        <controls:LinkButton Link="https://github.com/Moonholder/JASM/releases/latest" Text="看看最新版本有什么新内容" />
 
                     </StackPanel>
 

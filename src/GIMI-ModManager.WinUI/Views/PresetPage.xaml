@@ -39,7 +39,7 @@
 
                     <TextBlock
                         VerticalAlignment="Center"
-                        Text="Auto sync not enabled! Remember to manually reload 3Dmigoto config with the F10 key when doing changes"
+                        Text="未启用自动同步！记得在做更改时在游戏内用F10键手动重新加载3Dmigoto(或其他加载器)的配置文件！"
                         Visibility="{x:Bind ViewModel.AutoSync3DMigotoConfigIsDisabled, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
 
                     <Button Click="ButtonBase_OnClick">
@@ -57,7 +57,7 @@
             <TextBlock
                 Grid.Column="0"
                 Style="{StaticResource TitleTextBlockStyle}"
-                Text="Mod Presets and Mod Preferences"
+                Text="Mod预设和Mod首选项"
                 TextWrapping="NoWrap" />
         </Grid>
 
@@ -79,19 +79,19 @@
                     <TextBox
                         MinWidth="345"
                         HorizontalAlignment="Left"
-                        Header="New Preset Name"
+                        Header="新的预设名称"
                         IsEnabled="{x:Bind ViewModel.IsNotBusy, Mode=OneWay}"
                         Text="{x:Bind ViewModel.NewPresetNameInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <StackPanel
                         Margin="0,8"
                         Orientation="Horizontal"
                         Spacing="8">
-                        <Button Command="{x:Bind ViewModel.CreatePresetCommand}" Content="Save active mod preferences and create new preset" />
+                        <Button Command="{x:Bind ViewModel.CreatePresetCommand}" Content="保存已启用的mod首选项并创建新的预设" />
                         <CheckBox
-                            Content="Create as an empty preset"
+                            Content="创建为空预设"
                             IsChecked="{x:Bind ViewModel.CreateEmptyPresetInput, Mode=TwoWay}"
                             IsEnabled="{x:Bind ViewModel.IsNotBusy, Mode=OneWay}"
-                            ToolTipService.ToolTip="If checked, the new preset will be created without any mods enabled." />
+                            ToolTipService.ToolTip="如果选中，新的预设将被创建而不启用任何mod." />
 
                     </StackPanel>
                 </StackPanel>
@@ -110,12 +110,12 @@
                         Spacing="16">
                         <CheckBox
                             Command="{x:Bind ViewModel.ToggleAutoSyncCommand}"
-                            Content="Auto sync Mod Preferences when switching presets"
+                            Content="切换预设时自动同步Mod首选项"
                             IsChecked="{x:Bind ViewModel.AutoSync3DMigotoConfig, Mode=OneWay}"
-                            ToolTipService.ToolTip="If checked, then JASM will automatically sync preferences when creating presets and when switching between presets" />
+                            ToolTipService.ToolTip="如果选中，JASM将在创建预设和在预设之间切换时自动同步首选项" />
                         <Button
                             Command="{x:Bind ViewModel.StartElevatorCommand}"
-                            Content="Start Elevator..."
+                            Content="启动 Elevator..."
                             IsEnabled="{x:Bind ViewModel.ElevatorService.CanStartElevator, Mode=OneWay}" />
                     </StackPanel>
 
@@ -126,20 +126,20 @@
                         Spacing="16">
                         <Button
                             Command="{x:Bind ViewModel.SaveActivePreferencesCommand}"
-                            Content="Save active mod preferences (KeySwaps) to mods"
-                            ToolTipService.ToolTip="Reads 3Dmigoto mod preferences (d3dx_user.ini) for active mods and stores the settings in each Mod's .JASM_Config.json file"
+                            Content="保存激活的mod偏好（KeySwaps）到mod"
+                            ToolTipService.ToolTip="读取3Dmigoto的mod首选项（d3dx_user.ini）为启用的mod和存储设置在每个mod的 .JASM_Config.json文件"
                             Visibility="{x:Bind ViewModel.ShowManualControls, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
 
                         <Button
                             Command="{x:Bind ViewModel.ApplySavedModPreferencesCommand}"
-                            Content="Apply saved mod preferences (KeySwaps)"
-                            ToolTipService.ToolTip="Reads currently active mods' preferences from .JASM_Config.json and writes them to d3dx_user.ini for 3Dmigoto to read"
+                            Content="应用保存的mod偏好（KeySwaps）"
+                            ToolTipService.ToolTip="从.JASM_Config中读取当前启用mod的首选项。并将它们写入d3dx_user.ini以供3Dmigoto读取"
                             Visibility="{x:Bind ViewModel.ShowManualControls, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
 
                         <CheckBox
-                            Content="Show Manual controls"
+                            Content="显示手动控制"
                             IsChecked="{x:Bind ViewModel.ShowManualControls, Mode=TwoWay}"
-                            ToolTipService.ToolTip="If you'd like to manually control setting preferences instead of letting JASM with the Elevator handle it for you" />
+                            ToolTipService.ToolTip="如果您希望手动控制设置首选项，而不是让带有Elevator的JASM为您处理它" />
 
                     </StackPanel>
 
@@ -196,34 +196,34 @@
 
 
                                     <StackPanel Orientation="Horizontal" Spacing="4">
-                                        <TextBlock Text="Preset Enabled Mods Count:" />
+                                        <TextBlock Text="此预设启用的Mod数量:" />
                                         <TextBlock Text="{x:Bind EnabledModsCount, Mode=OneWay}" />
 
                                     </StackPanel>
 
                                     <StackPanel Orientation="Horizontal" Spacing="4">
-                                        <TextBlock Text="Created at:" />
+                                        <TextBlock Text="创建于:" />
                                         <TextBlock Text="{x:Bind CreatedAt, Mode=OneWay}" />
                                     </StackPanel>
 
                                     <Button
                                         Command="{x:Bind NavigateToPresetDetailsCommand}"
                                         CommandParameter="{Binding}"
-                                        Content="Go to Preset Details" />
+                                        Content="进入预设详细信息" />
                                 </StackPanel>
 
                                 <StackPanel
                                     Grid.Column="2"
                                     Orientation="Horizontal"
                                     Spacing="16">
-                                    <Button Content="Apply Preset" ToolTipService.ToolTip="Enables all mods in this preset and writes the preset's mod preferences to mods">
+                                    <Button Content="应用预设" ToolTipService.ToolTip="启用这个预设中的所有mod，并将预设的mod首选项写入mod">
                                         <Button.Flyout>
                                             <Flyout Placement="Left">
                                                 <StackPanel>
                                                     <Button
                                                         Command="{x:Bind ApplyPresetCommand}"
                                                         CommandParameter="{Binding}"
-                                                        Content="Confirm" />
+                                                        Content="确认" />
                                                 </StackPanel>
                                             </Flyout>
                                         </Button.Flyout>
@@ -240,7 +240,7 @@
                                                     Command="{x:Bind ToggleReadOnlyCommand}"
                                                     CommandParameter="{Binding Mode=OneWay}"
                                                     IsChecked="{x:Bind IsReadOnly, Mode=OneWay}"
-                                                    Text="Read Only">
+                                                    Text="只读模式">
                                                     <MenuFlyoutItem.Icon>
                                                         <FontIcon Glyph="&#xE736;" />
                                                     </MenuFlyoutItem.Icon>
@@ -256,7 +256,7 @@
                                                 <MenuFlyoutItem
                                                     Command="{x:Bind DuplicatePresetCommand}"
                                                     CommandParameter="{Binding Mode=OneWay}"
-                                                    Text="Duplicate">
+                                                    Text="创建副本">
                                                     <MenuFlyoutItem.Icon>
                                                         <FontIcon Glyph="&#xEA35;" />
                                                     </MenuFlyoutItem.Icon>
@@ -265,8 +265,8 @@
                                                 <MenuFlyoutItem
                                                     Command="{x:Bind DeletePresetCommand}"
                                                     CommandParameter="{Binding Mode=OneWay}"
-                                                    Text="Delete"
-                                                    ToolTipService.ToolTip="Permanently delete this preset">
+                                                    Text="删除预设"
+                                                    ToolTipService.ToolTip="永久删除此预设">
                                                     <MenuFlyoutItem.Icon>
                                                         <FontIcon Glyph="&#xE74D;" />
                                                     </MenuFlyoutItem.Icon>
@@ -294,20 +294,20 @@
             <StackPanel Orientation="Horizontal" Spacing="32">
                 <Button
                     Command="{x:Bind ViewModel.RandomizeModsCommand}"
-                    Content="Randomize Mods"
-                    ToolTipService.ToolTip="Opens a dialog with more info" />
+                    Content="随机化Mod"
+                    ToolTipService.ToolTip="打开一个包含更多信息的对话框" />
 
-                <Button Content="Reset Mod Preferences" ToolTipService.ToolTip="Clear mod preferences stored in mods' .JASM_ModConfig.json">
+                <Button Content="重置Mod首选项" ToolTipService.ToolTip="清除存储在mod中的mod偏好 .JASM_ModConfig.json">
                     <Button.Flyout>
                         <Flyout>
                             <StackPanel>
-                                <TextBlock Text="Reset persisted mod preferences" />
-                                <CheckBox Content="Reset only for enabled Mods" IsChecked="{x:Bind ViewModel.ResetOnlyEnabledMods, Mode=TwoWay}" />
-                                <CheckBox Content="Also clear preferences in to 3Dmigoto user ini" IsChecked="{x:Bind ViewModel.AlsoReset3DmigotoConfig, Mode=TwoWay}" />
+                                <TextBlock Text="重置持久化的mod首选项" />
+                                <CheckBox Content="仅重置正启用的mod" IsChecked="{x:Bind ViewModel.ResetOnlyEnabledMods, Mode=TwoWay}" />
+                                <CheckBox Content="同时重置加载器的d3dx_user.ini文件" IsChecked="{x:Bind ViewModel.AlsoReset3DmigotoConfig, Mode=TwoWay}" />
                                 <Button
                                     HorizontalAlignment="Center"
                                     Command="{x:Bind ViewModel.ResetModPreferencesCommand}"
-                                    Content="Confirm" />
+                                    Content="确认" />
                             </StackPanel>
                         </Flyout>
                     </Button.Flyout>

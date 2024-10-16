@@ -20,10 +20,10 @@
         <TextBlock
             Margin="0,4,0,8"
             Style="{ThemeResource TitleTextBlockStyle}"
-            Text="All Notifications shown during the current application run" />
+            Text="当前应用程序运行期间显示的所有通知" />
 
         <StackPanel Grid.Row="1" Margin="0,4,0,16">
-            <TextBlock Style="{ThemeResource SubtitleTextBlockStyle}" Text="Notifications and Logs are written to:" />
+            <TextBlock Style="{ThemeResource SubtitleTextBlockStyle}" Text="通知和日志将被写入:" />
             <Grid VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />

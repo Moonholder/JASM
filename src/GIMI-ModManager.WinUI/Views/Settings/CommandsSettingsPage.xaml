@@ -20,19 +20,19 @@
             Margin="8,0,8,0"
             HorizontalAlignment="Stretch"
             Spacing="4">
-            <TextBlock Style="{StaticResource PageTitleStyle}" Text="Command Settings " />
+            <TextBlock Style="{StaticResource PageTitleStyle}" Text="命令设置 " />
 
 
             <controls:SettingsCard
-                Description="Here you can define custom commands that JASM can run for you. Currently, commands that contain {{TargetPath}} can only be run from the Mods Overview page"
-                Header="Create new command"
+                Description="在这里，您可以定义JASM可以运行的自定义命令。目前，包含{{TargetPath}}的命令只能在Mods Overview界面中执行"
+                Header="创建新命令"
                 HeaderIcon="{winUi:FontIcon Glyph=&#xE70F;}">
-                <Button Command="{x:Bind ViewModel.OpenCreateCommandCommand}" Content="Create New Command" />
+                <Button Command="{x:Bind ViewModel.OpenCreateCommandCommand}" Content="创建新的命令" />
             </controls:SettingsCard>
 
             <controls:SettingsExpander
-                Description="Here you can view and delete created command definitions"
-                Header="Command Definitions"
+                Description="在这里，您可以查看和删除已创建的命令"
+                Header="命令定义"
                 HeaderIcon="{winUi:FontIcon Glyph=&#xE74E;}"
                 IsExpanded="True">
                 <controls:SettingsExpander.Items>
@@ -70,7 +70,7 @@
                                                     IsTextSelectionEnabled="True"
                                                     TextTrimming="CharacterEllipsis"
                                                     ToolTipService.ToolTip="{x:Bind CommandDisplayName}">
-                                                    <Run Text="Display Name:" />
+                                                    <Run Text="显示名称:" />
                                                     <Run Text="{x:Bind CommandDisplayName}" />
                                                 </TextBlock>
 
@@ -91,12 +91,12 @@
                                                 Spacing="8">
                                                 <Button
                                                     VerticalAlignment="Center"
-                                                    Content="Run"
+                                                    Content="执行"
                                                     IsEnabled="{x:Bind HasNoTargetPathVariable, Mode=OneWay}">
                                                     <Button.Flyout>
                                                         <Flyout>
                                                             <StackPanel>
-                                                                <TextBlock Text="Are you sure you want to run this command?" />
+                                                                <TextBlock Text="您确定要运行这个命令吗?" />
                                                                 <Button
                                                                     HorizontalAlignment="Center"
                                                                     Command="{x:Bind RunCommand}"
@@ -112,7 +112,7 @@
                                                     VerticalAlignment="Center"
                                                     Command="{x:Bind EditCommand}"
                                                     CommandParameter="{x:Bind}"
-                                                    Content="Edit" />
+                                                    Content="编辑" />
 
                                                 <Button
                                                     VerticalAlignment="Center"
@@ -126,7 +126,7 @@
                                                                     HorizontalAlignment="Center"
                                                                     Command="{x:Bind DeleteCommand}"
                                                                     CommandParameter="{x:Bind}"
-                                                                    Content="Delete" />
+                                                                    Content="删除" />
                                                             </StackPanel>
                                                         </Flyout>
                                                     </Button.Flyout>
@@ -139,21 +139,21 @@
                                                 IsTextSelectionEnabled="True"
                                                 TextTrimming="CharacterEllipsis"
                                                 ToolTipService.ToolTip="{x:Bind Executable}">
-                                                <Run Text="Executable: " />
+                                                <Run Text="可执行文件: " />
                                                 <Run Text="{x:Bind Executable}" />
                                             </TextBlock>
                                             <TextBlock
                                                 IsTextSelectionEnabled="True"
                                                 TextTrimming="CharacterEllipsis"
                                                 ToolTipService.ToolTip="{x:Bind WorkingDirectory}">
-                                                <Run Text="Working Directory: " />
+                                                <Run Text="工作目录: " />
                                                 <Run Text="{x:Bind WorkingDirectory}" />
                                             </TextBlock>
                                             <TextBlock
                                                 IsTextSelectionEnabled="True"
                                                 TextTrimming="CharacterEllipsis"
                                                 ToolTipService.ToolTip="{x:Bind Arguments}">
-                                                <Run Text="Arguments: " />
+                                                <Run Text="运行参数: " />
                                                 <Run Text="{x:Bind Arguments}" />
                                             </TextBlock>
 
@@ -179,8 +179,8 @@
 
 
             <controls:SettingsExpander
-                Description="Commands started from JASM for the current running instance"
-                Header="Currently Running Commands"
+                Description="从JASM为当前运行的实例启动的命令"
+                Header="当前运行的命令"
                 HeaderIcon="{winUi:FontIcon Glyph=&#xE768;}"
                 IsExpanded="True">
 

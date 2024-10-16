@@ -44,20 +44,20 @@ public sealed partial class CommandsSettingsViewModel(
         {
             var commandWarningDialog = new ContentDialog
             {
-                Title = "Friendly Warning",
+                Title = "温馨提醒",
 
                 Content = new TextBlock()
                 {
-                    Text = "Please be careful when creating commands. " +
-                           "Commands can be used to run any executable on your system. " +
-                           "Only create commands from trusted sources.\n" +
-                           "JASM isn't perfect and can't protect you from malicious scripts or JASM bugs/glitches.\n\n" +
-                           "By clicking 'I understand' you acknowledge that you understand the risks.",
+                    Text = "请在创建命令时要小心. " +
+                           "命令可以用来在你的系统上运行任何可执行文件. " +
+                           "仅从可信来源创建命令.\n" +
+                           "JASM并不完美，不能保护您免受恶意脚本或JASM错误/故障的影响.\n\n" +
+                           "点击 '我明白了' 即表示你已了解风险.",
                     IsTextSelectionEnabled = true,
                     TextWrapping = TextWrapping.WrapWholeWords
                 },
-                PrimaryButtonText = "I understand",
-                CloseButtonText = "Cancel"
+                PrimaryButtonText = "我明白了",
+                CloseButtonText = "取消"
             };
 
             var result = await _windowManagerService.ShowDialogAsync(commandWarningDialog);
@@ -314,7 +314,7 @@ public partial class CommandDefinitionVM : ObservableObject
 
         if (attributes.Count != 0)
         {
-            attributes.Insert(0, "Options: ");
+            attributes.Insert(0, "选项: ");
             var lastItem = attributes.Last().TrimEnd('|', ' ');
             attributes[^1] = lastItem;
         }

@@ -468,14 +468,14 @@ public class ActivationService : IActivationService
         var textWarning = new TextBlock()
         {
             Text = """
-                   This version of JASM has a new folder structure.
+                   这个版本的JASM有一个新的文件夹结构.
 
-                   Now Characters are organized by category, and each category has its own folder. So new format is as follows:
+                   现在角色按照类别进行组织，每个类别都有自己的文件夹。因此新格式如下:
                    Mods/Category/Character/<Mod Folders>
-                   Therefore, JASM won't see any of your mods until you reorganize them.
-                   This is a one time thing, and you can do it manually if you want.
+                   因此，JASM 在重新组织之前无法看到你的任何模组.
+                   这是一次性的操作，如果需要，你可以手动进行.
 
-                   Also character folders are now created on demand and it is possible to clean up empty folders on the settings page.
+                   另外，角色文件夹现在是按需创建的，并且可以在设置页面清理空文件夹.
                    """,
             IsTextSelectionEnabled = true,
             TextWrapping = TextWrapping.WrapWholeWords
@@ -484,7 +484,7 @@ public class ActivationService : IActivationService
 
         var textWarning2 = new TextBlock()
         {
-            Text = "If you're uncertain about this then back up your mods first. I've tested this on my own mods.",
+            Text = "如果你对此不确定，请先备份你的模组。我在我自己的模组上进行了测试.",
             FontWeight = FontWeights.Bold,
             IsTextSelectionEnabled = true,
             TextWrapping = TextWrapping.WrapWholeWords
@@ -497,8 +497,8 @@ public class ActivationService : IActivationService
         {
             Text = """
 
-                   This popup will be shown until you chose an option below. You can also use the reorganize button on the settings page.
-                   Check the logs if you want to see what's happening.
+                   这个弹出窗口将显示，直到您选择下面的选项。您也可以使用设置页面上的重新组织按钮。
+                   如果你想知道发生了什么，可以查看日志.
                    """,
             IsTextSelectionEnabled = true,
             TextWrapping = TextWrapping.WrapWholeWords
@@ -509,11 +509,11 @@ public class ActivationService : IActivationService
 
         var dialog = new ContentDialog
         {
-            Title = "New Folder structure",
+            Title = "新建文件夹结构",
             Content = stackPanel,
-            PrimaryButtonText = "Reorganize my mods",
-            SecondaryButtonText = "I will do it myself",
-            CloseButtonText = "Cancel",
+            PrimaryButtonText = "重新整理我的mod",
+            SecondaryButtonText = "我自己来做",
+            CloseButtonText = "取消",
             DefaultButton = ContentDialogButton.Primary
         };
 

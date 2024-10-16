@@ -310,9 +310,9 @@ public partial class PresetViewModel(
     {
         var dialog = new ContentDialog
         {
-            Title = "Randomize Mods",
-            PrimaryButtonText = "Randomize",
-            CloseButtonText = "Cancel",
+            Title = "随机化Mod",
+            PrimaryButtonText = "随机",
+            CloseButtonText = "取消",
             DefaultButton = ContentDialogButton.Primary
         };
 
@@ -323,13 +323,13 @@ public partial class PresetViewModel(
 
         stackPanel.Children.Add(new TextBlock
         {
-            Text = "Select the categories you want to randomize mods for:"
+            Text = "选择你想要随机化Mod的类别:"
         });
 
         stackPanel.Children.Add(new TextBlock
         {
             Text =
-                "Note: This will only randomize mod folders that are meant to only have one mod active. So 'Others __' folders will not be randomized. While only one mod wil be enabled per in game character skin",
+                "注意：这只会随机化mod文件夹，意味着只有一个mod是启用的。所以“Others __”文件夹不会被随机化。而每个角色皮肤只能启用一个mod",
             TextWrapping = TextWrapping.WrapWholeWords,
             Margin = new Thickness(0, 0, 0, 10)
         });
@@ -349,7 +349,7 @@ public partial class PresetViewModel(
         stackPanel.Children.Add(new CheckBox
         {
             Margin = new Thickness(0, 10, 0, 0),
-            Content = "Allow no mods as a result. This means it is possible for no mods to be enabled for a mod folder",
+            Content = "允许没有模组作为结果。这意味着在一个模组文件夹中可能没有模组被启用",
             IsChecked = true
         });
 
@@ -357,7 +357,7 @@ public partial class PresetViewModel(
         stackPanel.Children.Add(new TextBlock
         {
             Text =
-                "I suggest creating a preset (or a backup) of your mods before randomizing if you have a lot of enabled mods",
+                "我建议在随机化之前创建一个预设（或备份）你的模组，如果你有很多已启用的模组",
             TextWrapping = TextWrapping.WrapWholeWords,
             Margin = new Thickness(0, 10, 0, 0)
         });
@@ -695,8 +695,8 @@ public partial class ModPresetVm : ObservableObject
     public required IAsyncRelayCommand ApplyPresetCommand { get; init; }
     public required IRelayCommand NavigateToPresetDetailsCommand { get; init; }
 
-    private const string RenameText = "Rename";
-    private const string ConfirmText = "Save New Name";
+    private const string RenameText = "重命名";
+    private const string ConfirmText = "保存新名称";
 }
 
 public partial class ModPresetEntryVm : ObservableObject

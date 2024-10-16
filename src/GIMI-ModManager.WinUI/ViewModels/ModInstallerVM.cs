@@ -95,8 +95,8 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
 
     [ObservableProperty] private ObservableCollection<RootFolder> _rootFolder = new();
 
-    private const string AddRenameText = "Rename and Add mod";
-    private const string AddReplaceText = "Overwrite old mod";
+    private const string AddRenameText = "重命名和添加mod";
+    private const string AddReplaceText = "覆盖旧mod";
     [ObservableProperty] private string _primaryButtonText = AddRenameText;
 
     [ObservableProperty] private bool _overwriteExistingMod;
@@ -291,8 +291,8 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
         InstallerFinished?.Invoke(this, EventArgs.Empty);
         _logger.Debug("Mod {newModPath} was added to {modListPath}", newMod.FullPath,
             _characterModList.AbsModsFolderPath);
-        _notificationManager.ShowNotification($"Mod '{modName}' installed",
-            $"Mod '{modName}' ({newMod.Name}), was successfully added to {_characterModList.Character.DisplayName} ModList",
+        _notificationManager.ShowNotification($"Mod '{modName}' 已安装",
+            $"Mod '{modName}' ({newMod.Name}), 已成功添加到 {_characterModList.Character.DisplayName} mod列表",
             TimeSpan.FromSeconds(5));
 
         if (EnableThisMod)

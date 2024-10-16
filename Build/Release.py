@@ -27,7 +27,7 @@ def checkSuccessfulExitCode(exitCode: int) -> None:
 		exit(exitCode)
 
 def extractVersionNumber() -> str:
-	with open(JASM_CSPROJ, "r") as jasmCSPROJ:
+	with open(JASM_CSPROJ, "r", encoding="utf-8") as jasmCSPROJ:
 		for line in jasmCSPROJ:
 			line = line.strip()
 			if line.startswith("<VersionPrefix>"):

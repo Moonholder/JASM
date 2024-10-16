@@ -129,7 +129,7 @@ public partial class CharactersViewModel : ObservableRecipient, INavigationAware
 
         DockPanelVM = new OverviewDockPanelVM();
         StartGameIcon = _gameService.GameIcon;
-        ShortGameName = "Start " + _gameService.GameShortName;
+        ShortGameName = "启动 " + _gameService.GameShortName;
         GameBananaLink = _gameService.GameBananaUrl;
 
         CanCheckForUpdates = _modUpdateAvailableChecker.IsReady;
@@ -315,16 +315,18 @@ public partial class CharactersViewModel : ObservableRecipient, INavigationAware
         _category = category;
         CategoryPageTitle =
             $"{category.DisplayName} {_localizer.GetLocalizedStringOrDefault("Overview", useUidAsDefaultValue: true)}";
-        ModToggleText = $"Show only {category.DisplayNamePlural} with Mods";
-        ModNotificationsToggleText = $"Show only {category.DisplayNamePlural} with Mod Notifications";
-        SearchBoxPlaceHolder = $"Search {category.DisplayNamePlural}...";
+        // ModToggleText = $"Show only {category.DisplayNamePlural} with Mods";
+        ModToggleText = $"只显示有Mod的{category.DisplayNamePlural}";
+        // ModNotificationsToggleText = $"Show only {category.DisplayNamePlural} with Mod Notifications";
+        ModNotificationsToggleText = $"只显示有更新通知的{category.DisplayNamePlural}";
+        SearchBoxPlaceHolder = $"搜索{category.DisplayNamePlural}...";
 
 
         var characters = _gameService.GetModdableObjects(_category);
 
         var firstType = characters.FirstOrDefault()?.GetType();
         if (characters.Any(ch => ch.GetType() != firstType))
-            throw new InvalidOperationException("Characters must be of the same type");
+            throw new InvalidOperationException("角色列表中存在不同类型的角色");
 
         var others =
             characters.FirstOrDefault(ch =>
@@ -1141,7 +1143,7 @@ public sealed class Sorter
     }
 
 
-    public const string AlphabeticalSortName = "Alphabetical";
+    public const string AlphabeticalSortName = "按字母顺序";
 
     // TODO: These can be a static property
     public static Sorter Alphabetical()
@@ -1157,7 +1159,7 @@ public sealed class Sorter
     }
 
 
-    public const string ReleaseDateSortName = "Release Date";
+    public const string ReleaseDateSortName = "发布时间";
 
     // TODO: IDateSupport interface
     public static Sorter ReleaseDate()
@@ -1174,7 +1176,7 @@ public sealed class Sorter
                 ));
     }
 
-    public const string RaritySortName = "Rarity";
+    public const string RaritySortName = "稀有度";
 
     public static Sorter Rarity()
     {
@@ -1190,7 +1192,7 @@ public sealed class Sorter
                 ));
     }
 
-    public const string ModCountSortName = "Mod Count";
+    public const string ModCountSortName = "Mod数量";
 
     public static Sorter ModCount()
     {
@@ -1207,7 +1209,7 @@ public sealed class Sorter
     }
 
 
-    public const string ModRecentlyAddedName = "Recently Added Mods";
+    public const string ModRecentlyAddedName = "最近添加的";
 
     public static Sorter ModRecentlyAdded()
     {

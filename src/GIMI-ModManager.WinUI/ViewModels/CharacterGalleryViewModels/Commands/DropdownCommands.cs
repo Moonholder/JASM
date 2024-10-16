@@ -49,7 +49,7 @@ public partial class CharacterGalleryViewModel
             {
                 new TextBlock()
                 {
-                    Text = $"Are you sure you want to delete {vm.Name}?",
+                    Text = $"您确定要删除 {vm.Name}吗?",
                     TextWrapping = Microsoft.UI.Xaml.TextWrapping.WrapWholeWords,
                 },
                 doNotAskAgainCheckBox
@@ -58,10 +58,10 @@ public partial class CharacterGalleryViewModel
 
         var dialog = new ContentDialog()
         {
-            Title = "Delete mod",
+            Title = "删除 mod",
             Content = stackPanel,
-            PrimaryButtonText = "Delete",
-            CloseButtonText = "Cancel",
+            PrimaryButtonText = "删除",
+            CloseButtonText = "取消",
             DefaultButton = ContentDialogButton.Primary,
         };
 

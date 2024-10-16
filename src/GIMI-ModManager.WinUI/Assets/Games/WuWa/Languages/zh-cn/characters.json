@@ -8,6 +8,10 @@
     "DisplayName": "武器"
   },
   {
+    "InternalName": "Gliders",
+    "DisplayName": "滑翔翼"
+  },
+  {
     "Keys": [
       "rover"
     ],

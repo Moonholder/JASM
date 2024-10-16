@@ -232,17 +232,17 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
         {
             var result = await _windowManagerService.ShowDialogAsync(new ContentDialog()
             {
-                Title = "Restart required",
+                Title = "应用程序需要重启",
                 Content = new TextBlock()
                 {
                     Text =
-                        "You'll need to restart the application for the theme to take effect or else the application will become unstable. " +
-                        "This is most likely me not configuring the theming correctly. Dark Mode is the recommended theme.\n\n" +
-                        "Sorry for the inconvenience.",
+                        "你需要重新启动应用程序，以使主题生效，否则应用程序将变得不稳定. " +
+                        "很可能是因为我没有正确配置主题。推荐使用深色模式.\n\n" +
+                        "对给您带来的不便深表歉意.",
                     TextWrapping = TextWrapping.Wrap
                 },
-                PrimaryButtonText = "Restart",
-                CloseButtonText = "Cancel",
+                PrimaryButtonText = "重启",
+                CloseButtonText = "取消",
                 DefaultButton = ContentDialogButton.Primary
             });
 
@@ -250,7 +250,7 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
 
             ElementTheme = param;
             await _themeSelectorService.SetThemeAsync(param);
-            _notificationManager.ShowNotification("Restarting...", "The application will restart now.",
+            _notificationManager.ShowNotification("重启中...", "应用程序现在将重新启动.",
                 null);
             await RestartAppAsync();
         }
@@ -314,11 +314,11 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
         var dialog = new ContentDialog();
         dialog.XamlRoot = App.MainWindow.Content.XamlRoot;
         dialog.Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style;
-        dialog.Title = "Update Folder Paths?";
-        dialog.CloseButtonText = "Cancel";
-        dialog.PrimaryButtonText = "Save";
+        dialog.Title = "更新文件夹路径?";
+        dialog.CloseButtonText = "取消";
+        dialog.PrimaryButtonText = "保存";
         dialog.DefaultButton = ContentDialogButton.Primary;
-        dialog.Content = "Do you want to save the new folder paths? The App will restart afterwards.";
+        dialog.Content = "要保存新的文件夹路径吗？之后应用程序将重新启动.";
 
         var result = await dialog.ShowAsync();
 
@@ -333,7 +333,7 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
             await _localSettingsService.SaveSettingAsync(ModManagerOptions.Section,
                 modManagerOptions);
             _logger.Information("Saved startup settings: {@ModManagerOptions}", modManagerOptions);
-            _notificationManager.ShowNotification("Settings saved. Restarting App...", "", TimeSpan.FromSeconds(2));
+            _notificationManager.ShowNotification("设置保存. 重新启动应用程序...", "", TimeSpan.FromSeconds(2));
 
 
             await RestartAppAsync();
@@ -361,19 +361,19 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
     {
         var result = await _windowManagerService.ShowDialogAsync(new ContentDialog()
         {
-            Title = "Reorganize Mods?",
+            Title = "重新整理 Mods?",
             Content = new TextBlock()
             {
                 Text =
-                    "Do you want to reorganize the Mods folder?\n" +
-                    "This will prompt the application to sort existing mods that are directly in the Mods folder and Others folder, into folders assigned to their respective characters.\n\n" +
-                    "Any mods that can't be reasonably matched will be placed in an 'Others' folder. While the mods already in 'Others' folder will remain there.",
+                    "你想要重新整理mods文件夹?\n" +
+                    "这将提示应用程序对直接在mods文件夹和Others文件夹中的现有mod进行排序，并将其分配给各自的角色.\n\n" +
+                    "任何不能合理匹配的mod都将被放在“Others”文件夹中。而已经在“其他”文件夹中的mod将保留在那里.",
                 TextWrapping = TextWrapping.WrapWholeWords,
                 IsTextSelectionEnabled = true
             },
-            PrimaryButtonText = "Yes",
+            PrimaryButtonText = "是的",
             DefaultButton = ContentDialogButton.Primary,
-            CloseButtonText = "Cancel",
+            CloseButtonText = "取消",
             Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style
         });
 
@@ -469,11 +469,11 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
         var dialog = new ContentDialog
         {
             Title = _localizer.GetLocalizedStringOrDefault("/Settings/StartElevatorDialogTitle") ??
-                    "Start Elevator Process?",
+                    "启动 Elevator 进程?",
             Content = stackPanel,
             DefaultButton = ContentDialogButton.Primary,
-            CloseButtonText = "Cancel",
-            PrimaryButtonText = "Start",
+            CloseButtonText = "取消",
+            PrimaryButtonText = "启动",
             XamlRoot = App.MainWindow.Content.XamlRoot
         };
 
@@ -556,13 +556,13 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
     {
         var dialog = new ContentDialog()
         {
-            PrimaryButtonText = "Export",
+            PrimaryButtonText = "导出",
             IsPrimaryButtonEnabled = true,
-            CloseButtonText = "Cancel",
+            CloseButtonText = "取消",
             DefaultButton = ContentDialogButton.Primary
         };
 
-        dialog.Title = "Export Mods";
+        dialog.Title = "导出所有Mod";
 
         dialog.ContentTemplate = contentDialog.ContentTemplate;
 
@@ -636,19 +636,19 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
 
             var restartDialog = new ContentDialog()
             {
-                Title = "Restart Required",
+                Title = "需要重新启动应用程序",
                 Content = new TextBlock()
                 {
                     Text = _localizer.GetLocalizedStringOrDefault("/Settings/ChangeLanguageDialogText",
                         defaultValue:
-                        "Changing the language requires a restart of the application.\n" +
-                        "This is required to ensure that the application is configured correctly for the selected language.\n\n" +
-                        "Do you want to change the language?"),
+                        "更改语言需要重新启动应用程序.\n" +
+                        "这是为了确保应用程序为所选语言正确配置.\n\n" +
+                        "你想要更改语言吗?"),
                     TextWrapping = TextWrapping.WrapWholeWords,
                     IsTextSelectionEnabled = true
                 },
-                PrimaryButtonText = "Change Language and restart",
-                CloseButtonText = "Cancel",
+                PrimaryButtonText = "更改语言并重新启动",
+                CloseButtonText = "取消",
                 DefaultButton = ContentDialogButton.Primary
             };
 
@@ -706,18 +706,18 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
 
         var switchGameDialog = new ContentDialog()
         {
-            Title = "Switch Game",
+            Title = "切换游戏",
             Content = new TextBlock()
             {
                 Text =
-                    "Switching games will restart the application. " +
-                    "This is required to ensure that the application is configured correctly for the selected game.\n\n" +
-                    "Do you want to switch games?",
+                    "切换游戏将重新启动应用程序. " +
+                    "这是为了确保应用程序为所选游戏正确配置.\n\n" +
+                    "你想要切换游戏吗?",
                 TextWrapping = TextWrapping.WrapWholeWords
             },
 
-            PrimaryButtonText = $"Switch to {game}",
-            CloseButtonText = "Cancel",
+            PrimaryButtonText = $"切换至 {game}",
+            CloseButtonText = "取消",
             DefaultButton = ContentDialogButton.Primary
         };
 
@@ -796,7 +796,7 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
                 BackGroundModCheckerSettings.Key);
 
         IsModUpdateCheckerEnabled = modUpdateCheckerOptions.Enabled;
-        var gameInfo = await GameService.GetGameInfoAsync(Enum.Parse<SupportedGames>(SelectedGame));
+        var gameInfo = await _gameService.GetGameInfoAsync(Enum.Parse<SupportedGames>(SelectedGame));
 
         if (gameInfo is not null)
         {

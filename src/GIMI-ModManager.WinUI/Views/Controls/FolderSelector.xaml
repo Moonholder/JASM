@@ -44,7 +44,7 @@
                 Margin="5,0,0,0"
                 VerticalAlignment="Center"
                 Command="{x:Bind BrowseCommand}"
-                Content="Browse" />
+                Content="浏览" />
         </Grid>
 
         <Grid

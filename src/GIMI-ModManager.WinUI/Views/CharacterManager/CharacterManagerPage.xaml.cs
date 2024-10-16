@@ -26,11 +26,12 @@ public sealed partial class CharacterManagerPage : Page
             EditFrame.Content = null;
     }
 
-    private void CharacterSearchBox_OnTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+    private void CharacterSearchBox_OnTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args) 
     {
         if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
             ViewModel.OnSearchTextChanged(sender.Text);
     }
+    
 
     private void CharacterSearchBox_OnQuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
     {

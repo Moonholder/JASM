@@ -72,20 +72,20 @@
                 </NavigationViewItem>-->
 
 
-                <NavigationViewItem helpers:NavigationHelper.NavigateTo="GIMI_ModManager.WinUI.ViewModels.CharacterManagerViewModel" Content="Character Management">
+                <NavigationViewItem helpers:NavigationHelper.NavigateTo="GIMI_ModManager.WinUI.ViewModels.CharacterManagerViewModel" Content="角色管理">
                     <NavigationViewItem.Icon>
                         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xEB7E;" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
 
-                <NavigationViewItem helpers:NavigationHelper.NavigateTo="GIMI_ModManager.WinUI.ViewModels.ModsOverviewVM" Content="Mods Overview">
+                <NavigationViewItem helpers:NavigationHelper.NavigateTo="GIMI_ModManager.WinUI.ViewModels.ModsOverviewVM" Content="模组概览">
                     <NavigationViewItem.Icon>
                         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xEA37;" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
 
 
-                <NavigationViewItem helpers:NavigationHelper.NavigateTo="GIMI_ModManager.WinUI.ViewModels.PresetViewModel" Content="Mod Presets">
+                <NavigationViewItem helpers:NavigationHelper.NavigateTo="GIMI_ModManager.WinUI.ViewModels.PresetViewModel" Content="模组预设">
                     <NavigationViewItem.Icon>
                         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xEA41;" />
                     </NavigationViewItem.Icon>
@@ -105,7 +105,7 @@
             </NavigationView.MenuItems>
 
             <NavigationView.FooterMenuItems>
-                <NavigationViewItem helpers:NavigationHelper.NavigateTo="GIMI_ModManager.WinUI.ViewModels.NotificationsViewModel" Content="Notifications">
+                <NavigationViewItem helpers:NavigationHelper.NavigateTo="GIMI_ModManager.WinUI.ViewModels.NotificationsViewModel" Content="通知">
                     <NavigationViewItem.Icon>
                         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE7E7;" />
                     </NavigationViewItem.Icon>

@@ -90,8 +90,8 @@ public sealed class ModUpdateAvailableChecker
         {
             _logger.Error(e, "An error occurred while executing {FuncName}", methodName);
             _notificationManager.ShowNotification(
-                $"An error occurred in the mod update background checker",
-                $"A fatal error occured in the background checker ({methodName} : {e.HResult}). This means that JASM can no longer check for mod updates in the background or manually. Error: {e}",
+                $"在mod更新后台检查器中发生错误",
+                $"在后台检查器中发生了致命错误 ({methodName} : {e.HResult}). 这意味着 JASM 无法再在后台或手动检查模组更新. 错误信息: {e}",
                 TimeSpan.FromSeconds(20));
             Status = RunningState.Error;
         }
@@ -167,8 +167,8 @@ public sealed class ModUpdateAvailableChecker
                 _logger.Error(e,
                     "An error occurred while checking for mod updates. Stopping background mod update checker...");
                 _notificationManager.ShowNotification(
-                    "An error occurred while checking for mod updates.",
-                    "Stopping background mod update checker...",
+                    "检查mod更新时发生错误.",
+                    "停止后台mod更新检查程序...",
                     TimeSpan.FromSeconds(20));
                 Status = RunningState.Error;
                 NextRunAt = null;
@@ -214,8 +214,8 @@ public sealed class ModUpdateAvailableChecker
         if (!modCheckOperation.ModsToCheck.Any())
         {
             if (!modCheckOperation.ModCheckRequest.ScheduledCheck)
-                _notificationManager.ShowNotification("No mods to check for updates",
-                    $"None of the mods were valid, therefore no check has been performed", TimeSpan.FromSeconds(4));
+                _notificationManager.ShowNotification("没有模组需要检查更新",
+                    $"这些模组都无效，因此没有进行任何检查", TimeSpan.FromSeconds(4));
             return;
         }
 
@@ -232,15 +232,15 @@ public sealed class ModUpdateAvailableChecker
         if (modCheckOperation.ModCheckRequest.IsCharacterCheck &&
             modCheckOperation.ModCheckRequest.Characters.Length == 1)
         {
-            _notificationManager.ShowNotification("Finished checking for mod updates",
-                $"Finished checking {modCheckOperation.ModsToCheck.Count} mods for updates for" +
+            _notificationManager.ShowNotification("完成mod更新检查",
+                $"{modCheckOperation.ModsToCheck.Count} mods 更新检查完毕" +
                 $" {modCheckOperation.ModCheckRequest.Characters.First().DisplayName}",
                 TimeSpan.FromSeconds(4));
         }
         else if (anyModsChecked)
         {
-            _notificationManager.ShowNotification("Finished checking for mod updates",
-                "Finished checking for mod updates", TimeSpan.FromSeconds(4));
+            _notificationManager.ShowNotification("完成mod更新检查",
+                "完成mod更新检查", TimeSpan.FromSeconds(4));
         }
     }
 
@@ -373,7 +373,7 @@ public sealed class ModUpdateAvailableChecker
             ModId = characterSkinEntry.Mod.Id,
             ModCustomName = modSettings.CustomName ?? characterSkinEntry.Mod.Name,
             ModFolderName = characterSkinEntry.Mod.Name,
-            Message = $"New or updated mods are available for {characterSkinEntry.Mod.GetNameWithoutDisabledPrefix()}",
+            Message = $"新的或更新的模组可用 {characterSkinEntry.Mod.GetNameWithoutDisabledPrefix()}",
             ModsRetrievedResult = result
         };
 

@@ -665,5 +665,6 @@ Testing/
 Testing_honkai/
 Testing_wuwa/
 Testing_ZZZ/
-
+output/
+*.7z
 # End of https://www.toptal.com/developers/gitignore/api/visualstudio,csharp,rider

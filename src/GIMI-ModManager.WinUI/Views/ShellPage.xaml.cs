@@ -19,9 +19,12 @@ public sealed partial class ShellPage : Page
 {
     public ShellViewModel ViewModel { get; }
 
-    public ShellPage(ShellViewModel viewModel)
+    private readonly IGameService _gameService;
+
+    public ShellPage(ShellViewModel viewModel, IGameService gameService)
     {
         ViewModel = viewModel;
+        _gameService = gameService;
         InitializeComponent();
 
         ViewModel.NavigationService.Frame = NavigationFrame;
@@ -81,7 +84,7 @@ public sealed partial class ShellPage : Page
             {
                 var categoryViewItem = new NavigationViewItem()
                 {
-                    Content = category.DisplayNamePlural,
+                    Content = category.DisplayNamePlural == "角色" ? "角色概览" : category.DisplayNamePlural,
                     Tag = category.InternalName.Id
                 };
                 NavigationHelper.SetNavigateToParameter(categoryViewItem, category);
@@ -168,8 +171,8 @@ public sealed partial class ShellPage : Page
                     Orientation = Orientation.Horizontal
                 };
 
-                var gameInfo = await GameService.GetGameInfoAsync(game);
-
+                var gameInfo = await _gameService.GetGameInfoAsync(game);
+ 
                 if (gameInfo is null)
                     return;
 
@@ -206,7 +209,7 @@ public sealed partial class ShellPage : Page
 
                 var toolTip = new ToolTip
                 {
-                    Content = $"Double click to switch to {gameInfo.GameName}"
+                    Content = $"双击可切换到 {gameInfo.GameName}"
                 };
 
                 ToolTipService.SetToolTip(navigationItem, toolTip);

@@ -135,7 +135,7 @@
                 Margin="0,16,0,0"
                 HorizontalAlignment="Right"
                 Command="{x:Bind ViewModel.StartUpdateCancelCommand}"
-                Content="Cancel" />
+                Content="取消" />
 
             <Button
                 Grid.Row="2"

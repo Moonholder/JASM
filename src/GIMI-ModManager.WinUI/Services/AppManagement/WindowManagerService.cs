@@ -174,7 +174,7 @@ public class WindowManagerService : IWindowManagerService
                 ["ContentDialogMaxWidth"] = 8000,
                 ["ContentDialogMaxHeight"] = 4000
             },
-            CloseButtonText = "Close"
+            CloseButtonText = "关闭"
         };
 
         dialog.SizeChanged += (s, e) =>

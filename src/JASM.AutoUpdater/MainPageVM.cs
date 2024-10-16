@@ -356,11 +356,11 @@ public partial class MainPageVM : ObservableRecipient
                 fileSystemInfo.Delete();
         }
 
-        Log("Copying new files...", $"Path: {_installedJasmFolder.FullName}");
+        Log("复制新文件...", $"Path: {_installedJasmFolder.FullName}");
 
         await Task.Run(() => { CopyFilesRecursively(_extractedJasmFolder, _installedJasmFolder); });
 
-        Log("JASM updated successfully");
+        Log("JASM更新成功");
     }
 
     // https://stackoverflow.com/questions/58744/copy-the-entire-contents-of-a-directory-in-c-sharp
@@ -374,13 +374,13 @@ public partial class MainPageVM : ObservableRecipient
 
     private void CleanUp()
     {
-        Log("Cleaning up work dir...", WorkDir);
+        Log("正在清理工作目录...", WorkDir);
         if (Directory.Exists(WorkDir))
         {
             Directory.Delete(WorkDir, true);
         }
 
-        Log("Clean up finished");
+        Log("工作目录已清理完成");
     }
 
     // Copied from GIMI-ModManager.WinUI/Services/UpdateChecker.cs
@@ -388,7 +388,7 @@ public partial class MainPageVM : ObservableRecipient
 
     private async Task<ApiGitHubRelease?> GetLatestVersionAsync(CancellationToken cancellationToken)
     {
-        Serilog.Log.Information("Checking for latest version...");
+        Serilog.Log.Information("检查最新版本...");
 
         using var httpClient = CreateHttpClient();
 
@@ -475,10 +475,10 @@ public partial class MainPageVM : ObservableRecipient
     {
         var content = new ContentDialog
         {
-            Title = "Warning",
-            PrimaryButtonText = "Continue",
+            Title = "警告",
+            PrimaryButtonText = "继续",
             DefaultButton = ContentDialogButton.Primary,
-            SecondaryButtonText = "Cancel",
+            SecondaryButtonText = "取消",
             XamlRoot = App.MainWindow.Content.XamlRoot
         };
 
@@ -487,8 +487,8 @@ public partial class MainPageVM : ObservableRecipient
         stackPanel.Children.Add(new TextBlock
         {
             Text =
-                "All files/folders in the installed JASM folder will be deleted permanently!\n" +
-                "This excludes the update folder itself. This action cannot be undone.\n" +
+                "安装的JASM文件夹下的所有文件/文件夹将被永久删除!\n" +
+                "这不包括更新文件夹本身。此操作不能撤消.\n" +
                 $"JASM Directory: {_installedJasmFolder.FullName}",
             TextWrapping = TextWrapping.WrapWholeWords,
             IsTextSelectionEnabled = true,
@@ -498,7 +498,7 @@ public partial class MainPageVM : ObservableRecipient
         if (warningFiles.Any())
             stackPanel.Children.Add(new TextBlock
             {
-                Text = "These files/folders do not belong to JASM and will be deleted as well:\n" +
+                Text = "这些文件/文件夹不属于JASM，也将被删除:\n" +
                        string.Join("\n", warningFiles),
                 IsTextSelectionEnabled = true,
                 TextWrapping = TextWrapping.WrapWholeWords,
@@ -507,7 +507,7 @@ public partial class MainPageVM : ObservableRecipient
 
         stackPanel.Children.Add(new Button()
         {
-            Content = "Open installed JASM folder...",
+            Content = "打开已安装的JASM文件夹...",
             Margin = new Thickness(0, 8, 0, 8),
             Command = new AsyncRelayCommand(async () =>
             {

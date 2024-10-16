@@ -136,8 +136,8 @@ public partial class EditCharacterViewModel : ObservableRecipient, INavigationAw
     {
         var deleteFolderCheckBox = new CheckBox()
         {
-            Content = "Delete Character folder and its contents/Mods?\n" +
-                      "Files will be permanently deleted!",
+            Content = "删除角色文件夹及其内容/mod?\n" +
+                      "文件将被永久删除!",
             IsChecked = false
         };
 
@@ -148,10 +148,10 @@ public partial class EditCharacterViewModel : ObservableRecipient, INavigationAw
                 new TextBlock()
                 {
                     Text =
-                        "Are you sure you want to disable this character? " +
-                        "This will not remove the character, but JASM will no longer recognize the character. " +
-                        "Character can be reactivated later. " +
-                        "This will be executed immediately on pressing yes",
+                        "您确定要禁用此角色吗? " +
+                        "这不会删除该角色，但JASM将不再识别该角色. " +
+                        "角色可以稍后重新激活. " +
+                        "这将在按“是”后立即执行",
                     TextWrapping = TextWrapping.WrapWholeWords,
                     Margin = new Thickness(0, 0, 0, 8)
                 },
@@ -162,10 +162,10 @@ public partial class EditCharacterViewModel : ObservableRecipient, INavigationAw
 
         var disableDialog = new ContentDialog
         {
-            Title = "Disable Character",
+            Title = "禁用角色",
             Content = dialogContent,
-            PrimaryButtonText = "Yes, disable this character",
-            CloseButtonText = "No",
+            PrimaryButtonText = "是的, 禁用此角色",
+            CloseButtonText = "不, 我再想想",
             DefaultButton = ContentDialogButton.Primary,
             XamlRoot = App.MainWindow.Content.XamlRoot
         };
@@ -191,18 +191,18 @@ public partial class EditCharacterViewModel : ObservableRecipient, INavigationAw
         var dialogContent = new TextBlock()
         {
             Text =
-                "Are you sure you want to enable this character? " +
-                "This will be executed immediately on pressing yes",
+                "您确定要启用此角色吗? " +
+                "这将在按“是”后立即执行",
             TextWrapping = TextWrapping.WrapWholeWords,
             Margin = new Thickness(0, 0, 0, 8)
         };
 
         var enableDialog = new ContentDialog
         {
-            Title = "Enable Character",
+            Title = "启用角色",
             Content = dialogContent,
-            PrimaryButtonText = "Yes, enable this character",
-            CloseButtonText = "No",
+            PrimaryButtonText = "是的, 启用此角色",
+            CloseButtonText = "不, 我再想想",
             DefaultButton = ContentDialogButton.Primary,
             XamlRoot = App.MainWindow.Content.XamlRoot
         };
@@ -386,7 +386,7 @@ public partial class EditCharacterViewModel : ObservableRecipient, INavigationAw
         {
             Title = "Character Model",
             Content = content,
-            CloseButtonText = "Close",
+            CloseButtonText = "关闭",
             DefaultButton = ContentDialogButton.Close,
             XamlRoot = App.MainWindow.Content.XamlRoot,
             FullSizeDesired = true

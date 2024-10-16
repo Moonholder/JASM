@@ -18,19 +18,19 @@ internal class ClearEmptyFoldersDialog
     {
         var dialog = new ContentDialog()
         {
-            Title = "Clear Empty Folders",
+            Title = "清除空文件夹",
             Content = new TextBlock()
             {
                 Text =
-                    "This will delete all empty folders in a character's modList if the folder is empty or only contains .JASM_ files/folders\n" +
-                    "If a character folder is empty then it will be deleted as well.\n" +
-                    "Empty folders in the root of the Mods folder will also be deleted",
+                    "如果文件夹为空或只包含.JASM_文件/文件夹，这将删除角色的mod列表中的所有空文件夹\n" +
+                    "如果角色文件夹是空的，那么它也会被删除.\n" +
+                    "mod文件夹根目录下的空文件夹也会被删除",
                 TextWrapping = TextWrapping.WrapWholeWords,
                 IsTextSelectionEnabled = true
             },
             DefaultButton = ContentDialogButton.Primary,
-            PrimaryButtonText = "Delete",
-            CloseButtonText = "Cancel"
+            PrimaryButtonText = "删除",
+            CloseButtonText = "取消"
         };
 
 
@@ -48,7 +48,7 @@ internal class ClearEmptyFoldersDialog
 
             var message = sb.ToString();
 
-            _notificationManager.ShowNotification("Empty folders deleted", message, TimeSpan.FromSeconds(5));
+            _notificationManager.ShowNotification("空文件夹清理完成", message, TimeSpan.FromSeconds(5));
         }
     }
 }

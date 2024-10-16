@@ -28,7 +28,7 @@
                     <MenuBarItem Title="Mods">
                         <MenuBarItem.Items>
 
-                            <MenuFlyoutItem Text="Add Mod...">
+                            <MenuFlyoutItem Text="添加Mod...">
                                 <MenuFlyoutItem.KeyboardAccelerators>
                                     <KeyboardAccelerator Key="O" Modifiers="Control" />
                                 </MenuFlyoutItem.KeyboardAccelerators>
@@ -44,7 +44,7 @@
                 <InfoBar
                     IsClosable="False"
                     IsOpen="True"
-                    Message="More than one skin selected"
+                    Message="选择多个皮肤"
                     Severity="Warning" />
             </Grid>
 

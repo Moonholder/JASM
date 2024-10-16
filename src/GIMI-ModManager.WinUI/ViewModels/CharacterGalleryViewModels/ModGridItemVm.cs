@@ -23,7 +23,7 @@ namespace GIMI_ModManager.WinUI.ViewModels.CharacterGalleryViewModels
         public Uri? ModUrl => string.IsNullOrWhiteSpace(_modModel.ModUrl) ? null : new Uri(_modModel.ModUrl);
         public bool HasModUrl => ModUrl is not null;
         public string NameTooltip => $"Custom Name: {Name}\nFolder Name: {FolderName}";
-        public string ButtonText => _modModel.IsEnabled ? "Disable" : "Enable";
+        public string ButtonText => _modModel.IsEnabled ? "禁用" : "启用";
 
         public string FolderName
         {

@@ -69,6 +69,8 @@ public interface IGameService
     public string OtherCharacterInternalName { get; }
     public string GlidersCharacterInternalName { get; }
     public string WeaponsCharacterInternalName { get; }
+
+    public Task<GameInfo?> GetGameInfoAsync(SupportedGames game);
 }
 
 public class InitializationOptions

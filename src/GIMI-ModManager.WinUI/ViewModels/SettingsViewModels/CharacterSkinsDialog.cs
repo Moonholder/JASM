@@ -21,30 +21,30 @@ internal class CharacterSkinsDialog
             },
             DefaultButton = ContentDialogButton.Primary,
             PrimaryButtonText = isEnabled ? DisablePrimaryButtonText : EnablePrimaryButtonText,
-            CloseButtonText = "Cancel"
+            CloseButtonText = "取消"
         };
 
 
         return await _windowManagerService.ShowDialogAsync(dialog).ConfigureAwait(false);
     }
 
-    private const string EnableTitle = "Enable Character Skins as Characters?";
+    private const string EnableTitle = "启用角色皮肤作为角色?";
 
     private const string EnableContent =
-        "Enabling this will make JASM treat in game skins as separate characters in the character overview.\n" +
-        "This could potentially become the default setting of JASM in the future.\n" +
-        "JASM will not move any of your mods nor will it delete any.\n\n" +
-        "Are you sure you want to enable character skins as characters? JASM will restart afterwards...";
+        "启用这一选项将使 JASM 将游戏中的皮肤视为角色概览中的独立角色.\n" +
+        "这可能会成为未来 JASM 的默认设置.\n" +
+        "JASM 不会移动你的任何模组，也不会删除任何模组.\n\n" +
+        "你确定要启用角色皮肤作为角色吗？JASM 将在之后重新启动...";
 
-    private const string EnablePrimaryButtonText = "Enable";
+    private const string EnablePrimaryButtonText = "启用";
 
-    private const string DisableTitle = "Disable Character Skins as Characters?";
+    private const string DisableTitle = "禁用角色皮肤作为角色?";
 
     private const string DisableContent =
-        "Disabling this will make JASM treat in game skins as skins of the base character in the character overview.\n" +
-        "This is currently the default setting of JASM\n" +
-        "JASM will not move any of your mods nor will it delete any.\n\n" +
-        "Are you sure you want to disable character skins as characters? JASM will restart afterwards...";
+        "如果禁用角色皮肤，JASM 将把游戏中的皮肤视为角色概览中的基础角色的皮肤.\n" +
+        "这目前是 JASM 的默认设置\n" +
+        "JASM 不会移动任何模组，也不会删除任何模组.\n\n" +
+        "你确定要禁用角色皮肤作为角色吗? JASM 将在之后重新启动...";
 
-    private const string DisablePrimaryButtonText = "Disable";
+    private const string DisablePrimaryButtonText = "禁用";
 }

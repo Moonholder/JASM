@@ -48,7 +48,7 @@ public partial class ModListVM : ObservableRecipient
 
                     if (Mods.Count(x => x.IsEnabled) > 1)
                     {
-                        SetInfoBarMessage("More than one skin mod enabled", InfoBarSeverity.Warning);
+                        SetInfoBarMessage("当前有多个Mod同时启用", InfoBarSeverity.Warning);
                     }
                     else
                     {

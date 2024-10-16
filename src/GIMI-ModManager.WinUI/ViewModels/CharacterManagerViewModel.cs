@@ -113,7 +113,7 @@ public partial class CharacterManagerViewModel : ObservableRecipient, INavigatio
         {
             Suggestions.Add(new CharacterSearchResult
             {
-                Name = "No results found",
+                Name = "没有发现合适的角色",
                 ImagePath = _imageHandlerService.PlaceholderImagePath
             });
             return;

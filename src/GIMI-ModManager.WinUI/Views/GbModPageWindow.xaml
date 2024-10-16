@@ -169,9 +169,9 @@
                         Height="50"
                         HorizontalAlignment="Left"
                         Command="{x:Bind ViewModel.CloseCommand}"
-                        Content="Close"
+                        Content="关闭"
                         IsEnabled="{x:Bind ViewModel.IsNotBusy, Mode=OneWay}"
-                        ToolTipService.ToolTip="Close window" />
+                        ToolTipService.ToolTip="关闭窗口" />
                 </Grid>
 
             </Grid>

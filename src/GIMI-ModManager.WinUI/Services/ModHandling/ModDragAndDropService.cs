@@ -5,8 +5,15 @@ using GIMI_ModManager.Core.Contracts.Entities;
 using GIMI_ModManager.Core.Services;
 using GIMI_ModManager.WinUI.Services.AppManagement;
 using Serilog;
-using static GIMI_ModManager.WinUI.Services.ModHandling.ModDragAndDropService.DragAndDropFinishedArgs;
 using GIMI_ModManager.WinUI.Views;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Navigation;
+using System;
+using Microsoft.UI.Dispatching;
+using System.Threading.Tasks;
+using static GIMI_ModManager.WinUI.Services.ModHandling.ModDragAndDropService.DragAndDropFinishedArgs;
+
 
 namespace GIMI_ModManager.WinUI.Services.ModHandling;
 
@@ -72,10 +79,15 @@ public class ModDragAndDropService
             {
                 var scanner = new DragAndDropScanner();
                 var extractResult = scanner.ScanAndGetContents(storageItem.Path);
+                if (extractResult.exitedCode == 1) {
+                    extractResult = await ShowPasswordInputWindow(scanner, storageItem.Path);
+                }
 
-
-                await _modInstallerService.StartModInstallationAsync(
-                    new DirectoryInfo(extractResult.ExtractedFolder.FullPath), modList);
+                if (extractResult != null)
+                {
+                    await _modInstallerService.StartModInstallationAsync(
+                        new DirectoryInfo(extractResult.ExtractedFolder.FullPath), modList);
+                } 
 
                 continue;
             }
@@ -138,6 +150,71 @@ public class ModDragAndDropService
         }
 
         DragAndDropFinished?.Invoke(this, new DragAndDropFinishedArgs(new List<ExtractPaths>()));
+    }
+
+    private async Task<DragAndDropScanResult> ShowPasswordInputWindow(DragAndDropScanner scanner, string filePath)
+    {
+        var tcs = new TaskCompletionSource<DragAndDropScanResult>();
+
+        // 创建一个ContentDialog
+        var passwordDialog = new ContentDialog
+        {
+            Title = "输入加密文件的密码",
+            PrimaryButtonText = "确认",
+            SecondaryButtonText = "取消"
+        };
+
+        // 创建一个Border并设置宽高
+        var border = new Border
+        {
+            Width = 400,
+            Height = 200,
+            Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.White)
+        };
+
+        // 创建一个Frame并导航到PasswordInputPage
+        var frame = new Frame();
+        frame.Navigate(typeof(PasswordInputPage));
+
+        // 获取导航到的页面实例
+        var passwordPage = frame.Content as PasswordInputPage;
+
+        // 设置Border的内容为Frame
+        border.Child = frame;
+
+        // 设置对话框的内容为Border
+        passwordDialog.Content = border;
+
+        // 获取当前窗口的XamlRoot
+        var xamlRoot = App.MainWindow.Content.XamlRoot;
+        if (xamlRoot != null)
+        {
+            passwordDialog.XamlRoot = xamlRoot;
+        }
+
+        // 处理确认按钮点击事件
+        passwordDialog.PrimaryButtonClick += (sender, args) =>
+        {
+            // 获取密码
+            var password = passwordPage?.GetPassword();
+
+            // 在这里使用密码进行后续操作，例如重新尝试解压
+            var extractResult = scanner.ScanAndGetContents(filePath, password);
+            tcs.SetResult(extractResult);
+            passwordDialog.Hide();
+        };
+
+        // 处理取消按钮点击事件
+        passwordDialog.SecondaryButtonClick += (sender, args) =>
+        {
+            tcs.SetResult(null); // 返回null表示取消操作
+            passwordDialog.Hide();
+        };
+
+        // 显示对话框
+        await passwordDialog.ShowAsync();
+
+        return await tcs.Task;
     }
 
     // ReSharper disable once InconsistentNaming
