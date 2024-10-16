@@ -61,8 +61,8 @@ public partial class MainPageVM : ObservableRecipient
         StopReason = null;
 
         Log(InstalledVersion.Equals(new Version(0, 0, 0, 0))
-            ? "Could not determine installed JASM version..."
-            : $"Installed JASM version: {InstalledVersion}");
+            ? "无法确定安装的JASM版本..."
+            : $"已安装的JASM版本: {InstalledVersion}");
 
 
         try
@@ -142,7 +142,7 @@ public partial class MainPageVM : ObservableRecipient
     {
         var newestVersionFound = await GetLatestVersionAsync(cancellationToken);
 
-        Log($"Newest version found: {newestVersionFound?.tag_name}");
+        Log($"找到最新版本: {newestVersionFound?.tag_name}");
 
         var release = new GitHubRelease()
         {
@@ -153,7 +153,7 @@ public partial class MainPageVM : ObservableRecipient
 
         if (release.Version <= InstalledVersion)
         {
-            Stop("Installed version is newer than or equal to the newest version found on GitHub");
+            Stop("当前版本比GitHub上的最新版本更新或等于最新版本");
             return null;
         }
 
@@ -162,13 +162,13 @@ public partial class MainPageVM : ObservableRecipient
         if (getJasmAsset?.browser_download_url is null)
         {
             Stop(
-                "Could not find JASM archive in the newest release on GitHub. This may be due to the developer having to manually upload the zip which can take a few minutes. " +
-                "If the problem persists, then you may have to update JASM manually");
+                "在GitHub上的最新版本中找不到JASM存档。这可能是由于开发人员必须手动上传zip，这可能需要几分钟. " +
+                "如果问题仍然存在，那么您可能必须手动更新JASM");
             return null;
         }
 
         release.DownloadUrl = new Uri(getJasmAsset.browser_download_url);
-        release.BrowserUrl = new Uri(newestVersionFound?.html_url ?? "https://github.com/Jorixon/JASM/releases");
+        release.BrowserUrl = new Uri(newestVersionFound?.html_url ?? "https://github.com/Moonholder/JASM/releases");
         release.FileName = getJasmAsset.name ?? "JASM.zip";
 
         LatestVersion = release.Version.ToString();
@@ -384,7 +384,7 @@ public partial class MainPageVM : ObservableRecipient
     }
 
     // Copied from GIMI-ModManager.WinUI/Services/UpdateChecker.cs
-    private const string ReleasesApiUrl = "https://api.github.com/repos/Jorixon/JASM/releases?per_page=2";
+    private const string ReleasesApiUrl = "https://api.github.com/repos/Moonholder/JASM/releases?per_page=2";
 
     private async Task<ApiGitHubRelease?> GetLatestVersionAsync(CancellationToken cancellationToken)
     {

@@ -429,7 +429,7 @@
                         NavigateUri="https://gamebanana.com/tools/14574" />
 
                     <StackPanel Orientation="Horizontal" Visibility="{x:Bind ViewModel.ShowNewVersionAvailable, Mode=OneWay, Converter={StaticResource BoolToVisibleConverter}}">
-                        <TextBlock VerticalAlignment="Center" Text="New Update Available on GitHub:" />
+                        <TextBlock VerticalAlignment="Center" Text="有新版本可用:" />
                         <TextBlock
                             Margin="8,0"
                             VerticalAlignment="Center"
@@ -449,14 +449,14 @@
                             <Button.Flyout>
                                 <Flyout ShouldConstrainToRootBounds="False">
                                     <StackPanel>
-                                        <TextBlock TextWrapping="WrapWholeWords" Text="JASM will exit and the update will start. Do you want to continue?" />
-                                        <Button Command="{x:Bind ViewModel.UpdateJasmCommand}" Content="Yes, Update JASM 😎" />
+                                        <TextBlock TextWrapping="WrapWholeWords" Text="JASM将退出，更新即将开始。你想继续吗?" />
+                                        <Button Command="{x:Bind ViewModel.UpdateJasmCommand}" Content="是的，更新JASM 😎" />
                                     </StackPanel>
                                 </Flyout>
                             </Button.Flyout>
                             <Button.Content>
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock VerticalAlignment="Center" Text="Update JASM to " />
+                                    <TextBlock VerticalAlignment="Center" Text="更新JASM版本至 " />
                                     <TextBlock
                                         Margin="4,0"
                                         VerticalAlignment="Center"
@@ -469,7 +469,7 @@
                         <Button
                             VerticalAlignment="Center"
                             Command="{x:Bind ViewModel.IgnoreNewVersionCommand}"
-                            Content="Ignore Current Update?"
+                            Content="忽略此次更新?"
                             Visibility="{x:Bind ViewModel.ShowNewVersionAvailable, Mode=OneWay, Converter={StaticResource BoolToVisibleConverter}}" />
                     </StackPanel>
                 </StackPanel>
