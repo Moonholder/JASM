@@ -172,7 +172,7 @@ public sealed partial class ShellPage : Page
                 };
 
                 var gameInfo = await _gameService.GetGameInfoAsync(game);
- 
+
                 if (gameInfo is null)
                     return;
 

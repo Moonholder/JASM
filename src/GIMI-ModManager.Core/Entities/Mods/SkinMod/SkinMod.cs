@@ -96,11 +96,11 @@ public class SkinMod : Mod, ISkinMod
 
     private static string? HasMergedInIFile(DirectoryInfo modDirectory)
     {
-            //     var mergedIniPath = modDirectory.EnumerateFiles("*.ini", SearchOption.TopDirectoryOnly)
-            // .FirstOrDefault(iniFiles =>
-            //     Constants.ScriptIniNames.Any(iniNames =>
-            //         iniNames.Equals(iniFiles.Name, StringComparison.OrdinalIgnoreCase)))
-            // ?.FullName;
+        //     var mergedIniPath = modDirectory.EnumerateFiles("*.ini", SearchOption.TopDirectoryOnly)
+        // .FirstOrDefault(iniFiles =>
+        //     Constants.ScriptIniNames.Any(iniNames =>
+        //         iniNames.Equals(iniFiles.Name, StringComparison.OrdinalIgnoreCase)))
+        // ?.FullName;
 
         // 获取目录及其子目录中的所有 INI 文件
         var iniFiles = modDirectory.EnumerateFiles("*.ini", SearchOption.AllDirectories).ToList();

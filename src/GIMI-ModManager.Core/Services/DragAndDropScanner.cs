@@ -42,12 +42,15 @@ public sealed class DragAndDropScanner
         {
             var copiedArchive = new FileInfo(path);
             copiedArchive = copiedArchive.CopyTo(Path.Combine(_tmpFolder, Path.GetFileName(path)), true);
-            if (password is not null) {
+            if (password is not null)
+            {
                 exitCode = Extract7Z(copiedArchive.FullName, password);
-            } else {
+            }
+            else
+            {
                 var result = Extractor(copiedArchive.FullName);
-                exitCode = result?.Invoke(copiedArchive.FullName)?? 0;
-            }   
+                exitCode = result?.Invoke(copiedArchive.FullName) ?? 0;
+            }
         }
         else if (Directory.Exists(path)) // ModDragAndDropService handles loose folders, but this added just in case 
         {
@@ -87,7 +90,8 @@ public sealed class DragAndDropScanner
         Func<string, int>? action = null;
 
         if (_extractTool == ExtractTool.Bundled7Zip)
-            action = (path) => {
+            action = (path) =>
+            {
                 return Extract7Z(path);
             };
         // else if (_extractTool == ExtractTool.SharpCompress)
@@ -207,8 +211,8 @@ public sealed class DragAndDropScanner
         };
         process.BeginOutputReadLine();
         process.WaitForExit();
-        
-         // 如果密码为空且密码被要求，返回1
+
+        // 如果密码为空且密码被要求，返回1
         int exitCode = (passwordRequired && !passwordProvided) ? 1 : process.ExitCode;
         _logger.Information("7z extraction finished with exit code {ExitCode}", exitCode);
         return exitCode;

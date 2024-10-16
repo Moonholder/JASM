@@ -79,7 +79,8 @@ public class ModDragAndDropService
             {
                 var scanner = new DragAndDropScanner();
                 var extractResult = scanner.ScanAndGetContents(storageItem.Path);
-                if (extractResult.exitedCode == 1) {
+                if (extractResult.exitedCode == 1)
+                {
                     extractResult = await ShowPasswordInputWindow(scanner, storageItem.Path);
                 }
 
@@ -87,7 +88,7 @@ public class ModDragAndDropService
                 {
                     await _modInstallerService.StartModInstallationAsync(
                         new DirectoryInfo(extractResult.ExtractedFolder.FullPath), modList);
-                } 
+                }
 
                 continue;
             }
