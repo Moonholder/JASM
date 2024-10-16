@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.16.6](https://github.com/Moonholder/JASM/compare/v2.16.5...v2.16.6) (2024-10-16)
+
+
+### Miscellaneous
+
+* dotnet format ([3cc321c](https://github.com/Moonholder/JASM/commit/3cc321c8ee28befe4c696689e8328fa2a3904326))
+
 ## [2.16.5](https://github.com/Moonholder/JASM/compare/v2.16.4...v2.16.5) (2024-10-16)
 
 
