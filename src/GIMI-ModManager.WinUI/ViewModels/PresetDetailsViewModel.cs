@@ -350,12 +350,12 @@ public sealed partial class PresetDetailsViewModel(
             _backendModEntries[backendIndex] = updatedModEntry;
 
 
-            _notificationManager.ShowNotification("Preferences saved for mod",
-                $"Preferences saved successfully for mod {presetEntryDetailedVm.Name}", null);
+            _notificationManager.ShowNotification("已保存模组首选项",
+                $"为mod {presetEntryDetailedVm.Name} 成功保存首选项 ", null);
         }
         catch (Exception e)
         {
-            _notificationManager.ShowNotification("Failed to save mod preferences", e.Message, null);
+            _notificationManager.ShowNotification("保存模组首选项失败", e.Message, null);
         }
         finally
         {

@@ -105,10 +105,10 @@ public partial class CharacterGalleryViewModel
         catch (Exception e)
         {
             _logger.Error(e, "Failed to delete mod");
-            notificationManager.ShowNotification("Failed to delete mod", e.Message, TimeSpan.FromSeconds(10));
+            notificationManager.ShowNotification("删除模组失败", e.Message, TimeSpan.FromSeconds(10));
             return;
         }
 
-        notificationManager.ShowNotification("Mod deleted", $"{vm.Name} has been deleted", TimeSpan.FromSeconds(5));
+        notificationManager.ShowNotification("模组删除成功", $"{vm.Name} 已从列表中删除。", TimeSpan.FromSeconds(5));
     }
 }

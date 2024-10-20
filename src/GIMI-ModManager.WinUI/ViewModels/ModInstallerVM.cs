@@ -329,7 +329,7 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
                 ModFolderName = newMod.Name,
                 ShowOnOverview = true,
                 AttentionType = AttentionType.Added,
-                Message = "Mod was successfully added"
+                Message = "Mod添加成功"
             }));
     }
 
@@ -686,7 +686,7 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
             _logger.Error(e, "Failed to get presets");
 
             _notificationManager.ShowNotification(
-                "Failed to get presets, could not automatically update mod entries in presets", e.Message,
+                "获取预设失败，无法自动更新预设中的模组条目", e.Message,
                 TimeSpan.FromSeconds(5));
 
             return;
@@ -713,7 +713,7 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
                 _logger.Error(e, "Failed to update preset {presetName}", modPreset.Name);
 
                 _notificationManager.ShowNotification(
-                    $"Failed to update preset {modPreset.Name}, could not automatically update mod entries in preset. Please check your presets manually",
+                    $"更新预设 {modPreset.Name} 失败，无法自动更新预设中的模组条目。请手动检查你的预设",
                     e.Message, TimeSpan.FromSeconds(5));
                 return;
             }
@@ -729,19 +729,19 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
 
         var readOnlyPresetsMessage = readOnlyPresetsWithMod.Length == 0
             ? ""
-            : "The following presets were not updated due to being read-only: " +
+            : "以下预设由于为只读而未更新: " +
               string.Join(", ", readOnlyPresets.Select(p => p.Name));
 
         TimeSpan? notificationDuration = readOnlyPresetsMessage.Any() ? null : TimeSpan.FromSeconds(6);
 
         var presetsUpdatedMessage = presetsUpdated.Count == 0
             ? ""
-            : "The mod was updated in the following presets: " +
+            : "模组在以下预设中已更新: " +
               string.Join(", ", presets.Select(p => p.Name)) + "\n" +
               readOnlyPresetsMessage;
 
         var notification = new SimpleNotification(
-            title: presetsUpdated.Count == 0 ? "Mod was not updated for any presets" : "Mod was updated for presets",
+            title: presetsUpdated.Count == 0 ? "模组没有更新任何预设" : "模组已更新至预设",
             message: presetsUpdatedMessage,
             notificationDuration);
 
@@ -1002,8 +1002,8 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
             }
             else
             {
-                _notificationManager.QueueNotification("Could not determine skin for new mod",
-                    "JASM could not determine what ingame skin this mod is for, therefore it can't determine what mods to disable.");
+                _notificationManager.QueueNotification("无法确定新模组的皮肤",
+                    "JASM 无法确定该模组对应的游戏内皮肤，因此无法确定需要禁用哪些模组.");
                 return;
             }
         }

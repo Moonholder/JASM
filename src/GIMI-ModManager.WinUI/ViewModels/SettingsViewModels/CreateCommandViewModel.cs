@@ -341,7 +341,7 @@ public partial class CreateCommandViewModel : ObservableObject
                 .ConfigureAwait(false);
             CloseRequested?.Invoke(this, EventArgs.Empty);
 
-            _notificationManager.ShowNotification($"Command '{createOptions.CommandDisplayName}' updated successfully.",
+            _notificationManager.ShowNotification($"命令 '{createOptions.CommandDisplayName}' 更新成功.",
                 "", TimeSpan.FromSeconds(3));
 
             await _commandService.SetSpecialCommands(_createOptions.CommandDefinition.Id,
@@ -352,7 +352,7 @@ public partial class CreateCommandViewModel : ObservableObject
             await _commandService.SaveCommandDefinitionAsync(createOptions).ConfigureAwait(false);
             CloseRequested?.Invoke(this, EventArgs.Empty);
 
-            _notificationManager.ShowNotification($"Command '{createOptions.CommandDisplayName}' created successfully.",
+            _notificationManager.ShowNotification($"命令 '{createOptions.CommandDisplayName}' 创建成功.",
                 "",
                 TimeSpan.FromSeconds(3));
 

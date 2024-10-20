@@ -57,8 +57,8 @@ public sealed class ModPresetHandlerService(
 
         if (!preferencesResult)
         {
-            _notificationManager.ShowNotification("Could not write mod preferences to 3Dmigoto user .ini",
-                "See logs for details", null);
+            _notificationManager.ShowNotification("无法写入模组设置到 3Dmigoto user .ini",
+                "详细信息请参见日志", null);
         }
 
 
@@ -67,8 +67,8 @@ public sealed class ModPresetHandlerService(
 
         var simpleNotification = new SimpleNotification
         (
-            "Mod preset applied",
-            $"Mod preset {modPreset.Name} applied successfully",
+            "应用模组预设",
+            $"模组预设 {modPreset.Name} 已应用",
             TimeSpan.FromSeconds(5)
         );
 
