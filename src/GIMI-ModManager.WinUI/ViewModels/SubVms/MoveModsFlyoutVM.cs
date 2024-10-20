@@ -242,16 +242,16 @@ public partial class MoveModsFlyoutVM : ObservableRecipient
         {
             _logger.Error(e, "Error deleting mods");
             notificationManager
-                .ShowNotification("Invalid Operation Exception",
-                    $"Mods Deleted: {modsDeleted}. Some mods may not have been deleted, See Logs.\n{e.Message}",
+                .ShowNotification("无效操作异常",
+                    $"已删除模组：{modsDeleted}。某些模组可能未被删除，请查看日志。\n{e.Message}",
                     TimeSpan.FromSeconds(10));
             if (modsDeleted > 0)
                 ModsDeleted?.Invoke(this, EventArgs.Empty);
             return;
         }
 
-        notificationManager.ShowNotification($"{modsDeleted} Mods Deleted",
-            $"Successfully deleted {string.Join(", ", modEntryNames)} in {shownCharacterName} Mods Folder",
+        notificationManager.ShowNotification($"{modsDeleted} 模组已删除",
+            $"在 {shownCharacterName} 中删除文件夹 {string.Join(", ", modEntryNames)} 成功",
             TimeSpan.FromSeconds(5));
 
         ModsDeleted?.Invoke(this, EventArgs.Empty);

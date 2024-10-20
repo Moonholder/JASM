@@ -370,8 +370,8 @@ public partial class ModPaneVM : ObservableRecipient
         IsEditingModName = false;
 
         if (!errored)
-            _notificationManager.ShowNotification("Mod settings saved",
-                $"Settings saved for {SelectedModModel.Name}", TimeSpan.FromSeconds(2));
+            _notificationManager.ShowNotification("Mod设置已保存",
+                $"模组 {SelectedModModel.Name} 的设置已保存", TimeSpan.FromSeconds(2));
     }
 
     private void SettingsPropertiesChanged()

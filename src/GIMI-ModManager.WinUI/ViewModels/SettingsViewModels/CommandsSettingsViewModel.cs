@@ -97,18 +97,18 @@ public sealed partial class CommandsSettingsViewModel(
             }
             catch (Exception e)
             {
-                _notificationManager.ShowNotification("Failed to kill process", e.Message, TimeSpan.FromSeconds(5));
+                _notificationManager.ShowNotification("终止进程失败", e.Message, TimeSpan.FromSeconds(5));
                 return;
             }
         }
         else
         {
-            _notificationManager.ShowNotification("Process is not running", string.Empty, TimeSpan.FromSeconds(2));
+            _notificationManager.ShowNotification("进程未运行", string.Empty, TimeSpan.FromSeconds(2));
             await RefreshRunningCommandsAsync();
             return;
         }
 
-        _notificationManager.ShowNotification("Process killed successfully", string.Empty, TimeSpan.FromSeconds(2));
+        _notificationManager.ShowNotification("进程被成功终止", string.Empty, TimeSpan.FromSeconds(2));
     }
 
     private bool CanEditCommand(CommandDefinitionVM? commandVM)
@@ -162,7 +162,7 @@ public sealed partial class CommandsSettingsViewModel(
             await RefreshCommandDefinitionsAsync();
         }
 
-        _notificationManager.ShowNotification($"Command '{commandDefinition.CommandDisplayName}' deleted successfully",
+        _notificationManager.ShowNotification($"命令 '{commandDefinition.CommandDisplayName}' 删除成功",
             string.Empty, TimeSpan.FromSeconds(2));
     }
 
