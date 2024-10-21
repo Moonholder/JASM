@@ -1192,7 +1192,7 @@ public sealed class Sorter
                 ));
     }
 
-    public const string ModCountSortName = "Mod数量";
+    public const string ModCountSortName = "模组数量";
 
     public static Sorter ModCount()
     {

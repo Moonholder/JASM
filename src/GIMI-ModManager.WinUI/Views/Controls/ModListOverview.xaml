@@ -28,7 +28,7 @@
                     <MenuBarItem Title="Mods">
                         <MenuBarItem.Items>
 
-                            <MenuFlyoutItem Text="添加Mod...">
+                            <MenuFlyoutItem Text="添加模组...">
                                 <MenuFlyoutItem.KeyboardAccelerators>
                                     <KeyboardAccelerator Key="O" Modifiers="Control" />
                                 </MenuFlyoutItem.KeyboardAccelerators>

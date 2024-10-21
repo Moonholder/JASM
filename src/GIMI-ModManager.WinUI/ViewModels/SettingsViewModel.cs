@@ -361,13 +361,13 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
     {
         var result = await _windowManagerService.ShowDialogAsync(new ContentDialog()
         {
-            Title = "重新整理 Mods?",
+            Title = "重新整理模组?",
             Content = new TextBlock()
             {
                 Text =
-                    "你想要重新整理mods文件夹?\n" +
-                    "这将提示应用程序对直接在mods文件夹和Others文件夹中的现有mod进行排序，并将其分配给各自的角色.\n\n" +
-                    "任何不能合理匹配的mod都将被放在“Others”文件夹中。而已经在“其他”文件夹中的mod将保留在那里.",
+                    "你想要重新整理模组文件夹?\n" +
+                    "这将提示应用程序对直接在模组文件夹和Others文件夹中的现有模组进行排序，并将其分配给各自的角色.\n\n" +
+                    "任何不能合理匹配的模组都将被放在“Others”文件夹中。而已经在“其他”文件夹中的模组将保留在那里.",
                 TextWrapping = TextWrapping.WrapWholeWords,
                 IsTextSelectionEnabled = true
             },

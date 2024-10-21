@@ -59,7 +59,7 @@
                 <AppBarButton
                     Command="{x:Bind ViewModel.AddModsToPresetCommand}"
                     Icon="Add"
-                    Label="添加 Mod" />
+                    Label="添加模组" />
             </CommandBar>
 
             <TextBox

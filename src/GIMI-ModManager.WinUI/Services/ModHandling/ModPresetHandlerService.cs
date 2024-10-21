@@ -136,8 +136,8 @@ public sealed class ModPresetHandlerService(
     {
         await _userPreferencesService.SaveModPreferencesAsync().ConfigureAwait(false);
 
-        return Result.Success(new SimpleNotification("Active preferences saved",
-            $"Preferences stored in {Constants.UserIniFileName} have been saved for enabled mods",
+        return Result.Success(new SimpleNotification("激活的偏好设置已保存",
+            $"存储在 {Constants.UserIniFileName} 的偏好设置已为启用的模组保存",
             TimeSpan.FromSeconds(5)));
     }
 
@@ -164,8 +164,8 @@ public sealed class ModPresetHandlerService(
         await _userPreferencesService.SetModPreferencesAsync(cancellationToken: cancellationToken)
             .ConfigureAwait(false);
 
-        return Result.Success(new SimpleNotification("Saved preferences applied",
-            $"Mod preferences written to 3DMigoto {Constants.UserIniFileName}",
+        return Result.Success(new SimpleNotification("已应用保存的偏好设置",
+            $"模组偏好设置已写入 3DMigoto {Constants.UserIniFileName}",
             TimeSpan.FromSeconds(5)));
     }
 }

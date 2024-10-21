@@ -156,8 +156,8 @@ public partial class MoveModsFlyoutVM : ObservableRecipient
             return;
         }
 
-        notificationManager.ShowNotification($"{selectedModsCount} Mods Moved",
-            $"Successfully moved {string.Join(",", SelectedMods.Select(m => m.Name))} mods to {selectedCharacterName}",
+        notificationManager.ShowNotification($"{selectedModsCount} 模组已移动",
+            $"成功将 {string.Join(",", SelectedMods.Select(m => m.Name))} 移动到 {selectedCharacterName}",
             TimeSpan.FromSeconds(5));
 
         ModsMoved?.Invoke(this, EventArgs.Empty);
@@ -310,7 +310,7 @@ public partial class MoveModsFlyoutVM : ObservableRecipient
     }
 
     private readonly IModdableObject
-        _noCharacterFound = new Character("None", "No Characters Found...");
+        _noCharacterFound = new Character("None", "没有找到任何角色...");
 
     [RelayCommand]
     private async Task TextChanged(string searchString)
