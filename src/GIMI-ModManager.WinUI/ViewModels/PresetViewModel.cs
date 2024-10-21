@@ -156,7 +156,7 @@ public partial class PresetViewModel(
         }
         catch (Exception e)
         {
-            _notificationManager.ShowNotification("Failed to delete preset", e.Message, TimeSpan.FromSeconds(5));
+            _notificationManager.ShowNotification("删除预设失败", e.Message, TimeSpan.FromSeconds(5));
         }
 
         ReloadPresets();
@@ -208,12 +208,12 @@ public partial class PresetViewModel(
                 }
             });
 
-            _notificationManager.ShowNotification("Preset applied", $"Preset '{preset.Name}' has been applied",
+            _notificationManager.ShowNotification("已应用预设", $"预设: '{preset.Name}' 已应用。",
                 TimeSpan.FromSeconds(5));
         }
         catch (Exception e)
         {
-            _notificationManager.ShowNotification("Failed to apply preset", e.Message, TimeSpan.FromSeconds(5));
+            _notificationManager.ShowNotification("预设应用失败", e.Message, TimeSpan.FromSeconds(5));
         }
         finally
         {
@@ -238,7 +238,7 @@ public partial class PresetViewModel(
         }
         catch (Exception e)
         {
-            _notificationManager.ShowNotification("Failed to rename preset", e.Message, TimeSpan.FromSeconds(5));
+            _notificationManager.ShowNotification("预设重命名失败", e.Message, TimeSpan.FromSeconds(5));
         }
 
         ReloadPresets();
@@ -256,7 +256,7 @@ public partial class PresetViewModel(
         }
         catch (Exception e)
         {
-            _notificationManager.ShowNotification("Failed to save preset order", e.Message, TimeSpan.FromSeconds(5));
+            _notificationManager.ShowNotification("保存预设顺序失败", e.Message, TimeSpan.FromSeconds(5));
         }
 
         ReloadPresets();
@@ -299,7 +299,7 @@ public partial class PresetViewModel(
         }
         catch (Exception e)
         {
-            _notificationManager.ShowNotification("Failed to toggle read only", e.Message, TimeSpan.FromSeconds(5));
+            _notificationManager.ShowNotification("预设切换只读失败", e.Message, TimeSpan.FromSeconds(5));
         }
 
         ReloadPresets();
@@ -310,7 +310,7 @@ public partial class PresetViewModel(
     {
         var dialog = new ContentDialog
         {
-            Title = "随机化Mod",
+            Title = "随机启用模组",
             PrimaryButtonText = "随机",
             CloseButtonText = "取消",
             DefaultButton = ContentDialogButton.Primary
@@ -323,13 +323,13 @@ public partial class PresetViewModel(
 
         stackPanel.Children.Add(new TextBlock
         {
-            Text = "选择你想要随机化Mod的类别:"
+            Text = "选择你想要随机的类别:"
         });
 
         stackPanel.Children.Add(new TextBlock
         {
             Text =
-                "注意：这只会随机化mod文件夹，意味着只有一个mod是启用的。所以“Others __”文件夹不会被随机化。而每个角色皮肤只能启用一个mod",
+                "注意：这只会随机启用模组，所以如果一个角色有多个模组，只能启用其中一个。如果需要随机启用角色皮肤，请在“角色皮肤”文件夹中启用模组。“Others __”文件夹下的模组不会被随机化。",
             TextWrapping = TextWrapping.WrapWholeWords,
             Margin = new Thickness(0, 0, 0, 10)
         });
@@ -390,7 +390,7 @@ public partial class PresetViewModel(
 
         if (selectedCategories.Count == 0)
         {
-            _notificationManager.ShowNotification("No categories selected", "No categories were selected to randomize.",
+            _notificationManager.ShowNotification("未选择任何类别", "未选择任何类别进行随机化.",
                 TimeSpan.FromSeconds(5));
             return;
         }
@@ -463,7 +463,7 @@ public partial class PresetViewModel(
         catch (Exception e)
         {
             _logger.Error(e, "Failed to randomize mods");
-            _notificationManager.ShowNotification("Failed to randomize mods", e.Message, TimeSpan.FromSeconds(5));
+            _notificationManager.ShowNotification("随机启用模组失败", e.Message, TimeSpan.FromSeconds(5));
             return;
         }
 
@@ -473,8 +473,8 @@ public partial class PresetViewModel(
         }
 
 
-        _notificationManager.ShowNotification("Mods randomized",
-            "Mods have been randomized for the categories: " +
+        _notificationManager.ShowNotification("已随机启用模组",
+            "已经为以下类别随机启用模组: " +
             string.Join(", ",
                 selectedCategories.Select(c =>
                     c.DisplayNamePlural)),
@@ -492,8 +492,8 @@ public partial class PresetViewModel(
             var isStarted = await Task.Run(() => ElevatorService.StartElevator());
 
             if (!isStarted)
-                _notificationManager.ShowNotification("Failed to start elevator",
-                    "Elevator failed to start",
+                _notificationManager.ShowNotification("启动Elevator失败",
+                    "Elevator进程启动失败",
                     TimeSpan.FromSeconds(5));
 
             AutoSync3DMigotoConfig = ElevatorService.ElevatorStatus == ElevatorStatus.Running &&
@@ -502,7 +502,7 @@ public partial class PresetViewModel(
         }
         catch (Exception e)
         {
-            _notificationManager.ShowNotification("Failed to start elevator", e.Message, TimeSpan.FromSeconds(5));
+            _notificationManager.ShowNotification("启动Elevator失败", e.Message, TimeSpan.FromSeconds(5));
         }
 
         IsBusy = false;
@@ -523,14 +523,14 @@ public partial class PresetViewModel(
                     await _userPreferencesService.Clear3DMigotoModPreferencesAsync(ResetOnlyEnabledMods)
                         .ConfigureAwait(false);
 
-                _notificationManager.ShowNotification("Mod preferences reset",
-                    $"Mod preferences have been removed{(AlsoReset3DmigotoConfig ? $" and {Constants.UserIniFileName} have been cleared" : "")}",
+                _notificationManager.ShowNotification("模组首选项已重置",
+                    $"模组首选项已被移除{(AlsoReset3DmigotoConfig ? $" 并且 {Constants.UserIniFileName} 已被清除" : "")}",
                     TimeSpan.FromSeconds(5));
             });
         }
         catch (Exception e)
         {
-            _notificationManager.ShowNotification("Failed to reset mod preferences", e.Message,
+            _notificationManager.ShowNotification("模组首选项重置失败", e.Message,
                 TimeSpan.FromSeconds(5));
         }
     }

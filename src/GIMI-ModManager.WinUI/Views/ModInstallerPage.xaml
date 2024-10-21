@@ -20,14 +20,14 @@
             <MenuFlyoutItem
                 Command="{x:Bind ViewModel.SetModPreviewImageCommand, Mode=OneWay}"
                 CommandParameter="{Binding}"
-                Text="设置mod预览图" />
+                Text="设置模组预览图" />
         </MenuFlyout>
 
         <MenuFlyout x:Name="FolderFlyout">
             <MenuFlyoutItem
                 Command="{x:Bind ViewModel.SetRootFolderCommand, Mode=OneWay}"
                 CommandParameter="{Binding}"
-                Text="设置Mod根目录" />
+                Text="设置模组根目录" />
             <!--  TODO: Enable Later  -->
             <MenuFlyoutItem
                 Command="{x:Bind ViewModel.SetShaderFixesFolderCommand}"
@@ -152,7 +152,7 @@
                     <StackPanel Grid.Row="2">
                         <CheckBox
                             Margin="4"
-                            Content="覆盖现有mod"
+                            Content="覆盖现有模组"
                             IsChecked="{x:Bind ViewModel.OverwriteExistingMod, Mode=TwoWay}" />
 
                         <CheckBox
@@ -160,7 +160,7 @@
                             Command="{x:Bind ViewModel.ToggleReplaceDuplicateModInPresetCommand}"
                             IsChecked="{x:Bind ViewModel.ReplaceDuplicateModInPreset, Mode=OneWay}"
                             ToolTipService.ToolTip="重复的模组将在预设中被新安装的模组替换。该选项与'在预设中替换旧模组'复选框是互斥的.">
-                            <TextBlock TextWrapping="WrapWholeWords" Text="用新的mod替换预设中重复的mod" />
+                            <TextBlock TextWrapping="WrapWholeWords" Text="用新的模组替换预设中重复的模组" />
                         </CheckBox>
                     </StackPanel>
 
@@ -214,7 +214,7 @@
                     HorizontalAlignment="Left"
                     VerticalAlignment="Bottom"
                     Command="{x:Bind ViewModel.ReRetrieveModInfoCommand}"
-                    ToolTipService.ToolTip="从mod页面检索mod信息">
+                    ToolTipService.ToolTip="从模组页面检索详细信息">
                     <Button.Content>
                         <FontIcon Glyph="&#xE72C;" />
                     </Button.Content>
@@ -231,7 +231,7 @@
                     Header="Mod页面URL"
                     IsReadOnly="{x:Bind ViewModel.IsRetrievingModInfo, Mode=OneWay}"
                     KeyDown="UrlTextBox_KeyDown"
-                    PlaceholderText="粘贴 URL 以自动填充字段 (仅支持 GameBanana)"
+                    PlaceholderText="粘贴 URL 自动填充模组预览图等信息 (仅支持 GameBanana)"
                     Text="{x:Bind ViewModel.ModUrl, Mode=TwoWay}" />
                 <TextBox
                     Grid.Row="2"
@@ -403,7 +403,7 @@
                         Margin="4,0"
                         HorizontalAlignment="Right"
                         Command="{x:Bind ViewModel.AddModCommand}"
-                        Content="添加Mod">
+                        Content="添加模组">
                         <Button.KeyboardAccelerators>
                             <KeyboardAccelerator Key="S" Modifiers="Control" />
                         </Button.KeyboardAccelerators>

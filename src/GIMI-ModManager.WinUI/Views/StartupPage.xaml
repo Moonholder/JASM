@@ -138,7 +138,7 @@
                 <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                     <CheckBox
                         Margin="12,0,12,0"
-                        Content="整理 Mods "
+                        Content="整理模组文件夹"
                         IsChecked="{x:Bind ViewModel.ReorganizeModsOnStartup, Mode=TwoWay}" />
 
                     <Button Background="Transparent" CornerRadius="8">
@@ -181,7 +181,7 @@
 
                     <CheckBox
                         Margin="40,0,12,0"
-                        Content="同时禁用所有mod"
+                        Content="同时禁用所有模组"
                         IsChecked="{x:Bind ViewModel.DisableMods, Mode=TwoWay}"
                         IsEnabled="{x:Bind ViewModel.ReorganizeModsOnStartup, Mode=OneWay}" />
 

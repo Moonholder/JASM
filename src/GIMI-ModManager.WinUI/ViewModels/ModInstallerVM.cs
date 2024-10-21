@@ -95,8 +95,8 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
 
     [ObservableProperty] private ObservableCollection<RootFolder> _rootFolder = new();
 
-    private const string AddRenameText = "重命名和添加mod";
-    private const string AddReplaceText = "覆盖旧mod";
+    private const string AddRenameText = "重命名和添加模组";
+    private const string AddReplaceText = "覆盖旧模组";
     [ObservableProperty] private string _primaryButtonText = AddRenameText;
 
     [ObservableProperty] private bool _overwriteExistingMod;
@@ -329,7 +329,7 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
                 ModFolderName = newMod.Name,
                 ShowOnOverview = true,
                 AttentionType = AttentionType.Added,
-                Message = "Mod添加成功"
+                Message = "模组添加成功"
             }));
     }
 

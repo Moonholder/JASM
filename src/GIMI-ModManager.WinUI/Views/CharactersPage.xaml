@@ -218,7 +218,7 @@
                 CornerRadius="8"
                 Orientation="Horizontal">
                 <CommandBar DefaultLabelPosition="Right" IsOpen="False">
-                    <AppBarButton Label="Mod 预设">
+                    <AppBarButton Label="模组预设">
                         <AppBarButton.Icon>
                             <FontIcon Glyph="&#xEA41;" />
                         </AppBarButton.Icon>

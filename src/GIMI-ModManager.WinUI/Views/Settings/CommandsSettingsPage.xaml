@@ -116,17 +116,17 @@
 
                                                 <Button
                                                     VerticalAlignment="Center"
-                                                    Content="Delete"
+                                                    Content="删除"
                                                     IsEnabled="{x:Bind CanDelete, Mode=OneWay}">
                                                     <Button.Flyout>
                                                         <Flyout x:Name="DeleteFlyout">
                                                             <StackPanel>
-                                                                <TextBlock Text="Are you sure you want to delete this command?" />
+                                                                <TextBlock Text="您确定要删除该命令吗?" />
                                                                 <Button
                                                                     HorizontalAlignment="Center"
                                                                     Command="{x:Bind DeleteCommand}"
                                                                     CommandParameter="{x:Bind}"
-                                                                    Content="删除" />
+                                                                    Content="确定" />
                                                             </StackPanel>
                                                         </Flyout>
                                                     </Button.Flyout>

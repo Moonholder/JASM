@@ -118,10 +118,10 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="BackupWarning.Text" xml:space="preserve">
-    <value>在使用与您的文件交互的应用程序之前备份您的文件或修改通常是一个很好的主意</value>
+    <value>在使用与您的文件交互的应用程序之前，备份您的文件/模组总是一个好主意。</value>
   </data>
   <data name="Body1.Text" xml:space="preserve">
-    <value>作为首次设置的一部分，您需要选择一个 Mod加载器 文件夹（3dmigoto/gimi/wwmi/zzmi/srmi）及其连接的 Mods 文件夹。3dmigoto 文件夹包含 3DMigoto Loader.exe 或 3DMigotoLoader.exe 以及一个 Mods 文件夹。如果您尚未设置模型导入程序，请立即进行设置，请参阅下方链接。我通常在 Gamebanana 上找到大多数修改，但 Nexusmods 也有一些。</value>
+    <value>作为首次设置的一部分，您需要选择 Mod加载器 文件夹（3dmigoto/gimi/wwmi/zzmi/srmi 和 存放Mod的文件夹。3dmigoto 文件夹包含 3DMigoto Loader.exe 或 3DMigotoLoader.exe 以及一个 Mods 文件夹。如果您尚未设置模型导入程序，请立即进行设置，请参阅下方链接。我通常在 Gamebanana 上找到大多数修改，但 Nexusmods 也有一些。</value>
   </data>
   <data name="Body2.Text" xml:space="preserve">
     <value>保存设置后，应用程序将在“Mods”文件夹中为每个角色创建一个文件夹。位于这些角色文件夹之外的修改文件夹将被忽略。此应用程序通过在修改文件夹前加上“DISABLED_”来启用和禁用修改。JASM 还支持导出由其管理的修改，如果您希望将它们用于其他应用程序。</value>

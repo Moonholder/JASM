@@ -154,7 +154,7 @@ public sealed partial class CommandsSettingsViewModel(
         }
         catch (Exception e)
         {
-            _notificationManager.ShowNotification("Failed to delete command", e.Message, TimeSpan.FromSeconds(5));
+            _notificationManager.ShowNotification("删除命令失败", e.Message, TimeSpan.FromSeconds(5));
             return;
         }
         finally

@@ -57,7 +57,7 @@
             <TextBlock
                 Grid.Column="0"
                 Style="{StaticResource TitleTextBlockStyle}"
-                Text="Mod预设和Mod首选项"
+                Text="模组预设和模组首选项"
                 TextWrapping="NoWrap" />
         </Grid>
 
@@ -86,12 +86,12 @@
                         Margin="0,8"
                         Orientation="Horizontal"
                         Spacing="8">
-                        <Button Command="{x:Bind ViewModel.CreatePresetCommand}" Content="保存已启用的mod首选项并创建新的预设" />
+                        <Button Command="{x:Bind ViewModel.CreatePresetCommand}" Content="保存已启用的模组首选项并创建新的预设" />
                         <CheckBox
                             Content="创建为空预设"
                             IsChecked="{x:Bind ViewModel.CreateEmptyPresetInput, Mode=TwoWay}"
                             IsEnabled="{x:Bind ViewModel.IsNotBusy, Mode=OneWay}"
-                            ToolTipService.ToolTip="如果选中，新的预设将被创建而不启用任何mod." />
+                            ToolTipService.ToolTip="如果选中，新的预设将被创建而不启用任何模组." />
 
                     </StackPanel>
                 </StackPanel>
@@ -127,7 +127,7 @@
                         <Button
                             Command="{x:Bind ViewModel.SaveActivePreferencesCommand}"
                             Content="保存激活的mod偏好（KeySwaps）到mod"
-                            ToolTipService.ToolTip="读取3Dmigoto的mod首选项（d3dx_user.ini）为启用的mod和存储设置在每个mod的 .JASM_Config.json文件"
+                            ToolTipService.ToolTip="读取3Dmigoto的mod首选项（d3dx_user.ini）为启用的mod存储设置在每个mod的 .JASM_Config.json文件"
                             Visibility="{x:Bind ViewModel.ShowManualControls, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
 
                         <Button
@@ -196,7 +196,7 @@
 
 
                                     <StackPanel Orientation="Horizontal" Spacing="4">
-                                        <TextBlock Text="此预设启用的Mod数量:" />
+                                        <TextBlock Text="此预设启用的模组数量:" />
                                         <TextBlock Text="{x:Bind EnabledModsCount, Mode=OneWay}" />
 
                                     </StackPanel>
@@ -294,15 +294,15 @@
             <StackPanel Orientation="Horizontal" Spacing="32">
                 <Button
                     Command="{x:Bind ViewModel.RandomizeModsCommand}"
-                    Content="随机化Mod"
+                    Content="随机启用模组"
                     ToolTipService.ToolTip="打开一个包含更多信息的对话框" />
 
-                <Button Content="重置Mod首选项" ToolTipService.ToolTip="清除存储在mod中的mod偏好 .JASM_ModConfig.json">
+                <Button Content="重置模组首选项" ToolTipService.ToolTip="清除存储在mod中的mod偏好 .JASM_ModConfig.json">
                     <Button.Flyout>
                         <Flyout>
                             <StackPanel>
-                                <TextBlock Text="重置持久化的mod首选项" />
-                                <CheckBox Content="仅重置正启用的mod" IsChecked="{x:Bind ViewModel.ResetOnlyEnabledMods, Mode=TwoWay}" />
+                                <TextBlock Text="重置持久化的模组首选项" />
+                                <CheckBox Content="仅重置正启用的模组" IsChecked="{x:Bind ViewModel.ResetOnlyEnabledMods, Mode=TwoWay}" />
                                 <CheckBox Content="同时重置加载器的d3dx_user.ini文件" IsChecked="{x:Bind ViewModel.AlsoReset3DmigotoConfig, Mode=TwoWay}" />
                                 <Button
                                     HorizontalAlignment="Center"
