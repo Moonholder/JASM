@@ -61,8 +61,8 @@ public class KeySwapService
         catch (Exception e)
         {
             _logger.Error(e, "Failed to save key swap configuration for mod {ModName}", skinMod.Name);
-            _notificationManager.ShowNotification($"Failed to save key swap configuration for mod {skinMod.Name}",
-                $"An error occurred when saving. Reason: {e.Message}", null);
+            _notificationManager.ShowNotification($"保存KeySwap配置失败: {skinMod.Name}",
+                $"保存时发生错误。原因是: {e.Message}", null);
             return new Error<Exception>(e);
         }
     }

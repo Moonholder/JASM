@@ -69,7 +69,7 @@
                 MaxHeight="32"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Center"
-                PlaceholderText="搜索 Mods..."
+                PlaceholderText="搜索模组..."
                 TextChanged="SearchBox_OnTextChanged" />
         </Grid>
 

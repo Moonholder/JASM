@@ -44,12 +44,12 @@
                         Margin="10"
                         FontSize="20"
                         FontWeight="Bold"
-                        Text="New Downloadable Files Found" />
+                        Text="找到新的可下载文件" />
 
                     <controls:LinkButton
                         Link="{x:Bind ViewModel.ModPath, Mode=OneWay}"
                         Text="{x:Bind ViewModel.ModPath.LocalPath, Mode=OneWay, FallbackValue=ModPath}"
-                        ToolTipService.ToolTip="Open Mod folder..." />
+                        ToolTipService.ToolTip="打开文件夹..." />
                 </StackPanel>
 
                 <controls1:SwitchPresenter Grid.Row="1" Value="{x:Bind ViewModel.Initializing, Mode=OneWay}">
@@ -58,7 +58,7 @@
                         <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
                             <StackPanel>
                                 <ProgressRing IsActive="True" />
-                                <TextBlock Text="Loading Mod Info from GameBanana..." />
+                                <TextBlock Text="从GameBanana加载Mod信息..." />
                             </StackPanel>
                         </Grid>
 
@@ -116,7 +116,7 @@
                                                     Grid.Row="0"
                                                     Grid.Column="1"
                                                     HorizontalAlignment="Right"
-                                                    Text="New since last check"
+                                                    Text="上次检查后新增"
                                                     Visibility="{Binding Path=IsNew, Mode=OneTime, Converter={StaticResource BoolToVisibilityConverter}}" />
 
                                                 <StackPanel Grid.Row="1" Grid.Column="1">
@@ -126,7 +126,7 @@
                                                             HorizontalAlignment="Right"
                                                             Command="{x:Bind DownloadCommand}"
                                                             CommandParameter="{Binding Mode=OneWay}"
-                                                            Content="Download"
+                                                            Content="下载"
                                                             Visibility="{Binding Path=ShowDownloadButton, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
 
                                                         <Button
@@ -179,7 +179,7 @@
                         Height="50"
                         HorizontalAlignment="Left"
                         Command="{x:Bind ViewModel.IgnoreAndCloseCommand}"
-                        Content="Ignore and Close"
+                        Content="忽略并关闭"
                         IsEnabled="{x:Bind ViewModel.IsNotBusy, Mode=OneWay}"
                         ToolTipService.ToolTip="Removes the notification and closes this window" />
 
@@ -189,7 +189,7 @@
                         HorizontalAlignment="Right"
                         Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
                         CornerRadius="4">
-                        <TextBlock Text="Last Check:" />
+                        <TextBlock Text="上次检查:" />
                         <TextBlock Text="{x:Bind ViewModel.LastUpdateCheck, Mode=OneWay}" />
                     </StackPanel>
 
@@ -223,7 +223,7 @@
                         Grid.Column="1"
                         Margin="8,0"
                         Click="ButtonBase_OnClick"
-                        Content="Downloads"
+                        Content="下载管理"
                         IsEnabled="{x:Bind ViewModel.IsOpenDownloadButtonEnabled, Mode=OneWay}" />
                     <ProgressRing
                         x:Name="ModPageLoadingRing"

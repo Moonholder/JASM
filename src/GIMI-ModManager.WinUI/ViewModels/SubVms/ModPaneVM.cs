@@ -136,7 +136,7 @@ public partial class ModPaneVM : ObservableRecipient
         foreach (var supportedImageExtension in _supportedImageExtensions)
             filePicker.FileTypeFilter.Add(supportedImageExtension);
 
-        filePicker.CommitButtonText = "Set Image";
+        filePicker.CommitButtonText = "设置图片";
         var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
         WinRT.Interop.InitializeWithWindow.Initialize(filePicker, hwnd);
         var file = await filePicker.PickSingleFileAsync();
@@ -325,7 +325,7 @@ public partial class ModPaneVM : ObservableRecipient
 
 
         var saveResult =
-            await Task.Run(() => _modSettingsService.SaveSettingsAsync(SelectedModModel), cancellationToken);
+            await Task.Run(() => _modSettingsService.LegacySaveSettingsAsync(SelectedModModel), cancellationToken);
 
         if (saveResult.TryPickT2(out var error, out var notFoundOrSuccess))
         {

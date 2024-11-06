@@ -46,7 +46,7 @@
                         <StackPanel
                             Grid.Row="1"
                             Orientation="Horizontal"
-                            ToolTipService.ToolTip="Keeps the jasm mod folder structure. I.e. Characters/Diluc/SomeDilucSkinMod">
+                            ToolTipService.ToolTip="保持jasm模组文件夹结构。例如：Characters/Diluc/SomeDilucSkinMod">
                             <CheckBox IsChecked="{x:Bind KeepFolderStructure, Mode=TwoWay}" />
                             <TextBlock
                                 IsTextSelectionEnabled="True"
@@ -57,7 +57,7 @@
                         <StackPanel
                             Grid.Row="2"
                             Orientation="Horizontal"
-                            ToolTipService.ToolTip="This is recursive and removes all files AND folders starting with .JASM_">
+                            ToolTipService.ToolTip="这是递归的，并且会删除所有以.JASM_开头的文件和文件夹">
                             <CheckBox IsChecked="{x:Bind RemoveJasmSettings, Mode=TwoWay}" />
                             <TextBlock
                                 IsTextSelectionEnabled="True"
@@ -68,7 +68,7 @@
                         <StackPanel
                             Grid.Row="3"
                             Orientation="Horizontal"
-                            ToolTipService.ToolTip="Whether to prepend or remove the 'DISABLED_' prefix from the exported mods">
+                            ToolTipService.ToolTip="是否在导出的模组前添加或移除'DISABLED_'前缀">
                             <ComboBox ItemsSource="{x:Bind SetModStatuses, Mode=TwoWay}" SelectedItem="{x:Bind SetModStatus, Mode=TwoWay}" />
                             <TextBlock
                                 VerticalAlignment="Center"
@@ -149,6 +149,14 @@
                     </StackPanel>
 
                 </StackPanel>
+
+
+               <TextBlock Text="遗留设置: " />
+                <CheckBox
+                    Command="{x:Bind ViewModel.ToggleLegacyCharacterDetailsCommand}"
+                    Content="使用旧版角色详情页面（此设置将在后续版本中移除）"
+                    IsChecked="{x:Bind ViewModel.LegacyCharacterDetails, Mode=OneWay}"
+                    ToolTipService.ToolTip="角色详情页面是您查看以网格形式展示的模组的地方。此页面已经被重写。由于可能出现的错误，目前有一个过渡期，旧版本仍然可用。此复选框将在某个时候被移除。" />
 
                 <TextBlock
                     Style="{ThemeResource SubtitleTextBlockStyle}"
@@ -260,7 +268,7 @@
                         VerticalAlignment="Center"
                         IsTextSelectionEnabled="True"
                         TextWrapping="WrapWholeWords"
-                        Text="The Mod Update Checker checks for updates on startup and periodically in the background, only support for GameBanana.&#x0a;Does a check every 30 minutes when enabled, however, it only checks mods that have not been checked in at least 15 minutes.&#x0a;Manually checking for updates always checks GameBanana directly"
+                        Text="Mod更新检查器会在启动时以及在后台定期检查更新，仅支持GameBanana.&#x0a;在启用时，每2小时检查一次，但仅检查那些至少在1小时内未被检查过的模组.&#x0a;手动检查更新时始终会直接检查GameBanana"
                         l:Uids.Uid="/Settings/ModUpdateCheckerDescription" />
 
                 </StackPanel>
@@ -303,11 +311,15 @@
                         <Button
                             Margin="40,0,0,0"
                             Command="{x:Bind ViewModel.ReorganizeModsCommand}"
-                            Content="整理 Mods" />
+                            Content="整理Mods文件夹" />
                         <Button
                             Margin="40,0,0,0"
                             Command="{x:Bind ViewModel.ShowCleanModsFolderDialogCommand}"
-                            Content="清理mod文件夹" />
+                            Content="清理模组文件夹" />
+                        <Button
+                            Margin="40,0,0,0"
+                            Command="{x:Bind ViewModel.ShowDisableAllModsDialogCommand}"
+                            Content="禁用所有模组" />
                     </StackPanel>
 
                     <StackPanel Margin="0,16,0,0" Orientation="Horizontal">

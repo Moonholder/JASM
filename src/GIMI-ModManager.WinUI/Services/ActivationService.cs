@@ -9,7 +9,6 @@ using GIMI_ModManager.Core.GamesService;
 using GIMI_ModManager.Core.Helpers;
 using GIMI_ModManager.WinUI.Activation;
 using GIMI_ModManager.WinUI.Contracts.Services;
-using GIMI_ModManager.WinUI.Helpers;
 using GIMI_ModManager.WinUI.Models.Options;
 using GIMI_ModManager.WinUI.Models.Settings;
 using GIMI_ModManager.WinUI.Services.AppManagement;
@@ -48,9 +47,7 @@ public class ActivationService : IActivationService
     private readonly LifeCycleService _lifeCycleService;
     private UIElement? _shell = null;
 
-    private readonly bool IsMsix = RuntimeHelper.IsMSIX;
     private readonly string[] _args = Environment.GetCommandLineArgs().Skip(1).ToArray();
-
 
     public ActivationService(ActivationHandler<LaunchActivatedEventArgs> defaultHandler,
         IEnumerable<IActivationHandler> activationHandlers, IThemeSelectorService themeSelectorService,
@@ -468,14 +465,14 @@ public class ActivationService : IActivationService
         var textWarning = new TextBlock()
         {
             Text = """
-                   这个版本的JASM有一个新的文件夹结构.
+                   This version of JASM has a new folder structure.
 
-                   现在角色按照类别进行组织，每个类别都有自己的文件夹。因此新格式如下:
+                   Now Characters are organized by category, and each category has its own folder. So new format is as follows:
                    Mods/Category/Character/<Mod Folders>
-                   因此，JASM 在重新组织之前无法看到你的任何模组.
-                   这是一次性的操作，如果需要，你可以手动进行.
+                   Therefore, JASM won't see any of your mods until you reorganize them.
+                   This is a one time thing, and you can do it manually if you want.
 
-                   另外，角色文件夹现在是按需创建的，并且可以在设置页面清理空文件夹.
+                   Also character folders are now created on demand and it is possible to clean up empty folders on the settings page.
                    """,
             IsTextSelectionEnabled = true,
             TextWrapping = TextWrapping.WrapWholeWords
@@ -484,7 +481,7 @@ public class ActivationService : IActivationService
 
         var textWarning2 = new TextBlock()
         {
-            Text = "如果你对此不确定，请先备份你的模组。我在我自己的模组上进行了测试.",
+            Text = "If you're uncertain about this then back up your mods first. I've tested this on my own mods.",
             FontWeight = FontWeights.Bold,
             IsTextSelectionEnabled = true,
             TextWrapping = TextWrapping.WrapWholeWords
@@ -497,8 +494,8 @@ public class ActivationService : IActivationService
         {
             Text = """
 
-                   这个弹出窗口将显示，直到您选择下面的选项。您也可以使用设置页面上的重新组织按钮。
-                   如果你想知道发生了什么，可以查看日志.
+                   This popup will be shown until you chose an option below. You can also use the reorganize button on the settings page.
+                   Check the logs if you want to see what's happening.
                    """,
             IsTextSelectionEnabled = true,
             TextWrapping = TextWrapping.WrapWholeWords
@@ -509,11 +506,11 @@ public class ActivationService : IActivationService
 
         var dialog = new ContentDialog
         {
-            Title = "新建文件夹结构",
+            Title = "New Folder structure",
             Content = stackPanel,
-            PrimaryButtonText = "重新整理我的mod",
-            SecondaryButtonText = "我自己来做",
-            CloseButtonText = "取消",
+            PrimaryButtonText = "Reorganize my mods",
+            SecondaryButtonText = "I will do it myself",
+            CloseButtonText = "Cancel",
             DefaultButton = ContentDialogButton.Primary
         };
 
