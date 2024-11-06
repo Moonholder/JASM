@@ -2,7 +2,6 @@
 using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
-using Windows.ApplicationModel;
 using Windows.Storage.Pickers;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -108,6 +107,8 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
 
     public PathPicker PathToGIMIFolderPicker { get; }
     public PathPicker PathToModsFolderPicker { get; }
+
+    [ObservableProperty] private bool _legacyCharacterDetails;
 
 
     private static bool _showElevatorStartDialog = true;
@@ -280,19 +281,7 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
 
     private static string GetVersionDescription()
     {
-        Version version;
-
-        if (RuntimeHelper.IsMSIX)
-        {
-            var packageVersion = Package.Current.Id.Version;
-
-            version = new Version(packageVersion.Major, packageVersion.Minor, packageVersion.Build,
-                packageVersion.Revision);
-        }
-        else
-        {
-            version = Assembly.GetExecutingAssembly().GetName().Version!;
-        }
+        var version = Assembly.GetExecutingAssembly().GetName().Version!;
 
         return
             $"{"AppDisplayName".GetLocalized()} - {VersionFormatter(version)}";
@@ -412,13 +401,6 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
     private async Task RestartAppAsync(int delay = 2)
     {
         _navigationViewService.IsEnabled = false;
-
-        if (RuntimeHelper.IsMSIX)
-        {
-            _logger.Information("Restarting in MSIX mode not supported. Shutting down...");
-            Application.Current.Exit();
-            return;
-        }
 
         await Task.Delay(TimeSpan.FromSeconds(delay));
 
@@ -599,13 +581,13 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
                     removeLocalJasmSettings: model.RemoveJasmSettings, zip: false,
                     keepCharacterFolderStructure: model.KeepFolderStructure, setModStatus: model.SetModStatus);
             });
-            _notificationManager.ShowNotification("Mods exported", $"Mods exported to {folder.Path}",
+            _notificationManager.ShowNotification("模组导出成功", $"导出模组到 {folder.Path}",
                 TimeSpan.FromSeconds(5));
         }
         catch (Exception e)
         {
             _logger.Error(e, "Error exporting mods");
-            _notificationManager.ShowNotification("Error exporting mods", e.Message, TimeSpan.FromSeconds(10));
+            _notificationManager.ShowNotification("导出模组出错", e.Message, TimeSpan.FromSeconds(10));
         }
         finally
         {
@@ -684,13 +666,13 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
         catch (Exception e)
         {
             _logger.Error(e, "Error starting update process");
-            _notificationManager.ShowNotification("Error starting update process", e.Message, TimeSpan.FromSeconds(10));
+            _notificationManager.ShowNotification("启动更新过程出错", e.Message, TimeSpan.FromSeconds(10));
         }
 
         if (errors is not null && errors.Any())
         {
             var errorMessages = errors.Select(e => e.Description).ToArray();
-            _notificationManager.ShowNotification("Could not start update process", string.Join('\n', errorMessages),
+            _notificationManager.ShowNotification("无法启动更新进程", string.Join('\n', errorMessages),
                 TimeSpan.FromSeconds(10));
         }
     }
@@ -796,7 +778,7 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
                 BackGroundModCheckerSettings.Key);
 
         IsModUpdateCheckerEnabled = modUpdateCheckerOptions.Enabled;
-        var gameInfo = await _gameService.GetGameInfoAsync(Enum.Parse<SupportedGames>(SelectedGame));
+        var gameInfo = await GameService.GetGameInfoAsync(Enum.Parse<SupportedGames>(SelectedGame));
 
         if (gameInfo is not null)
         {
@@ -806,6 +788,9 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
         var windowSettings =
             await _localSettingsService.ReadOrCreateSettingAsync<ScreenSizeSettings>(ScreenSizeSettings.Key);
 
+        var characterDetailsSettings = await _localSettingsService.ReadCharacterDetailsSettingsAsync(SettingScope.App);
+
+        LegacyCharacterDetails = characterDetailsSettings.LegacyCharacterDetails;
         PersistWindowSize = windowSettings.PersistWindowSize;
         PersistWindowPosition = windowSettings.PersistWindowPosition;
         await GenshinProcessManager.TryInitialize();
@@ -834,11 +819,29 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
         SetCacheString(maxValue);
     }
 
+    [RelayCommand]
+    private async Task ToggleLegacyCharacterDetailsAsync()
+    {
+        var settings = await _localSettingsService.ReadCharacterDetailsSettingsAsync(SettingScope.App);
+
+        LegacyCharacterDetails = !LegacyCharacterDetails;
+        settings.LegacyCharacterDetails = LegacyCharacterDetails;
+
+        await _localSettingsService.SaveCharacterDetailsSettingsAsync(settings, SettingScope.App).ConfigureAwait(false);
+    }
+
 
     [RelayCommand]
     private static Task ShowCleanModsFolderDialogAsync()
     {
         var dialog = new ClearEmptyFoldersDialog();
+        return dialog.ShowDialogAsync();
+    }
+
+    [RelayCommand]
+    private Task ShowDisableAllModsDialogAsync()
+    {
+        var dialog = new DisableAllModsDialog();
         return dialog.ShowDialogAsync();
     }
 

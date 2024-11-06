@@ -104,7 +104,7 @@
                     <InfoBar
                         IsClosable="False"
                         IsOpen="True"
-                        Message="1. 你可以选择覆盖旧模组, 从而删除它.&#x0a;Or&#x0a;2. 你可以重命名新模组或旧模组中的任意一个"
+                        Message="1. 你可以选择覆盖旧模组, 从而删除它.&#x0a;或者&#x0a;2. 你可以重命名新模组或旧模组中的任意一个"
                         Severity="Warning" />
 
                     <Grid Grid.Row="1">
@@ -115,36 +115,36 @@
 
 
                         <StackPanel Margin="4">
-                            <TextBlock Text="New Mod:" />
+                            <TextBlock Text="新模组:" />
                             <TextBox
                                 Margin="4"
-                                Header="自定义名称"
+                                Header="重命名"
                                 IsEnabled="{x:Bind ViewModel.OverwriteExistingMod, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}"
-                                PlaceholderText="CustomName"
+                                PlaceholderText="自定义名称"
                                 Text="{x:Bind ViewModel.CustomName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                             <TextBox
                                 Margin="4"
-                                Header="文件夹名称"
+                                Header="重命名文件夹"
                                 IsEnabled="{x:Bind ViewModel.OverwriteExistingMod, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}"
-                                PlaceholderText="FolderName"
+                                PlaceholderText="文件夹名称"
                                 Text="{x:Bind ViewModel.ModFolderName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         </StackPanel>
 
                         <StackPanel Grid.Column="1" Margin="4">
-                            <TextBlock Text="Other Mod:" />
+                            <TextBlock Text="其他模组:" />
                             <TextBox
                                 Margin="4"
-                                Header="自定义名称"
+                                Header="重命名"
                                 IsEnabled="{x:Bind ViewModel.OverwriteExistingMod, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}"
-                                PlaceholderText="CustomName"
+                                PlaceholderText="自定义名称"
                                 Text="{x:Bind ViewModel.DuplicateModCustomName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                             <TextBox
                                 Margin="4"
-                                Header="文件夹名称"
+                                Header="重命名文件夹"
                                 IsEnabled="{x:Bind ViewModel.OverwriteExistingMod, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}"
-                                PlaceholderText="FolderName"
+                                PlaceholderText="文件夹名称"
                                 Text="{x:Bind ViewModel.DuplicateModFolderName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                            <controls:LinkButton Link="{x:Bind ViewModel.DuplicateModPath, Mode=OneWay}" Text="Open existing mod folder..." />
+                            <controls:LinkButton Link="{x:Bind ViewModel.DuplicateModPath, Mode=OneWay}" Text="打开已经存在的模组文件夹..." />
                         </StackPanel>
 
                     </Grid>
@@ -333,7 +333,7 @@
                         Padding="8"
                         HorizontalAlignment="Left"
                         TextWrapping="WrapWholeWords"
-                        Text="你也可以手动选择模组预览图像的图像文件。通常只需按下 '添加Mod' 就可以了" />
+                        Text="你也可以手动选择模组预览图像的图像文件。通常只需按下 '添加模组' 就可以了" />
 
 
 

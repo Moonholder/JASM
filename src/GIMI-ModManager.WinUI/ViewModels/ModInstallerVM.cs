@@ -242,7 +242,7 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
                     var fileSystemItem = RootFolder.FirstOrDefault()
                         ?.GetByPath(autoFoundImages.FirstOrDefault()?.LocalPath ?? "");
                     SetModPreviewImage(fileSystemItem);
-                    ImageSource = "Local image found in new Mod";
+                    ImageSource = "在新模组中找到本地图像";
                 });
 
             if (options?.ModUrl is not null)
@@ -451,7 +451,7 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
         }
 
         LastSelectedImageFile = fileSystemItem;
-        ImageSource = "Local image selected from new Mod";
+        ImageSource = "从新模组中选择的本地图像";
     }
 
     [RelayCommand]
@@ -1019,7 +1019,7 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
 
         if (detectedSkin is not null && !detectedSkin.InternalNameEquals(_inGameSkin.InternalName))
         {
-            await _modSettingsService.SetCharacterSkinOverride(installedMod.Id, _inGameSkin.InternalName)
+            await _modSettingsService.SetCharacterSkinOverrideLegacy(installedMod.Id, _inGameSkin.InternalName)
                 .ConfigureAwait(false);
         }
 

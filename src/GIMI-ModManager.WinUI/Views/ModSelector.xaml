@@ -35,7 +35,7 @@
                 Grid.Column="1"
                 MinWidth="400"
                 HorizontalAlignment="Right"
-                PlaceholderText="搜索 Mods..."
+                PlaceholderText="搜索模组..."
                 TextChanged="TextBox_OnTextChanged" />
         </Grid>
 

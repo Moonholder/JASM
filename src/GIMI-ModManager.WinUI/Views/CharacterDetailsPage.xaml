@@ -22,6 +22,15 @@
         <xaml:StringToUri x:Name="StringToUri" />
         <xaml:AttentionTypeToSymbolConverter x:Name="AttentionTypeToSymbolConverter" />
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+
+        <Style x:Key="BaseButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="FontSize" Value="16" />
+        </Style>
+
         <Storyboard x:Name="PulsingIcon">
             <DoubleAnimation
                 AutoReverse="True"
@@ -49,24 +58,18 @@
                         <RowDefinition />
                     </Grid.RowDefinitions>
                     <Grid BorderBrush="{ThemeResource ControlElevationBorderBrush}" BorderThickness="0,0,0,4">
-                        <Grid>
-                            <StackPanel Orientation="Horizontal">
-
-                                <TextBlock
-                                    Margin="0,0,4,0"
-                                    HorizontalAlignment="Left"
-                                    Text="选中Mod数量:" />
-                                <TextBlock HorizontalAlignment="Left" Text="{x:Bind ViewModel.MoveModsFlyoutVM.SelectedModsCount, Mode=OneWay}" />
-                            </StackPanel>
-                            <Button
-                                Padding="0"
-                                HorizontalAlignment="Right"
-                                Background="Transparent"
-                                BorderThickness="0"
-                                Command="{x:Bind ViewModel.MoveModsFlyoutVM.DeleteModsCommand}">
-                                <FontIcon FontSize="16" Glyph="&#xE74D;" />
-                            </Button>
-                        </Grid>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock
+                                Margin="0,0,4,0"
+                                HorizontalAlignment="Left"
+                                Text="选中模组数量:" />
+                            <TextBlock HorizontalAlignment="Left" Text="{x:Bind ViewModel.MoveModsFlyoutVM.SelectedModsCount, Mode=OneWay}" />
+                        </StackPanel>
+                        <Button
+                            Style="{StaticResource BaseButtonStyle}"
+                            Command="{x:Bind ViewModel.MoveModsFlyoutVM.DeleteModsCommand}">
+                            <FontIcon FontSize="16" Glyph="&#xE74D;" />
+                        </Button>
                     </Grid>
 
                     <StackPanel
@@ -105,7 +108,6 @@
                         BorderThickness="0,4,0,0">
                         <Expander
                             HorizontalAlignment="Stretch"
-                            VerticalAlignment="Top"
                             ExpandDirection="Down"
                             Header="移动mod到另一个皮肤"
                             IsEnabled="{x:Bind ViewModel.MultipleInGameSkins, Mode=OneWay}"
@@ -113,17 +115,13 @@
                             <Expander.Content>
                                 <StackPanel>
                                     <controls1:SelectCharacterFromGrid GridSource="{x:Bind ViewModel.MoveModsFlyoutVM.SelectableCharacterSkins, Mode=OneWay}" ItemClickedCommand="{x:Bind ViewModel.MoveModsFlyoutVM.SelectNewCharacterSkinCommand}" />
-
                                     <StackPanel Margin="0,8,0,0" Orientation="Horizontal">
-                                        <Button HorizontalAlignment="Left" Command="{x:Bind ViewModel.MoveModsFlyoutVM.OverrideModCharacterSkinCommand}">
-                                            <Button.Content>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <FontIcon Margin="0,0,4,0" Glyph="&#xE74E;" />
-                                                    <TextBlock Text="覆盖" />
-                                                </StackPanel>
-                                            </Button.Content>
+                                        <Button Style="{StaticResource BaseButtonStyle}" Command="{x:Bind ViewModel.MoveModsFlyoutVM.OverrideModCharacterSkinCommand}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <FontIcon Margin="0,0,4,0" Glyph="&#xE74E;" />
+                                                <TextBlock Text="覆盖" />
+                                            </StackPanel>
                                         </Button>
-
                                         <StackPanel Margin="4,0,0,0" Visibility="{x:Bind ViewModel.MoveModsFlyoutVM.SelectedModHasCharacterSkinOverride, Mode=OneWay}">
                                             <TextBlock Text="覆盖皮肤设置为: " />
                                             <TextBlock HorizontalAlignment="Center" Text="{x:Bind ViewModel.MoveModsFlyoutVM.SelectedModCharacterSkinOverrideDisplayName, Mode=OneWay}" />
@@ -135,7 +133,6 @@
                     </StackPanel>
                 </Grid>
             </Flyout>
-
 
             <Flyout x:Name="SelectInGameSkin">
                 <controls1:SelectCharacterFromGrid GridSource="{x:Bind ViewModel.SelectableInGameSkins, Mode=OneWay}" ItemClickedCommand="{x:Bind ViewModel.SwitchCharacterSkinCommand}" />
@@ -154,8 +151,6 @@
                     Icon="Copy"
                     Text="复制图片" />
                 <MenuFlyoutSeparator />
-                <MenuFlyoutSeparator />
-                <MenuFlyoutSeparator />
                 <MenuFlyoutItem
                     Command="{x:Bind ViewModel.ModPaneVM.ClearImageCommand}"
                     Icon="Delete"
@@ -163,24 +158,20 @@
             </MenuFlyout>
         </Grid.Resources>
 
-
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="10*" />
             </Grid.ColumnDefinitions>
 
-
-
             <Grid Background="{ThemeResource ControlFillColorDefaultBrush}">
-
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
+
                 <StackPanel MaxWidth="220">
                     <Grid>
-
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition />
@@ -190,10 +181,8 @@
                             <Button.KeyboardAccelerators>
                                 <KeyboardAccelerator Key="Escape" IsEnabled="True" />
                             </Button.KeyboardAccelerators>
-
                             <FontIcon Glyph="&#xE72B; &#xE80A; " />
                         </Button>
-
 
                         <StackPanel
                             Grid.Column="1"
@@ -207,7 +196,6 @@
                                 <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xEA37;" />
                             </Button>
 
-
                             <Button
                                 HorizontalAlignment="Right"
                                 Command="{x:Bind ViewModel.GoToCharacterEditScreenCommand}"
@@ -215,29 +203,16 @@
                                 <FontIcon Glyph="&#xE70F;" />
                             </Button>
                         </StackPanel>
-
                     </Grid>
 
-                    <Grid
-                        x:Name="itemHero"
-                        Width="200"
-                        Height="200"
-                        Margin="{StaticResource SmallRightMargin}"
-                        Padding="{StaticResource XSmallLeftTopRightBottomMargin}"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Top"
-                        CornerRadius="10">
-                        <Image
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            ImageFailed="Image_OnImageFailed">
-
+                    <Grid x:Name="itemHero" Width="200" Height="200" Margin="{StaticResource SmallRightMargin}" Padding="{StaticResource XSmallLeftTopRightBottomMargin}" HorizontalAlignment="Center" VerticalAlignment="Top" CornerRadius="10">
+                        <Image HorizontalAlignment="Center" VerticalAlignment="Center" ImageFailed="Image_OnImageFailed">
                             <Image.Source>
                                 <BitmapImage DecodePixelHeight="200" UriSource="{x:Bind ViewModel.ModdableObjectImage, Mode=OneWay}" />
                             </Image.Source>
-
                         </Image>
                     </Grid>
+
                     <TextBlock
                         Padding="{StaticResource XSmallLeftTopRightBottomMargin}"
                         HorizontalAlignment="Center"
@@ -249,62 +224,25 @@
                         RelativePanel.Below="itemHero"
                         TextWrapping="Wrap"
                         Text="{x:Bind ViewModel.ShownCharacter.DisplayName}" />
-                    <!--  Style="{ThemeResource TitleTextBlockStyle}"  -->
 
-
-                    <StackPanel
-                        Margin="0,8"
-                        HorizontalAlignment="Center"
-                        Orientation="Horizontal">
-                        <TextBlock
-                            Margin="0,0,4,0"
-                            VerticalAlignment="Center"
-                            Style="{ThemeResource BodyTextStyle}"
-                            Text="找到的Mod数量:" />
+                    <StackPanel Margin="0,8" HorizontalAlignment="Center" Orientation="Horizontal">
+                        <TextBlock Margin="0,0,4,0" VerticalAlignment="Center" Style="{ThemeResource BodyTextStyle}" Text="找到的模组数量:" />
                         <TextBlock Style="{ThemeResource BodyTextStyle}" Text="{x:Bind ViewModel.ModListVM.Mods.Count, Mode=OneWay}" />
                     </StackPanel>
 
-                    <StackPanel
-                        x:Name="SelectSkinBox"
-                        Padding="8"
-                        Background="{ThemeResource ControlFillColorDefaultBrush}"
-                        Visibility="{x:Bind ViewModel.IsICharacter, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                        <TextBlock
-                            Padding="0,0,0,16"
-                            HorizontalAlignment="Center"
-                            Text="选择游戏内皮肤:" />
-                        <TextBlock
-                            HorizontalAlignment="Center"
-                            FontFamily="{StaticResource GenshinFont}"
-                            IsTextSelectionEnabled="True"
-                            TextWrapping="WrapWholeWords"
-                            Text="{x:Bind ViewModel.SelectedInGameSkin.DisplayName, Mode=OneWay}" />
-                        <Button
-                            Margin="0,16,0,0"
-                            HorizontalAlignment="Center"
-                            Content="选择皮肤"
-                            Flyout="{StaticResource SelectInGameSkin}"
-                            IsEnabled="{x:Bind ViewModel.MultipleInGameSkins, Mode=OneWay}">
-
+                    <StackPanel x:Name="SelectSkinBox" Padding="8" Background="{ThemeResource ControlFillColorDefaultBrush}" Visibility="{x:Bind ViewModel.IsICharacter, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <TextBlock Padding="0,0,0,16" HorizontalAlignment="Center" Text="选择游戏内皮肤:" />
+                        <TextBlock HorizontalAlignment="Center" FontFamily="{StaticResource GenshinFont}" IsTextSelectionEnabled="True" TextWrapping="WrapWholeWords" Text="{x:Bind ViewModel.SelectedInGameSkin.DisplayName, Mode=OneWay, FallbackValue=Default}" />
+                        <Button Margin="0,16,0,0" HorizontalAlignment="Center" Content="选择皮肤" Flyout="{StaticResource SelectInGameSkin}" IsEnabled="{x:Bind ViewModel.MultipleInGameSkins, Mode=OneWay}">
                             <Button.KeyboardAccelerators>
                                 <KeyboardAccelerator Key="F1" />
                             </Button.KeyboardAccelerators>
                         </Button>
                     </StackPanel>
-
-
-
                 </StackPanel>
 
-                <Button
-                    Grid.Row="1"
-                    Margin="0,8,0,8"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Bottom"
-                    Command="{x:Bind ViewModel.DisableAllModsCommand}"
-                    Content="禁用所有Mod" />
+                <Button Grid.Row="1" Margin="0,8,0,8" HorizontalAlignment="Center" VerticalAlignment="Bottom" Command="{x:Bind ViewModel.DisableAllModsCommand}" Content="禁用所有模组" />
             </Grid>
-
 
             <Grid Grid.Column="1" Margin="4,0,4,0">
                 <Grid.RowDefinitions>
@@ -322,22 +260,15 @@
                         <MenuBar>
                             <MenuBarItem Title="添加">
                                 <MenuBarItem.Items>
-                                    <MenuFlyoutItem
-                                        Command="{x:Bind ViewModel.AddModFolderCommand}"
-                                        ToolTipService.ToolTip="添加一个mod文件夹"
-                                        Text="添加文件夹..." />
-
-                                    <MenuFlyoutItem
-                                        Command="{x:Bind ViewModel.AddModArchiveCommand}"
-                                        ToolTipService.ToolTip="在压缩归档文件中添加一个mod"
-                                        Text="添加压缩包...">
+                                    <MenuFlyoutItem Command="{x:Bind ViewModel.AddModFolderCommand}" ToolTipService.ToolTip="添加一个模组文件夹" Text="添加文件夹..." />
+                                    <MenuFlyoutItem Command="{x:Bind ViewModel.AddModArchiveCommand}" ToolTipService.ToolTip="在压缩归档文件中添加一个模组" Text="添加压缩包...">
                                         <MenuFlyoutItem.KeyboardAccelerators>
                                             <KeyboardAccelerator Key="O" Modifiers="Control" />
                                         </MenuFlyoutItem.KeyboardAccelerators>
                                     </MenuFlyoutItem>
 
                                     <MenuFlyoutSeparator />
-                                    <MenuFlyoutItem Command="{x:Bind ViewModel.RefreshModsCommand}" Text="刷新Mod列表">
+                                    <MenuFlyoutItem Command="{x:Bind ViewModel.RefreshModsCommand}" Text="刷新模组列表">
                                         <MenuFlyoutItem.KeyboardAccelerators>
                                             <KeyboardAccelerator Key="F5" />
                                         </MenuFlyoutItem.KeyboardAccelerators>
@@ -346,21 +277,14 @@
                             </MenuBarItem>
 
                             <MenuBarItem Title="文件夹">
-                                <MenuFlyoutItem Command="{x:Bind ViewModel.OpenModsFolderCommand}" Text="打开角色的Mod文件夹..." />
+                                <MenuFlyoutItem Command="{x:Bind ViewModel.OpenModsFolderCommand}" Text="打开角色的模组文件夹..." />
                                 <MenuFlyoutSeparator />
                                 <MenuFlyoutItem Command="{x:Bind ViewModel.OpenGIMIRootFolderCommand}" Text="打开加载器根文件夹..." />
                             </MenuBarItem>
                         </MenuBar>
-
                     </StackPanel>
 
-                    <StackPanel
-                        Grid.Column="1"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Center"
-                        Orientation="Horizontal"
-                        Spacing="16">
-
+                    <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Orientation="Horizontal" Spacing="16">
                         <InfoBar
                             Height="50"
                             VerticalAlignment="Center"
@@ -370,39 +294,20 @@
                             Severity="{x:Bind ViewModel.ModListVM.Severity, Mode=OneWay}"
                             Visibility="Visible" />
 
-                        <ToggleSwitch
-                            x:Name="ViewToggleSwitch"
-                            IsOn="False"
-                            OffContent="详细视图"
-                            OnContent="画廊视图"
-                            Toggled="ViewToggleSwitch_OnToggled" />
-
+                        <ToggleSwitch x:Name="ViewToggleSwitch" IsOn="False" OffContent="详细视图" OnContent="画廊视图" Toggled="ViewToggleSwitch_OnToggled" />
                         <Grid MinWidth="32">
                             <ProgressRing IsActive="{x:Bind ViewModel.IsAddingModFolder, Mode=OneWay}" />
                         </Grid>
-
                     </StackPanel>
-
                 </Grid>
-                <Grid
-                    x:Name="MainContentArea"
-                    Grid.Row="1"
-                    AllowDrop="False"
-                    Background="Transparent"
-                    DragOver="ModListArea_OnDragOver"
-                    Drop="ModListArea_OnDrop">
+
+                <Grid x:Name="MainContentArea" Grid.Row="1" AllowDrop="False" Background="Transparent" DragOver="ModListArea_OnDragOver" Drop="ModListArea_OnDrop">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="7*" />
                             <ColumnDefinition Width="3*" />
                         </Grid.ColumnDefinitions>
-                        <Grid
-                            x:Name="ModListArea"
-                            AllowDrop="True"
-                            Background="Transparent"
-                            CornerRadius="10"
-                            DragOver="ModListArea_OnDragOver"
-                            Drop="ModListArea_OnDrop">
+                        <Grid x:Name="ModListArea" AllowDrop="True" Background="Transparent" CornerRadius="10" DragOver="ModListArea_OnDragOver" Drop="ModListArea_OnDrop">
                             <controls:DataGrid
                                 x:Name="ModListGrid"
                                 AllowDrop="False"
@@ -425,33 +330,27 @@
                                         CanUserSort="True"
                                         Header="是否启用"
                                         Tag="IsEnabled">
-
                                         <controls:DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate x:DataType="models:ModModel">
                                                 <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
                                                     <CheckBox
                                                         Command="{x:Bind ToggleModCommand}"
                                                         IsChecked="{x:Bind IsEnabled, Mode=OneWay}"
-                                                        IsTabStop="False"
-                                                        Width="Auto"
-                                                        MinWidth="0"
-                                                        />
+                                                        IsTabStop="False" />
                                                 </Grid>
                                             </DataTemplate>
                                         </controls:DataGridTemplateColumn.CellTemplate>
                                     </controls:DataGridTemplateColumn>
 
-
                                     <controls:DataGridTemplateColumn
                                         Width="SizeToCells"
+                                        MinWidth="0"
                                         CanUserSort="False"
                                         Header=""
                                         IsReadOnly="True"
-                                        Tag="NotificationColumn"
-                                        MinWidth="0">
+                                        Tag="NotificationColumn">
                                         <controls:DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate x:DataType="models:ModModel">
-
                                                 <StackPanel
                                                     HorizontalAlignment="Center"
                                                     VerticalAlignment="Center"
@@ -481,7 +380,6 @@
                                                         </ItemsRepeater.ItemTemplate>
                                                     </ItemsRepeater>
                                                 </StackPanel>
-
                                             </DataTemplate>
                                         </controls:DataGridTemplateColumn.CellTemplate>
                                     </controls:DataGridTemplateColumn>
@@ -489,7 +387,7 @@
                                     <controls:DataGridTemplateColumn
                                         Width="SizeToCells"
                                         CanUserSort="True"
-                                        Header="Mod 名称"
+                                        Header="模组名称"
                                         IsReadOnly="True"
                                         Tag="Name">
                                         <controls:DataGridTemplateColumn.CellTemplate>
@@ -504,11 +402,12 @@
                                             </DataTemplate>
                                         </controls:DataGridTemplateColumn.CellTemplate>
                                     </controls:DataGridTemplateColumn>
+
                                     <controls:DataGridTextColumn
                                         Width="SizeToCells"
                                         Binding="{Binding FolderName, Mode=OneWay}"
                                         CanUserSort="True"
-                                        Header="Mod 文件夹名称"
+                                        Header="模组文件夹名"
                                         IsReadOnly="True"
                                         Tag="Folder Name" />
 
@@ -541,7 +440,6 @@
                                         </controls:DataGridTemplateColumn.CellTemplate>
                                     </controls:DataGridTemplateColumn>
                                 </controls:DataGrid.Columns>
-
                             </controls:DataGrid>
                         </Grid>
 
@@ -627,7 +525,6 @@
                                                 Text="忽略此模组的 .ini 文件" />
                                         </MenuFlyout>
                                     </SplitButton.Flyout>
-
                                 </SplitButton>
                             </Grid>
 
@@ -638,7 +535,7 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBox
                                     VerticalAlignment="Center"
-                                    Header="Mod 链接:"
+                                    Header="模组链接:"
                                     IsEnabled="{x:Bind ViewModel.ModPaneVM.IsReadOnlyMode, Mode=OneWay, Converter={StaticResource BoolInverter}}"
                                     Text="{x:Bind ViewModel.ModPaneVM.SelectedModModel.ModUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
@@ -649,14 +546,11 @@
                                     NavigateUri="{x:Bind ViewModel.ModPaneVM.SelectedModModel.ModUrl, Mode=OneWay, Converter={StaticResource StringToUri}}">
                                     <FontIcon FontSize="18" Glyph="&#xE8A7;" />
                                 </HyperlinkButton>
-
                             </Grid>
-
 
                             <StackPanel Grid.Row="4" Orientation="Horizontal">
                                 <TextBlock Visibility="Collapsed" Text="Latest Version:" />
                                 <TextBlock Text="{x:Bind ViewModel.ModPaneVM.SelectedModModel.ModUrl}" />
-
                             </StackPanel>
 
                             <ScrollViewer
@@ -664,7 +558,6 @@
                                 Margin="0,12,0,0"
                                 Padding="0,0,14,0"
                                 VerticalScrollBarVisibility="Auto">
-
                                 <controls:SwitchPresenter Value="{x:Bind ViewModel.ModPaneVM.ShowKeySwapSection, Mode=OneWay}">
                                     <controls:Case Value="true">
                                         <StackPanel>
@@ -690,6 +583,7 @@
                                                                     <TextBlock Text="{x:Bind VariationsCount, Mode=OneWay}" />
                                                                 </StackPanel>
                                                             </StackPanel>
+
                                                             <TextBox
                                                                 Grid.Column="2"
                                                                 MinWidth="100"
@@ -700,7 +594,6 @@
                                                     </DataTemplate>
                                                 </ItemsRepeater.ItemTemplate>
                                             </ItemsRepeater>
-
                                         </StackPanel>
                                     </controls:Case>
 
@@ -710,13 +603,10 @@
                                             VerticalAlignment="Top"
                                             TextWrapping="WrapWholeWords"
                                             Text="该模组的键位切换管理已被禁用" />
-
                                     </controls:Case>
                                 </controls:SwitchPresenter>
-
-
-
                             </ScrollViewer>
+
                             <Grid Grid.Row="6" Padding="0,12">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
@@ -736,11 +626,9 @@
                                     <Button.KeyboardAccelerators>
                                         <KeyboardAccelerator Key="S" Modifiers="Control" />
                                     </Button.KeyboardAccelerators>
-
                                 </Button>
 
                                 <Grid Grid.Column="1" Visibility="{x:Bind ViewModel.ModPaneVM.SelectedModModel.IsEnabled, Mode=OneWay}">
-
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="Auto" />
@@ -755,11 +643,9 @@
                                             Padding="4,0"
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Center"
-                                            Text="Mod 已启用" />
+                                            Text="模组已启用" />
                                     </Border>
-
                                 </Grid>
-
 
                                 <Button
                                     Grid.Column="2"
@@ -783,10 +669,7 @@
                         </controls:GridSplitter>
                     </Grid>
                 </Grid>
-
-
             </Grid>
-
         </Grid>
     </Grid>
 </Page>

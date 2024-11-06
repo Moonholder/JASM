@@ -48,7 +48,7 @@
             VerticalAlignment="{x:Bind ButtonVerticalAlignment, Mode=OneWay}"
             Background="{ThemeResource SmokeFillColorDefaultBrush}"
             Command="{x:Bind EditButtonCommand, Mode=OneWay}"
-            ToolTipService.ToolTip="Pick an Image"
+            ToolTipService.ToolTip="选择图片"
             Visibility="{x:Bind EditButtonVisibility, Mode=OneWay}">
             <FontIcon x:Name="EditButtonFontIcon" Glyph="&#xE70F;" />
         </Button>

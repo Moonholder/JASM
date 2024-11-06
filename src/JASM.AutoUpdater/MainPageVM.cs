@@ -104,16 +104,16 @@ public partial class MainPageVM : ObservableRecipient
         }
         catch (TaskCanceledException e)
         {
-            Stop("User cancelled");
+            Stop("用户取消");
         }
         catch (OperationCanceledException e)
         {
-            Stop("User cancelled");
+            Stop("用户取消");
         }
         catch (Exception e)
         {
-            Log("An error occurred!", e.Message);
-            Serilog.Log.Error(e, "An error occurred! Full error");
+            Log("发生错误!", e.Message);
+            Serilog.Log.Error(e, "发生错误！完整错误信息");
             Stop(e.Message);
         }
         finally
@@ -203,13 +203,13 @@ public partial class MainPageVM : ObservableRecipient
         var httpClient = CreateHttpClient();
         httpClient.DefaultRequestHeaders.Add("Accept", "application/octet-stream");
 
-        Log("Downloading latest version...");
+        Log("正在下载最新版本...");
         var result = await httpClient.GetAsync(gitHubRelease.DownloadUrl, HttpCompletionOption.ResponseHeadersRead,
             cancellationToken);
 
         if (!result.IsSuccessStatusCode)
         {
-            Stop($"Failed to download latest version. Status Code: {result.StatusCode}, Reason: {result.ReasonPhrase}");
+            Stop($"下载最新版本失败. 状态码: {result.StatusCode}, 原因: {result.ReasonPhrase}");
             return;
         }
 
@@ -217,7 +217,7 @@ public partial class MainPageVM : ObservableRecipient
 
         await using var fileStream = File.Create(_zipPath);
         await stream.CopyToAsync(fileStream, cancellationToken);
-        Log($"Latest version downloaded from {gitHubRelease.DownloadUrl}");
+        Log($"从 {gitHubRelease.DownloadUrl} 下载最新版本成功.");
     }
 
     private async Task UnzipLatestVersion(CancellationToken cancellationToken)
@@ -236,12 +236,12 @@ public partial class MainPageVM : ObservableRecipient
         };
 
         process.Start();
-        Log("Extracting downloaded zip file...");
+        Log("正在解压下载文件...");
         await process.WaitForExitAsync(cancellationToken);
 
         if (process.ExitCode != 0)
         {
-            Stop($"Failed to extract downloaded zip file. Exit Code: {process.ExitCode}");
+            Stop($"解压下载文件失败. 退出代码: {process.ExitCode}");
             return;
         }
 
@@ -251,11 +251,11 @@ public partial class MainPageVM : ObservableRecipient
 
         if (_extractedJasmFolder is null)
         {
-            Stop("Failed to find JASM folder in extracted zip file");
+            Stop("未能在解压的 zip 文件中找到 JASM 文件夹");
             return;
         }
 
-        Log($"JASM Application folder extracted successfully. Path: {_extractedJasmFolder.FullName}");
+        Log($"JASM 应用程序文件夹已成功解压。路径: {_extractedJasmFolder.FullName}");
     }
 
     private async Task InstallLatestVersion()
@@ -263,7 +263,7 @@ public partial class MainPageVM : ObservableRecipient
         _installedJasmFolder = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory)).Parent!;
         if (_installedJasmFolder is null)
         {
-            Stop("Failed to find installed JASM folder in path");
+            Stop("未能在路径中找到已安装的 JASM 文件夹");
             return;
         }
 
@@ -309,15 +309,15 @@ public partial class MainPageVM : ObservableRecipient
         if (!containsJasmExe)
         {
             Stop(
-                $"Failed to find '{jasmExe}' in installed JASM folder. Path: {_installedJasmFolder}");
+                $"未能在已安装的 JASM 文件夹中找到 '{jasmExe}'。路径: {_installedJasmFolder}");
             return;
         }
 
         if (containsSystemFiles)
         {
             Stop(
-                $"JASM folder seems to contain windows system files, this should never happen. File Found: '{systemFileFound}' at " +
-                $"Path: {_installedJasmFolder}");
+                $"JASM 文件夹似乎包含 Windows 系统文件，这绝不应该发生。找到的文件：'{systemFileFound}' 在" +
+                $"路径: {_installedJasmFolder}");
             return;
         }
 
@@ -325,13 +325,13 @@ public partial class MainPageVM : ObservableRecipient
 
         if (result is ContentDialogResult.Secondary or ContentDialogResult.None)
         {
-            Stop("User cancelled");
+            Stop("用户取消");
             return;
         }
 
         var autoUpdaterFolder = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
 
-        Log("Deleting old files...", $"Path: {_installedJasmFolder.FullName}");
+        Log("正在删除旧文件...", $"路径: {_installedJasmFolder.FullName}");
 
         string[] doNotDeleteFiles = ["Elevator.exe", "JASM - Just Another Skin Manager.exe.WebView2", "logs"];
 

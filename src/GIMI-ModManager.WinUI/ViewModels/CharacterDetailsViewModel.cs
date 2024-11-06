@@ -540,7 +540,7 @@ public partial class CharacterDetailsViewModel : ObservableRecipient, INavigatio
         try
         {
             IsAddingModFolder = true;
-            await _modDragAndDropService.AddStorageItemFoldersAsync(_modList, storageItems);
+            await Task.Run(async () => await _modDragAndDropService.AddStorageItemFoldersAsync(_modList, storageItems));
         }
         catch (Exception e)
         {
@@ -671,7 +671,7 @@ public partial class CharacterDetailsViewModel : ObservableRecipient, INavigatio
         var modWindow = new ModUpdateAvailableWindow(notification.Id)
         {
             Title =
-                $"New Mod Files Available: {ModFolderHelpers.GetFolderNameWithoutDisabledPrefix(skinEntry.Mod.Name)}"
+                $"模组有更新: {ModFolderHelpers.GetFolderNameWithoutDisabledPrefix(skinEntry.Mod.Name)}"
         };
         _windowManagerService.CreateWindow(modWindow, identifier: notification.Id);
         await Task.Delay(100);
@@ -714,11 +714,11 @@ public partial class CharacterDetailsViewModel : ObservableRecipient, INavigatio
     private async Task GoToGalleryScreen()
     {
         var settings = await _localSettingsService.ReadOrCreateSettingAsync<CharacterDetailsSettings>(
-            CharacterDetailsSettings.Key);
+            CharacterDetailsSettings.Key, SettingScope.App);
 
         settings.GalleryView = true;
 
-        await _localSettingsService.SaveSettingAsync(CharacterDetailsSettings.Key, settings);
+        await _localSettingsService.SaveSettingAsync(CharacterDetailsSettings.Key, settings, SettingScope.App);
 
         _navigationService.NavigateTo(typeof(CharacterGalleryViewModel).FullName!, ShownCharacter.InternalName);
         _navigationService.ClearBackStack(1);

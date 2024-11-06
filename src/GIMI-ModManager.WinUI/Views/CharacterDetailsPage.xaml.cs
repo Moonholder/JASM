@@ -107,7 +107,8 @@ public sealed partial class CharacterDetailsPage : Page
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
-        this.RegisterElementForConnectedAnimation("animationKeyContentGrid", itemHero);
+        if (itemHero != null) // Trying to fix an argument null exception
+            this.RegisterElementForConnectedAnimation("animationKeyContentGrid", itemHero);
         ViewModel.ModListVM.BackendMods.CollectionChanged += (sender, args) => CheckIfAnyMods();
         CheckIfAnyMods();
     }
@@ -193,7 +194,7 @@ public sealed partial class CharacterDetailsPage : Page
             // Create the TextBlock for "Drop Mods Here"
             var dropText = new TextBlock
             {
-                Text = "拖放Mod文件夹或压缩包到这里",
+                Text = "拖放模组文件夹/压缩包到这里",
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
                 FontSize = 20,

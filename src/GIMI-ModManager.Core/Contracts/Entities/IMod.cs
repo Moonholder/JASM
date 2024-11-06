@@ -56,4 +56,6 @@ public interface IMod : IEqualityComparer<IMod>
     public bool DeepEquals(IMod? x, IMod? y);
 
     public byte[] GetContentsHash();
+    public float GetSizeInGB();
+    public void Refresh();
 }

@@ -115,12 +115,12 @@ public class GameService : IGameService
     }
 
 
-    public async Task<GameInfo?> GetGameInfoAsync(SupportedGames game)
+    public static async Task<GameInfo?> GetGameInfoAsync(SupportedGames game)
     {
-        var currentLanguage = _localizer.CurrentLanguage;
+        // var currentLanguage = _localizer.CurrentLanguage;
         string gameAssetDir = Path.Combine(AppContext.BaseDirectory, "Assets", "Games", game.ToString()), assetDir = gameAssetDir;
-        if (currentLanguage.LanguageCode == "zh-cn")
-            assetDir = Path.Combine(AppContext.BaseDirectory, "Assets", "Games", game.ToString(), "Languages", "zh-cn");
+        // if (currentLanguage.LanguageCode == "zh-cn")
+        assetDir = Path.Combine(AppContext.BaseDirectory, "Assets", "Games", game.ToString(), "Languages", "zh-cn");
 
         var gameFilePath = Path.Combine(assetDir, "game.json");
 
@@ -306,7 +306,7 @@ public class GameService : IGameService
         return characters.FirstOrDefault(x => x.InternalNameEquals(internalName));
     }
 
-    public IModdableObject? GetModdableObjectByIdentifier(InternalName internalName,
+    public IModdableObject? GetModdableObjectByIdentifier(InternalName? internalName,
         GetOnly getOnlyStatus = GetOnly.Enabled)
     {
         return GetAllModdableObjects(getOnlyStatus).FirstOrDefault(x => x.InternalNameEquals(internalName));
@@ -741,7 +741,7 @@ public class GameService : IGameService
         {
             InternalName = new InternalName("Default_" + character.InternalName),
             ModFilesName = "",
-            DisplayName = "Default",
+            DisplayName = "默认",
             Rarity = character.Rarity,
             ReleaseDate = character.ReleaseDate,
             Character = character,

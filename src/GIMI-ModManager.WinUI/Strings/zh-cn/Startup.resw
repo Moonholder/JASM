@@ -127,7 +127,7 @@
     <value>保存设置后，应用程序将在“Mods”文件夹中为每个角色创建一个文件夹。位于这些角色文件夹之外的修改文件夹将被忽略。此应用程序通过在修改文件夹前加上“DISABLED_”来启用和禁用修改。JASM 还支持导出由其管理的修改，如果您希望将它们用于其他应用程序。</value>
   </data>
   <data name="DisableModsTooltip.Text" xml:space="preserve">
-    <value>在所有修改的名称前添加“DISABLED_”，以便将它们禁用</value>
+    <value>在所有模组的名称前添加“DISABLED_”，以便将它们禁用</value>
   </data>
   <data name="GameSelectorBox.ToolTipService.ToolTip" xml:space="preserve">
     <value>选择您希望管理修改的游戏。您可以随时在设置页面更改此选项</value>

@@ -130,7 +130,7 @@
                     SelectionChangedTrigger="Committed">
                     <ComboBoxItem Content="添加时间" Tag="DateAdded" />
                     <ComboBoxItem Content="文件夹名" Tag="FolderName" />
-                    <ComboBoxItem Content="Mod名称" Tag="Name" />
+                    <ComboBoxItem Content="模组名称" Tag="Name" />
                 </ComboBox>
 
                 <ToggleButton
@@ -178,8 +178,8 @@
                                         HorizontalAlignment="Left"
                                         Command="{x:Bind ViewModel.ToggleSingleSelectionCommand}"
                                         IsChecked="{x:Bind ViewModel.IsSingleSelection, Mode=OneWay}"
-                                        ToolTipService.ToolTip="选择此选项将只允许一次启用一个mod.">
-                                        Mod单选
+                                        ToolTipService.ToolTip="选择此选项将只允许一次启用一个模组.">
+                                        仅允许单选
                                     </CheckBox>
                                 </StackPanel>
                             </StackPanel>
@@ -192,7 +192,7 @@
                     Height="32"
                     MinWidth="200"
                     MaxWidth="320"
-                    PlaceholderText="搜索 Mods..."
+                    PlaceholderText="搜索模组..."
                     TextChanged="ModSearchBox_OnTextChanged" />
 
 
@@ -309,7 +309,7 @@
                                                         <MenuFlyoutItem
                                                             Command="{x:Bind OpenModFolderCommand}"
                                                             CommandParameter="{x:Bind Mode=OneWay}"
-                                                            Text="打开Mod文件夹...">
+                                                            Text="打开模组文件夹...">
                                                             <MenuFlyoutItem.Icon>
                                                                 <FontIcon Glyph="&#xE838;" />
                                                             </MenuFlyoutItem.Icon>
@@ -318,7 +318,7 @@
                                                         <MenuFlyoutItem
                                                             Command="{x:Bind OpenModUrlCommand}"
                                                             CommandParameter="{x:Bind Mode=OneWay}"
-                                                            Text="打开Mod网址...">
+                                                            Text="打开模组网址...">
                                                             <MenuFlyoutItem.Icon>
                                                                 <FontIcon Glyph="&#xE8A7;" />
                                                             </MenuFlyoutItem.Icon>
@@ -326,7 +326,7 @@
                                                         <MenuFlyoutItem
                                                             Command="{x:Bind DeleteModCommand}"
                                                             CommandParameter="{x:Bind Mode=OneWay}"
-                                                            Text="删除此Mod">
+                                                            Text="删除此模组">
                                                             <MenuFlyoutItem.Icon>
                                                                 <FontIcon Glyph="&#xE74D;" />
                                                             </MenuFlyoutItem.Icon>
@@ -409,7 +409,7 @@
                     <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
                         <StackPanel Spacing="16">
                             <ProgressRing IsActive="True" />
-                            <TextBlock Text="Loading Mods..." />
+                            <TextBlock Text="正在加载模组..." />
                         </StackPanel>
                     </Grid>
 

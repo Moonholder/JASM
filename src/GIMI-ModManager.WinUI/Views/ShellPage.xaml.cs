@@ -19,12 +19,9 @@ public sealed partial class ShellPage : Page
 {
     public ShellViewModel ViewModel { get; }
 
-    private readonly IGameService _gameService;
-
-    public ShellPage(ShellViewModel viewModel, IGameService gameService)
+    public ShellPage(ShellViewModel viewModel)
     {
         ViewModel = viewModel;
-        _gameService = gameService;
         InitializeComponent();
 
         ViewModel.NavigationService.Frame = NavigationFrame;
@@ -171,7 +168,7 @@ public sealed partial class ShellPage : Page
                     Orientation = Orientation.Horizontal
                 };
 
-                var gameInfo = await _gameService.GetGameInfoAsync(game);
+                var gameInfo = await GameService.GetGameInfoAsync(game);
 
                 if (gameInfo is null)
                     return;

@@ -10,6 +10,7 @@ using GIMI_ModManager.WinUI.Services.Notifications;
 using OneOf;
 using OneOf.Types;
 using Serilog;
+using static GIMI_ModManager.WinUI.Helpers.HandlerServiceHelpers;
 using Success = ErrorOr.Success;
 
 namespace GIMI_ModManager.WinUI.Services.ModHandling;
@@ -30,7 +31,7 @@ public class ModSettingsService
     }
 
 
-    public async Task<OneOf<Success, ModNotFound, Error<Exception>>> SaveSettingsAsync(ModModel modModel)
+    public async Task<OneOf<Success, ModNotFound, Error<Exception>>> LegacySaveSettingsAsync(ModModel modModel)
     {
         var mod = _skinManagerService.GetModById(modModel.Id);
 
@@ -66,15 +67,15 @@ public class ModSettingsService
         {
             _logger.Error(e, "Failed to save settings for mod {modName}", mod.Name);
 
-            _notificationManager.ShowNotification($"Failed to save settings for mod {mod.Name}",
-                $"An Error Occurred. Reason: {e.Message}",
+            _notificationManager.ShowNotification($"保存模组设置失败 {mod.Name}",
+                $"发生错误。原因: {e.Message}",
                 TimeSpan.FromSeconds(5));
 
             return new Error<Exception>(e);
         }
     }
 
-    public async Task<OneOf<Success, NotFound, ModNotFound, Error<Exception>>> SetCharacterSkinOverride(Guid modId,
+    public async Task<OneOf<Success, NotFound, ModNotFound, Error<Exception>>> SetCharacterSkinOverrideLegacy(Guid modId,
         string skinName)
     {
         var mod = _skinManagerService.GetModById(modId);
@@ -96,8 +97,8 @@ public class ModSettingsService
             {
                 _logger.Error(e, "Failed to save settings for mod {modName}", mod.Name);
 
-                _notificationManager.ShowNotification($"Failed to save settings for mod {mod.Name}",
-                    $"An Error Occurred. Reason: {e.Message}",
+                _notificationManager.ShowNotification($"保存模组设置失败 {mod.Name}",
+                    $"发生错误。原因: {e.Message}",
                     TimeSpan.FromSeconds(5));
 
                 return new Error<Exception>(e);
@@ -132,7 +133,7 @@ public class ModSettingsService
         catch (ModSettingsNotFoundException e)
         {
             _logger.Error(e, "Could not find settings file for mod {ModName}", mod.Name);
-            _notificationManager.ShowNotification($"Could not find settings file for mod {mod.Name}", "",
+            _notificationManager.ShowNotification($"找不到模组的设置文件 {mod.Name}", "",
                 TimeSpan.FromSeconds(5));
             return new NotFound();
         }
@@ -140,14 +141,75 @@ public class ModSettingsService
         {
             _logger.Error(e, "Failed to read settings for mod {modName}", mod.Name);
 
-            _notificationManager.ShowNotification($"Failed to read settings for mod {mod.Name}",
-                $"An error occurred. Reason: {e.Message}",
+            _notificationManager.ShowNotification($"读取模组设置失败 {mod.Name}",
+                $"发生错误。原因: {e.Message}",
                 TimeSpan.FromSeconds(5));
 
             return new Error<Exception>(e);
         }
     }
 
+
+    public async Task<Result<ModSettings>> SaveSettingsAsync(Guid modId, UpdateSettingsRequest change, CancellationToken cancellationToken = default)
+    {
+        return await CommandWrapperAsync(async () =>
+        {
+            if (!change.AnyUpdates)
+                return Result<ModSettings>.Error(new SimpleNotification("未检测到任何更改", "模组设置未更改，无需保存"));
+
+            var mod = _skinManagerService.GetModById(modId);
+
+            if (mod is null)
+                throw new ModNotFoundException(modId);
+
+            var oldModSettings = await mod.Settings.TryReadSettingsAsync(cancellationToken: cancellationToken);
+
+            if (oldModSettings is null)
+                throw new ModSettingsNotFoundException(mod);
+
+            if (change.ImagePath.HasValue
+                && change.ImagePath.Value.ValueToSet != null
+                && change.ImagePath.Value.ValueToSet.IsFile
+                && !File.Exists(change.ImagePath.Value.ValueToSet.LocalPath)
+               )
+            {
+                change.ImagePath = null;
+                _notificationManager.ShowNotification("未找到图片文件",
+                    "保存模组设置时，未找到图片文件",
+                    TimeSpan.FromSeconds(5));
+            }
+
+
+            var newModSettings = oldModSettings.DeepCopyWithProperties(
+                author: change.Author.EmptyStringToNull(),
+                modUrl: change.ModUrl,
+                imagePath: change.ImagePath != null && change.ImagePath.Value == ImageHandlerService.StaticPlaceholderImageUri
+                    ? NewValue<Uri?>.Set(null)
+                    : change.ImagePath,
+                characterSkinOverride: change.CharacterSkinOverride.EmptyStringToNull(),
+                customName: change.CustomName.EmptyStringToNull(),
+                description: change.Description.EmptyStringToNull()
+            );
+
+
+            await mod.Settings.SaveSettingsAsync(newModSettings).ConfigureAwait(false);
+
+            _logger.Information("Updated modSettings for mod {ModName} ({ModPath})", mod.GetDisplayName(), mod.FullPath);
+
+
+            newModSettings = await mod.Settings.TryReadSettingsAsync(useCache: true, cancellationToken: cancellationToken);
+
+            if (newModSettings is null)
+                throw new ModSettingsNotFoundException(mod);
+
+
+            return Result<ModSettings>.Success(newModSettings, new SimpleNotification(
+                title: "模组设置已更新",
+                message: $"模组 {mod.GetDisplayName()} 的设置已更新",
+                null
+            ));
+        }).ConfigureAwait(false);
+    }
 
     public async Task<Result> SetModIniAsync(Guid modId, string modIni, bool autoDetect = false)
     {
@@ -171,14 +233,14 @@ public class ModSettingsService
         var mod = _skinManagerService.GetModById(modId);
 
         if (mod is null)
-            return Result.Error(new SimpleNotification("Could not find mod",
-                "An error occured trying to set Mod ini, restarting JASM may help"));
+            return Result.Error(new SimpleNotification("未找到模组",
+                "尝试设置Mod ini时发生错误，重新启动JASM可能会有所帮助"));
 
         var modSettings = await mod.Settings.TryReadSettingsAsync().ConfigureAwait(false);
 
         if (modSettings is null)
-            return Result.Error(new SimpleNotification("Could not find mod settings",
-                "An error occured trying to set Mod ini, restarting JASM may help"));
+            return Result.Error(new SimpleNotification("未找到模组设置",
+                "尝试设置Mod ini时发生错误，重新启动JASM可能会有所帮助"));
 
         ModSettings? newSettings;
         if (modIni.IsNullOrEmpty() && autoDetect)
@@ -208,16 +270,16 @@ public class ModSettingsService
             : null;
 
         if (modIniUri is null)
-            return Result.Error(new SimpleNotification("Invalid Mod ini path",
-                "An error occured trying to parse the path to the .ini"));
+            return Result.Error(new SimpleNotification("无效的Mod ini路径",
+                "试图解析.ini文件的路径时发生错误"));
 
         if (!File.Exists(modIniUri.LocalPath))
-            return Result.Error(new SimpleNotification("Mod ini file does not exist",
-                $"Could not find file at {modIniUri.LocalPath}"));
+            return Result.Error(new SimpleNotification("Mod ini文件不存在",
+                $"未找到.ini文件: {modIniUri.LocalPath}"));
 
         if (!SkinModHelpers.IsInModFolder(mod, modIniUri))
-            return Result.Error(new SimpleNotification("Mod ini file is not in mod folder",
-                $"The mod ini file must be in the mod folder. Mod folder: {mod.FullPath}\nIni path: {modIniUri.LocalPath}"));
+            return Result.Error(new SimpleNotification("Mod ini文件不在模组文件夹中",
+                $".ini文件必须位于模组文件夹中: {mod.FullPath}\nIni path: {modIniUri.LocalPath}"));
 
         newSettings =
             modSettings.DeepCopyWithProperties(mergedIniPath: NewValue<Uri?>.Set(modIniUri),
@@ -240,6 +302,79 @@ public readonly struct ModNotFound
     }
 
     public Guid ModId { get; }
+}
+
+public class ModNotFoundException(Guid modId) : Exception($"Could not find mod with id {modId}");
+
+public class UpdateSettingsRequest
+{
+    public bool AnyUpdates =>
+        GetType()
+            .GetProperties()
+            .Where(p => p.CanRead && p.Name != nameof(AnyUpdates))
+            .Select(p => p.GetValue(this))
+            .Any(value => value is not null);
+
+    public NewValue<string?>? Author { get; set; }
+
+    public string? SetAuthor
+    {
+        set => Author = NewValue<string?>.Set(value);
+    }
+
+    public NewValue<Uri?>? ModUrl { get; set; }
+
+    public Uri? SetModUrl
+    {
+        set => ModUrl = NewValue<Uri?>.Set(value);
+    }
+
+    public NewValue<Uri?>? ImagePath { get; set; }
+
+    public Uri? SetImagePath
+    {
+        set => ImagePath = NewValue<Uri?>.Set(value);
+    }
+
+    public NewValue<string?>? CharacterSkinOverride { get; set; }
+
+    public string? SetCharacterSkinOverride
+    {
+        set => CharacterSkinOverride = NewValue<string?>.Set(value);
+    }
+
+    public NewValue<string?>? CustomName { get; set; }
+
+    public string? SetCustomName
+    {
+        set => CustomName = NewValue<string?>.Set(value);
+    }
+
+    public NewValue<string?>? Description { get; set; }
+
+    public string? SetDescription
+    {
+        set => Description = NewValue<string?>.Set(value);
+    }
+
+
+    // TODO: Could do later, too big for this PR
+    //public List<string> CreateUpdateLogEntries(ModSettings newModSettings)
+    //{
+    //    var changeEntries = new List<string>();
+
+    //    if (Author is not null && newModSettings.Author != Author.Value)
+    //    {
+
+    //    }
+
+    //    return changeEntries;
+
+    //    string CreateLogEntry(string propertyName,string oldValue, string newValue)
+    //    {
+    //        return $""
+    //    }
+    //}
 }
 
 public record Result : IResult
@@ -330,7 +465,7 @@ public record Result<T> : IResult
     {
         IsError = true,
         Exception = exception,
-        Notification = new SimpleNotification("An Error Occurred", exception.Message, TimeSpan.FromSeconds(5))
+        Notification = new SimpleNotification("发生错误", exception.Message, TimeSpan.FromSeconds(5))
     };
 
     public static Result<T> Error(string errorMessage) => new()
