@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.17.0](https://github.com/Moonholder/JASM/compare/v2.16.8...v2.17.0) (2024-11-06)
+
+
+### Features
+
+* 重写角色详情页 ([#8](https://github.com/Moonholder/JASM/issues/8)) ([9e7c82f](https://github.com/Moonholder/JASM/commit/9e7c82fa981e62eb19e0955395c4d6e5e1e5718e))
+
 ## [2.16.8](https://github.com/Moonholder/JASM/compare/v2.16.7...v2.16.8) (2024-10-21)
 
 
