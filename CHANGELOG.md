@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.17.1](https://github.com/Moonholder/JASM/compare/v2.17.0...v2.17.1) (2024-11-07)
+
+
+### Miscellaneous
+
+* update dotnet-desktop.yml ([6e4adcd](https://github.com/Moonholder/JASM/commit/6e4adcd959aeefae5c984f1bbc9fe8f9aed27910))
+
 ## [2.17.0](https://github.com/Moonholder/JASM/compare/v2.16.8...v2.17.0) (2024-11-06)
 
 
