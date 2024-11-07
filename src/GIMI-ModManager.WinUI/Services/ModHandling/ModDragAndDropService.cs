@@ -81,6 +81,14 @@ public class ModDragAndDropService
             if (extractResult.exitedCode == 1)
             {
                 extractResult = await ShowPasswordInputWindow(scanner, storageItem.Path);
+                if (extractResult.exitedCode == 2)
+                {
+                    _notificationManager.ShowNotification(
+                        "解压失败",
+                        "密码错误，请尝试重新添加模组",
+                        TimeSpan.FromSeconds(5));
+                    return null;
+                }
             }
 
             if (extractResult != null)

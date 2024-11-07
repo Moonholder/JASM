@@ -291,7 +291,7 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
         InstallerFinished?.Invoke(this, EventArgs.Empty);
         _logger.Debug("Mod {newModPath} was added to {modListPath}", newMod.FullPath,
             _characterModList.AbsModsFolderPath);
-        _notificationManager.ShowNotification($"Mod '{modName}' 已安装",
+        _notificationManager.ShowNotification($"模组 '{modName}' 已安装",
             $"Mod '{modName}' ({newMod.Name}), 已成功添加到 {_characterModList.Character.DisplayName} mod列表",
             TimeSpan.FromSeconds(5));
 

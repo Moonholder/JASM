@@ -164,7 +164,7 @@ public partial class CharactersViewModel : ObservableRecipient, INavigationAware
     }
 
     private CharacterGridItemModel NoCharacterFound =>
-        new(new Character("None", $"No {_category.DisplayNamePlural} Found..."));
+        new(new Character("None", $"没有找到{_category.DisplayNamePlural}..."));
 
     public void AutoSuggestBox_TextChanged(string text)
     {

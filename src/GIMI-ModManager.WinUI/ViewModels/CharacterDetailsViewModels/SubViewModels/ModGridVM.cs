@@ -155,36 +155,44 @@ public partial class ModGridVM(
 
     private async Task InitModsAsync()
     {
-        GridMods.Clear();
-        _gridModsBackend.Clear();
-        SelectedMods.Clear();
-
-        await Task.Run(async () =>
+        try
         {
-            var refreshResult = await _skinManagerService
-                .RefreshModsAsync(_context.ShownModObject.InternalName, ct: _navigationCt)
-                .ConfigureAwait(false);
+            GridMods.Clear();
+            _gridModsBackend.Clear();
+            SelectedMods.Clear();
 
-            await LoadModsAsync().ConfigureAwait(false);
-
-            if (refreshResult.ModsDuplicate.Any())
+            await Task.Run(async () =>
             {
-                var message = $"Duplicate mods were detected in {_context.ModObjectDisplayName}'s mod folder.\n";
+                var refreshResult = await _skinManagerService
+                    .RefreshModsAsync(_context.ShownModObject.InternalName, ct: _navigationCt)
+                    .ConfigureAwait(false);
 
-                message = refreshResult.ModsDuplicate.Aggregate(message,
-                    (current, duplicateMod) =>
-                        current +
-                        $"Mod: '{duplicateMod.ExistingFolderName}' was renamed to '{duplicateMod.RenamedFolderName}' to avoid conflicts.\n");
+                await LoadModsAsync().ConfigureAwait(false);
 
-                _notificationService.ShowNotification("Duplicate Mods Detected",
-                    message,
-                    TimeSpan.FromSeconds(10));
-            }
-        }, _navigationCt);
+                if (refreshResult.ModsDuplicate.Any())
+                {
+                    var message = $"Duplicate mods were detected in {_context.ModObjectDisplayName}'s mod folder.\n";
+
+                    message = refreshResult.ModsDuplicate.Aggregate(message,
+                        (current, duplicateMod) =>
+                            current +
+                            $"Mod: '{duplicateMod.ExistingFolderName}' was renamed to '{duplicateMod.RenamedFolderName}' to avoid conflicts.\n");
+
+                    _notificationService.ShowNotification("Duplicate Mods Detected",
+                        message,
+                        TimeSpan.FromSeconds(10));
+                }
+            }, _navigationCt);
 
 
-        GridMods.AddRange(_gridModsBackend);
-        SetModSorting(CurrentSortingMethod.SortingMethodType, IsDescendingSort);
+            GridMods.AddRange(_gridModsBackend);
+            SetModSorting(CurrentSortingMethod.SortingMethodType, IsDescendingSort);
+        }
+        catch (Exception)
+        {
+
+        }
+
     }
 
     public bool QueueModRefresh(TimeSpan? minWaitTime = null) => _modRefreshChannel.Writer.TryWrite(new QueueRefresh(minWaitTime));
