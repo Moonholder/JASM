@@ -191,18 +191,17 @@ public partial class CharacterDetailsViewModel
             try
             {
                 IsAddingModFolder = true;
-                var result = await Task.Run(async () =>
+                var installMonitor = await _modDragAndDropService.AddStorageItemFoldersAsync(_modList, [file]).ConfigureAwait(false);
+
+                if (installMonitor is not null)
+                {
+                    var result = await installMonitor.WaitForCloseAsync().ConfigureAwait(false);
+                    if (result?.CloseReason == CloseRequestedArgs.CloseReasons.Success)
                     {
-                        var installMonitor = await _modDragAndDropService.AddStorageItemFoldersAsync(_modList, [file]).ConfigureAwait(false);
+                        await ModGridVM.ReloadAllModsAsync();
+                    }
+                }
 
-                        if (installMonitor is not null)
-                            return await installMonitor.WaitForCloseAsync().ConfigureAwait(false);
-                        return null;
-                    },
-                    CancellationToken.None);
-
-                if (result?.CloseReason == CloseRequestedArgs.CloseReasons.Success)
-                    await ModGridVM.ReloadAllModsAsync();
             }
             catch (Exception e)
             {
