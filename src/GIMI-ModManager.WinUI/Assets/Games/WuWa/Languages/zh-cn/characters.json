@@ -401,5 +401,39 @@
     "InGameSkins": [],
     "InternalName": "Youhu",
     "DisplayName": "釉瑚"
+  },
+  {
+    "Keys": [
+      "Camellya"
+    ],
+    "ReleaseDate": "2024-11-14T00:00:00",
+    "Image": "Camellya.png",
+    "Rarity": 5,
+    "Element": "Havoc",
+    "Class": "Sword",
+    "Region": [
+      "Bshores"
+    ],
+    "ModFilesName": "Camellya",
+    "InGameSkins": [],
+    "InternalName": "Camellya",
+    "DisplayName": "椿"
+  }, 
+  {
+    "Keys": [
+      "Lumi"
+    ],
+    "ReleaseDate": "2024-11-14T00:00:00",
+    "Image": "Lumi.png",
+    "Rarity": 4,
+    "Element": "Electro",
+    "Class": "Broadblade",
+    "Region": [
+      "Huanglong"
+    ],
+    "ModFilesName": "Lumi",
+    "InGameSkins": [],
+    "InternalName": "Lumi",
+    "DisplayName": "灯灯"
   }
 ]
