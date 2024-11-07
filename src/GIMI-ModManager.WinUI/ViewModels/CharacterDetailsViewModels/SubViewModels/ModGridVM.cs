@@ -193,6 +193,36 @@ public partial class ModGridVM(
 
         }
 
+        GridMods.Clear();
+        _gridModsBackend.Clear();
+        SelectedMods.Clear();
+
+        await Task.Run(async () =>
+        {
+            var refreshResult = await _skinManagerService
+                .RefreshModsAsync(_context.ShownModObject.InternalName, ct: _navigationCt)
+                .ConfigureAwait(false);
+
+            await LoadModsAsync().ConfigureAwait(false);
+
+            if (refreshResult.ModsDuplicate.Any())
+            {
+                var message = $"Duplicate mods were detected in {_context.ModObjectDisplayName}'s mod folder.\n";
+
+                message = refreshResult.ModsDuplicate.Aggregate(message,
+                    (current, duplicateMod) =>
+                        current +
+                        $"Mod: '{duplicateMod.ExistingFolderName}' was renamed to '{duplicateMod.RenamedFolderName}' to avoid conflicts.\n");
+
+                _notificationService.ShowNotification("Duplicate Mods Detected",
+                    message,
+                    TimeSpan.FromSeconds(10));
+            }
+        }, _navigationCt);
+
+
+        GridMods.AddRange(_gridModsBackend);
+        SetModSorting(CurrentSortingMethod.SortingMethodType, IsDescendingSort);
     }
 
     public bool QueueModRefresh(TimeSpan? minWaitTime = null) => _modRefreshChannel.Writer.TryWrite(new QueueRefresh(minWaitTime));

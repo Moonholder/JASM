@@ -199,8 +199,9 @@
                                 <MenuFlyoutSeparator />
                                 <MenuFlyoutItem
                                     Command="{x:Bind ViewModel.OpenModFolderCommand}"
-                                    IsEnabled="{x:Bind ViewModel.ModGridVM.IsSingleModSelected, Mode=OneWay}"
+                                   IsEnabled="{x:Bind ViewModel.ModGridVM.IsSingleModSelected, Mode=OneWay}"
                                     Text="打开模组文件夹..." />
+                                    Text="打开 Mod 文件夹..." />
                             </MenuBarItem>
 
                             <MenuBarItem Title="视图">

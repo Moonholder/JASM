@@ -168,6 +168,8 @@ public partial class ContextMenuVM(
 
         _notificationManager.ShowNotification($"{SelectedModsCount} 个模组已移动",
             $"成功移动模组 {string.Join(",", selectedMods.Select(m => m.Mod.GetDisplayName()))} 到 {destinationModList.Character.DisplayName}",
+        _notificationManager.ShowNotification($"{SelectedModsCount} Mods Moved",
+            $"Successfully moved {string.Join(",", selectedMods.Select(m => m.Mod.GetDisplayName()))} mods to {destinationModList.Character.DisplayName}",
             TimeSpan.FromSeconds(5));
 
         ModsMoved?.Invoke(this, EventArgs.Empty);

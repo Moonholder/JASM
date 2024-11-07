@@ -81,6 +81,7 @@ public class ModDragAndDropService
             if (extractResult.exitedCode == 1)
             {
                 extractResult = await ShowPasswordInputWindow(scanner, storageItem.Path);
+
                 if (extractResult.exitedCode == 2)
                 {
                     _notificationManager.ShowNotification(

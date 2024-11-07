@@ -1,5 +1,35 @@
 # Changelog
 
+## [2.17.0](https://github.com/Moonholder/JASM/compare/v2.16.8...v2.17.0) (2024-11-06)
+
+
+### Features
+
+* 重写角色详情页 ([#8](https://github.com/Moonholder/JASM/issues/8)) ([9e7c82f](https://github.com/Moonholder/JASM/commit/9e7c82fa981e62eb19e0955395c4d6e5e1e5718e))
+
+## [2.16.8](https://github.com/Moonholder/JASM/compare/v2.16.7...v2.16.8) (2024-10-21)
+
+
+### Miscellaneous
+
+* 文本更新 ([ff80962](https://github.com/Moonholder/JASM/commit/ff80962eaeebc4f706f89896ab476ea55e3b08ba))
+* 补充汉化文本 ([320a750](https://github.com/Moonholder/JASM/commit/320a75095c57f467e34cf36a13d721b9d8772ee7))
+
+## [2.16.7](https://github.com/Moonholder/JASM/compare/v2.16.6...v2.16.7) (2024-10-16)
+
+
+### Miscellaneous
+
+* 更新构建流程 ([3036862](https://github.com/Moonholder/JASM/commit/303686239eb89f4cf030973a0211f876a77fa5c2))
+* 自动更新程序汉化, 更新地址修改 ([bd2d4e2](https://github.com/Moonholder/JASM/commit/bd2d4e21ead099798ff37a01ff372764db860a4a))
+
+## [2.16.6](https://github.com/Moonholder/JASM/compare/v2.16.5...v2.16.6) (2024-10-16)
+
+
+### Miscellaneous
+
+* dotnet format ([3cc321c](https://github.com/Moonholder/JASM/commit/3cc321c8ee28befe4c696689e8328fa2a3904326))
+
 ## [2.16.5](https://github.com/Moonholder/JASM/compare/v2.16.4...v2.16.5) (2024-10-16)
 
 

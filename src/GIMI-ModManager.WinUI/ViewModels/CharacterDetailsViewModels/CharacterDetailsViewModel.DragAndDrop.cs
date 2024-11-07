@@ -40,6 +40,8 @@ public partial class CharacterDetailsViewModel
             try
             {
                 var installMonitor = await _modDragAndDropService.AddStorageItemFoldersAsync(_modList, items).ConfigureAwait(false);
+                var installMonitor = await Task.Run(async () =>
+                    await _modDragAndDropService.AddStorageItemFoldersAsync(_modList, items).ConfigureAwait(false), CancellationToken);
 
                 if (installMonitor is not null)
                     _ = installMonitor.Task.ContinueWith((task) => ModGridVM.QueueModRefresh(), CancellationToken);

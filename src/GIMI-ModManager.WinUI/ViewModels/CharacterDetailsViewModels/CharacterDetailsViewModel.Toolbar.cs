@@ -202,6 +202,18 @@ public partial class CharacterDetailsViewModel
                     }
                 }
 
+                var result = await Task.Run(async () =>
+                    {
+                        var installMonitor = await _modDragAndDropService.AddStorageItemFoldersAsync(_modList, [file]).ConfigureAwait(false);
+
+                        if (installMonitor is not null)
+                            return await installMonitor.WaitForCloseAsync().ConfigureAwait(false);
+                        return null;
+                    },
+                    CancellationToken.None);
+
+                if (result?.CloseReason == CloseRequestedArgs.CloseReasons.Success)
+                    await ModGridVM.ReloadAllModsAsync();
             }
             catch (Exception e)
             {

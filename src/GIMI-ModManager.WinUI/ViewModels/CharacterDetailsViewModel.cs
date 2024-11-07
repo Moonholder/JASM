@@ -539,7 +539,7 @@ public partial class CharacterDetailsViewModel : ObservableRecipient, INavigatio
         try
         {
             IsAddingModFolder = true;
-            await _modDragAndDropService.AddStorageItemFoldersAsync(_modList, storageItems);
+            await Task.Run(async () => await _modDragAndDropService.AddStorageItemFoldersAsync(_modList, storageItems));
         }
         catch (Exception e)
         {
