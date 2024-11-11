@@ -1,0 +1,152 @@
+name: Test, Build And Release JASM
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'src/**'
+  push:
+    branches: [ main ]
+    paths:
+      - 'src/**'
+      - 'CHANGELOG.md'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  format:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: ./src
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.x
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Format
+      run: dotnet format --verify-no-changes
+
+  build:
+    needs: format
+    strategy:
+      matrix:
+        configuration: [Release]
+        platform: [x64]
+        build_type: [Regular, SelfContained]
+
+    runs-on: windows-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Install .NET Core
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.x
+
+    - name: Test
+      run: dotnet test ${{ github.workspace }}\src
+
+    - name: Build, publish and zip the app
+      run: |
+        python ${{ github.workspace }}\Build\Release.py ${{ matrix.build_type == 'SelfContained' && 'SelfContained' || '' }} ExcludeElevator
+        echo "zipFile=JASM_v${{ github.ref }}_${{ matrix.build_type }}.7z" >> $GITHUB_ENV
+
+    - name: List build directory
+      run: dir ${{ github.workspace }}
+
+    - name: Upload JASM
+      uses: actions/upload-artifact@v4
+      with:
+        name: JASM_${{ matrix.build_type }}
+        path: ${{ github.workspace }}\\${{ env.zipFile }}
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Create Release with Release Please
+        id: release
+        uses: google-github-actions/release-please-action@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release-type: simple
+          package-name: jasm
+          extra-files: |
+                        src/GIMI-ModManager.WinUI/GIMI-ModManager.WinUI.csproj
+          changelog-types: >
+            [
+              { "type": "revert", "section": "Reverts", "hidden": false },
+              { "type": "feat", "section": "Features", "hidden": false },
+              { "type": "fix", "section": "Bug Fixes", "hidden": false },
+              { "type": "perf", "section": "Performance Improvements", "hidden": false },
+              { "type": "style", "section": "Styling", "hidden": false },
+              { "type": "tweak", "section": "Tweaks", "hidden": false },
+              { "type": "chore", "section": "Miscellaneous", "hidden": false },
+              { "type": "docs", "section": "Documentation", "hidden": false },
+              { "type": "ci", "section": "Continuous Integration", "hidden": false },
+              { "type": "test", "section": "Tests", "hidden": false },
+              { "type": "build", "section": "Build System", "hidden": false },
+              { "type": "refactor", "section": "Code Refactoring", "hidden": false }
+            ]
+    
+      - name: Download regular version build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: JASM_Regular
+    
+      - name: Download self-contained version build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: JASM_SelfContained
+
+      - name: Get version
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Upload regular version release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.release.outputs.upload_url }}
+          asset_path: ./JASM_v${{ steps.get_version.outputs.VERSION }}.7z
+          asset_name: JASM_v${{ steps.get_version.outputs.VERSION }}.7z
+          asset_content_type: application/x-7z-compressed
+
+      - name: Upload self-contained version release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.release.outputs.upload_url }}
+          asset_path: ./SelfContained_JASM_v${{ steps.get_version.outputs.VERSION }}.7z
+          asset_name: SelfContained_JASM_v${{ steps.get_version.outputs.VERSION }}.7z
+          asset_content_type: application/x-7z-compressed
