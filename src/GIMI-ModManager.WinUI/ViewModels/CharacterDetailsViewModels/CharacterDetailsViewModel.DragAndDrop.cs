@@ -35,6 +35,13 @@ public partial class CharacterDetailsViewModel
 
     public async Task DragDropModAsync(IReadOnlyList<IStorageItem> items)
     {
+        if (!CanDragDropMod(items))
+        {
+            _notificationService.ShowNotification("拖放操作失败",
+                "操作失败，因为所选项目不是有效的模组文件或文件夹。",
+                TimeSpan.FromSeconds(5));
+            return;
+        }
         await CommandWrapperAsync(true, async () =>
         {
             try
@@ -47,8 +54,8 @@ public partial class CharacterDetailsViewModel
             catch (Exception e)
             {
                 _logger.Error(e, "Error while adding storage items.");
-                _notificationService.ShowNotification("Drag And Drop operation failed",
-                    $"An error occurred while adding the storage items. Reason:\n{e.Message}",
+                _notificationService.ShowNotification("拖放操作失败",
+                    $"在添加存储项时发生错误。原因:\n{e.Message}",
                     TimeSpan.FromSeconds(5));
             }
         }).ConfigureAwait(false);
@@ -76,6 +83,13 @@ public partial class CharacterDetailsViewModel
 
     public async Task DragDropModUrlAsync(Uri uri)
     {
+        if (!CanDragDropModUrl(uri))
+        {
+            _notificationService.ShowNotification("拖放操作失败",
+                "操作失败，因为所选项目不是有效的GameBanana模组链接.",
+                TimeSpan.FromSeconds(5));
+            return;
+        }
         await CommandWrapperAsync(true, async () =>
         {
             try
@@ -85,7 +99,7 @@ public partial class CharacterDetailsViewModel
             catch (Exception e)
             {
                 _logger.Error(e, "Error opening mod page window");
-                _notificationService.ShowNotification("Error opening mod page window", e.Message, TimeSpan.FromSeconds(10));
+                _notificationService.ShowNotification("打开模组页面窗口时出错", e.Message, TimeSpan.FromSeconds(10));
             }
         }).ConfigureAwait(false);
     }
