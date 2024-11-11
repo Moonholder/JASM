@@ -12,10 +12,6 @@ on:
       - 'src/**'
       - 'CHANGELOG.md'
 
-permissions:
-  contents: write
-  pull-requests: write
-
 jobs:
   format:
     runs-on: windows-latest
@@ -90,31 +86,6 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
-
-      - name: Create Release with Release Please
-        id: release
-        uses: google-github-actions/release-please-action@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          release-type: simple
-          package-name: jasm
-          extra-files: |
-                        src/GIMI-ModManager.WinUI/GIMI-ModManager.WinUI.csproj
-          changelog-types: >
-            [
-              { "type": "revert", "section": "Reverts", "hidden": false },
-              { "type": "feat", "section": "Features", "hidden": false },
-              { "type": "fix", "section": "Bug Fixes", "hidden": false },
-              { "type": "perf", "section": "Performance Improvements", "hidden": false },
-              { "type": "style", "section": "Styling", "hidden": false },
-              { "type": "tweak", "section": "Tweaks", "hidden": false },
-              { "type": "chore", "section": "Miscellaneous", "hidden": false },
-              { "type": "docs", "section": "Documentation", "hidden": false },
-              { "type": "ci", "section": "Continuous Integration", "hidden": false },
-              { "type": "test", "section": "Tests", "hidden": false },
-              { "type": "build", "section": "Build System", "hidden": false },
-              { "type": "refactor", "section": "Code Refactoring", "hidden": false }
-            ]
     
       - name: Download regular version build artifact
         uses: actions/download-artifact@v3
