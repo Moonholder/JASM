@@ -1,5 +1,24 @@
 # Changelog
 
+## [2.18.0](https://github.com/Moonholder/JASM/compare/v2.17.1...v2.18.0) (2024-11-11)
+
+
+### Features
+
+* 增加筛选条件, 角色卡上显示启用的mod数量 ([6698595](https://github.com/Moonholder/JASM/commit/66985956b3ee7b01a352973368937ea08f1c45bd))
+
+
+### Bug Fixes
+
+* 可能的修复：解决WinRAR拖放无法正常工作的问题 ([94c2e6c](https://github.com/Moonholder/JASM/commit/94c2e6cc362b3b6ec5866c0a9f5abde53d0c2055))
+
+
+### Miscellaneous
+
+* update workflows file ([be0eba2](https://github.com/Moonholder/JASM/commit/be0eba252afc52b4fa25b802b28f2704373ef919))
+* **ZZZ:** 添加月城柳 ([7f61bff](https://github.com/Moonholder/JASM/commit/7f61bffa10cc215d321389b821fe6b4802318360))
+* 更新了模组安装窗口的UI文本 ([edb5086](https://github.com/Moonholder/JASM/commit/edb5086f2bf08821a1730d5de011c68d9e27fb12))
+
 ## [2.17.1](https://github.com/Moonholder/JASM/compare/v2.17.0...v2.17.1) (2024-11-07)
 
 
