@@ -44,7 +44,7 @@
                         Margin="10"
                         FontSize="20"
                         FontWeight="Bold"
-                        Text="Download Mods from GameBanana" />
+                        Text="从GameBanana下载模组" />
 
                     <controls:LinkButton
                         Link="{x:Bind ViewModel.CharacterModListPath, Mode=OneWay}"
@@ -58,7 +58,7 @@
                         <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
                             <StackPanel>
                                 <ProgressRing IsActive="True" />
-                                <TextBlock Text="Loading Mod Info from GameBanana..." />
+                                <TextBlock Text="从GameBanana加载模组信息..." />
                             </StackPanel>
                         </Grid>
 
@@ -119,7 +119,7 @@
                                                             HorizontalAlignment="Right"
                                                             Command="{x:Bind DownloadCommand}"
                                                             CommandParameter="{Binding Mode=OneWay}"
-                                                            Content="Download"
+                                                            Content="下载"
                                                             Visibility="{Binding Path=ShowDownloadButton, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
 
                                                         <Button
@@ -127,7 +127,7 @@
                                                             HorizontalAlignment="Right"
                                                             Command="{x:Bind InstallCommand}"
                                                             CommandParameter="{Binding Mode=OneWay}"
-                                                            Content="Install"
+                                                            Content="安装"
                                                             Visibility="{Binding Path=ShowInstallButton, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
                                                     </Grid>
 
@@ -191,7 +191,7 @@
                         <TextBlock
                             Margin="10,0"
                             VerticalAlignment="Center"
-                            Text="Mod Page:" />
+                            Text="模组页面:" />
                         <controls:LinkButton
                             VerticalAlignment="Center"
                             Link="{x:Bind ViewModel.ModPage, Mode=OneWay}"
@@ -202,7 +202,7 @@
                         Grid.Column="1"
                         Margin="8,0"
                         Click="ButtonBase_OnClick"
-                        Content="Downloads"
+                        Content="下载管理"
                         IsEnabled="{x:Bind ViewModel.IsOpenDownloadButtonEnabled, Mode=OneWay}" />
                     <ProgressRing
                         x:Name="ModPageLoadingRing"

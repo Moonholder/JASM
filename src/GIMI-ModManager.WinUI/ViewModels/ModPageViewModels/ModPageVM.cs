@@ -115,7 +115,7 @@ public partial class ModPageVM : ObservableRecipient
             return;
         }
 
-        _window.Title = $"Downloads for: {_modPageInfo.ModName}";
+        _window.Title = $"下载: {_modPageInfo.ModName}";
         CharacterModListPath = new Uri(_characterModList.AbsModsFolderPath);
 
         _modFiles = _modPageInfo.Files.ToList();

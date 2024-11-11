@@ -63,7 +63,7 @@ public class ModInstallerService(
         var modInstallWindow = new WindowEx()
         {
             SystemBackdrop = new MicaBackdrop(),
-            Title = $"Mod Installer Helper: {modTitle}",
+            Title = $"模组安装器: {modTitle}",
             Content = modInstallPage,
             Width = 1200,
             Height = 750,

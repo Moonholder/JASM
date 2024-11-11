@@ -228,16 +228,16 @@
 
                 <TextBox
                     Grid.Row="1"
-                    Header="Mod页面URL"
+                    Header="模组页面URL"
                     IsReadOnly="{x:Bind ViewModel.IsRetrievingModInfo, Mode=OneWay}"
                     KeyDown="UrlTextBox_KeyDown"
                     PlaceholderText="粘贴 URL 自动填充模组预览图等信息 (仅支持 GameBanana)"
                     Text="{x:Bind ViewModel.ModUrl, Mode=TwoWay}" />
                 <TextBox
                     Grid.Row="2"
-                    Header="Mod自定义名称"
+                    Header="模组自定义名称"
                     IsReadOnly="{x:Bind ViewModel.IsRetrievingModInfo, Mode=OneWay}"
-                    PlaceholderText="在整个JASM中显示自定义名称"
+                    PlaceholderText="在整个JASM中显示的自定义名称"
                     Text="{x:Bind ViewModel.CustomName, Mode=TwoWay}" />
                 <TextBox
                     Grid.Row="3"
@@ -246,10 +246,10 @@
                     Text="{x:Bind ViewModel.Author, Mode=TwoWay}" />
                 <TextBox
                     Grid.Row="4"
-                    Height="100"
-                    AcceptsReturn="True"
-                    Header="描述"
-                    PlaceholderText="该描述目前没有显示在JASM中的任何地方"
+                    Margin="0,0,0,8"
+                    AcceptsReturn="False"
+                    Header="备注"
+                    PlaceholderText="自定义自由文本备注，显示在角色详情页的表格中"
                     Text="{x:Bind ViewModel.Description, Mode=TwoWay}" />
             </Grid>
 
