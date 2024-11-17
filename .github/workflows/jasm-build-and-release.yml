@@ -70,10 +70,19 @@ jobs:
       with:
         name: JASM_${{ matrix.build_type }}
         path: ${{ github.workspace }}\\${{ env.zipFile }}
+        
+    - name: Set commit message flag
+      id: set_flag
+      run: |
+        if [[ '${{ github.event.head_commit.message }}' == *"chore(main): release"* ]]; then
+          echo "::set-output name=release_flag::true"
+        else
+          echo "::set-output name=release_flag::false"
+        fi
 
   release:
     needs: build
-    if: startsWith(github.ref, 'refs/tags/')
+    if: needs.build.outputs.release_flag == 'true'
     runs-on: windows-latest
 
     steps:

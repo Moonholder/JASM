@@ -134,7 +134,7 @@
                                                             HorizontalAlignment="Right"
                                                             Command="{x:Bind InstallCommand}"
                                                             CommandParameter="{Binding Mode=OneWay}"
-                                                            Content="Install"
+                                                            Content="安装"
                                                             Visibility="{Binding Path=ShowInstallButton, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
                                                     </Grid>
 

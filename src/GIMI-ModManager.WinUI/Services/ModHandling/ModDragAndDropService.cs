@@ -78,10 +78,10 @@ public class ModDragAndDropService
         {
             var scanner = new DragAndDropScanner();
             var extractResult = scanner.ScanAndGetContents(storageItem.Path);
-            if (extractResult.exitedCode == 1)
+            if (extractResult.exitedCode == 1 || extractResult.exitedCode == 2)
             {
                 extractResult = await ShowPasswordInputWindow(scanner, storageItem.Path);
-                if (extractResult.exitedCode == 2)
+                if (extractResult?.exitedCode == 2)
                 {
                     _notificationManager.ShowNotification(
                         "解压失败",
