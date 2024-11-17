@@ -43,6 +43,8 @@ jobs:
         build_type: [Regular, SelfContained]
 
     runs-on: windows-latest
+    outputs:
+      release_flag: ${{ steps.set_output.outputs.release_flag }}
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -71,14 +73,14 @@ jobs:
         name: JASM_${{ matrix.build_type }}
         path: ${{ github.workspace }}\\${{ env.zipFile }}
         
-    - name: Set commit message flag
-      id: set_flag
+    - name: Set release flag output
+      id: set_output
       run: |
-        if [[ '${{ github.event.head_commit.message }}' == *"chore(main): release"* ]]; then
+        if ([bool]${{ github.event.head_commit.message }} -match "chore$main$: release") {
           echo "::set-output name=release_flag::true"
-        else
+        } else {
           echo "::set-output name=release_flag::false"
-        fi
+        }
 
   release:
     needs: build
