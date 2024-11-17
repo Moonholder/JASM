@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.18.1](https://github.com/Moonholder/JASM/compare/v2.18.0...v2.18.1) (2024-11-17)
+
+
+### Bug Fixes
+
+* 修复部分加密压缩包未弹出密码输入框的问题 ([bb53508](https://github.com/Moonholder/JASM/commit/bb535080a0e5a81b22c4d0f0dd0649251e6944dc))
+
+
+### Miscellaneous
+
+* **Honkai:** 添加忘归人和星期日 ([b3589df](https://github.com/Moonholder/JASM/commit/b3589df0e2879219f4b456cb0f54c3b5b07a2cb6))
+
 ## [2.18.0](https://github.com/Moonholder/JASM/compare/v2.17.1...v2.18.0) (2024-11-11)
 
 
