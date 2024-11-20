@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.18.2](https://github.com/Moonholder/JASM/compare/v2.18.1...v2.18.2) (2024-11-20)
+
+
+### Miscellaneous
+
+* **Honkai:** 添加乱破 ([f838304](https://github.com/Moonholder/JASM/commit/f838304f86b7e24e4e1f412effbfd3a7d16402bb))
+* Updated to .NET 9 ([463c2a4](https://github.com/Moonholder/JASM/commit/463c2a46ddd20d8db768c97c67c569f0596c7e73))
+* 首次启动页提示和通知文本更新 ([a9dd7da](https://github.com/Moonholder/JASM/commit/a9dd7da0b3c93115fa3ec4d784c60bf6e55a52f6))
+
 ## [2.18.1](https://github.com/Moonholder/JASM/compare/v2.18.0...v2.18.1) (2024-11-17)
 
 
