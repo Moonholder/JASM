@@ -121,7 +121,7 @@ public partial class CreateCommandViewModel : ObservableObject
             index++;
         }
 
-        if (charBuffer != null && charBuffer.LastIndexOf('\0') == -1)
+        if (!charBuffer.IsEmpty && charBuffer.LastIndexOf('\0') == -1)
             throw new ArgumentException("Required null terminator missing.");
 
         fixed (char* p = charBuffer)
@@ -134,13 +134,13 @@ public partial class CreateCommandViewModel : ObservableObject
 
     private string? SetEffectiveWorkingDirectory()
     {
-        const string prefix = "有效工作目录: ";
+        const string prefix = "Effective working directory: ";
         var jasmWorkingDirectory = App.ROOT_DIR;
         string? workingDirectory = null;
 
         if (!IsValidWorkingDirectory())
         {
-            EffectiveWorkingDirectory = prefix + "无效的工作目录";
+            EffectiveWorkingDirectory = prefix + "Invalid working directory";
             return null;
         }
 
@@ -341,7 +341,7 @@ public partial class CreateCommandViewModel : ObservableObject
                 .ConfigureAwait(false);
             CloseRequested?.Invoke(this, EventArgs.Empty);
 
-            _notificationManager.ShowNotification($"命令 '{createOptions.CommandDisplayName}' 更新成功.",
+            _notificationManager.ShowNotification($"Command '{createOptions.CommandDisplayName}' 更新成功.",
                 "", TimeSpan.FromSeconds(3));
 
             await _commandService.SetSpecialCommands(_createOptions.CommandDefinition.Id,

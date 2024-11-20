@@ -30,7 +30,7 @@
 
 ## 要求
 - Windows 10，版本 1809 或更高版本（[据称](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/))
-- [NET 桌面运行时](https://aka.ms/dotnet-core-applaunch?missing_runtime=true&arch=x64&rid=win10-x64&apphost_version=8.0.0&gui=true)
+- [NET 桌面运行时](https://aka.ms/dotnet-core-applaunch?missing_runtime=true&arch=x64&rid=win10-x64&apphost_version=9.0.0&gui=true)
 - [Windows App SDK](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads)
 
 如果您尚未下载这些，应用程序将提示您下载必要的依赖项并提供链接。

@@ -20,19 +20,19 @@ jobs:
         working-directory: ./src
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
     
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.x
-
-    - name: Restore dependencies
-      run: dotnet restore
-
-    - name: Format
-      run: dotnet format --verify-no-changes
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.x
+  
+      - name: Restore dependencies
+        run: dotnet restore
+  
+      - name: Format
+        run: dotnet format --verify-no-changes
 
   build:
     needs: format
@@ -54,7 +54,7 @@ jobs:
     - name: Install .NET Core
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 8.x
+        dotnet-version: 9.x
 
     - name: Test
       run: dotnet test ${{ github.workspace }}\src
@@ -76,7 +76,7 @@ jobs:
     - name: Set release flag output
       id: set_output
       run: |
-        if ([bool]${{ github.event.head_commit.message }} -match "chore$main$: release") {
+        if ($(echo '${{ github.event.head_commit.message }}') -match "chore$main$: release") {
           echo "::set-output name=release_flag::true"
         } else {
           echo "::set-output name=release_flag::false"
