@@ -138,16 +138,16 @@ public partial class StartupViewModel : ObservableRecipient, INavigationAware
         _navigationService.NavigateTo(typeof(CharactersViewModel).FullName!, null, true);
         _windowManagerService.ResizeWindowPercent(_windowManagerService.MainWindow, 80, 80);
         _windowManagerService.MainWindow.CenterOnScreen();
-        App.GetService<NotificationManager>().ShowNotification("Startup settings saved",
-            $"Startup settings saved successfully to '{_localSettingsService.GameScopedSettingsLocation}'",
+        App.GetService<NotificationManager>().ShowNotification("保存启动设置",
+            $"启动设置已保存到 '{_localSettingsService.GameScopedSettingsLocation}'",
             TimeSpan.FromSeconds(7));
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
         Task.Run(async () =>
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
         {
             await Task.Delay(TimeSpan.FromSeconds(7));
-            App.GetService<NotificationManager>().ShowNotification("JASM is still in alpha",
-                "There will be bugs and things will most likely break. Anyway, hope you enjoy using Just Another Skin Manager!",
+            App.GetService<NotificationManager>().ShowNotification("JASM仍处于alpha阶段",
+                "会有bug，有可能会出现问题。无论如何，希望你喜欢使用JASM!",
                 TimeSpan.FromSeconds(20));
         });
     }

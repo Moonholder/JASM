@@ -11,7 +11,7 @@ public class ContainsAnyFileSystemEntryWithNames : AbstractValidator<PathPicker>
         var filenamesLowerArray = fileNamesArray.Select(name => name.ToLower()).ToArray();
 
         customMessage ??=
-            $"Folder does not contain any entry with the specified names: {string.Join(" Or ", fileNamesArray)}";
+            $"文件夹不包含任何具有指定名称的条目: {string.Join(" Or ", fileNamesArray)}， 如果您使用XXMI Launcher，请忽略此警告。";
 
         RuleFor(x => x.Path)
             .Must(path =>
