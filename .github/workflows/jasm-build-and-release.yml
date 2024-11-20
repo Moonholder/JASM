@@ -20,19 +20,19 @@ jobs:
         working-directory: ./src
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    - name: Checkout
+      uses: actions/checkout@v4
     
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 9.x
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.x
   
-      - name: Restore dependencies
-        run: dotnet restore
+    - name: Restore dependencies
+      run: dotnet restore
   
-      - name: Format
-        run: dotnet format --verify-no-changes
+    - name: Format
+      run: dotnet format --verify-no-changes
 
   build:
     needs: format
@@ -76,7 +76,8 @@ jobs:
     - name: Set release flag output
       id: set_output
       run: |
-        if ($(echo '${{ github.event.head_commit.message }}') -match "chore$main$: release") {
+        $message = "${{ github.event.head_commit.message }}"
+        if ($message -like "chore(main): release*") {
           echo "::set-output name=release_flag::true"
         } else {
           echo "::set-output name=release_flag::false"
@@ -113,22 +114,29 @@ jobs:
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
         shell: bash
 
+      - name: Get latest release upload URL
+        id: get_release
+        run: |
+          $response = Invoke-RestMethod -Uri "https://api.github.com/repos/${{ github.repository }}/releases/latest" -Headers @{Authorization = "token ${{ secrets.GITHUB_TOKEN }}"}
+          $uploadUrl = $response.upload_url -replace '{?name,label}', ''
+          echo "UPLOAD_URL=$uploadUrl" >> $env:GITHUB_ENV
+
       - name: Upload regular version release asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.release.outputs.upload_url }}
+          upload_url: ${{ env.UPLOAD_URL }}
           asset_path: ./JASM_v${{ steps.get_version.outputs.VERSION }}.7z
           asset_name: JASM_v${{ steps.get_version.outputs.VERSION }}.7z
           asset_content_type: application/x-7z-compressed
-
+    
       - name: Upload self-contained version release asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.release.outputs.upload_url }}
+          upload_url: ${{ env.UPLOAD_URL }}
           asset_path: ./SelfContained_JASM_v${{ steps.get_version.outputs.VERSION }}.7z
           asset_name: SelfContained_JASM_v${{ steps.get_version.outputs.VERSION }}.7z
           asset_content_type: application/x-7z-compressed
