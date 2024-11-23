@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.18.3](https://github.com/Moonholder/JASM/compare/v2.18.2...v2.18.3) (2024-11-23)
+
+
+### Miscellaneous
+
+* **Honkai:** 添加大黑塔 ([a6b74fc](https://github.com/Moonholder/JASM/commit/a6b74fc781219c37107ad3a2bf2859cf4bd017d3))
+* Updated WinAppSdk to 1.6.3 ([2e68d91](https://github.com/Moonholder/JASM/commit/2e68d9155ea624448910a56bb7d55a64feafbf6d))
+
 ## [2.18.2](https://github.com/Moonholder/JASM/compare/v2.18.1...v2.18.2) (2024-11-20)
 
 
