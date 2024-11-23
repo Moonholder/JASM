@@ -43,8 +43,6 @@ jobs:
         build_type: [Regular, SelfContained]
 
     runs-on: windows-latest
-    outputs:
-      release_flag: ${{ steps.set_output.outputs.release_flag }}
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -68,24 +66,14 @@ jobs:
       run: dir ${{ github.workspace }}
 
     - name: Upload JASM
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3
       with:
         name: JASM_${{ matrix.build_type }}
         path: ${{ github.workspace }}\\${{ env.zipFile }}
-        
-    - name: Set release flag output
-      id: set_output
-      run: |
-        $message = "${{ github.event.head_commit.message }}"
-        if ($message -like "chore(main): release*") {
-          echo "::set-output name=release_flag::true"
-        } else {
-          echo "::set-output name=release_flag::false"
-        }
 
   release:
     needs: build
-    if: needs.build.outputs.release_flag == 'true'
+    if: "${{ startsWith(github.event.head_commit.message, 'chore(main): release') }}"
     runs-on: windows-latest
 
     steps:
