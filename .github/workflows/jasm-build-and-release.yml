@@ -97,9 +97,14 @@ jobs:
         with:
           name: JASM_SelfContained
 
+      - name: Fetch all tags
+        run: git fetch --tags
+
       - name: Get version
         id: get_version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+        run: |
+          latest_tag=$(git describe --tags --abbrev=0)
+          echo "VERSION=$latest_tag" >> $GITHUB_OUTPUT
         shell: bash
 
       - name: Get latest release upload URL
@@ -115,8 +120,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ env.UPLOAD_URL }}
-          asset_path: ./JASM_v${{ steps.get_version.outputs.VERSION }}.7z
-          asset_name: JASM_v${{ steps.get_version.outputs.VERSION }}.7z
+          asset_path: ./JASM_${{ steps.get_version.outputs.VERSION }}.7z
+          asset_name: JASM_${{ steps.get_version.outputs.VERSION }}.7z
           asset_content_type: application/x-7z-compressed
     
       - name: Upload self-contained version release asset
@@ -125,6 +130,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ env.UPLOAD_URL }}
-          asset_path: ./SelfContained_JASM_v${{ steps.get_version.outputs.VERSION }}.7z
-          asset_name: SelfContained_JASM_v${{ steps.get_version.outputs.VERSION }}.7z
+          asset_path: ./SelfContained_JASM_${{ steps.get_version.outputs.VERSION }}.7z
+          asset_name: SelfContained_JASM_${{ steps.get_version.outputs.VERSION }}.7z
           asset_content_type: application/x-7z-compressed

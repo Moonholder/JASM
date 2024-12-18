@@ -229,7 +229,7 @@
                                 <TextBlock
                                     HorizontalAlignment="Center"
                                     Foreground="Red"
-                                    Text="This mod could not be found on disk!" />
+                                    Text="在磁盘上找不到该模组!" />
 
                                 <StackPanel>
                                     <TextBlock HorizontalAlignment="Center" Text="Original Path:" />

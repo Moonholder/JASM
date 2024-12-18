@@ -68,11 +68,11 @@ public sealed partial class PresetDetailsViewModel(
     {
         var preset = _modPresetService.GetPresets().FirstOrDefault(p => p.Name == PresetName);
 
-        var modCountText = $"{preset?.Mods.Count ?? 0} mods";
+        var modCountText = $"{preset?.Mods.Count ?? 0}个模组";
 
         var isReadOnly = preset?.IsReadOnly ?? false;
 
-        var readOnlyText = isReadOnly ? " (Read-Only)" : string.Empty;
+        var readOnlyText = isReadOnly ? " (只读)" : string.Empty;
 
         return $"预设详情: {PresetName} ({modCountText}){readOnlyText}";
     }
@@ -187,13 +187,13 @@ public sealed partial class PresetDetailsViewModel(
 
             ModEntries.Remove(modPresetEntryVm);
 
-            _notificationManager.ShowNotification("Mod removed from preset",
-                $"Removed {(modPresetEntryVm.IsMissing ? "missing" : "")} mod '{modPresetEntryVm.Name}' from preset {PresetName}",
+            _notificationManager.ShowNotification("模组已从预设中移除",
+                $"从预设 {PresetName} 中移除了{(modPresetEntryVm.IsMissing ? "缺失的" : "")}模组 '{modPresetEntryVm.Name}'",
                 null);
         }
         catch (Exception e)
         {
-            _notificationManager.ShowNotification("Failed to remove mod from preset", e.Message, null);
+            _notificationManager.ShowNotification("从预设中移除模组失败", e.Message, null);
         }
         finally
         {
@@ -237,13 +237,13 @@ public sealed partial class PresetDetailsViewModel(
             ModEntries.Insert(0, modEntryVm);
             _backendModEntries.Insert(0, modEntryVm);
 
-            _notificationManager.ShowNotification("Mod added to preset",
-                $"Added mod '{modEntryVm.Name}' to preset {PresetName}",
+            _notificationManager.ShowNotification("模组已添加到预设中",
+                $"已将模组 '{modEntryVm.Name}' 添加到预设 {PresetName}",
                 null);
         }
         catch (Exception e)
         {
-            _notificationManager.ShowNotification("Failed to add mod to preset", e.Message, null);
+            _notificationManager.ShowNotification("添加模组到预设失败", e.Message, null);
         }
         finally
         {
@@ -301,13 +301,13 @@ public sealed partial class PresetDetailsViewModel(
 
             await Task.Run(() => _modPresetService.DeleteModEntryAsync(PresetName, vm.ModId));
 
-            _notificationManager.ShowNotification("Mod added to preset",
-                $"Added mod '{modEntryVm.Name}' to preset {PresetName}",
+            _notificationManager.ShowNotification("模组已添加到预设中",
+                $"已将模组 '{modEntryVm.Name}' 添加到预设 {PresetName}",
                 null);
         }
         catch (Exception e)
         {
-            _notificationManager.ShowNotification("Failed to add mod to preset", e.Message, null);
+            _notificationManager.ShowNotification("添加模组到预设失败", e.Message, null);
         }
         finally
         {

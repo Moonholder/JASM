@@ -616,7 +616,7 @@ public partial class ModPaneFieldsVm : ObservableObject
     private ModPaneFieldsVm(CharacterSkinEntry modEntry, ModSettings modSettings, IEnumerable<KeySwapSection> keySwaps)
     {
         IsEnabled = modEntry.IsEnabled;
-        ImageUri = modSettings.ImagePath ?? ImageHandlerService.StaticPlaceholderImageUri;
+        ImageUri = new Uri(Uri.UnescapeDataString(modSettings.ImagePath?.ToString() ?? ImageHandlerService.StaticPlaceholderImageUri.ToString()));
         ModDisplayName = modEntry.Mod.GetDisplayName();
         ModUrl = modSettings.ModUrl?.ToString() ?? "";
         ModIniPath = modSettings.MergedIniPath?.ToString();
