@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.18.4](https://github.com/Moonholder/JASM/compare/v2.18.3...v2.18.4) (2024-12-18)
+
+
+### Bug Fixes
+
+* 修复路径存在全角字符时模组预览图不显示的问题 ([acbdd23](https://github.com/Moonholder/JASM/commit/acbdd2362e0fdc3c4c6ce57bd58d6c24fda5d127))
+
+
+### Miscellaneous
+
+* **Genshin:** 更新茜特菈莉角色信息和添加角色玛薇卡及蓝砚 ([d2fcb81](https://github.com/Moonholder/JASM/commit/d2fcb813827f96d5ddea5f5c825f7ff0305ac0ad))
+* **Honkai:** 添加角色阿格莱雅 ([aaa7d61](https://github.com/Moonholder/JASM/commit/aaa7d6114c5e2f575595d5b7bfb3e9fe2da71c42))
+* **ZZZ:** 添加角色悠真，耀嘉音和伊芙琳 ([59892df](https://github.com/Moonholder/JASM/commit/59892dfedf1c54e3ab9ca7de2cc2dcf0c1d757c0))
+
 ## [2.18.3](https://github.com/Moonholder/JASM/compare/v2.18.2...v2.18.3) (2024-11-23)
 
 
