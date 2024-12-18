@@ -522,5 +522,108 @@
     "InGameSkins": [],
     "InternalName": "Kachina",
     "DisplayName": "卡齐娜"
+  },
+  {
+    "Keys": [
+      "Xilonen"
+    ],
+    "ReleaseDate": "2024-10-09T00:00:00",
+    "Image": "Character_Xilonen_Thumb.png",
+    "Rarity": 5,
+    "Element": "Geo",
+    "Class": "Sword",
+    "Region": [
+      "Natlan"
+    ],
+    "ModFilesName": "Xilonen",
+    "InGameSkins": [],
+    "InternalName": "Xilonen",
+    "DisplayName": "希诺宁"
+  },
+  {
+    "Keys": [
+      "Chasca"
+    ],
+    "ReleaseDate": "2024-11-20T00:00:00",
+    "Image": "Character_Chasca_Thumb.png",
+    "Rarity": 5,
+    "Element": "Anemo",
+    "Class": "Bow",
+    "Region": [
+      "Natlan"
+    ],
+    "ModFilesName": "Chasca",
+    "InGameSkins": [],
+    "InternalName": "Chasca",
+    "DisplayName": "恰斯卡"
+  },
+  {
+    "Keys": [
+      "Ororon"
+    ],
+    "ReleaseDate": "2024-11-20T00:00:00",
+    "Image": "Character_Ororon_Thumb.png",
+    "Rarity": 4,
+    "Element": "Electro",
+    "Class": "Bow",
+    "Region": [
+      "Natlan"
+    ],
+    "ModFilesName": "Ororon",
+    "InGameSkins": [],
+    "InternalName": "Ororon",
+    "DisplayName": "欧洛伦"
+  },
+  {
+    "Keys": [
+      "Citlali"
+    ],
+    "ReleaseDate": "",
+    "Image": "Character_Citlali_Thumb.png",
+    "Rarity": 5,
+    "Element": "Cryo",
+    "Class": "Catalyst",
+    "Region": [
+      "Natlan"
+    ],
+    "ModFilesName": "Citlali",
+    "InGameSkins": [],
+    "InternalName": "Citlali",
+    "DisplayName": "茜特菈莉"
+    },
+  {
+    "Keys": [
+      "Mavuika"
+    ],
+    "ReleaseDate": "2024-11-20T00:00:00",
+    "Image": "Character_Mavuika_Thumb.png",
+    "Rarity": 5,
+    "Element": "Pyro",
+    "Class": "Claymore",
+    "Region": [
+      "Natlan"
+    ],
+    "ModFilesName": "Mavuika",
+    "InGameSkins": [],
+    "InternalName": "Mavuika",
+    "DisplayName": "玛薇卡"
+  },
+  {
+    "Keys": [
+      "Lan",
+      "Yan"
+    ],
+    "ReleaseDate": "2024-11-20T00:00:00",
+    "Image": "Character_Lan_Yan_Thumb.png",
+    "Rarity": 4,
+    "Element": "Anemo",
+    "Class": "Catalyst",
+    "Region": [
+      "Liyue"
+    ],
+    "ModFilesName": "LanYan",
+    "InGameSkins": [],
+    "InternalName": "Lan Yan",
+    "DisplayName": "蓝砚"
   }
 ]
