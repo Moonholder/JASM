@@ -1034,5 +1034,22 @@
     "InGameSkins": [],
     "InternalName": "The Herta",
     "DisplayName": "大黑塔"
+  },
+  {
+    "Keys": [
+      "Aglaea"
+    ],
+    "ReleaseDate": "2025-01-15T00:00:00",
+    "Image": "aglaea.png",
+    "Rarity": 5,
+    "Element": "Lightning",
+    "Class": "Remembrance",
+    "Region": [
+      "Amphoreus"
+    ],
+    "ModFilesName": "Aglaea",
+    "InGameSkins": [],
+    "InternalName": "Aglaea",
+    "DisplayName": "阿格莱雅"
   }
 ]
