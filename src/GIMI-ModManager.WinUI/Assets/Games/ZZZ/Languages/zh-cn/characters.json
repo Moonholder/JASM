@@ -456,5 +456,59 @@
     "InGameSkins": [],
     "InternalName": "Yanagi",
     "DisplayName": "月城柳"
+  },
+  {
+    "Keys": [
+      "Asaba",
+      "Harumasa"
+    ],
+    "ReleaseDate": "2024-11-6T00:00:00",
+    "Image": "Harumasa.webp",
+    "Rarity": 5,
+    "Element": "Electric",
+    "Class": "Attack",
+    "Region": [
+      "Section6"
+    ],
+    "ModFilesName": "Harumasa",
+    "InGameSkins": [],
+    "InternalName": "Harumasa",
+    "DisplayName": "悠真"
+  },
+  {
+    "Keys": [
+      "Astra",
+      "Yao"
+    ],
+    "ReleaseDate": "2024-11-6T00:00:00",
+    "Image": "Astra.webp",
+    "Rarity": 5,
+    "Element": "Ether",
+    "Class": "Support",
+    "Region": [
+      "Lyra"
+    ],
+    "ModFilesName": "Astra",
+    "InGameSkins": [],
+    "InternalName": "Astra",
+    "DisplayName": "耀嘉音"
+  },
+  {
+    "Keys": [
+      "Evelyn",
+      "Chevalier"
+    ],
+    "ReleaseDate": "2024-11-6T00:00:00",
+    "Image": "Evelyn.webp",
+    "Rarity": 5,
+    "Element": "Fire",
+    "Class": "Attack",
+    "Region": [
+      "Lyra"
+    ],
+    "ModFilesName": "Evelyn",
+    "InGameSkins": [],
+    "InternalName": "Evelyn",
+    "DisplayName": "伊芙琳 "
   }
 ]
