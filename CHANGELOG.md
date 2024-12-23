@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.18.6](https://github.com/Moonholder/JASM/compare/v2.18.5...v2.18.6) (2024-12-23)
+
+
+### Bug Fixes
+
+* 无法通过粘贴图像文件来设置模组预览图像 ([3aa1939](https://github.com/Moonholder/JASM/commit/3aa19392c1270895202bde0f546c5bcf20afdbf0))
+* 角色详情页未正常显示滑翔翼和武器图像 ([b778802](https://github.com/Moonholder/JASM/commit/b778802364fc070c33e2952c3220a594b1929fbe))
+
+
+### Miscellaneous
+
+* 界面汉化文本更新 ([5ef39c7](https://github.com/Moonholder/JASM/commit/5ef39c763f08929d3ca7f71f64c05b6d5768269c))
+
 ## [2.18.5](https://github.com/Moonholder/JASM/compare/v2.18.4...v2.18.5) (2024-12-23)
 
 
