@@ -111,7 +111,7 @@ jobs:
         id: get_release
         run: |
           $response = Invoke-RestMethod -Uri "https://api.github.com/repos/${{ github.repository }}/releases/latest" -Headers @{Authorization = "token ${{ secrets.GITHUB_TOKEN }}"}
-          $uploadUrl = $response.upload_url -replace '{?name,label}', ''
+          $uploadUrl = $response.upload_url -replace '\{\?name,label\}', ''
           echo "UPLOAD_URL=$uploadUrl" >> $env:GITHUB_ENV
 
       - name: Upload regular version release asset
