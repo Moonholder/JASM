@@ -238,7 +238,7 @@
                                                         <Button.Flyout>
                                                             <Flyout Placement="Right">
                                                                 <Button Command="{x:Bind ApplyPresetCommand}" CommandParameter="{x:Bind}">
-                                                                    <TextBlock Text="Confirm" />
+                                                                    <TextBlock Text="确认" />
                                                                 </Button>
                                                             </Flyout>
                                                         </Button.Flyout>

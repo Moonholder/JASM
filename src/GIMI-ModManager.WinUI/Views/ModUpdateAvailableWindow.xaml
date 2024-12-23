@@ -181,7 +181,7 @@
                         Command="{x:Bind ViewModel.IgnoreAndCloseCommand}"
                         Content="忽略并关闭"
                         IsEnabled="{x:Bind ViewModel.IsNotBusy, Mode=OneWay}"
-                        ToolTipService.ToolTip="Removes the notification and closes this window" />
+                        ToolTipService.ToolTip="移除本次通知并关闭此窗口" />
 
                     <StackPanel
                         Grid.Column="1"
@@ -212,7 +212,7 @@
                         <TextBlock
                             Margin="10,0"
                             VerticalAlignment="Center"
-                            Text="Mod Page:" />
+                            Text="模组页面:" />
                         <controls:LinkButton
                             VerticalAlignment="Center"
                             Link="{x:Bind ViewModel.ModPage, Mode=OneWay}"

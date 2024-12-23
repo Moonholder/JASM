@@ -111,7 +111,7 @@ public partial class ModGridVM(
             }
             catch (Exception e)
             {
-                _notificationService.ShowNotification("Error refreshing mods", e.Message, null);
+                _notificationService.ShowNotification("刷新模组时发生错误", e.Message, null);
             }
         }
     }
@@ -171,14 +171,14 @@ public partial class ModGridVM(
 
                 if (refreshResult.ModsDuplicate.Any())
                 {
-                    var message = $"Duplicate mods were detected in {_context.ModObjectDisplayName}'s mod folder.\n";
+                    var message = $"在 {_context.ModObjectDisplayName} 的模组文件夹中检测到重复的模组.\n";
 
                     message = refreshResult.ModsDuplicate.Aggregate(message,
                         (current, duplicateMod) =>
                             current +
-                            $"Mod: '{duplicateMod.ExistingFolderName}' was renamed to '{duplicateMod.RenamedFolderName}' to avoid conflicts.\n");
+                            $"模组: '{duplicateMod.ExistingFolderName}' 已重命名为 '{duplicateMod.RenamedFolderName}' 以避免冲突.\n");
 
-                    _notificationService.ShowNotification("Duplicate Mods Detected",
+                    _notificationService.ShowNotification("检测到重复模组",
                         message,
                         TimeSpan.FromSeconds(10));
                 }
@@ -382,7 +382,7 @@ public partial class ModGridVM(
                 }
                 catch (Exception e)
                 {
-                    _notificationService.ShowNotification("An error occured disabling mod", e.Message, TimeSpan.FromSeconds(5));
+                    _notificationService.ShowNotification("禁用模组时出错", e.Message, TimeSpan.FromSeconds(5));
                 }
 
 
@@ -399,7 +399,7 @@ public partial class ModGridVM(
         }
         catch (Exception e)
         {
-            _notificationService.ShowNotification("An error occured toggling mod", e.Message, TimeSpan.FromSeconds(5));
+            _notificationService.ShowNotification("切换模组时出错", e.Message, TimeSpan.FromSeconds(5));
         }
 
         Messenger.Send(new ModChangedMessage(this, modEntryToToggle, null));
@@ -428,13 +428,13 @@ public partial class ModGridVM(
             if (result.HasNotification)
                 _notificationService.ShowNotification(result.Notification);
             else
-                _notificationService.ShowNotification("An error occured saving mod settings", result.Exception?.ToString() ?? result.ErrorMessage ?? "",
+                _notificationService.ShowNotification("保存模组设置失败", result.Exception?.ToString() ?? result.ErrorMessage ?? "",
                     TimeSpan.FromSeconds(6));
         }
 
         if (result.IsSuccess)
         {
-            _notificationService.ShowNotification("Mod settings saved", messageBody, TimeSpan.FromSeconds(3));
+            _notificationService.ShowNotification("模组设置已保存", messageBody, TimeSpan.FromSeconds(3));
         }
 
         await UpdateModVmAsync(mod, true, CancellationToken.None);
@@ -478,7 +478,7 @@ public partial class ModGridVM(
         var modWindow = new ModUpdateAvailableWindow(notification.Id)
         {
             Title =
-                $"New Mod Files Available: {ModFolderHelpers.GetFolderNameWithoutDisabledPrefix(skinEntry.Mod.Name)}"
+                $"有新的模组文件可用: {ModFolderHelpers.GetFolderNameWithoutDisabledPrefix(skinEntry.Mod.Name)}"
         };
         _windowManagerService.CreateWindow(modWindow, identifier: notification.Id);
         await Task.Delay(100);
@@ -491,8 +491,8 @@ public partial class ModGridVM(
             return;
 
         _notificationService.ShowNotification(
-            $"Folder Activity Detected in {_context.ShownModObject.DisplayName}'s Mod Folder",
-            "Files/Folders were changed in the characters mod folder and mods have been refreshed.",
+            $"在 {_context.ShownModObject.DisplayName} 的模组文件夹中检测到文件夹活动",
+            "角色模组文件夹中的文件/文件夹已被更改，模组已刷新.",
             TimeSpan.FromSeconds(5));
 
 

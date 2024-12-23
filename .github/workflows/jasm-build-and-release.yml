@@ -11,6 +11,11 @@ on:
     paths:
       - 'src/**'
       - 'CHANGELOG.md'
+  workflow_call:
+    inputs:
+      upload_url:
+        required: true
+        type: string
 
 jobs:
   format:
@@ -22,15 +27,15 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
-    
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 9.x
-  
+
     - name: Restore dependencies
       run: dotnet restore
-  
+
     - name: Format
       run: dotnet format --verify-no-changes
 
@@ -75,7 +80,6 @@ jobs:
     needs: build
     if: "${{ startsWith(github.event.head_commit.message, 'chore(main): release') }}"
     runs-on: windows-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -86,12 +90,12 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
-    
+
       - name: Download regular version build artifact
         uses: actions/download-artifact@v3
         with:
           name: JASM_Regular
-    
+
       - name: Download self-contained version build artifact
         uses: actions/download-artifact@v3
         with:
@@ -107,12 +111,9 @@ jobs:
           echo "VERSION=$latest_tag" >> $GITHUB_OUTPUT
         shell: bash
 
-      - name: Get latest release upload URL
-        id: get_release
+      - name: Use passed upload URL
         run: |
-          $response = Invoke-RestMethod -Uri "https://api.github.com/repos/${{ github.repository }}/releases/latest" -Headers @{Authorization = "token ${{ secrets.GITHUB_TOKEN }}"}
-          $uploadUrl = $response.upload_url -replace '\{\?name,label\}', ''
-          echo "UPLOAD_URL=$uploadUrl" >> $env:GITHUB_ENV
+          echo "UPLOAD_URL=${{ inputs.upload_url }}" >> $GITHUB_ENV
 
       - name: Upload regular version release asset
         uses: actions/upload-release-asset@v1
@@ -123,7 +124,7 @@ jobs:
           asset_path: ./JASM_${{ steps.get_version.outputs.VERSION }}.7z
           asset_name: JASM_${{ steps.get_version.outputs.VERSION }}.7z
           asset_content_type: application/x-7z-compressed
-    
+
       - name: Upload self-contained version release asset
         uses: actions/upload-release-asset@v1
         env:

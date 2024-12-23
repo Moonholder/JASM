@@ -36,3 +36,6 @@ jobs:
               { "type": "build", "section": "Build System", "hidden": false },
               { "type": "refactor", "section": "Code Refactoring", "hidden": false }
             ]
+      - name: Set upload_url as output
+        id: set_upload_url
+        run: echo "::set-output name=upload_url::${{ steps.release.outputs.upload_url }}"

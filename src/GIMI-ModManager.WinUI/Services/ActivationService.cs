@@ -412,11 +412,11 @@ public class ActivationService : IActivationService
         var stackPanel = new StackPanel();
         var textWarning = new TextBlock()
         {
-            Text = "You are running JASM as an administrator. This is not recommended.\n" +
-                   "JASM was NOT designed to run with administrator privileges.\n" +
-                   "Simple bugs, though unlikely, can potentially cause serious damage to your file system.\n\n" +
-                   "Please consider running JASM without administrator privileges.\n\n" +
-                   "Use at your own risk, you have been warned",
+            Text = "您正在以管理员身份运行 JASM。这不推荐这样做.\n" +
+                   "JASM 并非设计为在管理员权限下运行.\n" +
+                   "尽管不太可能，但简单的漏洞有可能会对您的文件系统造成严重损害.\n\n" +
+                   "请考虑在无管理员权限的情况下运行 JASM.\n\n" +
+                   "自行承担使用风险，已对您做出警告",
             TextWrapping = TextWrapping.WrapWholeWords
         };
         stackPanel.Children.Add(textWarning);
@@ -424,7 +424,7 @@ public class ActivationService : IActivationService
         var doNotShowAgain = new CheckBox()
         {
             IsChecked = false,
-            Content = "Do not show this warning again",
+            Content = "不再显示此警告",
             Margin = new Thickness(0, 10, 0, 0)
         };
 
@@ -433,10 +433,10 @@ public class ActivationService : IActivationService
 
         var dialog = new ContentDialog
         {
-            Title = "Running as Administrator Warning",
+            Title = "以管理员身份运行警告",
             Content = stackPanel,
-            PrimaryButtonText = "I understand",
-            SecondaryButtonText = "Exit",
+            PrimaryButtonText = "我知道了",
+            SecondaryButtonText = "退出",
             DefaultButton = ContentDialogButton.Primary
         };
 
@@ -465,14 +465,14 @@ public class ActivationService : IActivationService
         var textWarning = new TextBlock()
         {
             Text = """
-                   This version of JASM has a new folder structure.
+                   这个版本的 JASM 采用了新的文件夹结构.
 
-                   Now Characters are organized by category, and each category has its own folder. So new format is as follows:
-                   Mods/Category/Character/<Mod Folders>
-                   Therefore, JASM won't see any of your mods until you reorganize them.
-                   This is a one time thing, and you can do it manually if you want.
+                   现在，角色按类别进行组织，每个类别都有其自己的文件夹。因此，新的格式如下:
+                   Mods/类别/角色/<模组文件夹>
+                   所以，在您重新整理模组之前，JASM 将无法识别您的任何模组.
+                   这是一次性的操作，如果您愿意的话，可以手动进行整理.
 
-                   Also character folders are now created on demand and it is possible to clean up empty folders on the settings page.
+                   此外，现在角色文件夹会按需创建，并且可以在设置页面清理空文件夹.
                    """,
             IsTextSelectionEnabled = true,
             TextWrapping = TextWrapping.WrapWholeWords
@@ -481,7 +481,7 @@ public class ActivationService : IActivationService
 
         var textWarning2 = new TextBlock()
         {
-            Text = "If you're uncertain about this then back up your mods first. I've tested this on my own mods.",
+            Text = "如果你对此不确定，那么请先备份你的模组。我已经在自己的模组上进行过测试了.",
             FontWeight = FontWeights.Bold,
             IsTextSelectionEnabled = true,
             TextWrapping = TextWrapping.WrapWholeWords
@@ -494,8 +494,8 @@ public class ActivationService : IActivationService
         {
             Text = """
 
-                   This popup will be shown until you chose an option below. You can also use the reorganize button on the settings page.
-                   Check the logs if you want to see what's happening.
+                   在你选择以下某个选项之前，这个弹出窗口将会一直显示。你也可以使用设置页面上的 “重新整理” 按钮.
+                   如果你想了解正在发生什么情况，可以查看日志.
                    """,
             IsTextSelectionEnabled = true,
             TextWrapping = TextWrapping.WrapWholeWords
@@ -506,11 +506,11 @@ public class ActivationService : IActivationService
 
         var dialog = new ContentDialog
         {
-            Title = "New Folder structure",
+            Title = "新文件夹结构",
             Content = stackPanel,
-            PrimaryButtonText = "Reorganize my mods",
-            SecondaryButtonText = "I will do it myself",
-            CloseButtonText = "Cancel",
+            PrimaryButtonText = "重新整理我的模组",
+            SecondaryButtonText = "我自己来做",
+            CloseButtonText = "取消",
             DefaultButton = ContentDialogButton.Primary
         };
 
@@ -528,12 +528,12 @@ public class ActivationService : IActivationService
                 await _skinManagerService.RefreshModsAsync();
 
                 if (movedModsCount == -1)
-                    _notificationManager.ShowNotification("Mods reorganization failed.",
-                        "See logs for more details.", TimeSpan.FromSeconds(5));
+                    _notificationManager.ShowNotification("模组重新整理失败.",
+                        "有关详细信息，请参阅日志.", TimeSpan.FromSeconds(5));
 
                 else
-                    _notificationManager.ShowNotification("Mods reorganized.",
-                        $"Moved {movedModsCount} mods to new character folders", TimeSpan.FromSeconds(5));
+                    _notificationManager.ShowNotification("模组已重新整理.",
+                        $"已将 {movedModsCount} 个模组移至新的角色文件夹", TimeSpan.FromSeconds(5));
             }
             finally
             {
