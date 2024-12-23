@@ -504,7 +504,7 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
         Uri? imageUri;
         try
         {
-            imageUri = await Task.Run(() => _imageHandlerService.GetImageFromClipboardAsync());
+            imageUri = await _imageHandlerService.GetImageFromClipboardAsync();
             ImageSource = "Manual";
         }
         catch (Exception e)
@@ -935,8 +935,8 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
         PInvoke.PlaySound("SystemAsterisk", null,
             SND_FLAGS.SND_ASYNC | SND_FLAGS.SND_ALIAS | SND_FLAGS.SND_NODEFAULT);
 
-        _notificationManager.ShowNotification("An error occurred",
-            "An error occurred while adding the mod. See logs for more details",
+        _notificationManager.ShowNotification("出现了一个错误",
+            "添加模组时出现错误. 如需了解更多详细信息，请查看日志",
             TimeSpan.FromSeconds(10));
 
         CloseRequested?.Invoke(this, new CloseRequestedArgs(CloseReasons.Error, e));
