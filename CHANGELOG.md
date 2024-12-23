@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.18.5](https://github.com/Moonholder/JASM/compare/v2.18.4...v2.18.5) (2024-12-23)
+
+
+### Miscellaneous
+
+* **ZZZ:** 添加了莱特，并更新了部分角色的发布日期 ([7612fc4](https://github.com/Moonholder/JASM/commit/7612fc495ffc22325a5784ceb60de0d8f622b61b))
+
 ## [2.18.4](https://github.com/Moonholder/JASM/compare/v2.18.3...v2.18.4) (2024-12-18)
 
 
