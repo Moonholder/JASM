@@ -51,7 +51,7 @@ public partial class CharacterDetailsViewModel
             Character = character;
             var skins = character.Skins.ToArray();
             SelectedSkin = skins.First();
-            ShownModImageUri = SelectedSkin.ImageUri ?? ImageHandlerService.StaticPlaceholderImageUri;
+            ShownModImageUri = SelectedSkin.ImageUri ?? (moddableObject.ImageUri ?? ImageHandlerService.StaticPlaceholderImageUri);
 
             foreach (var characterInGameSkin in skins)
             {
