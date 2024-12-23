@@ -510,5 +510,22 @@
     "InGameSkins": [],
     "InternalName": "Evelyn",
     "DisplayName": "伊芙琳 "
+  },
+  {
+    "Keys": [
+      "Lighter"
+    ],
+    "ReleaseDate": "2024-11-27T00:00:00",
+    "Image": "Lighter.webp",
+    "Rarity": 5,
+    "Element": "Fire",
+    "Class": "Stun",
+    "Region": [
+      "Calydon"
+    ],
+    "ModFilesName": "Lighter",
+    "InGameSkins": [],
+    "InternalName": "Lighter",
+    "DisplayName": "莱特 "
   }
 ]
