@@ -355,6 +355,7 @@ public sealed class ModInstallation : IDisposable
             author: options.Author,
             modUrl: Uri.TryCreate(options.ModUrl, UriKind.Absolute, out var modUrl) ? modUrl : null,
             description: options.Description,
+            characterSkinOverride: options.CharacterSkinOverride.IsNullOrEmpty() ? null : options.CharacterSkinOverride,
             dateAdded: DateTime.Now
         );
         await skinMod.Settings.SaveSettingsAsync(settings, new SaveSettingsOptions { DeleteOldImage = false })
@@ -415,4 +416,5 @@ public record AddModOptions
     public string? ModUrl { get; set; }
     public string? Author { get; set; }
     public string? Description { get; set; }
+    public string? CharacterSkinOverride { get; set; }
 }

@@ -105,13 +105,13 @@
                                             <Button.Content>
                                                 <StackPanel Orientation="Horizontal">
                                                     <FontIcon Margin="0,0,4,0" Glyph="&#xE74E;" />
-                                                    <TextBlock Text="Override" />
+                                                    <TextBlock Text="移动" />
                                                 </StackPanel>
                                             </Button.Content>
                                         </Button>
 
                                         <StackPanel Margin="4,0,0,0" Visibility="{x:Bind ViewModel.ContextMenuVM.ModHasCharacterSkinOverride, Mode=OneWay}">
-                                            <TextBlock Text="Override Skin Set To: " />
+                                            <TextBlock Text="移动模组到皮肤: " />
                                             <TextBlock HorizontalAlignment="Center" Text="{x:Bind ViewModel.ContextMenuVM.ModCharacterSkinOverride.DisplayName, FallbackValue='', Mode=OneWay}" />
                                         </StackPanel>
                                     </StackPanel>

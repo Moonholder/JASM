@@ -1,17 +1,14 @@
-﻿using Windows.Storage;
+﻿using GIMI_ModManager.Core.Contracts.Entities;
+using GIMI_ModManager.Core.GamesService.Interfaces;
+using GIMI_ModManager.Core.Services;
+using GIMI_ModManager.WinUI.Contracts.Services;
+using GIMI_ModManager.WinUI.Services.AppManagement;
+using GIMI_ModManager.WinUI.Views;
+using GIMI_ModManager.WinUI.Views.PasswordInputPages;
+using Serilog;
+using Windows.Storage;
 using Windows.Win32;
 using Windows.Win32.Media.Audio;
-using GIMI_ModManager.Core.Contracts.Entities;
-using GIMI_ModManager.Core.Services;
-using GIMI_ModManager.WinUI.Services.AppManagement;
-using Serilog;
-using GIMI_ModManager.WinUI.Views;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Navigation;
-using System;
-using Microsoft.UI.Dispatching;
-using System.Threading.Tasks;
 using static GIMI_ModManager.WinUI.Services.ModHandling.ModDragAndDropService.DragAndDropFinishedArgs;
 
 namespace GIMI_ModManager.WinUI.Services.ModHandling;
@@ -21,18 +18,19 @@ public class ModDragAndDropService
     private readonly ILogger _logger;
     private readonly ModInstallerService _modInstallerService;
     private readonly IWindowManagerService _windowManagerService;
-
-
+    private readonly ILocalSettingsService _localSettingsService = App.GetService<ILocalSettingsService>();
+    private readonly IThemeSelectorService _themeSelectorService;
     private readonly Notifications.NotificationManager _notificationManager;
 
     public event EventHandler<DragAndDropFinishedArgs>? DragAndDropFinished;
 
     public ModDragAndDropService(ILogger logger, Notifications.NotificationManager notificationManager,
-        ModInstallerService modInstallerService, IWindowManagerService windowManagerService)
+        ModInstallerService modInstallerService, IWindowManagerService windowManagerService, IThemeSelectorService themeSelectorService)
     {
         _notificationManager = notificationManager;
         _modInstallerService = modInstallerService;
         _windowManagerService = windowManagerService;
+        _themeSelectorService = themeSelectorService;
         _logger = logger.ForContext<ModDragAndDropService>();
     }
 
@@ -40,7 +38,7 @@ public class ModDragAndDropService
     // Sometimes only a few folders are copied, sometimes only a single file is copied, but usually 7zip removes them and the app just crashes
     // This code is a mess, but it works.
     public async Task<InstallMonitor?> AddStorageItemFoldersAsync(
-        ICharacterModList modList, IReadOnlyList<IStorageItem>? storageItems)
+        ICharacterModList modList, IReadOnlyList<IStorageItem>? storageItems, ICharacterSkin? inGameSkin = null)
     {
         if (storageItems is null || !storageItems.Any())
         {
@@ -52,7 +50,7 @@ public class ModDragAndDropService
         if (storageItems.Count > 1)
         {
             _notificationManager.ShowNotification(
-                "Drag and drop called with more than one storage item, this is currently not supported", "",
+                "使用多个存储条目进行了拖放操作，目前不支持这种情况", "",
                 TimeSpan.FromSeconds(5));
             return null;
         }
@@ -60,8 +58,8 @@ public class ModDragAndDropService
         if (_windowManagerService.GetWindow(modList) is { } window)
         {
             _notificationManager.ShowNotification(
-                $"Please finish adding the mod for '{modList.Character.DisplayName}' first",
-                $"JASM does not support multiple mod installs for the same character",
+                $"请先完成为 '{modList.Character.DisplayName}' 添加模组的操作",
+                $"JASM 不支持为同一个角色安装多个模组",
                 TimeSpan.FromSeconds(8));
 
             PInvoke.PlaySound("SystemAsterisk", null,
@@ -80,21 +78,13 @@ public class ModDragAndDropService
             var extractResult = scanner.ScanAndGetContents(storageItem.Path);
             if (extractResult.exitedCode == 1 || extractResult.exitedCode == 2)
             {
-                extractResult = await ShowPasswordInputWindow(scanner, storageItem.Path);
-                if (extractResult?.exitedCode == 2)
-                {
-                    _notificationManager.ShowNotification(
-                        "解压失败",
-                        "密码错误，请尝试重新添加模组",
-                        TimeSpan.FromSeconds(5));
-                    return null;
-                }
+                extractResult = await ShowPasswordInputDialogAsync(scanner, storageItem.Path);
             }
 
             if (extractResult != null)
             {
                 installMonitor = await _modInstallerService.StartModInstallationAsync(
-                    new DirectoryInfo(extractResult.ExtractedFolder.FullPath), modList);
+                    new DirectoryInfo(extractResult.ExtractedFolder.FullPath), modList, inGameSkin);
                 return installMonitor;
             }
         }
@@ -152,72 +142,20 @@ public class ModDragAndDropService
             throw;
         }
 
-        installMonitor = await _modInstallerService.StartModInstallationAsync(destDirectoryInfo.Parent!, modList)
+        installMonitor = await _modInstallerService.StartModInstallationAsync(destDirectoryInfo.Parent!, modList, inGameSkin)
             .ConfigureAwait(false);
         DragAndDropFinished?.Invoke(this, new DragAndDropFinishedArgs(new List<ExtractPaths>()));
         return installMonitor;
     }
 
-    private async Task<DragAndDropScanResult> ShowPasswordInputWindow(DragAndDropScanner scanner, string filePath)
+    private async Task<DragAndDropScanResult> ShowPasswordInputDialogAsync(DragAndDropScanner scanner, string filePath)
     {
         var tcs = new TaskCompletionSource<DragAndDropScanResult>();
-
-        // 创建一个ContentDialog
-        var passwordDialog = new ContentDialog
+        var passwordDialog = new PasswordInputDialog(tcs, scanner, filePath, _notificationManager)
         {
-            Title = "输入加密文件的密码",
-            PrimaryButtonText = "确认",
-            SecondaryButtonText = "取消"
+            RequestedTheme = _themeSelectorService.Theme
         };
 
-        // 创建一个Border并设置宽高
-        var border = new Border
-        {
-            Width = 400,
-            Height = 200,
-            Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.White)
-        };
-
-        // 创建一个Frame并导航到PasswordInputPage
-        var frame = new Frame();
-        frame.Navigate(typeof(PasswordInputPage));
-
-        // 获取导航到的页面实例
-        var passwordPage = frame.Content as PasswordInputPage;
-
-        // 设置Border的内容为Frame
-        border.Child = frame;
-
-        // 设置对话框的内容为Border
-        passwordDialog.Content = border;
-
-        // 获取当前窗口的XamlRoot
-        var xamlRoot = App.MainWindow.Content.XamlRoot;
-        if (xamlRoot != null)
-        {
-            passwordDialog.XamlRoot = xamlRoot;
-        }
-
-        // 处理确认按钮点击事件
-        passwordDialog.PrimaryButtonClick += (sender, args) =>
-        {
-            // 获取密码
-            var password = passwordPage?.GetPassword();
-
-            // 在这里使用密码进行后续操作，例如重新尝试解压
-            var extractResult = scanner.ScanAndGetContents(filePath, password);
-            tcs.SetResult(extractResult);
-            passwordDialog.Hide();
-        };
-
-        // 处理取消按钮点击事件
-        passwordDialog.SecondaryButtonClick += (sender, args) =>
-        {
-            tcs.SetResult(null); // 返回null表示取消操作
-            passwordDialog.Hide();
-        };
-
-        // 显示对话框
         await passwordDialog.ShowAsync();
 
         return await tcs.Task;

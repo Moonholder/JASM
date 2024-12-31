@@ -1,6 +1,7 @@
 ﻿using Windows.Storage;
 using GIMI_ModManager.Core.Helpers;
 using GIMI_ModManager.Core.Services.GameBanana;
+using GIMI_ModManager.Core.GamesService.Interfaces;
 
 namespace GIMI_ModManager.WinUI.ViewModels.CharacterDetailsViewModels;
 
@@ -33,7 +34,7 @@ public partial class CharacterDetailsViewModel
         return true;
     }
 
-    public async Task DragDropModAsync(IReadOnlyList<IStorageItem> items)
+    public async Task DragDropModAsync(IReadOnlyList<IStorageItem> items, ICharacterSkin? inGameSkin = null)
     {
         if (!CanDragDropMod(items))
         {
@@ -46,7 +47,7 @@ public partial class CharacterDetailsViewModel
         {
             try
             {
-                var installMonitor = await _modDragAndDropService.AddStorageItemFoldersAsync(_modList, items).ConfigureAwait(false);
+                var installMonitor = await _modDragAndDropService.AddStorageItemFoldersAsync(_modList, items, inGameSkin).ConfigureAwait(false);
 
                 if (installMonitor is not null)
                     _ = installMonitor.Task.ContinueWith((task) => ModGridVM.QueueModRefresh(), CancellationToken);

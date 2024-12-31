@@ -13,7 +13,7 @@
                 <ResourceDictionary Source="/Styles/FontTypes.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <xaml:BoolToVisibleConverter x:Key="BoolToVisibilityConverter" />
-
+            <xaml:StringNullOrEmptyToBooleanConverter x:Key="StringNullOrEmptyToBooleanConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -268,7 +268,7 @@ public sealed partial class CharacterDetailsPage : Page
             }
             else if (e.DataView.Contains(StandardDataFormats.StorageItems))
             {
-                await ViewModel.DragDropModAsync(await e.DataView.GetStorageItemsAsync());
+                await ViewModel.DragDropModAsync(await e.DataView.GetStorageItemsAsync(), ViewModel.SelectedSkin);
             }
         }
         finally

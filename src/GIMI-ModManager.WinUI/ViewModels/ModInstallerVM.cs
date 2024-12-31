@@ -152,6 +152,7 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
         _modInstallation = ModInstallation.Start(modToInstall, _characterModList);
         _dispatcherQueue = dispatcherQueue;
         _installOptions = options;
+        _inGameSkin = inGameSkin;
         OnPropertyChanged(nameof(IsUpdatingMod));
 
         RootFolder.Clear();
@@ -915,6 +916,7 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
             ModUrl = ModUrl,
             Author = Author,
             Description = Description,
+            CharacterSkinOverride = _inGameSkin?.InternalName ?? string.Empty,
             ModImage = ModPreviewImagePath == _placeholderImageUri ? null : ModPreviewImagePath
         };
     }

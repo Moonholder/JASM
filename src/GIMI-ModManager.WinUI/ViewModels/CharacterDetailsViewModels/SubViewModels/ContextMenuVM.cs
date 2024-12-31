@@ -145,8 +145,8 @@ public partial class ContextMenuVM(
         if (destinationModList is null)
         {
             _logger.Warning("Destination mod list not found");
-            _notificationManager.ShowNotification("Destination Mod List Not Found",
-                "Destination mod list not found", TimeSpan.FromSeconds(5));
+            _notificationManager.ShowNotification("目标模组列表未找到",
+                "目标模组列表未找到", TimeSpan.FromSeconds(5));
             return;
         }
 
@@ -236,16 +236,16 @@ public partial class ContextMenuVM(
 
         if (result.IsT0)
         {
-            _notificationManager.ShowNotification("Changed skin override for mod",
-                $"Set skin override for mod '{modEntry.Mod.GetDisplayName()}' to {characterSkinToSet.DisplayName}", null);
+            _notificationManager.ShowNotification("已更改模组的皮肤覆盖（设置）",
+                $"移动模组'{modEntry.Mod.GetDisplayName()}' 到皮肤: {characterSkinToSet.DisplayName}", null);
         }
         else
         {
             var error = result.IsT1 ? result.AsT1.ToString() : result.AsT2.ToString();
             _logger.Error("Failed to override character skin for mod {modName}", modEntry.Mod.GetDisplayName());
             _notificationManager.ShowNotification(
-                $"Failed to override character skin for mod {modEntry.Mod.GetDisplayName()}",
-                $"An Error Occurred. Reason: {error}",
+                $"未能覆盖模组的角色皮肤 {modEntry.Mod.GetDisplayName()}",
+                $"出现错误。原因: {error}",
                 TimeSpan.FromSeconds(5));
         }
 
