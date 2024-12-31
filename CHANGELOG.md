@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.19.0](https://github.com/Moonholder/JASM/compare/v2.18.6...v2.19.0) (2024-12-31)
+
+
+### Features
+
+* 新增密码管理器功能，管理常用解压密码 ([f77970a](https://github.com/Moonholder/JASM/commit/f77970a50b83e26c37277cf3f27b77ad0e134754))
+
+
+### Miscellaneous
+
+* **Honkai:** 新增角色缇宝 ([c0a2c2e](https://github.com/Moonholder/JASM/commit/c0a2c2e6cd63536f0b9cee37547b672dcc9e2457))
+* **WuWa:** 新增角色珂莱塔和洛可可, 新增皮肤桃夭灼灼和叱妖诰 ([4945735](https://github.com/Moonholder/JASM/commit/49457359e55e32bb318a0f1da20e6d0cd3878ba6))
+
 ## [2.18.6](https://github.com/Moonholder/JASM/compare/v2.18.5...v2.18.6) (2024-12-23)
 
 
