@@ -11,13 +11,42 @@ on:
     paths:
       - 'src/**'
       - 'CHANGELOG.md'
-  workflow_call:
-    inputs:
-      upload_url:
-        required: true
-        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
+  main:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: google-github-actions/release-please-action@v3
+        id: release
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release-type: simple
+          package-name: jasm
+          extra-files: |
+                        src/GIMI-ModManager.WinUI/GIMI-ModManager.WinUI.csproj
+          changelog-types: >
+            [
+              { "type": "revert", "section": "Reverts", "hidden": false },
+              { "type": "feat", "section": "Features", "hidden": false },
+              { "type": "fix", "section": "Bug Fixes", "hidden": false },
+              { "type": "perf", "section": "Performance Improvements", "hidden": false },
+              { "type": "style", "section": "Styling", "hidden": false },
+              { "type": "tweak", "section": "Tweaks", "hidden": false },
+              { "type": "chore", "section": "Miscellaneous", "hidden": false },
+              { "type": "docs", "section": "Documentation", "hidden": false },
+              { "type": "ci", "section": "Continuous Integration", "hidden": false },
+              { "type": "test", "section": "Tests", "hidden": false },
+              { "type": "build", "section": "Build System", "hidden": false },
+              { "type": "refactor", "section": "Code Refactoring", "hidden": false }
+            ]
+      - name: Set upload_url as environment variable
+        id: set_upload_url_env
+        run: echo "UPLOAD_URL=${{ steps.release.outputs.upload_url }}" >> $GITHUB_ENV
+
   format:
     runs-on: windows-latest
     defaults:
@@ -110,11 +139,7 @@ jobs:
           latest_tag=$(git describe --tags --abbrev=0)
           echo "VERSION=$latest_tag" >> $GITHUB_OUTPUT
         shell: bash
-
-      - name: Use passed upload URL
-        run: |
-          echo "UPLOAD_URL=${{ inputs.upload_url }}" >> $GITHUB_ENV
-
+        
       - name: Upload regular version release asset
         uses: actions/upload-release-asset@v1
         env:
