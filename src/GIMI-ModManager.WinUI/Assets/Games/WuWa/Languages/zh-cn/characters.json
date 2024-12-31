@@ -143,7 +143,12 @@
       "Huanglong"
     ],
     "ModFilesName": "Sanhua",
-    "InGameSkins": [],
+    "InGameSkins": [
+      {
+        "InternalName": "Exorcistic Adjuration",
+        "DisplayName": "叱妖诰"
+      }
+    ],
     "InternalName": "Sanhua",
     "DisplayName": "散华"
   },
@@ -327,10 +332,15 @@
     "Element": "Spectro",
     "Class": "Broadblade",
     "Region": [
-      "Huanglong"
+      "Huanglong" 
     ],
     "ModFilesName": "Jinhsi",
-    "InGameSkins": [],
+    "InGameSkins": [
+      {
+        "InternalName": "Peach Blossom",
+        "DisplayName": "桃夭灼灼"
+      }
+    ],
     "InternalName": "Jinhsi",
     "DisplayName": "今汐"
   },
@@ -435,5 +445,13 @@
     "InGameSkins": [],
     "InternalName": "Lumi",
     "DisplayName": "灯灯"
+  },
+  {
+    "InternalName": "Carlotta",
+    "DisplayName": "珂莱塔"
+  },
+  {
+    "InternalName": "Roccia",
+    "DisplayName": "洛可可"
   }
 ]

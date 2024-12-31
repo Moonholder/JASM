@@ -131,7 +131,14 @@
       "Huanglong"
     ],
     "ModFilesName": "Sanhua",
-    "InGameSkins": [],
+    "InGameSkins": [
+      {
+        "ModFilesName": "Exorcistic Adjuration",
+        "Image": "Character_Skin_SanhuaExorcisticAdjuration_Thumb.png",
+        "InternalName": "Exorcistic Adjuration",
+        "DisplayName": "Exorcistic Adjuration"
+      }
+    ],
     "InternalName": "Sanhua",
     "DisplayName": "Sanhua"
   },
@@ -318,7 +325,14 @@
       "Huanglong"
     ],
     "ModFilesName": "Jinhsi",
-    "InGameSkins": [],
+    "InGameSkins": [
+      {
+        "ModFilesName": "Peach Blossom",
+        "Image": "Character_Skin_JinhsiPeachBlossom_Thumb.png",
+        "InternalName": "Peach Blossom",
+        "DisplayName": "Peach Blossom"
+      }
+    ],
     "InternalName": "Jinhsi",
     "DisplayName": "Jinhsi"
   },
@@ -423,5 +437,39 @@
     "InGameSkins": [],
     "InternalName": "Lumi",
     "DisplayName": "Lumi"
+  },
+  {
+    "Keys": [
+      "Carlotta"
+    ],
+    "ReleaseDate": "2025-01-02T00:00:00",
+    "Image": "Carlotta.png",
+    "Rarity": 5,
+    "Element": "Glacio",
+    "Class": "Pistols",
+    "Region": [
+      "Rinascita"
+    ],
+    "ModFilesName": "Carlotta",
+    "InGameSkins": [],
+    "InternalName": "Carlotta",
+    "DisplayName": "Carlotta"
+  },
+  {
+    "Keys": [
+      "Roccia"
+    ],
+    "ReleaseDate": "2025-01-02T00:00:00",
+    "Image": "Roccia.png",
+    "Rarity": 5,
+    "Element": "Havoc",
+    "Class": "Gauntlet",
+    "Region": [
+      "Rinascita"
+    ],
+    "ModFilesName": "Roccia",
+    "InGameSkins": [],
+    "InternalName": "Roccia",
+    "DisplayName": "Roccia"
   }
 ]
