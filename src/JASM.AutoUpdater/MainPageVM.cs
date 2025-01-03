@@ -489,7 +489,7 @@ public partial class MainPageVM : ObservableRecipient
             Text =
                 "安装的JASM文件夹下的所有文件/文件夹将被永久删除!\n" +
                 "这不包括更新文件夹本身。此操作不能撤消.\n" +
-                $"JASM Directory: {_installedJasmFolder.FullName}",
+                $"JASM 文件夹路径: {_installedJasmFolder.FullName}",
             TextWrapping = TextWrapping.WrapWholeWords,
             IsTextSelectionEnabled = true,
             Margin = new Thickness(0, 0, 0, 10)

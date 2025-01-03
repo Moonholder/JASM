@@ -203,7 +203,7 @@
                                     Text="打开模组文件夹..." />
                             </MenuBarItem>
 
-                            <MenuBarItem Title="视图">
+                            <MenuBarItem Title="显示">
                                 <ToggleMenuFlyoutItem
                                     Command="{x:Bind ViewModel.ToggleSingleSelectCommand}"
                                     IsChecked="{x:Bind ViewModel.IsSingleSelectEnabled, Mode=OneWay}"
