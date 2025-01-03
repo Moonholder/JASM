@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.19.1](https://github.com/Moonholder/JASM/compare/v2.19.0...v2.19.1) (2025-01-03)
+
+
+### Miscellaneous
+
+* **Honkai:** 新增角色万敌 ([3407aaf](https://github.com/Moonholder/JASM/commit/3407aaf4871bdb8afcd2b8176970bdb8fd346b44))
+* **WuWa:** 新增角色布兰特、菲比、赞妮 ([e41d3a3](https://github.com/Moonholder/JASM/commit/e41d3a35c817c500bb572b302c89a27cd5215c74))
+* 适配深色主题下的密码管理器窗口 ([6e1f670](https://github.com/Moonholder/JASM/commit/6e1f670225fba877cf765ec1d7008ee376eea1f5))
+
 ## [2.19.0](https://github.com/Moonholder/JASM/compare/v2.18.6...v2.19.0) (2024-12-31)
 
 
