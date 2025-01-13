@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.20.0](https://github.com/Moonholder/JASM/compare/v2.19.1...v2.20.0) (2025-01-13)
+
+
+### Features
+
+* 在角色概览的右键菜单中添加了两个新的上下文项：“禁用所有模组” 和 “打开文件夹” ([9f224d5](https://github.com/Moonholder/JASM/commit/9f224d592af047d362746d293639abbb6096a862))
+* 在角色管理页面中添加对创建自定义角色的支持 ([605f3f7](https://github.com/Moonholder/JASM/commit/605f3f78dde7cf0b6bc7e1dcb27b783ffc38d406))
+
 ## [2.19.1](https://github.com/Moonholder/JASM/compare/v2.19.0...v2.19.1) (2025-01-03)
 
 
