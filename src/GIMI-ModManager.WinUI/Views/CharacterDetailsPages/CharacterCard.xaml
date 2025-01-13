@@ -22,6 +22,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
+
         </Grid.RowDefinitions>
         <StackPanel MaxWidth="220">
             <Grid>
@@ -75,7 +76,7 @@
                 <Image HorizontalAlignment="Center" VerticalAlignment="Center">
 
                     <Image.Source>
-                        <BitmapImage DecodePixelHeight="200" UriSource="{x:Bind ViewModel.ShownModImageUri, Mode=OneWay}" />
+                        <BitmapImage DecodePixelHeight="300" UriSource="{x:Bind ViewModel.ShownModImageUri, Mode=OneWay}" />
                     </Image.Source>
 
                 </Image>
@@ -137,6 +138,7 @@
 
 
         </StackPanel>
+
         <StackPanel Grid.Row="2" Margin="0,0,0,8">
             <Button HorizontalAlignment="Center" Command="{x:Bind ViewModel.DisableAllModsCommand}">禁用所有模组</Button>
         </StackPanel>

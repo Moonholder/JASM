@@ -66,6 +66,8 @@ public partial class ModGridVM(
 
     [ObservableProperty] private bool _isModFolderNameColumnVisible;
 
+    [ObservableProperty] private bool _showMultipleModsActiveWarning;
+
     public bool IsInitialized { get; private set; }
 
     private List<CharacterSkinEntry> _modsBackend = [];
@@ -155,44 +157,36 @@ public partial class ModGridVM(
 
     private async Task InitModsAsync()
     {
-        try
-        {
-            GridMods.Clear();
-            _gridModsBackend.Clear();
-            SelectedMods.Clear();
+        GridMods.Clear();
+        _gridModsBackend.Clear();
+        SelectedMods.Clear();
 
-            await Task.Run(async () =>
+        await Task.Run(async () =>
+        {
+            var refreshResult = await _skinManagerService
+                .RefreshModsAsync(_context.ShownModObject.InternalName, ct: _navigationCt)
+                .ConfigureAwait(false);
+
+            await LoadModsAsync().ConfigureAwait(false);
+
+            if (refreshResult.ModsDuplicate.Any())
             {
-                var refreshResult = await _skinManagerService
-                    .RefreshModsAsync(_context.ShownModObject.InternalName, ct: _navigationCt)
-                    .ConfigureAwait(false);
+                var message = $"在 {_context.ModObjectDisplayName} 的模组文件夹中检测到重复的模组.\n";
 
-                await LoadModsAsync().ConfigureAwait(false);
+                message = refreshResult.ModsDuplicate.Aggregate(message,
+                    (current, duplicateMod) =>
+                        current +
+                        $"模组: '{duplicateMod.ExistingFolderName}' 已重命名为 '{duplicateMod.RenamedFolderName}' 以避免冲突.\n");
 
-                if (refreshResult.ModsDuplicate.Any())
-                {
-                    var message = $"在 {_context.ModObjectDisplayName} 的模组文件夹中检测到重复的模组.\n";
-
-                    message = refreshResult.ModsDuplicate.Aggregate(message,
-                        (current, duplicateMod) =>
-                            current +
-                            $"模组: '{duplicateMod.ExistingFolderName}' 已重命名为 '{duplicateMod.RenamedFolderName}' 以避免冲突.\n");
-
-                    _notificationService.ShowNotification("检测到重复模组",
-                        message,
-                        TimeSpan.FromSeconds(10));
-                }
-            }, _navigationCt);
+                _notificationService.ShowNotification("检测到重复模组",
+                    message,
+                    TimeSpan.FromSeconds(10));
+            }
+        }, _navigationCt);
 
 
-            GridMods.AddRange(_gridModsBackend);
-            SetModSorting(CurrentSortingMethod.SortingMethodType, IsDescendingSort);
-        }
-        catch (Exception)
-        {
-
-        }
-
+        GridMods.AddRange(_gridModsBackend);
+        SetModSorting(CurrentSortingMethod.SortingMethodType, IsDescendingSort);
     }
 
     public bool QueueModRefresh(TimeSpan? minWaitTime = null) => _modRefreshChannel.Writer.TryWrite(new QueueRefresh(minWaitTime));
@@ -231,6 +225,9 @@ public partial class ModGridVM(
         SetModSorting(CurrentSortingMethod.SortingMethodType, IsDescendingSort);
     }
 
+    private bool RefreshMultipleModsActiveWarning() =>
+        ShowMultipleModsActiveWarning = !_context.ShownModObject.IsMultiMod && _modsBackend.Count(m => m.IsEnabled) > 1;
+
     private async Task LoadModsAsync()
     {
         if (_context.IsCharacter && _context.Skins.Count > 1)
@@ -257,7 +254,11 @@ public partial class ModGridVM(
             _gridModsBackend.Add(modVm);
         }
 
-        _dispatcherQueue.TryEnqueue(() => OnModsReloaded?.Invoke(this, EventArgs.Empty));
+        _dispatcherQueue.TryEnqueue(() =>
+        {
+            RefreshMultipleModsActiveWarning();
+            OnModsReloaded?.Invoke(this, EventArgs.Empty);
+        });
     }
 
     private async Task<ModRowVM> CreateModRowVM(CharacterSkinEntry characterSkinEntry,
@@ -402,6 +403,7 @@ public partial class ModGridVM(
             _notificationService.ShowNotification("切换模组时出错", e.Message, TimeSpan.FromSeconds(5));
         }
 
+        RefreshMultipleModsActiveWarning();
         Messenger.Send(new ModChangedMessage(this, modEntryToToggle, null));
     }
 

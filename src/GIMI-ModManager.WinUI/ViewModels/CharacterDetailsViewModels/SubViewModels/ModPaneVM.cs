@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using System.Threading.Channels;
+using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -223,6 +224,22 @@ public sealed partial class ModPaneVM(
     private async Task SetModIniFileAsync()
     {
         if (!IsModLoaded) return;
+        try
+        {
+            var modFolderPath = _loadedMod.Mod.FullPath;
+
+            var dataPackage = new DataPackage();
+            dataPackage.SetText(modFolderPath);
+            Clipboard.SetContent(dataPackage);
+
+            _notificationService.ShowNotification("模组文件夹路径已复制到剪贴板", "", TimeSpan.FromSeconds(3));
+        }
+        catch (Exception e)
+        {
+            _logger.Error(e, "An error occured while trying to copy mod folder path to clipboard when setting .ini");
+        }
+
+
         var filePicker = new FileOpenPicker();
         filePicker.SettingsIdentifier = "IniFilerPicker";
         filePicker.FileTypeFilter.Add(".ini");
@@ -630,7 +647,7 @@ public partial class ModPaneFieldsVm : ObservableObject
                 BackwardHotkey = keySwap.BackwardKey,
                 SectionKey = keySwap.SectionName,
                 Type = keySwap.Type,
-                VariationsCount = keySwap.Variants?.ToString() ?? "Unknown"
+                VariationsCount = keySwap.Variants?.ToString() ?? "未知"
             });
 
             KeySwaps.Last().PropertyChanged += (_, e) => { OnPropertyChanged(nameof(KeySwaps)); };

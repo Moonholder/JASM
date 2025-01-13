@@ -24,6 +24,7 @@ public sealed class ModUpdateAvailableChecker
 
     private CancellationTokenSource? _stoppingCancellationTokenSource;
     private CancellationTokenSource? _producerWaitingCancellationTokenSource;
+
     private readonly TimeSpan _waitTime = TimeSpan.FromHours(2);
     private readonly TimeSpan _minWaitTimePerMod = TimeSpan.FromMinutes(60);
 
@@ -342,7 +343,7 @@ public sealed class ModUpdateAvailableChecker
             var characterSkinEntry = queuedMods.Dequeue();
 
             var modSettings = await characterSkinEntry.Mod.Settings
-                .ReadSettingsAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
+                .ReadSettingsAsync(useCache: true, cancellationToken: cancellationToken).ConfigureAwait(false);
 
             if (modSettings.ModUrl is null)
                 continue;
@@ -373,7 +374,7 @@ public sealed class ModUpdateAvailableChecker
             ModId = characterSkinEntry.Mod.Id,
             ModCustomName = modSettings.CustomName ?? characterSkinEntry.Mod.Name,
             ModFolderName = characterSkinEntry.Mod.Name,
-            Message = $"新的或更新的模组可用 {characterSkinEntry.Mod.GetNameWithoutDisabledPrefix()}",
+            Message = $"有新的或需更新的模组可供使用 {characterSkinEntry.Mod.GetNameWithoutDisabledPrefix()}",
             ModsRetrievedResult = result
         };
 

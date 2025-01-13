@@ -32,8 +32,8 @@
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
             <AutoSuggestBox
@@ -45,7 +45,8 @@
                 PlaceholderText="开始输入搜索..."
                 QuerySubmitted="CharacterSearchBox_OnQuerySubmitted"
                 SuggestionChosen="CharacterSearchBox_OnSuggestionChosen"
-                TextChanged="CharacterSearchBox_OnTextChanged">
+                TextChanged="CharacterSearchBox_OnTextChanged"
+                Text="{x:Bind ViewModel.SearchBoxText, Mode=TwoWay}">
                 <AutoSuggestBox.KeyboardAccelerators>
                     <KeyboardAccelerator
                         Key="F"
@@ -73,12 +74,15 @@
                 </AutoSuggestBox.ItemTemplate>
             </AutoSuggestBox>
 
-            <InfoBar
-                Title="实验性功能"
+            <Button
                 Grid.Column="2"
-                IsClosable="False"
-                IsOpen="True"
-                Message="此功能是实验性的，可能不会像预期的那样工作。目前，我不能保证这些设置会在不同版本之间持续存在" />
+                Margin="16,0,0,0"
+                VerticalAlignment="Bottom"
+                Command="{x:Bind ViewModel.OpenCreateCharacterFormCommand}"
+                ToolTipService.ToolTip="创建新角色">
+                <FontIcon Glyph="&#xE710;" />
+            </Button>
+
         </Grid>
 
 

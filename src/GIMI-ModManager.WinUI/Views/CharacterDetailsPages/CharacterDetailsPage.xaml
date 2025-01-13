@@ -161,71 +161,94 @@
 
                 <Grid x:Name="ToolBarArea" Margin="0,0,0,8">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition />
-                        <ColumnDefinition />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <StackPanel Orientation="Horizontal">
-                        <MenuBar IsEnabled="{x:Bind ViewModel.IsNotHardBusy, Mode=OneWay}">
-                            <MenuBarItem Title="模组">
-                                <MenuBarItem.Items>
-                                    <MenuFlyoutItem
-                                        Command="{x:Bind ViewModel.AddModFolderCommand}"
-                                        ToolTipService.ToolTip="添加一个模组文件夹"
-                                        Text="添加模组..." />
 
-                                    <MenuFlyoutItem
-                                        Command="{x:Bind ViewModel.AddModArchiveCommand}"
-                                        ToolTipService.ToolTip="在压缩包中添加模组"
-                                        Text="添加模组(压缩包)..." >
-                                        <MenuFlyoutItem.KeyboardAccelerators>
-                                            <KeyboardAccelerator Key="O" Modifiers="Control" />
-                                        </MenuFlyoutItem.KeyboardAccelerators>
-                                    </MenuFlyoutItem>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
 
+                        <StackPanel Orientation="Horizontal">
+                            <MenuBar IsEnabled="{x:Bind ViewModel.IsNotHardBusy, Mode=OneWay}">
+                                <MenuBarItem Title="模组">
+                                    <MenuBarItem.Items>
+                                        <MenuFlyoutItem
+                                            Command="{x:Bind ViewModel.AddModFolderCommand}"
+                                            ToolTipService.ToolTip="添加一个模组文件夹"
+                                            Text="添加模组..." />
+
+                                        <MenuFlyoutItem
+                                            Command="{x:Bind ViewModel.AddModArchiveCommand}"
+                                            ToolTipService.ToolTip="在压缩包中添加模组"
+                                            Text="添加模组(压缩包)...">
+                                            <MenuFlyoutItem.KeyboardAccelerators>
+                                                <KeyboardAccelerator Key="O" Modifiers="Control" />
+                                            </MenuFlyoutItem.KeyboardAccelerators>
+                                        </MenuFlyoutItem>
+
+                                        <MenuFlyoutSeparator />
+                                        <MenuFlyoutItem Command="{x:Bind ViewModel.RefreshAllModsCommand}" Text="刷新模组">
+                                            <MenuFlyoutItem.KeyboardAccelerators>
+                                                <KeyboardAccelerator Key="F5" />
+                                            </MenuFlyoutItem.KeyboardAccelerators>
+                                        </MenuFlyoutItem>
+                                    </MenuBarItem.Items>
+                                </MenuBarItem>
+
+                                <MenuBarItem Title="文件夹">
+                                    <MenuFlyoutItem Command="{x:Bind ViewModel.OpenGIMIRootFolderCommand}" Text="打开加载器根目录..." />
                                     <MenuFlyoutSeparator />
-                                    <MenuFlyoutItem Command="{x:Bind ViewModel.RefreshAllModsCommand}" Text="刷新模组">
-                                        <MenuFlyoutItem.KeyboardAccelerators>
-                                            <KeyboardAccelerator Key="F5" />
-                                        </MenuFlyoutItem.KeyboardAccelerators>
-                                    </MenuFlyoutItem>
-                                </MenuBarItem.Items>
-                            </MenuBarItem>
+                                    <MenuFlyoutItem Command="{x:Bind ViewModel.OpenCharacterFolderCommand}" Text="打开角色文件夹..." />
+                                    <MenuFlyoutSeparator />
+                                    <MenuFlyoutItem
+                                        Command="{x:Bind ViewModel.OpenModFolderCommand}"
+                                        IsEnabled="{x:Bind ViewModel.ModGridVM.IsSingleModSelected, Mode=OneWay}"
+                                        Text="打开模组文件夹..." />
+                                </MenuBarItem>
 
-                            <MenuBarItem Title="文件夹">
-                                <MenuFlyoutItem Command="{x:Bind ViewModel.OpenGIMIRootFolderCommand}" Text="打开加载器根目录..." />
-                                <MenuFlyoutSeparator />
-                                <MenuFlyoutItem Command="{x:Bind ViewModel.OpenCharacterFolderCommand}" Text="打开角色文件夹..." />
-                                <MenuFlyoutSeparator />
-                                <MenuFlyoutItem
-                                    Command="{x:Bind ViewModel.OpenModFolderCommand}"
-                                    IsEnabled="{x:Bind ViewModel.ModGridVM.IsSingleModSelected, Mode=OneWay}"
-                                    Text="打开模组文件夹..." />
-                            </MenuBarItem>
+                                <MenuBarItem Title="显示">
+                                    <ToggleMenuFlyoutItem
+                                        Command="{x:Bind ViewModel.ToggleSingleSelectCommand}"
+                                        IsChecked="{x:Bind ViewModel.IsSingleSelectEnabled, Mode=OneWay}"
+                                        ToolTipService.ToolTip="选择此选项将只允许一次启用一个模组."
+                                        Text="只启用一个模组" />
+                                    <ToggleMenuFlyoutItem
+                                        Command="{x:Bind ViewModel.ToggleHideModFolderColumnCommand}"
+                                        IsChecked="{x:Bind ViewModel.IsModFolderNameColumnVisible, Mode=OneWay}"
+                                        Text="显示 '模组文件夹名' 列" />
+                                </MenuBarItem>
 
-                            <MenuBarItem Title="显示">
-                                <ToggleMenuFlyoutItem
-                                    Command="{x:Bind ViewModel.ToggleSingleSelectCommand}"
-                                    IsChecked="{x:Bind ViewModel.IsSingleSelectEnabled, Mode=OneWay}"
-                                    ToolTipService.ToolTip="选择此选项将只允许一次启用一个模组."
-                                    Text="只启用一个模组" />
-                                <ToggleMenuFlyoutItem
-                                    Command="{x:Bind ViewModel.ToggleHideModFolderColumnCommand}"
-                                    IsChecked="{x:Bind ViewModel.IsModFolderNameColumnVisible, Mode=OneWay}"
-                                    Text="显示 '模组文件夹名' 列 "/>
-                            </MenuBarItem>
+                                <MenuBarItem
+                                    Title="模组偏好设置"
+                                    IsEnabled="{x:Bind ViewModel.IsSingleModSelected, Mode=OneWay}"
+                                    Visibility="Collapsed">
+                                    <ToggleMenuFlyoutItem ToolTipService.ToolTip="读取所选模组的3Dmigoto模组偏好设置（d3dx_user.ini）并将设置存储在模组的.JASM_Config.json文件中" Text="保存所选模组的偏好设置" />
+                                    <MenuFlyoutSeparator />
+                                    <ToggleMenuFlyoutItem ToolTipService.ToolTip="从当前选定的模组的.JASM_Config.json文件中读取偏好设置，并将其写入d3dx_user.ini文件供3Dmigoto读取" Text="读取所选模组的偏好设置" />
+                                </MenuBarItem>
+                            </MenuBar>
 
-                            <MenuBarItem
-                                Title="模组偏好设置"
-                                IsEnabled="{x:Bind ViewModel.IsSingleModSelected, Mode=OneWay}"
-                                Visibility="Collapsed">
-                                <ToggleMenuFlyoutItem ToolTipService.ToolTip="读取所选模组的3Dmigoto模组偏好设置（d3dx_user.ini）并将设置存储在模组的.JASM_Config.json文件中" Text="保存所选模组的偏好设置" />
-                                <MenuFlyoutSeparator />
-                                <ToggleMenuFlyoutItem ToolTipService.ToolTip="从当前选定的模组的.JASM_Config.json文件中读取偏好设置，并将其写入d3dx_user.ini文件供3Dmigoto读取" Text="读取所选模组的偏好设置" />
-                            </MenuBarItem>
-                        </MenuBar>
+                        </StackPanel>
 
-                    </StackPanel>
+
+                        <InfoBar
+                            Grid.Column="1"
+                            Height="50"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            IsClosable="False"
+                            IsOpen="{x:Bind ViewModel.ModGridVM.ShowMultipleModsActiveWarning, Mode=OneWay}"
+                            Message="Multiple Mods active"
+                            Severity="Warning"
+                            Visibility="Visible" />
+
+                    </Grid>
+
+
 
                     <StackPanel
                         Grid.Column="1"

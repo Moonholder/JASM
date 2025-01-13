@@ -340,6 +340,7 @@ public sealed class CharacterModList : ICharacterModList
             DisableMod(modId);
             return false;
         }
+
         EnableMod(modId);
         return true;
     }
@@ -385,7 +386,7 @@ public sealed class CharacterModList : ICharacterModList
     public void Dispose()
     {
         _watcher?.Dispose();
-        _selfWatcher.Dispose();
+        _selfWatcher?.Dispose();
         _watcher = null;
     }
 
