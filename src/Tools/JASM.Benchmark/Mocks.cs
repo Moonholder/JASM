@@ -26,7 +26,7 @@ public static class Mocks
     {
         gameService ??= GetGameService();
         var crawlerService = new ModCrawlerService(Logger, gameService);
-        
+
         return new SkinManagerService(gameService, Logger, crawlerService);
     }
 }

@@ -162,7 +162,7 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
             if (_updateChecker.LatestRetrievedVersion != _updateChecker.IgnoredVersion)
                 CanIgnoreUpdate = true;
         }
-        
+
         ArchiveCacheFolderPath = _modArchiveRepository.ArchiveDirectory;
 
         _modManagerOptions = localSettingsService.ReadSetting<ModManagerOptions>(ModManagerOptions.Section);
