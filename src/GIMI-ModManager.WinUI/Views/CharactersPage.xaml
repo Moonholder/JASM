@@ -37,20 +37,36 @@
                     Command="{x:Bind ViewModel.CheckForUpdatesForCharacterCommand}"
                     CommandParameter="{Binding}"
                     IsEnabled="{x:Bind ViewModel.CanCheckForUpdates, Mode=OneWay}"
-                    Text="Check for updates">
+                    Text="检查更新">
                     <MenuFlyoutItem.Icon>
                         <FontIcon Glyph="&#xE777;" />
                     </MenuFlyoutItem.Icon>
                 </MenuFlyoutItem>
-                <MenuFlyoutSeparator />
+
                 <MenuFlyoutItem
-                    Command="{x:Bind ViewModel.ClearNotificationsCommand}"
+                    Command="{x:Bind ViewModel.OpenCharacterFolderCommand}"
                     CommandParameter="{Binding}"
-                    Text="清除通知">
+                    Text="打开文件夹...">
                     <MenuFlyoutItem.Icon>
-                        <FontIcon Glyph="&#xE894;" />
+                        <FontIcon Glyph="&#xE8DA;" />
                     </MenuFlyoutItem.Icon>
                 </MenuFlyoutItem>
+                <MenuFlyoutSeparator />
+                <MenuFlyoutSubItem Text="Mods">
+                    <MenuFlyoutItem
+                        Command="{x:Bind ViewModel.ClearNotificationsCommand}"
+                        CommandParameter="{Binding}"
+                        Text="清除通知">
+                        <MenuFlyoutItem.Icon>
+                            <FontIcon Glyph="&#xE894;" />
+                        </MenuFlyoutItem.Icon>
+                    </MenuFlyoutItem>
+                    <MenuFlyoutSeparator />
+                    <MenuFlyoutItem
+                        Command="{x:Bind ViewModel.DisableCharacterModsCommand}"
+                        CommandParameter="{Binding}"
+                        Text="禁用所有模组" />
+                </MenuFlyoutSubItem>
             </MenuFlyout>
         </Grid.Resources>
 
@@ -79,8 +95,8 @@
                     <TextBlock
                         Margin="0,0,0,8"
                         IsTextSelectionEnabled="True"
-                        TextWrapping="WrapWholeWords"
-                        Text="选择您想要启动的进程的路径。保存后，按下启动按钮时将启动此进程。这可以在设置页面重置." />
+                        Text="选择您想要启动的进程的路径。保存后，按下启动按钮时将启动此进程。这可以在设置页面重置."
+                        TextWrapping="WrapWholeWords" />
 
                     <controls1:FolderSelector
                         Title=""
@@ -143,8 +159,8 @@
                 <TextBlock
                     Margin="0,0,8,0"
                     VerticalAlignment="Center"
-                    TextWrapping="WrapWholeWords"
-                    Text="排序方式:" />
+                    Text="排序方式:"
+                    TextWrapping="WrapWholeWords" />
 
                 <ComboBox
                     x:Name="SortingComboBox"
@@ -175,7 +191,7 @@
                     Content="启动Mod加载器">
                     <ToolTipService.ToolTip>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock TextWrapping="WrapWholeWords" Text="{x:Bind ViewModel.ThreeDMigtoProcessManager.ProcessPath, Mode=OneWay}" />
+                            <TextBlock Text="{x:Bind ViewModel.ThreeDMigtoProcessManager.ProcessPath, Mode=OneWay}" TextWrapping="WrapWholeWords" />
                         </StackPanel>
                     </ToolTipService.ToolTip>
                 </Button>
@@ -196,7 +212,7 @@
                     </StackPanel>
                     <ToolTipService.ToolTip>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock TextWrapping="WrapWholeWords" Text="{x:Bind ViewModel.GenshinProcessManager.ProcessPath, Mode=OneWay}" />
+                            <TextBlock Text="{x:Bind ViewModel.GenshinProcessManager.ProcessPath, Mode=OneWay}" TextWrapping="WrapWholeWords" />
                         </StackPanel>
                     </ToolTipService.ToolTip>
                 </Button>
@@ -320,8 +336,8 @@
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Style="{ThemeResource SubtitleTextBlockStyle}"
-                    TextWrapping="NoWrap"
-                    Text="拖到这里自动检测Mod..." />
+                    Text="拖到这里自动检测Mod..."
+                    TextWrapping="NoWrap" />
 
             </Grid>
 
@@ -451,7 +467,7 @@
                                 Margin="0,0,-16,0"
                                 HorizontalAlignment="Right"
                                 VerticalAlignment="Bottom">
-                                <TextBlock Visibility="{x:Bind HasMods, Mode=OneWay, Converter={StaticResource BoolToVisibleConverter}}" Text="{x:Bind ModCountString, Mode=OneWay}" />
+                                <TextBlock Text="{x:Bind ModCountString, Mode=OneWay}" Visibility="{x:Bind HasMods, Mode=OneWay, Converter={StaticResource BoolToVisibleConverter}}" />
                                 <Border
                                     BorderBrush="{ThemeResource AccentFillColorDefaultBrush}"
                                     BorderThickness="0,0,0,2"
@@ -465,8 +481,8 @@
                                 VerticalAlignment="Bottom"
                                 FontFamily="{StaticResource GenshinFont}"
                                 FontSize="14"
-                                TextWrapping="WrapWholeWords"
-                                Text="{x:Bind Character.DisplayName}" />
+                                Text="{x:Bind Character.DisplayName}"
+                                TextWrapping="WrapWholeWords" />
                         </Grid>
                     </Grid>
                 </DataTemplate>

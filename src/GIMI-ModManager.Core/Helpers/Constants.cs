@@ -7,7 +7,7 @@ public static class Constants
     public static readonly IReadOnlyList<string> SupportedArchiveTypes = [".zip", ".rar", ".7z"];
     public static readonly string ModConfigFileName = ".JASM_ModConfig.json";
     public static readonly string ShaderFixesFolderName = "ShaderFixes";
-    public static readonly string[] ScriptIniNames = ["Script.ini", "merged.ini"];
+    public static readonly string[] ScriptIniNames = ["Script.ini", "merged.ini", "mod.ini"];
     public static readonly string[] ScriptIniPrefixes = ["Master"];
     public static readonly string UserIniFileName = "d3dx_user.ini";
 }
