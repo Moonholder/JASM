@@ -43,10 +43,6 @@ jobs:
               { "type": "build", "section": "Build System", "hidden": false },
               { "type": "refactor", "section": "Code Refactoring", "hidden": false }
             ]
-      - name: Set upload_url as output using GITHUB_OUTPUT
-        id: set_upload_url_env
-        run: | 
-          echo "upload_url=${{ steps.release.outputs.upload_url }}" >> $GITHUB_OUTPUT
 
   format:
     runs-on: windows-latest
@@ -141,12 +137,12 @@ jobs:
           echo "VERSION=$latest_tag" >> $GITHUB_OUTPUT
         shell: bash
 
-      - name: Get upload_url from previous job's output
-        id: get_upload_url
+      - name: Get latest release upload URL
+        id: get_release
         run: |
-          upload_url=$(echo "${{ needs.main.outputs.upload_url }}" | tr -d '\r')
-          echo "UPLOAD_URL=${upload_url}" >> $GITHUB_ENV
-        shell: bash
+          $response = Invoke-RestMethod -Uri "https://api.github.com/repos/${{ github.repository }}/releases/latest" -Headers @{Authorization = "token ${{ secrets.GITHUB_TOKEN }}"}
+          $uploadUrl = $response.upload_url
+          echo "UPLOAD_URL=$uploadUrl" >> $env:GITHUB_ENV
         
       - name: Upload regular version release asset
         uses: actions/upload-release-asset@v1
