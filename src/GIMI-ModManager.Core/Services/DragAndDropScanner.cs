@@ -94,14 +94,6 @@ public sealed class DragAndDropScanner
             {
                 return Extract7Z(path);
             };
-        // else if (_extractTool == ExtractTool.SharpCompress)
-        //     action = Path.GetExtension(path) switch
-        //     {
-        //         ".zip" => SharpExtractZip,
-        //         ".rar" => SharpExtractRar,
-        //         ".7z" => SharpExtract7z,
-        //         _ => null
-        //     };
         else if (_extractTool == ExtractTool.System7Zip) throw new NotImplementedException();
 
         return action;
@@ -215,6 +207,11 @@ public sealed class DragAndDropScanner
         // 如果密码为空且密码被要求，返回1
         int exitCode = (passwordRequired && !passwordProvided) ? 1 : process.ExitCode;
         _logger.Information("7z extraction finished with exit code {ExitCode}", exitCode);
+        if (exitCode != 0 && Directory.Exists(_workFolder))
+        {
+            Directory.Delete(_workFolder, true);
+            _logger.Error("Failed to extract 7z archive, deleting work folder");
+        }
         return exitCode;
     }
 
