@@ -242,7 +242,7 @@
                             VerticalAlignment="Center"
                             IsClosable="False"
                             IsOpen="{x:Bind ViewModel.ModGridVM.ShowMultipleModsActiveWarning, Mode=OneWay}"
-                            Message="Multiple Mods active"
+                            Message="已启用多个模组"
                             Severity="Warning"
                             Visibility="Visible" />
 
