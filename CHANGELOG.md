@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.20.1](https://github.com/Moonholder/JASM/compare/v2.20.0...v2.20.1) (2025-01-14)
+
+
+### Bug Fixes
+
+* 修复加密压缩包解压出现空文件的问题 ([2608e8b](https://github.com/Moonholder/JASM/commit/2608e8b5744ab21bf974c65245d9692c610fb45f))
+
+
+### Miscellaneous
+
+* 汉化文本更新 ([18ec845](https://github.com/Moonholder/JASM/commit/18ec845d6769ae9602f7c369eaa1c3d12fff2106))
+
 ## [2.20.0](https://github.com/Moonholder/JASM/compare/v2.19.1...v2.20.0) (2025-01-13)
 
 
