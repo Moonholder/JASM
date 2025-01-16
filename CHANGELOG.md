@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.20.2](https://github.com/Moonholder/JASM/compare/v2.20.1...v2.20.2) (2025-01-16)
+
+
+### Bug Fixes
+
+* Fix swapkey '=' recognition, variants count, and BackwardHotkey save issue ([4904b07](https://github.com/Moonholder/JASM/commit/4904b07e92a2ffc2d656166c838e9ee06bbec1b5))
+* 修复模组预览图和ini路径出现空格时无法正确识别的问题 ([d19e608](https://github.com/Moonholder/JASM/commit/d19e6085ad5c00a04b29aafd34314152edc16261))
+
 ## [2.20.1](https://github.com/Moonholder/JASM/compare/v2.20.0...v2.20.1) (2025-01-14)
 
 
