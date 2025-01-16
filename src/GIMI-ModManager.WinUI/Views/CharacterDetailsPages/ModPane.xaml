@@ -124,7 +124,6 @@
                 VerticalAlignment="Center"
                 Header="模组链接:"
                 IsEnabled="{x:Bind ViewModel.IsNotReadOnly, Mode=OneWay}"
-                PlaceholderText="支持GameBanana模组链接，定时检测更新"
                 Text="{x:Bind ViewModel.ModModel.ModUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
             <HyperlinkButton

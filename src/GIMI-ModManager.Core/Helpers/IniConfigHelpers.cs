@@ -24,12 +24,12 @@ public static class IniConfigHelpers
             else if (IsIniKey(line, IniKeySwapSection.TypeIniKey))
                 skinModKeySwap.Type = GetIniValue(line);
 
-            else if (Regex.IsMatch(line, @"^\s*\$\w+\s*=\s*\d+(,\d+)+"))
+            else if (Regex.IsMatch(line, @"^\s*\$\w+\s*=\s*\d+\s*(,\s*\d+\s*)*"))
             {
                 var value = GetIniValue(line);
                 if (!string.IsNullOrEmpty(value))
                 {
-                    skinModKeySwap.SwapVar = value.Split(',');
+                    skinModKeySwap.SwapVar = value.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 }
             }
 
@@ -50,7 +50,7 @@ public static class IniConfigHelpers
         if (split.Length <= 2) return split.Length != 2 ? null : split[1].Trim();
 
 
-        split[1] = string.Join("", split.Skip(1));
+        split[1] = string.Join("=", split.Skip(1));
         return split[1].Trim();
     }
 

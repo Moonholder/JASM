@@ -296,6 +296,22 @@ public sealed partial class ModPaneVM(
     private async Task PickImageUriAsync()
     {
         if (!IsModLoaded) return;
+
+        try
+        {
+            var modFolderPath = _loadedMod.Mod.FullPath;
+
+            var dataPackage = new DataPackage();
+            dataPackage.SetText(modFolderPath);
+            Clipboard.SetContent(dataPackage);
+
+            _notificationService.ShowNotification("模组文件夹路径已复制到剪贴板", "", TimeSpan.FromSeconds(3));
+        }
+        catch (Exception e)
+        {
+            _logger.Error(e, "An error occured while trying to copy mod folder path to clipboard when picking image");
+        }
+
         var filePicker = new FileOpenPicker();
         filePicker.CommitButtonText = "设置图片";
         filePicker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
@@ -422,8 +438,8 @@ public sealed partial class ModPaneVM(
                     var keySwapSection = new KeySwapSection()
                     {
                         SectionName = modModelSkinModKeySwap.SectionKey,
-                        ForwardKey = modModelSkinModKeySwap.ForwardHotkey,
-                        BackwardKey = modModelSkinModKeySwap.BackwardHotkey,
+                        ForwardKey = string.IsNullOrWhiteSpace(modModelSkinModKeySwap.ForwardHotkey) ? null : modModelSkinModKeySwap.ForwardHotkey,
+                        BackwardKey = string.IsNullOrWhiteSpace(modModelSkinModKeySwap.BackwardHotkey) ? null : modModelSkinModKeySwap.BackwardHotkey,
                         Variants = variants == -1 ? null : variants,
                         Type = modModelSkinModKeySwap.Type ?? "Unknown"
                     };
@@ -633,7 +649,7 @@ public partial class ModPaneFieldsVm : ObservableObject
     private ModPaneFieldsVm(CharacterSkinEntry modEntry, ModSettings modSettings, IEnumerable<KeySwapSection> keySwaps)
     {
         IsEnabled = modEntry.IsEnabled;
-        ImageUri = new Uri(Uri.UnescapeDataString(modSettings.ImagePath?.ToString() ?? ImageHandlerService.StaticPlaceholderImageUri.ToString()));
+        ImageUri = modSettings.ImagePath ?? ImageHandlerService.StaticPlaceholderImageUri;
         ModDisplayName = modEntry.Mod.GetDisplayName();
         ModUrl = modSettings.ModUrl?.ToString() ?? "";
         ModIniPath = modSettings.MergedIniPath?.ToString();
