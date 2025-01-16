@@ -1,6 +1,8 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Unicode;
 using GIMI_ModManager.Core.Contracts.Entities;
 using GIMI_ModManager.Core.Entities.Mods.Contract;
 using GIMI_ModManager.Core.Entities.Mods.Exceptions;
@@ -29,6 +31,7 @@ public class SkinModSettingsManager
 
     private static readonly JsonSerializerOptions _serializerOptions = new()
     {
+        Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
         ReadCommentHandling = JsonCommentHandling.Skip,
         AllowTrailingCommas = true,
         WriteIndented = true

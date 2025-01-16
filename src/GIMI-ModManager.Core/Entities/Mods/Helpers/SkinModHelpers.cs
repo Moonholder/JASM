@@ -28,13 +28,14 @@ public static class SkinModHelpers
         {
             var relativeUri = modUri.MakeRelativeUri(uri);
 
-            var modName = modUri.Segments.LastOrDefault();
+            var modName = Uri.UnescapeDataString(modUri.Segments.LastOrDefault(string.Empty));
             if (string.IsNullOrWhiteSpace(modName))
                 modName = mod.Name;
 
             // var relativePath = relativeUri.OriginalString.Replace($"{modName}/", "");
             var regex = new Regex(Regex.Escape($"{modName}/"));
-            var relativePath = regex.Replace(relativeUri.OriginalString, "", 1);
+            var decodedRelativeUri = Uri.UnescapeDataString(relativeUri.OriginalString);
+            var relativePath = regex.Replace(decodedRelativeUri, "", 1);
             return relativePath;
         }
 

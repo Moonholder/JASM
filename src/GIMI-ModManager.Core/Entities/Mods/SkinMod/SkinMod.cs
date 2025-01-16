@@ -160,9 +160,6 @@ public class SkinMod : Mod, ISkinMod
             modIniPath = iniPath;
         }
 
-        // 将路径中的转义字符还原
-        modIniPath = Uri.UnescapeDataString(modIniPath);
-
         if (!File.Exists(modIniPath))
         {
             settings.MergedIniPath = null;
