@@ -262,6 +262,18 @@
                                                 </DataTemplate>
                                             </ItemsRepeater.ItemTemplate>
                                         </ItemsRepeater>
+                                        
+                                        <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                                        
+                                        <Button 
+                                            HorizontalAlignment="Stretch"
+                                            Command="{x:Bind ViewModel.RandomizeModsCommand}"
+                                            ToolTipService.ToolTip="打开一个包含更多信息的对话框">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <FontIcon Glyph="&#xE8B1;" />
+                                                <TextBlock Text="随机启用模组" />
+                                            </StackPanel>
+                                        </Button>
                                     </StackPanel>
                                 </ScrollViewer>
                             </Flyout>
