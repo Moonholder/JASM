@@ -1,5 +1,23 @@
 # Changelog
 
+## [2.21.0](https://github.com/Moonholder/JASM/compare/v2.20.1...v2.21.0) (2025-01-26)
+
+
+### Features
+
+* 支持在角色页面随机启用模组 ([098a3a1](https://github.com/Moonholder/JASM/commit/098a3a1033cf815af70020a4ef6624a0c6043eac))
+
+
+### Bug Fixes
+
+* Fix swapkey '=' recognition, variants count, and BackwardHotkey save issue ([4904b07](https://github.com/Moonholder/JASM/commit/4904b07e92a2ffc2d656166c838e9ee06bbec1b5))
+* 修复模组预览图和ini路径出现空格时无法正确识别的问题 ([d19e608](https://github.com/Moonholder/JASM/commit/d19e6085ad5c00a04b29aafd34314152edc16261))
+
+
+### Miscellaneous
+
+* 已将 WinAppSDK 更新至 1.6.4 版本 ([0eeb892](https://github.com/Moonholder/JASM/commit/0eeb89271031daabd431b97560a594415af69b4d))
+
 ## [2.20.1](https://github.com/Moonholder/JASM/compare/v2.20.0...v2.20.1) (2025-01-14)
 
 
