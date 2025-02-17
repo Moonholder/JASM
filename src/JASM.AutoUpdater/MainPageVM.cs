@@ -14,6 +14,7 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Newtonsoft.Json;
+using static MirrorAddressSelector;
 
 namespace JASM.AutoUpdater;
 
@@ -44,10 +45,14 @@ public partial class MainPageVM : ObservableRecipient
 
     [ObservableProperty] private bool _stopped;
     [ObservableProperty] private string? _stopReason;
+    [ObservableProperty] private bool _enableMirrorAcceleration = true;
+    [ObservableProperty] private MirrorInfo _currentMirror;
 
+    private bool RetryMirrorAcceleration = false;
     public MainPageVM(string installedJasmVersion)
     {
         InstalledVersion = Version.TryParse(installedJasmVersion, out var version) ? version : new Version(0, 0, 0, 0);
+        CurrentMirror = MirrorAddressSelector.GetNextMirror();
     }
 
     [RelayCommand(IncludeCancelCommand = true)]
@@ -67,6 +72,12 @@ public partial class MainPageVM : ObservableRecipient
 
         try
         {
+            if (RetryMirrorAcceleration)
+            {
+                CurrentMirror = MirrorAddressSelector.GetNextMirror();
+                RetryMirrorAcceleration = false;
+            }
+
             var release = await IsNewerVersionAvailable(cancellationToken);
             UpdateProgress.NextStage();
             if (Stopped || release is null)
@@ -105,6 +116,7 @@ public partial class MainPageVM : ObservableRecipient
         catch (TaskCanceledException e)
         {
             Stop("用户取消");
+            RetryMirrorAcceleration = true;
         }
         catch (OperationCanceledException e)
         {
@@ -131,6 +143,8 @@ public partial class MainPageVM : ObservableRecipient
         Finish();
     }
 
+    [RelayCommand]
+    private void SwitchMirror() => CurrentMirror = MirrorAddressSelector.GetNextMirror();
 
     private void Finish()
     {
@@ -167,7 +181,7 @@ public partial class MainPageVM : ObservableRecipient
             return null;
         }
 
-        release.DownloadUrl = new Uri(getJasmAsset.browser_download_url);
+        release.DownloadUrl = EnableMirrorAcceleration ? new Uri(CurrentMirror.Address + getJasmAsset.browser_download_url) : new Uri(getJasmAsset.browser_download_url);
         release.BrowserUrl = new Uri(newestVersionFound?.html_url ?? "https://github.com/Moonholder/JASM/releases");
         release.FileName = getJasmAsset.name ?? "JASM.zip";
 
@@ -209,7 +223,15 @@ public partial class MainPageVM : ObservableRecipient
 
         if (!result.IsSuccessStatusCode)
         {
-            Stop($"下载最新版本失败. 状态码: {result.StatusCode}, 原因: {result.ReasonPhrase}");
+            if (EnableMirrorAcceleration)
+            {
+                RetryMirrorAcceleration = true;
+                Stop($"下载最新版本失败. 状态码: {result.StatusCode}, 原因: 当前镜像节点 [{CurrentMirror.NodeName}] 可能已失效,重试自动切换其他节点");
+            }
+            else
+            {
+                Stop($"下载最新版本失败. 状态码: {result.StatusCode}, 原因: {result.ReasonPhrase}");
+            }
             return;
         }
 

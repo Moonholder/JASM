@@ -45,6 +45,24 @@
                 Style="{ThemeResource BodyStrongTextBlockStyle}"
                 Text="如果在JASM文件夹中有mods文件夹或其他个人文件，请将它们移出，否则它们将被删除."
                 TextWrapping="WrapWholeWords" />
+            <CheckBox
+                Margin="0,8"
+                HorizontalAlignment="Left"
+                Content="启用镜像加速"
+                IsChecked="{x:Bind ViewModel.EnableMirrorAcceleration, Mode=TwoWay}"
+                ToolTipService.ToolTip="从镜像下载JASM更新， 如果镜像不可用，请选择其他节点." />
+            <StackPanel Visibility="{x:Bind ViewModel.EnableMirrorAcceleration, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                <TextBlock
+                    Margin="0,8"
+                    HorizontalAlignment="Left"
+                    Text="{x:Bind ViewModel.CurrentMirror.NodeName, Mode=OneWay}"
+                    TextWrapping="WrapWholeWords" />
+                <Button
+                    Margin="0,8"
+                    HorizontalAlignment="Left"
+                    Command="{x:Bind ViewModel.SwitchMirrorCommand}"
+                    Content="切换镜像节点" />
+            </StackPanel>
             <Button
                 Margin="0,16,0,0"
                 HorizontalAlignment="Center"
