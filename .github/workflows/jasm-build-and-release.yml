@@ -17,7 +17,29 @@ permissions:
   pull-requests: write
 
 jobs:
+  format:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: ./src
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.x
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Format
+      run: dotnet format --verify-no-changes
+
   main:
+    needs: format
     runs-on: ubuntu-20.04
     steps:
       - uses: google-github-actions/release-please-action@v3
@@ -44,29 +66,9 @@ jobs:
               { "type": "refactor", "section": "Code Refactoring", "hidden": false }
             ]
 
-  format:
-    runs-on: windows-latest
-    defaults:
-      run:
-        working-directory: ./src
-
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 9.x
-
-    - name: Restore dependencies
-      run: dotnet restore
-
-    - name: Format
-      run: dotnet format --verify-no-changes
-
   build:
     needs: format
+    if: "${{ startsWith(github.event.head_commit.message, 'chore(main): release') }}"
     strategy:
       matrix:
         configuration: [Release]
