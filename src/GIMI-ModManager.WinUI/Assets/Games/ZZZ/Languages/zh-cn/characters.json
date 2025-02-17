@@ -72,7 +72,12 @@
       "Victoria"
     ],
     "ModFilesName": "Ellen",
-    "InGameSkins": [],
+    "InGameSkins": [
+      {
+        "InternalName": "Ellen On Campus",
+        "DisplayName": "从周一到周五"
+      }
+    ],
     "InternalName": "Ellen",
     "DisplayName": "艾莲"
   },
@@ -295,7 +300,12 @@
       "CHares"
     ],
     "ModFilesName": "Nicole",
-    "InGameSkins": [],
+    "InGameSkins": [
+      {
+        "InternalName": "Nicole Cunning Cutie",
+        "DisplayName": "狡黠甜心"
+      }
+    ],
     "InternalName": "Nicole",
     "DisplayName": "妮可"
   },
@@ -489,7 +499,12 @@
       "Lyra"
     ],
     "ModFilesName": "Astra",
-    "InGameSkins": [],
+    "InGameSkins": [
+      {
+        "InternalName": "Astra Chandelier",
+        "DisplayName": "水晶灯下"
+      }
+    ],
     "InternalName": "Astra",
     "DisplayName": "耀嘉音"
   },
@@ -527,5 +542,17 @@
     "InGameSkins": [],
     "InternalName": "Lighter",
     "DisplayName": "莱特 "
+  },
+  {
+    "InternalName": "Pulchra",
+    "DisplayName": "波可娜"
+  },
+  {
+    "InternalName": "Silver Soldier - Anby",
+    "DisplayName": "银心锡兵·安比"
+  },
+  {
+    "InternalName": "Trigger",
+    "DisplayName": "扳机 "
   }
 ]

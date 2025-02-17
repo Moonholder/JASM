@@ -383,6 +383,12 @@
         "Image": "Character_Skin_March7Hunt_Thumb.png",
         "InternalName": "March7Hunt",
         "DisplayName": "三月七•巡猎"
+      },
+      {
+        "ModFilesName": "MarchNS",
+        "Image": "Character_Skin_MarchNS_Thumb.png",
+        "InternalName": "MarchNS",
+        "DisplayName": "冬去煦至"
       }
     ],
     "InternalName": "March7",

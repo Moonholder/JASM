@@ -4,5 +4,13 @@
     "DisplayName": "其他NPC",
     "IsMultiMod": true,
     "Image": "Npc_Others.png"
+  },
+  {
+    "InternalName": "Mem",
+    "DisplayName": "迷迷"
+  },
+  {
+    "InternalName": "Garmentmaker",
+    "DisplayName": "衣匠"
   }
 ]
