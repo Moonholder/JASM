@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.22.0](https://github.com/Moonholder/JASM/compare/v2.21.0...v2.22.0) (2025-02-17)
+
+
+### Features
+
+* 自动更新程序增加镜像加速支持 ([2186a21](https://github.com/Moonholder/JASM/commit/2186a213c9d6ddcdc1ea4b3137617358367d0360))
+
+
+### Miscellaneous
+
+* 添加新角色及皮肤 ([d7572ca](https://github.com/Moonholder/JASM/commit/d7572ca5c33754dce47b312766a94d6c12af431b))
+
 ## [2.21.0](https://github.com/Moonholder/JASM/compare/v2.20.1...v2.21.0) (2025-01-26)
 
 
