@@ -590,7 +590,7 @@
     "InGameSkins": [],
     "InternalName": "Citlali",
     "DisplayName": "茜特菈莉"
-    },
+  },
   {
     "Keys": [
       "Mavuika"
@@ -629,5 +629,13 @@
   {
     "InternalName": "Yumemizuki Mizuki",
     "DisplayName": "梦见月瑞希"
+  },
+  {
+    "InternalName": "Varesa",
+    "DisplayName": "瓦雷莎"
+  },
+  {
+    "InternalName": "Iansan",
+    "DisplayName": "伊安珊"
   }
 ]
