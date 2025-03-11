@@ -73,7 +73,7 @@
                             <TextBlock
                                 VerticalAlignment="Center"
                                 IsTextSelectionEnabled="True"
-                                Text="Change status of exported mods"
+                                Text="更改已导出模组的状态"
                                 l:Uids.Uid="Settings_ExportDialog_ChangeStatus" />
                         </StackPanel>
 

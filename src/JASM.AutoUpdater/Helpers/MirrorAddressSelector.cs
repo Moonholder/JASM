@@ -6,7 +6,7 @@ public static class MirrorAddressSelector
 {
     private static readonly List<MirrorInfo> mirrorAddresses =
         [
-        new MirrorInfo("https://gh.ddlc.top/", "美国2 Cloudflare CDN"),
+        new MirrorInfo("https://ghfast.top/", "韩国"),
         new MirrorInfo("https://slink.ltd/", "美国3 Cloudflare CDN"),
         new MirrorInfo("https://gh-proxy.com/", "美国4 Cloudflare CDN"),
         new MirrorInfo("https://cors.isteed.cc/", "美国5 Cloudflare CDN"),

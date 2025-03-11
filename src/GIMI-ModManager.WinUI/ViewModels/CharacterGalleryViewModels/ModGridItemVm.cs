@@ -4,25 +4,33 @@ using GIMI_ModManager.Core.GamesService.Interfaces;
 using GIMI_ModManager.WinUI.Helpers;
 using GIMI_ModManager.WinUI.Models;
 using Microsoft.UI.Xaml;
+using GIMI_ModManager.WinUI.Services;
+using WinRT.Interop;
+using System.Collections.Generic;
+using System.IO;
+using Windows.Storage;
+using GIMI_ModManager.WinUI.Services.ModHandling;
+using GIMI_ModManager.WinUI.Services.Notifications;
 
 namespace GIMI_ModManager.WinUI.ViewModels.CharacterGalleryViewModels
 {
     public class ModGridItemVm : ObservableObject
     {
         private readonly ModModel _modModel;
+        private Uri? _originalImagePath;
 
         public Guid Id => _modModel.Id;
         public IModdableObject Character => _modModel.Character;
         public string Name => _modModel.Name;
         public string Author => _modModel.Author;
         public DateTime DateAdded => _modModel.DateAdded;
-        public string DateAddedView => $"Added to JASM on: {DateAdded}";
+        public string DateAddedView => $"于 {DateAdded} 添加到 JASM 中";
         public TimeSpan TimeSinceAdded => DateTime.Now - DateAdded;
         public string TimeSinceFormated => FormaterHelpers.FormatTimeSinceAdded(TimeSinceAdded);
         public Uri ImagePath => _modModel.ImagePath;
         public Uri? ModUrl => string.IsNullOrWhiteSpace(_modModel.ModUrl) ? null : new Uri(_modModel.ModUrl);
         public bool HasModUrl => ModUrl is not null;
-        public string NameTooltip => $"Custom Name: {Name}\nFolder Name: {FolderName}";
+        public string NameTooltip => $"模组名称: {Name}\n文件夹名: {FolderName}";
         public string ButtonText => _modModel.IsEnabled ? "禁用" : "启用";
 
         public string FolderName
@@ -63,6 +71,8 @@ namespace GIMI_ModManager.WinUI.ViewModels.CharacterGalleryViewModels
             }
         }
 
+        public bool CanSaveImage => ImagePath != _originalImagePath;
+
         public ModGridItemVm(
             ModModel modModel,
             IAsyncRelayCommand toggleModCommand,
@@ -72,6 +82,7 @@ namespace GIMI_ModManager.WinUI.ViewModels.CharacterGalleryViewModels
         )
         {
             _modModel = modModel;
+            _originalImagePath = modModel.ImagePath;
             ToggleModCommand = toggleModCommand;
             OpenModFolderCommand = openModFolderCommand;
             OpenModUrlCommand = openModUrlCommand;
@@ -86,5 +97,60 @@ namespace GIMI_ModManager.WinUI.ViewModels.CharacterGalleryViewModels
         public IAsyncRelayCommand OpenModUrlCommand { get; }
 
         public IAsyncRelayCommand DeleteModCommand { get; }
+
+        public IAsyncRelayCommand PasteImageFromClipboardCommand => new AsyncRelayCommand(async () =>
+        {
+            var imageHandlerService = App.GetService<ImageHandlerService>();
+
+            var clipboardHasValidImageResult = await imageHandlerService.ClipboardContainsImageAsync();
+            if (!clipboardHasValidImageResult.Result)
+            {
+                return;
+            }
+
+            var imagePath = await imageHandlerService.GetImageFromClipboardAsync(clipboardHasValidImageResult.DataPackage);
+            if (imagePath == null)
+            {
+                return;
+            }
+
+            _modModel.ImagePath = imagePath;
+            OnPropertyChanged(nameof(ImagePath));
+            OnPropertyChanged(nameof(CanSaveImage));
+        });
+
+        public IRelayCommand ClearImageCommand => new RelayCommand(() =>
+        {
+            _modModel.ImagePath = ImageHandlerService.StaticPlaceholderImageUri;
+            OnPropertyChanged(nameof(ImagePath));
+            OnPropertyChanged(nameof(CanSaveImage));
+        });
+
+        public IAsyncRelayCommand SaveImageCommand => new AsyncRelayCommand(async () =>
+        {
+            var modSettingsService = App.GetService<ModSettingsService>();
+            var notificationService = App.GetService<NotificationManager>();
+
+            try
+            {
+                var updateRequest = new UpdateSettingsRequest
+                {
+                    SetImagePath = ImagePath
+                };
+
+                var result = await modSettingsService.SaveSettingsAsync(Id, updateRequest);
+
+                if (result?.Notification is not null)
+                    notificationService.ShowNotification(result.Notification);
+
+                _originalImagePath = ImagePath;
+                OnPropertyChanged(nameof(CanSaveImage));
+            }
+            catch (Exception e)
+            {
+                notificationService.ShowNotification("保存图片失败", e.Message, null);
+            }
+        },
+        () => CanSaveImage);
     }
 }

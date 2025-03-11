@@ -950,7 +950,7 @@ public partial class CharactersViewModel : ObservableRecipient, INavigationAware
         catch (Exception e)
         {
             _logger.Error(e, "Error adding mod");
-            NotificationManager.ShowNotification("Error adding mod", e.Message, TimeSpan.FromSeconds(10));
+            NotificationManager.ShowNotification("添加模组时出错", e.Message, TimeSpan.FromSeconds(10));
         }
         finally
         {
@@ -976,7 +976,7 @@ public partial class CharactersViewModel : ObservableRecipient, INavigationAware
 
         if (!GameBananaUrlHelper.TryGetModIdFromUrl(uri, out _))
         {
-            NotificationManager.ShowNotification("Invalid GameBanana mod page link", "", null);
+            NotificationManager.ShowNotification("无效的GameBanana 模组页面链接", "", null);
             return;
         }
 
@@ -988,7 +988,7 @@ public partial class CharactersViewModel : ObservableRecipient, INavigationAware
         catch (Exception e)
         {
             _logger.Error(e, "Error opening mod page window");
-            NotificationManager.ShowNotification("Error opening mod page window", e.Message, TimeSpan.FromSeconds(10));
+            NotificationManager.ShowNotification("打开模组页面时出错", e.Message, TimeSpan.FromSeconds(10));
         }
         finally
         {

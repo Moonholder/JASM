@@ -36,7 +36,7 @@ public sealed class DragAndDropScanner
 
         _workFolder = Path.Combine(_workFolder, Path.GetFileName(path));
 
-        int exitCode = 0;
+        var exitCode = 0;
 
         if (IsArchive(path))
         {
@@ -58,7 +58,7 @@ public sealed class DragAndDropScanner
             modFolder.CopyTo(_workFolder);
         }
         else
-            throw new Exception("No valid mod folder or archive found");
+            throw new Exception("没有找到有效的压缩文件或文件夹");
 
 
         return new DragAndDropScanResult()
@@ -181,8 +181,8 @@ public sealed class DragAndDropScanner
 
         // 读取标准输出
         var output = new System.Text.StringBuilder();
-        bool passwordRequired = false;
-        bool passwordProvided = password != null;
+        var passwordRequired = false;
+        var passwordProvided = password != null;
 
         process.OutputDataReceived += (sender, e) =>
         {

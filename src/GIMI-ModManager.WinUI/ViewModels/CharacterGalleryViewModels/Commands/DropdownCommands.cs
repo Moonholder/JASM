@@ -40,7 +40,7 @@ public partial class CharacterGalleryViewModel
 
         var doNotAskAgainCheckBox = new CheckBox()
         {
-            Content = "Do not ask again",
+            Content = "下次不再询问",
             IsChecked = false,
         };
         var stackPanel = new StackPanel()

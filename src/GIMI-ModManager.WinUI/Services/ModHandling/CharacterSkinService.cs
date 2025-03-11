@@ -180,7 +180,7 @@ public class CharacterSkinService
         }
 
         var detectedSkin =
-            _modCrawlerService.GetFirstSubSkinRecursive(mod.FullPath, character?.InternalName.Id);
+            _modCrawlerService.GetFirstSubSkinRecursive(mod.FullPath, character?.InternalName.Id) ?? character?.Skins.FirstOrDefault(s => s.IsDefault);
 
         return detectedSkin;
     }

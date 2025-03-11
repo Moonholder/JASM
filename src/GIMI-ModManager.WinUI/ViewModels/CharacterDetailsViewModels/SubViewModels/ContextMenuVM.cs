@@ -161,8 +161,8 @@ public partial class ContextMenuVM(
         {
             _logger.Error(e, "Error moving mods");
             _notificationManager
-                .ShowNotification("Invalid Operation Exception",
-                    $"Cannot move mods\n{e.Message}, see logs for details.", TimeSpan.FromSeconds(10));
+                .ShowNotification("无效操作异常",
+                    $"无法移动模组 \n {e.Message}, 请查看日志以获取详细信息.", TimeSpan.FromSeconds(10));
             return;
         }
 
