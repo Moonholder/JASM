@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.22.1](https://github.com/Moonholder/JASM/compare/v2.22.0...v2.22.1) (2025-03-11)
+
+
+### Miscellaneous
+
+* 增加画廊视图下的预览图粘贴 ([5508b24](https://github.com/Moonholder/JASM/commit/5508b24c28e9528fa9fae389b9e971a5d256e409))
+* 添加新角色 ([4b6af9d](https://github.com/Moonholder/JASM/commit/4b6af9da4ab8e197e2e7ed6c8a7d0ef6908aae8f))
+
 ## [2.22.0](https://github.com/Moonholder/JASM/compare/v2.21.0...v2.22.0) (2025-02-17)
 
 
