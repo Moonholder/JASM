@@ -527,11 +527,11 @@
     "Keys": [
       "Zani"
     ],
-    "ReleaseDate": "2025-04-11T00:00:00",
+    "ReleaseDate": "2025-04-29T00:00:00",
     "Image": "Zani.png",
     "Rarity": 5,
     "Element": "Spectro",
-    "Class": "Unknown",
+    "Class": "Gauntlets",
     "Region": [
       "Rinascita"
     ],
@@ -539,5 +539,39 @@
     "InGameSkins": [],
     "InternalName": "Zani",
     "DisplayName": "Zani"
+  },
+  {
+    "Keys": [
+      "Ciaccona"
+    ],
+    "ReleaseDate": "2025-04-29T00:00:00",
+    "Image": "Ciaccona.png",
+    "Rarity": 5,
+    "Element": "Aero",
+    "Class": "Pistols",
+    "Region": [
+      "Rinascita"
+    ],
+    "ModFilesName": "Ciaccona",
+    "InGameSkins": [],
+    "InternalName": "Ciaccona",
+    "DisplayName": "Ciaccona"
+  },
+  {
+    "Keys": [
+      "Cartethyia"
+    ],
+    "ReleaseDate": "2025-05-01T00:00:00",
+    "Image": "Cartethyia.png",
+    "Rarity": 5,
+    "Element": "Aero",
+    "Class": "Sword",
+    "Region": [
+      "Rinascita"
+    ],
+    "ModFilesName": "Cartethyia",
+    "InGameSkins": [],
+    "InternalName": "Cartethyia",
+    "DisplayName": "Cartethyia"
   }
 ]
