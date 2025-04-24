@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.22.2](https://github.com/Moonholder/JASM/compare/v2.22.1...v2.22.2) (2025-04-24)
+
+
+### Bug Fixes
+
+* 修复模组文件夹存在exe文件时模组安装器空白异常, 以及合并模组的根目录识别问题 ([0abf369](https://github.com/Moonholder/JASM/commit/0abf369f0c21d87143974d8b36cb70752b783cb5))
+* 当自定义角色与其他可修改对象（NPC、武器等）内部名称重复时，JASM 启动崩溃的问题​ ([621e006](https://github.com/Moonholder/JASM/commit/621e00627bfb66769de7eb60a96b27f54a143b36))
+
+
+### Miscellaneous
+
+* **WuWa:** 新增角色夏空和卡提希娅 ([e02f01a](https://github.com/Moonholder/JASM/commit/e02f01ad62bd679efb474718f9443398b9be6417))
+* 更新WinAppSDK到1.7.1 ([d943e94](https://github.com/Moonholder/JASM/commit/d943e943eb81a8f77c85ee69810dffaafe5947c6))
+
 ## [2.22.1](https://github.com/Moonholder/JASM/compare/v2.22.0...v2.22.1) (2025-03-11)
 
 
