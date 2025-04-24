@@ -41,7 +41,7 @@ public sealed class ModPresetHandlerService(
 #endif
 
             _logger.Error(e, "An error occured when applying preset {PresetName}", presetName);
-            return Result.Error(new SimpleNotification("Failed to apply preset", e.Message, null));
+            return Result.Error(new SimpleNotification("应用模组预设失败", e.Message, null));
         }
     }
 
@@ -128,7 +128,7 @@ public sealed class ModPresetHandlerService(
 #endif
 
             _logger.Error(e, "An error occured when saving active preferences");
-            return Result.Error(new SimpleNotification("Failed to save active preferences", e.Message, null));
+            return Result.Error(new SimpleNotification("保存激活的偏好设置失败", e.Message, null));
         }
     }
 
@@ -155,7 +155,7 @@ public sealed class ModPresetHandlerService(
 #endif
 
             _logger.Error(e, "An error occured when applying active preferences");
-            return Result.Error(new SimpleNotification("Failed to apply saved preferences", e.Message, null));
+            return Result.Error(new SimpleNotification("应用保存的偏好设置失败", e.Message, null));
         }
     }
 

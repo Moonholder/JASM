@@ -160,7 +160,7 @@ public sealed class ModInstallation : IDisposable
     {
         foreach (var fileInfo in _originalModFolder.GetFiles("*", SearchOption.AllDirectories))
         {
-            var fileStream = fileInfo.Open(FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
+            var fileStream = fileInfo.Open(FileMode.Open, FileAccess.Read, FileShare.Read);
             _lockedFiles.Add(fileStream);
         }
     }

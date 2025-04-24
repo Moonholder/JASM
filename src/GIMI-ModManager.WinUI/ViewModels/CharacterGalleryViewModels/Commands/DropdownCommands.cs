@@ -58,7 +58,7 @@ public partial class CharacterGalleryViewModel
 
         var dialog = new ContentDialog()
         {
-            Title = "删除 mod",
+            Title = "删除模组",
             Content = stackPanel,
             PrimaryButtonText = "删除",
             CloseButtonText = "取消",

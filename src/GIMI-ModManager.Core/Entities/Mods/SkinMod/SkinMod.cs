@@ -116,7 +116,7 @@ public class SkinMod : Mod, ISkinMod
             .Where(iniFile =>
                 Constants.ScriptIniNames.Any(iniNames =>
                     iniNames.Equals(iniFile.Name, StringComparison.OrdinalIgnoreCase)) ||
-                Constants.ScriptIniPrefixes.Any(prefix =>
+                Constants.MergedIniPrefixes.Any(prefix =>
                     iniFile.Name.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)))
             .FirstOrDefault()?.FullName;
 

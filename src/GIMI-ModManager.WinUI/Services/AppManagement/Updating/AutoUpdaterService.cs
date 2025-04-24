@@ -87,7 +87,7 @@ public class AutoUpdaterService
         if (HasStartedSelfUpdateProcess)
         {
             _logger.Warning("Self update process already started.");
-            return new[] { Error.Conflict(description: "Self update process already started.") };
+            return new[] { Error.Conflict(description: "自动更新进程已启动.") };
         }
 
         HasStartedSelfUpdateProcess = true;
@@ -113,7 +113,7 @@ public class AutoUpdaterService
             {
                 Error.NotFound(
                     description:
-                    $"Current auto updater folder does not exist. Could not find the update folder: {_currentAutoUpdaterFolder.FullName}")
+                    $"当前的自动更新程序文件夹不存在. 找不到更新文件夹: {_currentAutoUpdaterFolder.FullName}")
             };
         }
 
@@ -127,7 +127,7 @@ public class AutoUpdaterService
             {
                 Error.NotFound(
                     description:
-                    $"Current auto updater folder does not contain the auto updater exe. Could not find {AutoUpdaterExe} in {_currentAutoUpdaterFolder.FullName}")
+                    $"当前的自动更新程序文件夹中不包含自动更新程序的可执行文件. 在  {AutoUpdaterExe}  中找不到 {_currentAutoUpdaterFolder.FullName}")
             };
         }
 
@@ -136,7 +136,7 @@ public class AutoUpdaterService
         if (isAutoUpdaterRunning)
         {
             _logger.Error("Auto updater is already running.");
-            return new[] { Error.Conflict(description: "Auto updater is already running.") };
+            return new[] { Error.Conflict(description: "自动更新程序已在运行.") };
         }
 
         try
@@ -153,7 +153,7 @@ public class AutoUpdaterService
             if (process is null || process.HasExited)
             {
                 _logger.Error("Failed to start Auto Updater.");
-                return new[] { Error.Unexpected(description: "Failed to start Auto Updater.") };
+                return new[] { Error.Unexpected(description: "自动更新程序启动失败.") };
             }
         }
         catch (Exception e)
@@ -161,7 +161,7 @@ public class AutoUpdaterService
             _logger.Error(e, "Failed to start Auto Updater.");
             return new[]
             {
-                Error.Unexpected(description: $"An error occurred while starting the Auto Updater. Reason: {e.Message}")
+                Error.Unexpected(description: $"启动自动更新程序时发生了错误. 错误信息: {e.Message}")
             };
         }
 
