@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.23.0](https://github.com/Moonholder/JASM/compare/v2.22.2...v2.23.0) (2025-05-24)
+
+
+### Features
+
+* 移动模组到另一个皮肤支持多选 ([a895378](https://github.com/Moonholder/JASM/commit/a89537880980e9a4ccf8677bcca63fd177aba8ae))
+
+
+### Miscellaneous
+
+* 更新角色配置 ([bbc2f02](https://github.com/Moonholder/JASM/commit/bbc2f02208627246084c9169e486895bb7f4913b))
+
 ## [2.22.2](https://github.com/Moonholder/JASM/compare/v2.22.1...v2.22.2) (2025-04-24)
 
 
