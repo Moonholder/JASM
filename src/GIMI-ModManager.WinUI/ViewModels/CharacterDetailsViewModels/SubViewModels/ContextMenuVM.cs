@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -208,7 +208,7 @@ public partial class ContextMenuVM(
                 ModCharacterSkinOverride is null && !_context.SelectedSkin.InternalNameEquals(selectedCharacterSkin.InternalName)
             ;
 
-        return _busySetter.IsNotHardBusy && SelectableCharacterSkins.Any(c => c.IsSelected) && SelectedModsCount == 1 && isDifferentSkinSelected;
+        return _busySetter.IsNotHardBusy && SelectableCharacterSkins.Any(c => c.IsSelected) && isDifferentSkinSelected;
     }
 
     [RelayCommand(CanExecute = nameof(CanOverrideModCharacterSkin))]
@@ -218,7 +218,6 @@ public partial class ContextMenuVM(
         if (selectedCharacterSkin == null || !_context.IsCharacter) return;
 
         var character = _context.Character;
-
         var characterSkinToSet = character.Skins.FirstOrDefault(charSkin => charSkin.InternalNameEquals(selectedCharacterSkin.InternalName));
 
         if (characterSkinToSet == null)
@@ -227,28 +226,48 @@ public partial class ContextMenuVM(
             return;
         }
 
-        var modEntry = _modList.Mods.FirstOrDefault(m => m.Id == _selectedMods[0]);
-        if (modEntry is null) return;
+        var selectedModEntries = _modList.Mods.Where(m => _selectedMods.Contains(m.Id)).ToList();
+        if (!selectedModEntries.Any()) return;
 
+        int successCount = 0;
+        int failCount = 0;
+        var failedModNames = new List<string>();
 
-        var result = await _modSettingsService.SetCharacterSkinOverrideLegacy(modEntry.Id, characterSkinToSet.InternalName);
-
-
-        if (result.IsT0)
+        foreach (var modEntry in selectedModEntries)
         {
-            _notificationManager.ShowNotification("已更改模组的皮肤覆盖（设置）",
-                $"移动模组'{modEntry.Mod.GetDisplayName()}' 到皮肤: {characterSkinToSet.DisplayName}", null);
+            var result = await _modSettingsService.SetCharacterSkinOverrideLegacy(modEntry.Id, characterSkinToSet.InternalName);
+
+            if (result.IsT0)
+            {
+                successCount++;
+            }
+            else
+            {
+                failCount++;
+                failedModNames.Add(modEntry.Mod.GetDisplayName());
+                _logger.Error("Failed to override character skin for mod {modName}", modEntry.Mod.GetDisplayName());
+            }
         }
-        else
+
+        if (successCount > 0)
         {
-            var error = result.IsT1 ? result.AsT1.ToString() : result.AsT2.ToString();
-            _logger.Error("Failed to override character skin for mod {modName}", modEntry.Mod.GetDisplayName());
-            _notificationManager.ShowNotification(
-                $"未能覆盖模组的角色皮肤 {modEntry.Mod.GetDisplayName()}",
-                $"出现错误。原因: {error}",
+            var message = successCount == 1
+                ? $"成功为模组 '{selectedModEntries[0].Mod.GetDisplayName()}' 设置皮肤: {characterSkinToSet.DisplayName}"
+                : $"成功为 {successCount} 个模组设置皮肤: {characterSkinToSet.DisplayName}";
+
+            _notificationManager.ShowNotification("皮肤设置完成", message, null);
+        }
+
+        if (failCount > 0)
+        {
+            var message = failCount == 1
+                ? $"未能为模组 '{failedModNames[0]}' 设置皮肤"
+                : $"未能为 {failCount} 个模组设置皮肤";
+
+            _notificationManager.ShowNotification("部分操作失败",
+                $"{message}\n请查看日志获取详细信息",
                 TimeSpan.FromSeconds(5));
         }
-
 
         ModCharactersSkinOverriden?.Invoke(this, EventArgs.Empty);
         CloseFlyout?.Invoke(this, EventArgs.Empty);

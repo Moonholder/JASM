@@ -71,8 +71,8 @@
                                 ItemsSource="{x:Bind ViewModel.ContextMenuVM.SuggestedModdableObjects, Mode=OneWay}"
                                 PlaceholderText="搜索..."
                                 QuerySubmitted="MoveModSearch_OnQuerySubmitted"
-                                TextChanged="MoveModSearch_OnTextChanged"
-                                Text="{x:Bind ViewModel.ContextMenuVM.MoveModsSearchText, Mode=TwoWay}">
+                                Text="{x:Bind ViewModel.ContextMenuVM.MoveModsSearchText, Mode=TwoWay}"
+                                TextChanged="MoveModSearch_OnTextChanged">
                                 <AutoSuggestBox.ItemTemplate>
                                     <DataTemplate x:DataType="subViewModels:SuggestedModObject">
                                         <TextBlock FontFamily="{StaticResource GenshinFont}" Text="{x:Bind DisplayName}" />
@@ -111,7 +111,7 @@
                                         </Button>
 
                                         <StackPanel Margin="4,0,0,0" Visibility="{x:Bind ViewModel.ContextMenuVM.ModHasCharacterSkinOverride, Mode=OneWay}">
-                                            <TextBlock Text="移动模组到皮肤: " />
+                                            <TextBlock Text="当前皮肤设置: " />
                                             <TextBlock HorizontalAlignment="Center" Text="{x:Bind ViewModel.ContextMenuVM.ModCharacterSkinOverride.DisplayName, FallbackValue='', Mode=OneWay}" />
                                         </StackPanel>
                                     </StackPanel>
@@ -178,13 +178,13 @@
                                     <MenuBarItem.Items>
                                         <MenuFlyoutItem
                                             Command="{x:Bind ViewModel.AddModFolderCommand}"
-                                            ToolTipService.ToolTip="添加一个模组文件夹"
-                                            Text="添加模组..." />
+                                            Text="添加模组..."
+                                            ToolTipService.ToolTip="添加一个模组文件夹" />
 
                                         <MenuFlyoutItem
                                             Command="{x:Bind ViewModel.AddModArchiveCommand}"
-                                            ToolTipService.ToolTip="在压缩包中添加模组"
-                                            Text="添加模组(压缩包)...">
+                                            Text="添加模组(压缩包)..."
+                                            ToolTipService.ToolTip="在压缩包中添加模组">
                                             <MenuFlyoutItem.KeyboardAccelerators>
                                                 <KeyboardAccelerator Key="O" Modifiers="Control" />
                                             </MenuFlyoutItem.KeyboardAccelerators>
@@ -214,8 +214,8 @@
                                     <ToggleMenuFlyoutItem
                                         Command="{x:Bind ViewModel.ToggleSingleSelectCommand}"
                                         IsChecked="{x:Bind ViewModel.IsSingleSelectEnabled, Mode=OneWay}"
-                                        ToolTipService.ToolTip="选择此选项将只允许一次启用一个模组."
-                                        Text="只启用一个模组" />
+                                        Text="只启用一个模组"
+                                        ToolTipService.ToolTip="选择此选项将只允许一次启用一个模组." />
                                     <ToggleMenuFlyoutItem
                                         Command="{x:Bind ViewModel.ToggleHideModFolderColumnCommand}"
                                         IsChecked="{x:Bind ViewModel.IsModFolderNameColumnVisible, Mode=OneWay}"
@@ -226,9 +226,9 @@
                                     Title="模组偏好设置"
                                     IsEnabled="{x:Bind ViewModel.IsSingleModSelected, Mode=OneWay}"
                                     Visibility="Collapsed">
-                                    <ToggleMenuFlyoutItem ToolTipService.ToolTip="读取所选模组的3Dmigoto模组偏好设置（d3dx_user.ini）并将设置存储在模组的.JASM_Config.json文件中" Text="保存所选模组的偏好设置" />
+                                    <ToggleMenuFlyoutItem Text="保存所选模组的偏好设置" ToolTipService.ToolTip="读取所选模组的3Dmigoto模组偏好设置（d3dx_user.ini）并将设置存储在模组的.JASM_Config.json文件中" />
                                     <MenuFlyoutSeparator />
-                                    <ToggleMenuFlyoutItem ToolTipService.ToolTip="从当前选定的模组的.JASM_Config.json文件中读取偏好设置，并将其写入d3dx_user.ini文件供3Dmigoto读取" Text="读取所选模组的偏好设置" />
+                                    <ToggleMenuFlyoutItem Text="读取所选模组的偏好设置" ToolTipService.ToolTip="从当前选定的模组的.JASM_Config.json文件中读取偏好设置，并将其写入d3dx_user.ini文件供3Dmigoto读取" />
                                 </MenuBarItem>
                             </MenuBar>
 
@@ -270,8 +270,8 @@
                                 MaxWidth="500"
                                 IsEnabled="{x:Bind ViewModel.IsNotHardBusy, Mode=OneWay}"
                                 PlaceholderText="搜索模组..."
-                                TextChanged="SearchModsTextBox_OnTextChanged"
-                                Text="{x:Bind ViewModel.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                Text="{x:Bind ViewModel.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                TextChanged="SearchModsTextBox_OnTextChanged">
 
                                 <TextBox.KeyboardAccelerators>
                                     <KeyboardAccelerator
