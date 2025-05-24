@@ -590,5 +590,39 @@
     "InGameSkins": [],
     "InternalName": "Trigger",
     "DisplayName": "Trigger "
+  },
+  {
+    "Keys": [
+      "Vivian"
+    ],
+    "ReleaseDate": "2025-04-23T00:00:00",
+    "Image": "Vivian.webp",
+    "Rarity": 5,
+    "Element": "Ether",
+    "Class": "Anomaly",
+    "Region": [
+      "Mockingbird"
+    ],
+    "ModFilesName": "Vivian",
+    "InGameSkins": [],
+    "InternalName": "Vivian",
+    "DisplayName": "Vivian"
+    },
+  {
+    "Keys": [
+      "Hugo"
+    ],
+    "ReleaseDate": "2025-05-14T00:00:00",
+    "Image": "Hugo.png",
+    "Rarity": 5,
+    "Element": "Ice",
+    "Class": "Attack",
+    "Region": [
+      "Mockingbird"
+    ],
+    "ModFilesName": "Hugo",
+    "InGameSkins": [],
+    "InternalName": "Hugo",
+    "DisplayName": "Hugo"
   }
 ]

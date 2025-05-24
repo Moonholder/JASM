@@ -34,6 +34,7 @@
 - Windows 10 1809 版本或更高版本（[据称](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/))
 - [.NET 桌面运行时](https://aka.ms/dotnet-core-applaunch?missing_runtime=true&arch=x64&rid=win10-x64&apphost_version=9.0.0&gui=true)
 - [Windows App SDK](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads)
+- [WebP 映像扩展](https://apps.microsoft.com/detail/9pg2dk419drg?hl=zh-CN&gl=CN) (仅限Windows 10)
 
 如果未下载这些，应用程序会提示你下载必要的依赖项并提供相应链接。
 
@@ -79,6 +80,15 @@
 如果 JASM 之前能正常工作，另一个可能的修复方法是删除 JASM 的用户设置文件夹。这会清除你的设置，比如预设、文件夹路径等。不过，你的模组以及模组设置（如自定义显示名称和图片）不会受到影响。JASM 设置存储在以下位置：`%localappdata%\JASM` / `C:\Users\<username>\AppData\Local\JASM`。你可以先尝试删除每个游戏的设置文件夹，看看是否有帮助，或者也可以直接删除整个文件夹。预设存储在预设文件夹内。最好先备份一下。
 
 使用了[H.InputSimulator](https://github.com/HavenDV/H.InputSimulator) 库来发送键盘输入。
+
+### XXMI 兼容性
+截至目前，JASM 尚未完全兼容。在那之前，在你为 XXMI 中的 MI 设置的文件夹中创建一个名为 “3dmigoto loader.exe” 的空白文件。
+
+或者，如果你清楚自己在做什么，并且希望能够通过 JASM 在 XXMI 中启动游戏，创建一个指向快捷方式的符号链接。（在 XXMI 中 “开始” 按钮旁边的下拉菜单中为特定游戏创建快捷方式）。
+
+
+### 缺失图像
+你很可能正在使用 Windows 10 系统，并且缺少[Webp 图像扩展程序](https://apps.microsoft.com/detail/9pg2dk419drg?hl=zh-CN&gl=CN)。
 
 ### 命令行支持
 

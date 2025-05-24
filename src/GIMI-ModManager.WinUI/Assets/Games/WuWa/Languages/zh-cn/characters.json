@@ -145,7 +145,7 @@
     "ModFilesName": "Sanhua",
     "InGameSkins": [
       {
-        "InternalName": "Exorcistic Adjuration",
+        "InternalName": "Sanhua Exorcistic Adjuration",
         "DisplayName": "叱妖诰"
       }
     ],
@@ -306,19 +306,12 @@
     "DisplayName": "吟霖"
   },
   {
-    "Keys": [
-      "Changli"
+    "InGameSkins": [
+      {
+        "InternalName": "Changli Laurel Nymph",
+        "DisplayName": "桂枝宁芙"
+      }
     ],
-    "ReleaseDate": "2024-06-6T00:00:00",
-    "Image": "Changli.png",
-    "Rarity": 5,
-    "Element": "Fusion",
-    "Class": "Sword",
-    "Region": [
-      "Huanglong"
-    ],
-    "ModFilesName": "Changli",
-    "InGameSkins": [],
     "InternalName": "Changli",
     "DisplayName": "长离"
   },
@@ -337,7 +330,7 @@
     "ModFilesName": "Jinhsi",
     "InGameSkins": [
       {
-        "InternalName": "Peach Blossom",
+        "InternalName": "Jinhsi Peach Blossom",
         "DisplayName": "桃夭灼灼"
       }
     ],
@@ -447,6 +440,12 @@
     "DisplayName": "灯灯"
   },
   {
+    "InGameSkins": [
+      {
+        "InternalName": "Carlotta Splashing Summer",
+        "DisplayName": "夏日旖旎"
+      }
+    ],
     "InternalName": "Carlotta",
     "DisplayName": "珂莱塔"
   },
@@ -477,5 +476,9 @@
   {
     "InternalName": "Cartethyia",
     "DisplayName": "卡提希娅"
+  },
+  {
+    "InternalName": "Lupa",
+    "DisplayName": "露帕"
   }
 ]

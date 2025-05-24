@@ -142,6 +142,12 @@
     "DisplayName": "五郎"
   },
   {
+    "InGameSkins": [
+      {
+        "InternalName": "Hu Tao Cherries Snow-Laden",
+        "DisplayName": "宿雪桃红"
+      }
+    ],
     "InternalName": "Hu Tao",
     "DisplayName": "胡桃"
   },
@@ -370,6 +376,12 @@
     "DisplayName": "流浪者"
   },
   {
+    "InGameSkins": [
+      {
+        "InternalName": "Xiangling New Year's Cheer",
+        "DisplayName": "岁夜欢哗"
+      }
+    ],
     "InternalName": "Xiangling",
     "DisplayName": "香菱"
   },
@@ -637,5 +649,9 @@
   {
     "InternalName": "Iansan",
     "DisplayName": "伊安珊"
+  },
+    {
+    "InternalName": "Escoffier",
+    "DisplayName": "爱可菲"
   }
 ]
