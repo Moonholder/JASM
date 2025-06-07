@@ -93,32 +93,28 @@ public static class SkinModHelpers
         return Guid.TryParse(guid, out var result) ? result : Guid.NewGuid();
     }
 
-    public static readonly string[] _imageNamePriority = new[] { ".jasm_cover", "preview", "cover" };
+    public static readonly string[] _imageNamePriority = [".jasm_cover", "preview", "cover"];
 
     public static Uri[] DetectModPreviewImages(string modDirPath)
     {
         var modDir = new DirectoryInfo(modDirPath);
         if (!modDir.Exists)
-            return Array.Empty<Uri>();
+            return [];
 
-        var images = new List<FileInfo>();
-        foreach (var file in modDir.EnumerateFiles())
-        {
-            if (!_imageNamePriority.Any(i => file.Name.ToLower().StartsWith(i)))
-                continue;
+        var supportedExtensions = Constants.SupportedImageExtensions
+            .Select(e => e.ToLowerInvariant())
+            .ToHashSet();
 
-
-            var extension = file.Extension.ToLower();
-            if (!Constants.SupportedImageExtensions.Contains(extension))
-                continue;
-
-            images.Add(file);
-        }
+        var images = modDir.EnumerateFiles("*", SearchOption.AllDirectories)
+            .Where(file => _imageNamePriority.Any(prefix =>
+                file.Name.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)))
+            .Where(file => supportedExtensions.Contains(file.Extension.ToLowerInvariant()))
+            .ToList();
 
         // Sort images by priority
         foreach (var imageName in _imageNamePriority.Reverse())
         {
-            var image = images.FirstOrDefault(x => x.Name.ToLower().StartsWith(imageName));
+            var image = images.FirstOrDefault(x => x.Name.StartsWith(imageName, StringComparison.CurrentCultureIgnoreCase));
             if (image is null)
                 continue;
 

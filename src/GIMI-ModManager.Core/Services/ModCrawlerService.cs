@@ -146,8 +146,8 @@ public class ModCrawlerService
     {
         foreach (var file in directoryInfo.EnumerateFiles("*.ini", SearchOption.AllDirectories))
         {
-            if (Constants.MergedIniPrefixes.Any(iniNames =>
-                    file.Name.Trim().StartsWith(iniNames, StringComparison.OrdinalIgnoreCase)))
+            if (Constants.MergedIniPrefixes.Any(prefix =>
+                    file.Name.Trim().StartsWith(prefix, StringComparison.OrdinalIgnoreCase)))
                 return file;
         }
 
