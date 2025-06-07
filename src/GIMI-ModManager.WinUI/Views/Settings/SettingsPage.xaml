@@ -157,12 +157,6 @@
                     Text="Language"
                     l:Uids.Uid="/Settings/LanguageSelectionSectionHeader" />
                 <StackPanel Margin="{StaticResource SmallTopBottomMargin}">
-                    <TextBlock
-                        Margin="0,0,0,8"
-                        TextWrapping="WrapWholeWords"
-                        Text="Language options are currently limited. It is a work in progress."
-                        l:Uids.Uid="/Settings/LanguageSelectorTitle" />
-
                     <ComboBox
                         x:Name="LanguageSelectorComboBox"
                         Header="Select Display Language:"
