@@ -684,36 +684,49 @@ public class GameService : IGameService
     private static int GetBaseSearchResult(string searchQuery, INameable character)
     {
         var loweredDisplayName = character.DisplayName.ToLower();
+        var loweredSearchQuery = searchQuery.ToLower();
 
         var result = 0;
 
-        // If the search query contains the display name, we give it a lot of points
-        var sameChars = loweredDisplayName.Split().Count(searchQuery.Contains);
-        result += sameChars * 60;
+        // If the search query is a prefix of the display name, we give it a lot of points
+        if (loweredDisplayName.StartsWith(loweredSearchQuery))
+        {
+            result += 60;
+        }
 
-        var splitNames = loweredDisplayName.Split();
-        var sameStartChars = 0;
+        // If the search query is contained within the display name, we give it some points
+        if (loweredDisplayName.Contains(loweredSearchQuery))
+        {
+            result += 30;
+        }
+
+        // Calculate the number of matching starting characters for each name in the display name
+        var splitNames = loweredDisplayName.Split([' ', '\t', '\n'], StringSplitOptions.RemoveEmptyEntries);
         var bestResultOfNames = 0;
-        // This loop will give points for each name that starts with the same chars as the search query
+
         foreach (var name in splitNames)
         {
-            sameStartChars = 0;
-            foreach (var @char in searchQuery)
+            var sameStartChars = 0;
+            foreach (var @char in loweredSearchQuery)
             {
-                if (name.ElementAtOrDefault(sameStartChars) == default(char)) continue;
-
-                if (name[sameStartChars] != @char) continue;
-
+                if (name.Length <= sameStartChars || name[sameStartChars] != @char)
+                {
+                    break;
+                }
                 sameStartChars++;
                 if (sameStartChars > bestResultOfNames)
+                {
                     bestResultOfNames = sameStartChars;
+                }
             }
         }
 
-        result += sameStartChars * 11; // Give more points for same start chars
+        // Give more points for matching starting characters
+        result += bestResultOfNames * 11;
 
-        result += loweredDisplayName.Split(' ', options: StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-            .Max(name => Fuzz.PartialRatio(name, searchQuery)); // Do a partial ratio for each name
+        // Use fuzzy matching to calculate the partial match ratio
+        result += Fuzz.PartialRatio(loweredDisplayName, loweredSearchQuery);
+
         return result;
     }
 
