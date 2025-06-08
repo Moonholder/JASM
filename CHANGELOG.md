@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.23.1](https://github.com/Moonholder/JASM/compare/v2.23.0...v2.23.1) (2025-06-08)
+
+
+### Bug Fixes
+
+* 修复导入模组时的预览图识别 ([f92413e](https://github.com/Moonholder/JASM/commit/f92413eb6f1865d948c49dc4522a3ae25848b6d6))
+* 现在，在使用DPI缩放功能时，窗口大小能够正确地被保存和恢复 ([b8e06ca](https://github.com/Moonholder/JASM/commit/b8e06cad73b613fe90805a8237fc8298bebd85c9))
+
+
+### Miscellaneous
+
+* 添加ZZZ WuWa Honkai新角色 ([dcfdfc6](https://github.com/Moonholder/JASM/commit/dcfdfc63f190ab73a99a54af3ce455d94bccbdfc))
+
 ## [2.23.0](https://github.com/Moonholder/JASM/compare/v2.22.2...v2.23.0) (2025-05-24)
 
 
