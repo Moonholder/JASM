@@ -18,5 +18,9 @@
   {
     "InternalName": "Support",
     "DisplayName": "Support"
+  },
+  {
+    "InternalName": "Rupture",
+    "DisplayName": "Rupture"
   }
 ]

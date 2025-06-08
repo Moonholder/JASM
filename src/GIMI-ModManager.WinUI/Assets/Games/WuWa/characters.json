@@ -575,7 +575,7 @@
     "Keys": [
       "Cartethyia"
     ],
-    "ReleaseDate": "2025-06-10T00:00:00",
+    "ReleaseDate": "2025-06-12T00:00:00",
     "Image": "Cartethyia.png",
     "Rarity": 5,
     "Element": "Aero",
@@ -587,11 +587,12 @@
     "InGameSkins": [],
     "InternalName": "Cartethyia",
     "DisplayName": "Cartethyia"
-  },{
+  },
+  {
     "Keys": [
       "Lupa"
     ],
-    "ReleaseDate": "2025-06-10T00:00:00",
+    "ReleaseDate": "2025-06-12T00:00:00",
     "Image": "Lupa.png",
     "Rarity": 5,
     "Element": "Fusion",
@@ -603,5 +604,107 @@
     "InGameSkins": [],
     "InternalName": "Lupa",
     "DisplayName": "Lupa"
+  },
+  {
+    "Keys": [
+      "Augusta"
+    ],
+    "ReleaseDate": "2026-01-01T00:00:00",
+    "Image": "Augusta.webp",
+    "Rarity": 5,
+    "Element": "Electro",
+    "Class": "Broadblade",
+    "Region": [
+      "Rinascita"
+    ],
+    "ModFilesName": "Augusta",
+    "InGameSkins": [],
+    "InternalName": "Augusta",
+    "DisplayName": "Augusta"
+  },
+  {
+    "Keys": [
+      "Iuno"
+    ],
+    "ReleaseDate": "2026-01-02T00:00:00",
+    "Image": "Iuno.webp",
+    "Rarity": 5,
+    "Element": "Unknown",
+    "Class": "Unknown",
+    "Region": [
+      "Rinascita"
+    ],
+    "ModFilesName": "Iuno",
+    "InGameSkins": [],
+    "InternalName": "Iuno",
+    "DisplayName": "Iuno"
+  },
+  {
+    "Keys": [
+      "Phrolova"
+    ],
+    "ReleaseDate": "2026-01-03T00:00:00",
+    "Image": "Phrolova.webp",
+    "Rarity": 5,
+    "Element": "Havoc",
+    "Class": "Rectifier",
+    "Region": [
+      "Rinascita"
+    ],
+    "ModFilesName": "Phrolova",
+    "InGameSkins": [],
+    "InternalName": "Phrolova",
+    "DisplayName": "Phrolova"
+  },
+  {
+    "Keys": [
+      "Qiuyuan"
+    ],
+    "ReleaseDate": "2026-01-04T00:00:00",
+    "Image": "Qiuyuan.webp",
+    "Rarity": 5,
+    "Element": "Unknown",
+    "Class": "Unknown",
+    "Region": [
+      "Huanglong"
+    ],
+    "ModFilesName": "Qiuyuan",
+    "InGameSkins": [],
+    "InternalName": "Qiuyuan",
+    "DisplayName": "Qiuyuan"
+  },
+  {
+    "Keys": [
+      "Chisa"
+    ],
+    "ReleaseDate": "2026-01-05T00:00:00",
+    "Image": "Chisa.webp",
+    "Rarity": 5,
+    "Element": "Unknown",
+    "Class": "Unknown",
+    "Region": [
+      "Unknown"
+    ],
+    "ModFilesName": "Chisa",
+    "InGameSkins": [],
+    "InternalName": "Chisa",
+    "DisplayName": "Chisa"
+  },
+  {
+    "Keys": [
+      "Galbrena"
+    ],
+    "ReleaseDate": "2026-01-06T00:00:00",
+    "Image": "Galbrena.webp",
+    "Rarity": 5,
+    "Element": "Fusion",
+    "Class": "Pistols",
+    "Region": [
+      "Rinascita"
+    ],
+    "ModFilesName": "Galbrena",
+    "InGameSkins": [],
+    "InternalName": "Galbrena",
+    "DisplayName": "Galbrena"
   }
 ]

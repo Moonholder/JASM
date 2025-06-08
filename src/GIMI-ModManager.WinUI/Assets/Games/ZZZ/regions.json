@@ -1,6 +1,6 @@
 [
     {
-      "InternalName": "Belogbog",
+      "InternalName": "Belobog",
       "DisplayName": "Belobog Heavy Industries"
     },
     {
@@ -34,5 +34,13 @@
     {
       "InternalName": "Lyra",
       "DisplayName": "Stars of Lyra"
+    },
+    {
+      "InternalName": "Mockingbird",
+      "DisplayName": "Mockingbird"
+    },
+    {
+      "InternalName": "Yunkui",
+      "DisplayName": "Yunkui Summit"
     }
 ]

@@ -23,5 +23,10 @@
 		"InternalName": "Ether",
 		"DisplayName": "Ether",
 		"Image": "Ether.svg"
+	},
+	{
+		"InternalName": "Auric Ink",
+		"DisplayName": "Auric Ink",
+		"Image": "Auric_Ink.svg"
 	}
 ]

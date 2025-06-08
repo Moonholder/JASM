@@ -23,5 +23,10 @@
 		"InternalName": "Ether",
 		"DisplayName": "以太",
 		"Image": "Ether.svg"
+	},
+	{
+		"InternalName": "Auric Ink",
+		"DisplayName": "玄墨",
+		"Image": "Auric_Ink.svg"
 	}
 ]

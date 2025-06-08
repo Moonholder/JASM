@@ -1,22 +1,26 @@
 [
   {
     "InternalName": "Anomaly",
-    "DisplayName": "Anomaly"
+    "DisplayName": "异常"
   },
   {
     "InternalName": "Attack",
-    "DisplayName": "Attack"
+    "DisplayName": "强攻"
   },
   {
     "InternalName": "Defense",
-    "DisplayName": "Defense"
+    "DisplayName": "防护"
   },
   {
     "InternalName": "Stun",
-    "DisplayName": "Stun"
+    "DisplayName": "击破"
   },
   {
     "InternalName": "Support",
-    "DisplayName": "Support"
+    "DisplayName": "支援"
+  },
+  {
+    "InternalName": "Rupture",
+    "DisplayName": "命破"
   }
 ]

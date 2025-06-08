@@ -1,38 +1,46 @@
 [
     {
-      "InternalName": "Belogbog",
-      "DisplayName": "Belobog Heavy Industries"
+      "InternalName": "Belobog",
+      "DisplayName": "白祇重工"
     },
     {
       "InternalName": "ResponseTeam",
-      "DisplayName": "Criminal Investigation Special Response Team"
+      "DisplayName": "刑侦特勤组"
     },
     {
       "InternalName": "CHares",
-      "DisplayName": "Cunning Hares"
+      "DisplayName": "狡兔屋"
     },
     {
         "InternalName": "OBOLS",
-        "DisplayName": "OBOLS Squad"
+        "DisplayName": "奥波勒斯小队"
     },
     {
       "InternalName": "Section6",
-      "DisplayName": "Section 6"
+      "DisplayName": "对空六课"
     },
     {
       "InternalName": "Calydon",
-      "DisplayName": "Sons of Calydon"
+      "DisplayName": "卡吕冬之子"
     },
     {
       "InternalName": "Victoria",
-      "DisplayName": "Victoria Housekeeping"
+      "DisplayName": "维多利亚家政"
     },
     {
       "InternalName": "Phaethon",
-      "DisplayName": "Phaethon"
+      "DisplayName": "法厄同"
     },
     {
       "InternalName": "Lyra",
       "DisplayName": "天琴座"
+    },
+    {
+      "InternalName": "Mockingbird",
+      "DisplayName": "反舌鸟"
+    },
+    {
+      "InternalName": "Yunkui",
+      "DisplayName": "云岿山"
     }
 ]

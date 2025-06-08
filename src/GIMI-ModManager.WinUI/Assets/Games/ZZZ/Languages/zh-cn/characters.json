@@ -562,5 +562,19 @@
   {
     "InternalName": "Hugo",
     "DisplayName": "雨果"
+  },
+  {
+    "InternalName": "Yixuan",
+    "DisplayName": "仪玄",
+    "InGameSkins": [
+      {
+        "InternalName": "Yixuan Trails of Ink",
+        "DisplayName": "墨形影踪"
+      }
+    ]
+  },
+  {
+    "InternalName": "JuFufu",
+    "DisplayName": "橘福福"
   }
 ]
