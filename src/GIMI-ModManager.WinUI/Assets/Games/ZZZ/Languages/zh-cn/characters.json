@@ -20,7 +20,12 @@
       "Phaethon"
     ],
     "ModFilesName": "Belle",
-    "InGameSkins": [],
+    "InGameSkins": [
+        {
+          "InternalName": "BelleDelicateSunlight",
+          "DisplayName": "曦色玲珑"
+        }
+    ],
     "InternalName": "Belle",
     "DisplayName": "铃"
   },
@@ -37,7 +42,12 @@
       "Phaethon"
     ],
     "ModFilesName": "Wise",
-    "InGameSkins": [],
+    "InGameSkins": [
+       {
+        "InternalName": "WiseSoaringCrane",
+        "DisplayName": "鹤唳青霄"
+      }
+    ],
     "InternalName": "Wise",
     "DisplayName": "哲"
   },
@@ -576,5 +586,17 @@
   {
     "InternalName": "JuFufu",
     "DisplayName": "橘福福"
+  },
+  {
+    "InternalName": "PanYinhu",
+    "DisplayName": "潘引壶"
+  },
+  {
+    "InternalName": "Yuzuha",
+    "DisplayName": "浮波柚叶"
+  },
+  {
+    "InternalName": "Alice",
+    "DisplayName": "爱丽丝"
   }
 ]

@@ -592,7 +592,7 @@
     "Keys": [
       "Lupa"
     ],
-    "ReleaseDate": "2025-06-12T00:00:00",
+    "ReleaseDate": "2025-07-02T00:00:00",
     "Image": "Lupa.png",
     "Rarity": 5,
     "Element": "Fusion",
@@ -604,6 +604,23 @@
     "InGameSkins": [],
     "InternalName": "Lupa",
     "DisplayName": "Lupa"
+  },
+  {
+    "Keys": [
+      "Phrolova"
+    ],
+    "ReleaseDate": "2025-07-24T00:00:00",
+    "Image": "Phrolova.png",
+    "Rarity": 5,
+    "Element": "Havoc",
+    "Class": "Rectifier",
+    "Region": [
+      "Rinascita"
+    ],
+    "ModFilesName": "Phrolova",
+    "InGameSkins": [],
+    "InternalName": "Phrolova",
+    "DisplayName": "Phrolova"
   },
   {
     "Keys": [
@@ -638,23 +655,6 @@
     "InGameSkins": [],
     "InternalName": "Iuno",
     "DisplayName": "Iuno"
-  },
-  {
-    "Keys": [
-      "Phrolova"
-    ],
-    "ReleaseDate": "2026-01-03T00:00:00",
-    "Image": "Phrolova.webp",
-    "Rarity": 5,
-    "Element": "Havoc",
-    "Class": "Rectifier",
-    "Region": [
-      "Rinascita"
-    ],
-    "ModFilesName": "Phrolova",
-    "InGameSkins": [],
-    "InternalName": "Phrolova",
-    "DisplayName": "Phrolova"
   },
   {
     "Keys": [

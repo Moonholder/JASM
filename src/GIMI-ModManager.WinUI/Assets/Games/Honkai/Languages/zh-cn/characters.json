@@ -1093,5 +1093,13 @@
   {
     "InternalName": "Archer",
     "DisplayName": "Archer"
+  },
+  {
+    "InternalName": "Cerydra",
+    "DisplayName": "刻律德菈"
+  },
+  {
+    "InternalName": "Hysilens",
+    "DisplayName": "海瑟音"
   }
 ]

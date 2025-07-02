@@ -7,13 +7,10 @@ public static class MirrorAddressSelector
     private static readonly List<MirrorInfo> mirrorAddresses =
         [
         new MirrorInfo("https://ghfast.top/", "韩国"),
-        new MirrorInfo("https://slink.ltd/", "美国3 Cloudflare CDN"),
         new MirrorInfo("https://gh-proxy.com/", "美国4 Cloudflare CDN"),
         new MirrorInfo("https://cors.isteed.cc/", "美国5 Cloudflare CDN"),
         new MirrorInfo("https://ghproxy.cfd/", "美国8 洛杉矶"),
         new MirrorInfo("https://github.boki.moe/", "美国9 Cloudflare CDN"),
-        new MirrorInfo("https://github.moeyy.xyz/", "美国10 Cloudflare CDN"),
-        new MirrorInfo("https://gh-proxy.ygxz.in/", "美国13 洛杉矶"),
         new MirrorInfo("https://ghproxy.net/", "英国伦敦"),
         new MirrorInfo("https://wget.la/", "其他"),
         ];
