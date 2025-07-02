@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.23.2](https://github.com/Moonholder/JASM/compare/v2.23.1...v2.23.2) (2025-07-02)
+
+
+### Tweaks
+
+* 改进角色搜索中文名称匹配逻辑 ([1c8a79a](https://github.com/Moonholder/JASM/commit/1c8a79add56c902c95b4453238c6f67f111ec6f6))
+
+
+### Miscellaneous
+
+* 添加Genshin Honkai ZZZ 新角色 ([b528691](https://github.com/Moonholder/JASM/commit/b52869192f8433dd334051630252242a48661a46))
+
 ## [2.23.1](https://github.com/Moonholder/JASM/compare/v2.23.0...v2.23.1) (2025-06-08)
 
 
