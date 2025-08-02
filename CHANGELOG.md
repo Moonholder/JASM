@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.24.0](https://github.com/Moonholder/JASM/compare/v2.23.2...v2.24.0) (2025-08-02)
+
+
+### Features
+
+* 新增支持从剪贴板中的GB链接/文件夹/压缩包添加模组 ([59723c5](https://github.com/Moonholder/JASM/commit/59723c5483566891acb1242be6d210b1de0e0cc6))
+* 重写了ini按键绑定显示页 ([c9b91f7](https://github.com/Moonholder/JASM/commit/c9b91f77972f5855416f7315c86300537ecf2880))
+
+
+### Miscellaneous
+
+* 更新了模组安装窗口中的UI文本 ([f3572fb](https://github.com/Moonholder/JASM/commit/f3572fb87cb61e31fb66c6e5d49985c4d1decfda))
+* 更新角色配置 ([bb1b5f9](https://github.com/Moonholder/JASM/commit/bb1b5f96aa05e945626af35335aba533e6f31bc9))
+
 ## [2.23.2](https://github.com/Moonholder/JASM/compare/v2.23.1...v2.23.2) (2025-07-02)
 
 
