@@ -398,6 +398,14 @@ public partial class ModGridVM(
                 Messenger.Send(new ModChangedMessage(this, otherModEntry, null));
             }
         }
+        catch (IOException ex)
+        {
+            var message = ex.Message.Contains("Access to the path")
+                ? "无法切换模组状态，目标文件正被其他程序占用。\n\n请：\n1. 关闭资源管理器中打开的模组文件夹\n2. 关闭可能正在编辑模组文件的程序\n3. 稍后重试"
+                : ex.Message;
+
+            _notificationService.ShowNotification("操作失败", message, TimeSpan.FromSeconds(10));
+        }
         catch (Exception e)
         {
             _notificationService.ShowNotification("切换模组时出错", e.Message, TimeSpan.FromSeconds(5));

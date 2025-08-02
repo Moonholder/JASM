@@ -121,7 +121,7 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
 
     [ObservableProperty] private FileSystemItem? _lastSelectedImageFile;
 
-    [ObservableProperty] private string _imageSource = "Auto";
+    [ObservableProperty] private string _imageSource = "自动";
 
     public ModInstallerVM(ILogger logger, ImageHandlerService imageHandlerService,
         NotificationManager notificationManager, IWindowManagerService windowManagerService,
@@ -221,7 +221,7 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
                         {
                             ClearModPreviewImage();
                             ModPreviewImagePath = new Uri(imageFile.Path);
-                            ImageSource = "Image from existing Mod";
+                            ImageSource = "现有模组中的图片";
                         }
 
                         CustomName = oldModSettings.CustomName ?? string.Empty;
@@ -465,7 +465,7 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
             LastSelectedImageFile = null;
         }
 
-        ImageSource = "Manual";
+        ImageSource = "手动";
     }
 
     private bool _canCopyImage()
@@ -506,7 +506,7 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
         try
         {
             imageUri = await _imageHandlerService.GetImageFromClipboardAsync();
-            ImageSource = "Manual";
+            ImageSource = "手动";
         }
         catch (Exception e)
         {
@@ -537,7 +537,7 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
 
 
         ModPreviewImagePath = new Uri(imageUri.Path);
-        ImageSource = "Manual";
+        ImageSource = "手动";
         if (LastSelectedImageFile is not null)
         {
             LastSelectedImageFile.RightIcon = null;
@@ -865,7 +865,7 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
                         var newImage = await Task.Run(() => _imageHandlerService.DownloadImageAsync(newImageUrl, ct),
                             ct);
                         ModPreviewImagePath = new Uri(newImage.Path);
-                        ImageSource = "GB Mod Thumbnail";
+                        ImageSource = "GB模组缩略图";
                         if (LastSelectedImageFile is not null)
                         {
                             LastSelectedImageFile.RightIcon = null;

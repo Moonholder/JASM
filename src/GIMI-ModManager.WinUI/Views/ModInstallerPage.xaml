@@ -32,8 +32,8 @@
             <MenuFlyoutItem
                 Command="{x:Bind ViewModel.SetShaderFixesFolderCommand}"
                 CommandParameter="{Binding}"
-                Visibility="Collapsed"
-                Text="设置ShaderFixes文件夹" />
+                Text="设置ShaderFixes文件夹"
+                Visibility="Collapsed" />
         </MenuFlyout>
 
         <DataTemplate x:Key="RootFolderTemplate" x:DataType="viewModels:RootFolder">
@@ -160,7 +160,7 @@
                             Command="{x:Bind ViewModel.ToggleReplaceDuplicateModInPresetCommand}"
                             IsChecked="{x:Bind ViewModel.ReplaceDuplicateModInPreset, Mode=OneWay}"
                             ToolTipService.ToolTip="重复的模组将在预设中被新安装的模组替换。该选项与'在预设中替换旧模组'复选框是互斥的.">
-                            <TextBlock TextWrapping="WrapWholeWords" Text="用新的模组替换预设中重复的模组" />
+                            <TextBlock Text="用新的模组替换预设中重复的模组" TextWrapping="WrapWholeWords" />
                         </CheckBox>
                     </StackPanel>
 
@@ -309,32 +309,37 @@
                         Orientation="Horizontal"
                         Visibility="Collapsed">
                         <CheckBox
-                            Content="Auto"
+                            Content="自动"
                             IsChecked="True"
                             IsEnabled="False" />
                         <CheckBox Content="Url" IsEnabled="False" />
-                        <CheckBox Content="Mod Files" IsEnabled="False" />
-                        <CheckBox Content="Ignore" IsEnabled="False" />
+                        <CheckBox Content="模组文件" IsEnabled="False" />
+                        <CheckBox Content="忽略" IsEnabled="False" />
                     </StackPanel>
 
                     <TextBlock
                         Padding="8"
                         HorizontalAlignment="Left"
-                        TextWrapping="WrapWholeWords"
-                        Text="在这里你可以选择mod文件夹的根目录." />
+                        Text="你可以通过鼠标右键设置mod文件夹的根目录"
+                        TextWrapping="WrapWholeWords" />
 
                     <TextBlock
                         Padding="8"
                         HorizontalAlignment="Left"
-                        TextWrapping="WrapWholeWords"
-                        Text="“这通常是包含 'merged.ini/Script.ini' 或 '.JASM_ModConfig.json' 的文件夹。JASM 会自动检测模组文件夹和 merged.ini 文件。如果你想手动选择模组文件夹，可以通过右键点击上方概述中的文件夹来实现. " />
+                        Text="你可以通过复制粘贴图像文件来设置预览图片"
+                        TextWrapping="WrapWholeWords" />
 
                     <TextBlock
                         Padding="8"
                         HorizontalAlignment="Left"
-                        TextWrapping="WrapWholeWords"
-                        Text="你也可以手动选择模组预览图像的图像文件。通常只需按下 '添加模组' 就可以了" />
+                        Text="你也可以手动选择右侧模组文件夹中的预览图像文件"
+                        TextWrapping="WrapWholeWords" />
 
+                    <TextBlock
+                        Padding="8"
+                        HorizontalAlignment="Left"
+                        Text="通常只需按下 '添加模组' 就可以了"
+                        TextWrapping="WrapWholeWords" />
 
 
                     <StackPanel Visibility="Collapsed">
@@ -342,12 +347,12 @@
                         <StackPanel Orientation="Horizontal">
                             <FontIcon Margin="4,0" Glyph="{x:Bind ViewModel.SelectedMergeIniIcon}" />
                             <TextBlock Margin="4,0" Text="MergedIniFile Folder:" />
-                            <TextBlock Text="Auto" />
+                            <TextBlock Text="自动" />
                         </StackPanel>
 
                         <StackPanel Margin="0,0,0,8" Orientation="Horizontal">
                             <CheckBox
-                                Content="Auto"
+                                Content="自动"
                                 IsChecked="True"
                                 IsEnabled="False" />
                         </StackPanel>
@@ -359,12 +364,12 @@
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal">
-                            <CheckBox Content="Auto" IsEnabled="False" />
+                            <CheckBox Content="自动" IsEnabled="False" />
                             <CheckBox
-                                Content="Manual Select"
+                                Content="手动选择"
                                 IsChecked="True"
                                 IsEnabled="False" />
-                            <CheckBox Content="Ignore" IsEnabled="False" />
+                            <CheckBox Content="忽略" IsEnabled="False" />
                         </StackPanel>
 
                     </StackPanel>
@@ -377,7 +382,7 @@
 
 
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
@@ -385,9 +390,10 @@
                     <CheckBox
                         Margin="4,0"
                         Command="{x:Bind ViewModel.EnableOnlyToggleCommand}"
-                        Content="启用此模组并禁用其他模组?"
                         IsChecked="{x:Bind ViewModel.EnableThisMod, Mode=OneWay}"
-                        ToolTipService.ToolTip="这将启用此模组并禁用所有其他模组。如果是某个角色，则只会禁用该角色的皮肤" />
+                        ToolTipService.ToolTip="这将启用此模组并禁用该角色的其他模组。">
+                        <TextBlock Text="启用此模组并禁用其他模组?" TextWrapping="NoWrap" />
+                    </CheckBox>
 
 
                     <CheckBox
