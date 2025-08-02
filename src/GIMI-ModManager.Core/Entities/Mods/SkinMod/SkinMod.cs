@@ -58,7 +58,7 @@ public class SkinMod : Mod, ISkinMod
 
         skinMod.Id = await skinMod.Settings.InitializeAsync().ConfigureAwait(false);
 
-        await skinMod.GetModIniPathAsync().ConfigureAwait(false);
+        skinMod.KeySwaps = new SkinModKeySwapManager(skinMod);
 
         if (!forceGenerateNewId) return skinMod;
 

@@ -12,8 +12,6 @@ public interface ISkinMod : IMod, IEqualityComparer<ISkinMod>, IEquatable<ISkinM
     public new ISkinMod CopyTo(string absPath);
 
     public bool ContainsOnlyJasmFiles();
-    public Task<string?> GetModIniPathAsync();
-
     // Get folder name without the disabled prefix
     public string GetNameWithoutDisabledPrefix();
 }

@@ -212,7 +212,6 @@ public sealed class SkinManagerService : ISkinManagerService
                         mod = x;
                         mod.Mod.ClearCache();
                         orphanedMods.Remove(x);
-                        await TryRefreshIniPathAsync(mod.Mod, errors).ConfigureAwait(false);
                         break;
                     }
 
@@ -221,7 +220,6 @@ public sealed class SkinManagerService : ISkinManagerService
                         mod = x;
                         mod.Mod.ClearCache();
                         orphanedMods.Remove(x);
-                        await TryRefreshIniPathAsync(mod.Mod, errors).ConfigureAwait(false);
                         break;
                     }
 
@@ -231,7 +229,6 @@ public sealed class SkinManagerService : ISkinManagerService
                         mod = x;
                         mod.Mod.ClearCache();
                         orphanedMods.Remove(x);
-                        await TryRefreshIniPathAsync(mod.Mod, errors).ConfigureAwait(false);
                         break;
                     }
                 }
@@ -271,23 +268,6 @@ public sealed class SkinManagerService : ISkinManagerService
                     characterModList.Character.DisplayName);
             });
             continue;
-
-            async Task TryRefreshIniPathAsync(ISkinMod mod, IList<string> errorList)
-            {
-                try
-                {
-                    await mod.GetModIniPathAsync().ConfigureAwait(false);
-                }
-                catch (Exception e)
-                {
-#if DEBUG
-                    throw;
-#endif
-                    _logger.Error(e, "Failed getting mod .ini path when refreshing mods");
-                    errorList.Add(
-                        $"Failed to get ini path for mod: '{mod.GetDisplayName()}' | Mod file path: {mod.FullPath}");
-                }
-            }
         }
 
         return new RefreshResult(modsUntracked, newModsFound, duplicateModsFound, errors: errors);

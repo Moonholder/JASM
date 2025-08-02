@@ -4,30 +4,53 @@ public class IniKeySwapSection
 {
     public Dictionary<string, string> IniKeyValues { get; } = new();
 
+    public List<string> ForwardKeys { get; set; } = [];
+    public List<string> BackwardKeys { get; set; } = [];
+
     public const string KeySwapIniSection = "KeySwap";
+
+    public const string CommandListSection = "KeyCommndList";
     public string SectionKey { get; set; } = KeySwapIniSection;
 
     public const string ForwardIniKey = "key";
 
     public string? ForwardHotkey
     {
-        get => IniKeyValues.TryGetValue(ForwardIniKey, out var value) ? value : null;
-        set => IniKeyValues[ForwardIniKey] = value ?? string.Empty;
+        get => ForwardKeys.Count > 0 ? string.Join(", ", ForwardKeys) : null;
+        set
+        {
+            ForwardKeys.Clear();
+            if (!string.IsNullOrEmpty(value))
+            {
+                ForwardKeys.AddRange(value.Split([',', ' '], StringSplitOptions.RemoveEmptyEntries)
+                    .Select(k => k.Trim())
+                    .Where(k => !string.IsNullOrEmpty(k)));
+            }
+        }
     }
 
     public const string BackwardIniKey = "back";
 
     public string? BackwardHotkey
     {
-        get => IniKeyValues.TryGetValue(BackwardIniKey, out var value) ? value : null;
-        set => IniKeyValues[BackwardIniKey] = value ?? string.Empty;
+        get => BackwardKeys.Count > 0 ? string.Join(", ", BackwardKeys) : null;
+        set
+        {
+            BackwardKeys.Clear();
+            if (!string.IsNullOrEmpty(value))
+            {
+                BackwardKeys.AddRange(value.Split([',', ' '], StringSplitOptions.RemoveEmptyEntries)
+                    .Select(k => k.Trim())
+                    .Where(k => !string.IsNullOrEmpty(k)));
+            }
+        }
     }
 
     public const string TypeIniKey = "type";
 
     public string? Type
     {
-        get => IniKeyValues.TryGetValue(TypeIniKey, out var value) ? value : null;
+        get => IniKeyValues.GetValueOrDefault(TypeIniKey);
         set => IniKeyValues[TypeIniKey] = value ?? string.Empty;
     }
 
@@ -36,6 +59,6 @@ public class IniKeySwapSection
 
     public bool AnyValues()
     {
-        return ForwardHotkey is not null || BackwardHotkey is not null;
+        return ForwardKeys.Count > 0 || BackwardKeys.Count > 0;
     }
 }

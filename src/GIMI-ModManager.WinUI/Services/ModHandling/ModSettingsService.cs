@@ -165,87 +165,6 @@ public class ModSettingsService
             ));
         }).ConfigureAwait(false);
     }
-
-    public async Task<Result> SetModIniAsync(Guid modId, string modIni, bool autoDetect = false)
-    {
-        try
-        {
-            return await InternalSetModIniAsync(modId, modIni, autoDetect).ConfigureAwait(false);
-        }
-        catch (Exception e)
-        {
-#if DEBUG
-            throw;
-#endif
-
-            _logger.Error(e, "Failed to set mod ini for mod {modId}", modId);
-            return Result.Error(e);
-        }
-    }
-
-    private async Task<Result> InternalSetModIniAsync(Guid modId, string modIni, bool autoDetect = false)
-    {
-        var mod = _skinManagerService.GetModById(modId);
-
-        if (mod is null)
-            return Result.Error(new SimpleNotification("未找到模组",
-                "尝试设置Mod ini时发生错误，重新启动JASM可能会有所帮助"));
-
-        var modSettings = await mod.Settings.TryReadSettingsAsync().ConfigureAwait(false);
-
-        if (modSettings is null)
-            return Result.Error(new SimpleNotification("未找到模组设置",
-                "尝试设置Mod ini时发生错误，重新启动JASM可能会有所帮助"));
-
-        ModSettings? newSettings;
-        if (modIni.IsNullOrEmpty() && autoDetect)
-        {
-            newSettings =
-                modSettings.DeepCopyWithProperties(mergedIniPath: NewValue<Uri?>.Set(null),
-                    ignoreMergedIni: NewValue<bool>.Set(false));
-            await mod.Settings.SaveSettingsAsync(newSettings).ConfigureAwait(false);
-            await mod.GetModIniPathAsync().ConfigureAwait(false);
-            return Result.Success();
-        }
-
-
-        if (modIni.Trim() == string.Empty)
-        {
-            newSettings =
-                modSettings.DeepCopyWithProperties(mergedIniPath: null, ignoreMergedIni: NewValue<bool>.Set(true));
-
-            await mod.Settings.SaveSettingsAsync(newSettings).ConfigureAwait(false);
-            return Result.Success();
-        }
-
-
-        var modIniUri = Uri.TryCreate(modIni, UriKind.Absolute, out var uriResult) &&
-                        (uriResult.Scheme == Uri.UriSchemeFile)
-            ? uriResult
-            : null;
-
-        if (modIniUri is null)
-            return Result.Error(new SimpleNotification("无效的Mod ini路径",
-                "试图解析.ini文件的路径时发生错误"));
-
-        if (!File.Exists(modIniUri.LocalPath))
-            return Result.Error(new SimpleNotification("Mod ini文件不存在",
-                $"未找到.ini文件: {modIniUri.LocalPath}"));
-
-        if (!SkinModHelpers.IsInModFolder(mod, modIniUri))
-            return Result.Error(new SimpleNotification("Mod ini文件不在模组文件夹中",
-                $".ini文件必须位于模组文件夹中: {mod.FullPath}\nIni path: {modIniUri.LocalPath}"));
-
-        newSettings =
-            modSettings.DeepCopyWithProperties(mergedIniPath: NewValue<Uri?>.Set(modIniUri),
-                ignoreMergedIni: NewValue<bool>.Set(false));
-
-        await mod.Settings.SaveSettingsAsync(newSettings).ConfigureAwait(false);
-        await mod.GetModIniPathAsync().ConfigureAwait(false);
-        return Result.Success();
-    }
-
-
     private static string? EmptyStringToNull(string? str) => string.IsNullOrWhiteSpace(str) ? null : str;
 }
 
@@ -369,6 +288,14 @@ public record Result : IResult
     {
         _result = Result<Success>.Error(notification)
     };
+
+    public static Result Error(Exception exception, SimpleNotification notification)
+    {
+        return new Result
+        {
+            _result = Result<Success>.Error(exception, notification)
+        };
+    }
 }
 
 public record Result<T> : IResult

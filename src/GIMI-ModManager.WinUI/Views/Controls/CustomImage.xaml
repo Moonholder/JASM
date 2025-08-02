@@ -38,11 +38,13 @@
         <Image
             x:Name="CustomImageControl"
             Width="{Binding ElementName=CustomImageRoot, Path=Width, Mode=OneWay}"
-            Height="{Binding ElementName=CustomImageRoot, Path=Height, Mode=OneWay}">
+            Height="{Binding ElementName=CustomImageRoot, Path=Height, Mode=OneWay}"
+            MaxWidth="{x:Bind MaxWidth, Mode=OneWay}"
+            MaxHeight="{x:Bind MaxHeight, Mode=OneWay}"
+            Stretch="{x:Bind Stretch, Mode=OneWay}">
             <Image.Source>
                 <BitmapImage
                     CreateOptions="IgnoreImageCache"
-                    DecodePixelWidth="{Binding ElementName=CustomImageRoot, Path=Width, Mode=OneWay}"
                     UriSource="{x:Bind ImageUri, Mode=OneWay}" />
             </Image.Source>
         </Image>

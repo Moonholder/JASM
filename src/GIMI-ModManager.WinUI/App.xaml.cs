@@ -149,7 +149,7 @@ public partial class App : Application
                 services.AddSingleton<ModCrawlerService>();
                 services.AddSingleton<ModSettingsService>();
                 services.AddSingleton<ModPresetHandlerService>();
-                services.AddSingleton<KeySwapService>();
+                services.AddSingleton<IKeySwapService, KeySwapService>();
                 services.AddSingleton<ILanguageLocalizer, Localizer>();
                 services.AddSingleton<ModPresetService>();
                 services.AddSingleton<UserPreferencesService>();

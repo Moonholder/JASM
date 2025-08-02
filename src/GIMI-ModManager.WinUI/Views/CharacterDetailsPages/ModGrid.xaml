@@ -128,9 +128,9 @@
                                                     Click="Notification_OnClick"
                                                     CornerRadius="0"
                                                     DataContext="{x:Bind}"
-                                                    ToolTipService.ToolTip="有新版本可用"
                                                     PointerEntered="NotificationButton_OnPointerEntered"
-                                                    PointerExited="NotificationButton_OnPointerExited">
+                                                    PointerExited="NotificationButton_OnPointerExited"
+                                                    ToolTipService.ToolTip="有新版本可用">
                                                     <Button.Content>
                                                         <FontIcon
                                                             VerticalAlignment="Bottom"

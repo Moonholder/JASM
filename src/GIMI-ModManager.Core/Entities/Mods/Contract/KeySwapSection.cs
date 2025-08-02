@@ -12,18 +12,24 @@ public record KeySwapSection
 
     public int? Variants { get; init; }
 
-    public string Type { get; init; } = "Unknown";
+    public string? Type { get; init; }
 
+    public List<string> ForwardKeys { get; init; } = [];
 
+    public List<string> BackwardKeys { get; init; } = [];
+
+    public string? OriginalSectionName { get; init; }
     internal static KeySwapSection FromIniKeySwapSection(IniKeySwapSection iniKeySwapSection)
     {
         return new KeySwapSection
         {
             SectionName = iniKeySwapSection.SectionKey,
-            ForwardKey = iniKeySwapSection.ForwardHotkey,
-            BackwardKey = iniKeySwapSection.BackwardHotkey,
+            ForwardKey = string.Join(", ", iniKeySwapSection.ForwardKeys),
+            BackwardKey = string.Join(", ", iniKeySwapSection.BackwardKeys),
+            ForwardKeys = [.. iniKeySwapSection.ForwardKeys],
+            BackwardKeys = [.. iniKeySwapSection.BackwardKeys],
             Variants = iniKeySwapSection.SwapVar?.Length,
-            Type = iniKeySwapSection.Type ?? "Unknown"
+            Type = iniKeySwapSection.Type ?? "",
         };
     }
 }

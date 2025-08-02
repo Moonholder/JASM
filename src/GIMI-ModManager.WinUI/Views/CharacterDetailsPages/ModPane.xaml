@@ -15,6 +15,8 @@
 
     <UserControl.Resources>
         <xaml:StringToUri x:Name="StringToUri" />
+        <xaml:BoolToVisibleConverter x:Name="BoolToVisibleConverter" />
+        <local:BoolInverterToVisibilityConverter x:Name="BoolInverterToVisibilityConverter" />
     </UserControl.Resources>
 
     <Grid
@@ -25,48 +27,34 @@
         Background="{ThemeResource ControlFillColorDefaultBrush}"
         CornerRadius="10">
 
-
         <Grid.RowDefinitions>
-            <RowDefinition Height="3*" />
+            <RowDefinition
+                Height="Auto"
+                MinHeight="80"
+                MaxHeight="450" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" MinHeight="120" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-
         </Grid.RowDefinitions>
 
+        <!--  图片区域  -->
         <Grid
             Grid.Row="0"
             MinWidth="200"
-            MinHeight="200"
+            MinHeight="80"
+            MaxHeight="450"
             AllowDrop="True"
             Background="{ThemeResource ControlFillColorTertiaryBrush}"
             CornerRadius="10"
             DragEnter="PaneImage_OnDragEnter"
             DragOver="PaneImage_OnDragEnter"
             Drop="PaneImage_OnDrop">
-            <!--
-            -->
-            <!--<Image Stretch="Uniform">
-                <Image.Source>
-                    <BitmapImage CreateOptions="IgnoreImageCache" UriSource="{x:Bind ViewModel.ModModel.ImageUri, Mode=OneWay}" />
-                </Image.Source>
-            </Image>
-            <Button
-                Margin="0,20,20,0"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Top"
-                IsEnabled="{x:Bind ViewModel.IsNotReadOnly, Mode=OneWay}">
-            -->
-            <!--
-                Command="{x:Bind ViewModel.ModPaneVM.SetImageUriCommand}"
-            -->
-            <!--
-                <FontIcon Glyph="&#xE70F;" />
-            </Button>-->
-
             <controls:CustomImage
                 x:Name="ModDetailsPaneImage"
+                Width="Auto"
+                Height="Auto"
+                MaxWidth="400"
+                MaxHeight="450"
                 ButtonHorizontalAlignment="Right"
                 ButtonVerticalAlignment="Top"
                 ClearButtonCommand="{x:Bind ViewModel.ClearImageCommand}"
@@ -74,124 +62,356 @@
                 EditButtonCommand="{x:Bind ViewModel.PickImageUriCommand}"
                 ImageUri="{x:Bind ViewModel.ModModel.ImageUri, Mode=OneWay}"
                 IsContextMenuEnabled="True"
-                PasteButtonCommand="{x:Bind ViewModel.PasteImageFromClipboardCommand}" />
-        </Grid>
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <controls:EditableTextBlock
-                x:Name="ModNameTextBlock"
-                Margin="0,8"
-                HorizontalAlignment="Stretch"
-                IsEditMode="{x:Bind ViewModel.IsEditingModName, Mode=OneWay}"
-                Style="{ThemeResource SubtitleTextBlockStyle}"
-                TextAlignment="Center"
-                ToolTipService.ToolTip="更改模组显示名称"
-                Text="{x:Bind ViewModel.ModModel.ModDisplayName, Mode=TwoWay}" />
-
-
-
-            <SplitButton
-                Grid.Column="1"
-                Command="{x:Bind ViewModel.ToggleEditingModNameCommand}"
-                IsEnabled="{x:Bind ViewModel.IsNotReadOnly, Mode=OneWay}">
-                <FontIcon Glyph="&#xE70F;" />
-                <SplitButton.Flyout>
-                    <MenuFlyout Placement="Bottom">
-                        <MenuFlyoutItem
-                            Command="{x:Bind ViewModel.SetModIniFileCommand}"
-                            ToolTipService.ToolTip="设置模组的 .ini 文件给 JASM 读取"
-                            Text="设置 .ini 文件" />
-                        <MenuFlyoutItem
-                            Command="{x:Bind ViewModel.ClearSetModIniFileCommand}"
-                            Icon="Clear"
-                            ToolTipService.ToolTip="JASM 将不会查找 merged.ini/Script.ini 文件，并会忽略此模组的键位切换(KeySwaps)"
-                            Text="忽略此模组的 .ini 文件" />
-                    </MenuFlyout>
-                </SplitButton.Flyout>
-
-            </SplitButton>
+                PasteButtonCommand="{x:Bind ViewModel.PasteImageFromClipboardCommand}"
+                Stretch="Uniform" />
         </Grid>
 
+        <!--  分割器  -->
+        <controls1:GridSplitter
+            Grid.Row="1"
+            Width="40"
+            Height="8"
+            Margin="0,-6,0,0"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Top"
+            CornerRadius="4"
+            ResizeBehavior="PreviousAndNext"
+            ResizeDirection="Rows" />
+
+        <!--  模组信息和Keyswap管理区域  -->
         <Grid Grid.Row="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <TextBox
-                VerticalAlignment="Center"
-                Header="模组链接:"
-                IsEnabled="{x:Bind ViewModel.IsNotReadOnly, Mode=OneWay}"
-                Text="{x:Bind ViewModel.ModModel.ModUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
 
-            <HyperlinkButton
-                Grid.Column="1"
-                VerticalAlignment="Bottom"
-                IsEnabled="{x:Bind ViewModel.IsNotReadOnly, Mode=OneWay}"
-                NavigateUri="{x:Bind ViewModel.ModModel.ModUrl, Mode=OneWay, Converter={StaticResource StringToUri}}">
-                <FontIcon FontSize="18" Glyph="&#xE8A7;" />
-            </HyperlinkButton>
+            <!--  模组信息区域  -->
+            <Grid Grid.Row="0" Margin="0,8,0,16">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
+                <!--  模组名称区域  -->
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <controls:EditableTextBlock
+                        x:Name="ModNameTextBlock"
+                        Margin="0,8"
+                        HorizontalAlignment="Stretch"
+                        IsEditMode="{x:Bind ViewModel.IsEditingModName, Mode=OneWay}"
+                        Style="{ThemeResource SubtitleTextBlockStyle}"
+                        Text="{x:Bind ViewModel.ModModel.ModDisplayName, Mode=TwoWay}"
+                        TextAlignment="Center"
+                        ToolTipService.ToolTip="更改模组显示名称" />
+
+                    <SplitButton
+                        Grid.Column="1"
+                        Command="{x:Bind ViewModel.ToggleEditingModNameCommand}"
+                        IsEnabled="{x:Bind ViewModel.IsNotReadOnly, Mode=OneWay}">
+                        <FontIcon Glyph="&#xE70F;" />
+                        <SplitButton.Flyout>
+                            <MenuFlyout Placement="Bottom">
+                                <MenuFlyoutItem
+                                    Command="{x:Bind ViewModel.ToggleShowDisabledIniFilesCommand}"
+                                    Text="{x:Bind ViewModel.ShowDisabledIniFilesText, Mode=OneWay}"
+                                    ToolTipService.ToolTip="显示或隐藏 DISABLED 前缀的 .ini 文件" />
+                            </MenuFlyout>
+                        </SplitButton.Flyout>
+                    </SplitButton>
+                </Grid>
+
+                <!--  模组链接区域  -->
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBox
+                        VerticalAlignment="Center"
+                        Header="模组链接:"
+                        IsEnabled="{x:Bind ViewModel.IsNotReadOnly, Mode=OneWay}"
+                        Text="{x:Bind ViewModel.ModModel.ModUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <HyperlinkButton
+                        Grid.Column="1"
+                        VerticalAlignment="Bottom"
+                        IsEnabled="{x:Bind ViewModel.IsNotReadOnly, Mode=OneWay}"
+                        NavigateUri="{x:Bind ViewModel.ModModel.ModUrl, Mode=OneWay, Converter={StaticResource StringToUri}}">
+                        <FontIcon FontSize="18" Glyph="&#xE8A7;" />
+                    </HyperlinkButton>
+                </Grid>
+            </Grid>
+
+            <!--  Keyswaps滚动区域  -->
+            <ScrollViewer
+                Grid.Row="1"
+                HorizontalScrollBarVisibility="Disabled"
+                VerticalScrollBarVisibility="Auto">
+                <StackPanel Padding="1,0,2,0">
+                    <!--  可折叠的Keyswap提示区域  -->
+                    <Grid
+                        x:Name="KeyswapHelpPanel"
+                        Padding="8,4"
+                        CornerRadius="6"
+                        Visibility="{x:Bind ViewModel.HasAnyKeySwap, Mode=OneWay, Converter={StaticResource BoolToVisibleConverter}}">
+
+                        <StackPanel>
+                            <HyperlinkButton
+                                Padding="0"
+                                HorizontalContentAlignment="Stretch"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Click="OnKeyswapHelpToggleClicked">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <!--  提示图标  -->
+                                    <FontIcon
+                                        x:Name="InfoIcon"
+                                        Grid.Column="0"
+                                        Margin="0,0,6,0"
+                                        VerticalAlignment="Center"
+                                        FontSize="12"
+                                        Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                        Glyph="&#xE946;" />
+
+                                    <!--  标题文本  -->
+                                    <TextBlock
+                                        x:Name="HelpTitle"
+                                        Grid.Column="1"
+                                        VerticalAlignment="Center"
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Style="{ThemeResource CaptionTextBlockStyle}"
+                                        Text="按键绑定提示" />
+
+                                    <!--  展开图标  -->
+                                    <FontIcon
+                                        x:Name="ExpandIcon"
+                                        Grid.Column="2"
+                                        FontSize="10"
+                                        Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                        Glyph="&#xE70D;"
+                                        RenderTransformOrigin="0.5,0.5">
+                                        <FontIcon.RenderTransform>
+                                            <RotateTransform x:Name="ExpandIconTransform" Angle="0" />
+                                        </FontIcon.RenderTransform>
+                                    </FontIcon>
+                                </Grid>
+                            </HyperlinkButton>
+
+                            <!--  详细帮助内容 (默认折叠)  -->
+                            <Grid
+                                x:Name="HelpDetails"
+                                Height="0"
+                                Margin="0,8,0,0">
+                                <Border
+                                    Padding="10"
+                                    Background="{ThemeResource ControlFillColorSecondaryBrush}"
+                                    BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="6">
+                                    <TextBlock Style="{ThemeResource CaptionTextBlockStyle}" TextWrapping="WrapWholeWords">
+                                        <Run Text="组合按键用空格分隔，如：VK_CTRL VK_UP" />
+                                        <LineBreak />
+                                        <Run Text="支持多个按键，用逗号分隔。例如：Alt UP,XB_A" />
+                                        <LineBreak />
+                                        <Run Text="系统会自动解析为多个Key/Back行" />
+                                        <LineBreak />
+                                        <Run Text="支持NO_前缀，表示不按某键 例如：NO_VK_CTRL ALT UP" />
+                                        <LineBreak /><LineBreak />
+                                        <Run Text="详细内容请见：" />
+                                        <Hyperlink NavigateUri="https://leotorrez.github.io/modding/docs/key#key-bindings" ToolTipService.ToolTip="点击打开文档">
+                                            <Run Text="按键绑定帮助文档" />
+                                        </Hyperlink>
+                                    </TextBlock>
+                                </Border>
+                            </Grid>
+                        </StackPanel>
+                    </Grid>
+
+                    <!--  显示所有 ini 文件的 keyswaps  -->
+                    <ItemsRepeater ItemsSource="{x:Bind ViewModel.IniKeySwapGroups, Mode=OneWay}" VirtualizingStackPanel.VirtualizationMode="Recycling">
+                        <ItemsRepeater.ItemTemplate>
+                            <DataTemplate x:DataType="subViewModels:IniKeySwapGroupVm">
+                                <Border
+                                    Margin="0,0,0,10"
+                                    Padding="16"
+                                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                    CornerRadius="12">
+                                    <StackPanel>
+                                        <Grid Margin="0,0,0,6">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock
+                                                MaxWidth="300"
+                                                FontWeight="SemiBold"
+                                                Style="{ThemeResource SubtitleTextBlockStyle}"
+                                                Text="{x:Bind IniFileName}"
+                                                TextTrimming="CharacterEllipsis"
+                                                TextWrapping="NoWrap"
+                                                ToolTipService.ToolTip="{x:Bind IniFileName}" />
+                                            <Button
+                                                Grid.Column="1"
+                                                Margin="8,0,0,0"
+                                                Command="{x:Bind OpenIniFileCommand}"
+                                                CommandParameter="{x:Bind IniFileName}"
+                                                ToolTipService.ToolTip="打开配置文件">
+                                                <FontIcon FontSize="14" Glyph="&#xE8A7;" />
+                                            </Button>
+                                        </Grid>
+                                        <TextBlock
+                                            Margin="0,0,0,12"
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            Style="{ThemeResource CaptionTextBlockStyle}"
+                                            Text="配置文件" />
+                                        <ItemsRepeater ItemsSource="{x:Bind KeySwaps, Mode=OneWay}" VirtualizingStackPanel.VirtualizationMode="Recycling">
+                                            <ItemsRepeater.ItemTemplate>
+                                                <DataTemplate x:DataType="subViewModels:ModPaneFieldsKeySwapVm">
+                                                    <!--  节信息区域  -->
+                                                    <Border
+                                                        Margin="0,0,0,10"
+                                                        Padding="12"
+                                                        Background="{ThemeResource ControlFillColorTertiaryBrush}"
+                                                        BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+                                                        BorderThickness="1"
+                                                        CornerRadius="8">
+                                                        <Grid>
+                                                            <Grid.RowDefinitions>
+                                                                <RowDefinition Height="Auto" />
+                                                                <RowDefinition Height="Auto" />
+                                                                <RowDefinition Height="Auto" />
+                                                            </Grid.RowDefinitions>
+
+                                                            <Grid Grid.Row="0" Margin="0,0,0,8">
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="*" MinWidth="200" />
+                                                                    <ColumnDefinition Width="Auto" />
+                                                                </Grid.ColumnDefinitions>
+
+                                                                <StackPanel
+                                                                    Grid.Column="0"
+                                                                    HorizontalAlignment="Stretch"
+                                                                    VerticalAlignment="Center"
+                                                                    Orientation="Horizontal">
+                                                                    <TextBlock
+                                                                        MaxWidth="150"
+                                                                        VerticalAlignment="Center"
+                                                                        FontWeight="SemiBold"
+                                                                        Style="{ThemeResource SubtitleTextBlockStyle}"
+                                                                        Text="{x:Bind DisplaySectionName}"
+                                                                        TextTrimming="CharacterEllipsis"
+                                                                        TextWrapping="NoWrap"
+                                                                        ToolTipService.ToolTip="{x:Bind DisplaySectionName}"
+                                                                        Visibility="{x:Bind IsEditingSectionName, Mode=OneWay, Converter={StaticResource BoolInverterToVisibilityConverter}}" />
+
+                                                                    <TextBox
+                                                                        MinWidth="100"
+                                                                        MaxWidth="200"
+                                                                        FontWeight="SemiBold"
+                                                                        PlaceholderText="输入节名称"
+                                                                        Text="{x:Bind SectionNameForEdit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                        Visibility="{x:Bind IsEditingSectionName, Mode=OneWay}" />
+
+
+                                                                    <Button
+                                                                        Margin="8,0,0,0"
+                                                                        VerticalAlignment="Center"
+                                                                        Command="{x:Bind ToggleEditingSectionNameCommand}"
+                                                                        ToolTipService.ToolTip="编辑节名称">
+                                                                        <FontIcon FontSize="12" Glyph="&#xE70F;" />
+                                                                    </Button>
+                                                                </StackPanel>
+
+                                                                <StackPanel
+                                                                    Grid.Column="1"
+                                                                    HorizontalAlignment="Right"
+                                                                    VerticalAlignment="Center"
+                                                                    Orientation="Horizontal"
+                                                                    Visibility="{x:Bind VariationsCountVisibility}">
+                                                                    <TextBlock
+                                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                                        Style="{ThemeResource CaptionTextBlockStyle}"
+                                                                        Text="变体数: "
+                                                                        TextWrapping="NoWrap" />
+                                                                    <TextBlock
+                                                                        Margin="2,-1,0,0"
+                                                                        FontWeight="SemiBold"
+                                                                        Text="{x:Bind VariationsCount}"
+                                                                        TextWrapping="NoWrap" />
+                                                                </StackPanel>
+                                                            </Grid>
+
+                                                            <!--  前进键区域  -->
+                                                            <StackPanel Grid.Row="1" Margin="0,0,0,8">
+                                                                <TextBlock
+                                                                    Margin="0,0,0,4"
+                                                                    FontWeight="SemiBold"
+                                                                    Style="{ThemeResource CaptionTextBlockStyle}"
+                                                                    Text="前进键" />
+
+                                                                <TextBox
+                                                                    MinWidth="200"
+                                                                    FontFamily="Courier New"
+                                                                    Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                                                    Text="{x:Bind ForwardHotkey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                    ToolTipService.ToolTip="{x:Bind ForwardHotkey}" />
+
+                                                                <TextBlock
+                                                                    Margin="0,4,0,0"
+                                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                                    Style="{ThemeResource CaptionTextBlockStyle}"
+                                                                    Text="{x:Bind ForwardHotkeyFriendlyText, Mode=TwoWay}"
+                                                                    TextTrimming="CharacterEllipsis" />
+                                                            </StackPanel>
+
+                                                            <!--  后退键区域  -->
+                                                            <StackPanel Grid.Row="2">
+                                                                <TextBlock
+                                                                    Margin="0,0,0,4"
+                                                                    FontWeight="SemiBold"
+                                                                    Style="{ThemeResource CaptionTextBlockStyle}"
+                                                                    Text="后退键" />
+
+                                                                <TextBox
+                                                                    MinWidth="200"
+                                                                    FontFamily="Courier New"
+                                                                    Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                                                    Text="{x:Bind BackwardHotkey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                    ToolTipService.ToolTip="{x:Bind BackwardHotkey}" />
+
+                                                                <TextBlock
+                                                                    Margin="0,4,0,0"
+                                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                                    Style="{ThemeResource CaptionTextBlockStyle}"
+                                                                    Text="{x:Bind BackwardHotkeyFriendlyText, Mode=TwoWay}"
+                                                                    TextTrimming="CharacterEllipsis" />
+                                                            </StackPanel>
+                                                        </Grid>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsRepeater.ItemTemplate>
+                                        </ItemsRepeater>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsRepeater.ItemTemplate>
+                    </ItemsRepeater>
+                </StackPanel>
+            </ScrollViewer>
         </Grid>
 
-
-
-        <ScrollViewer Grid.Row="3">
-
-            <controls1:SwitchPresenter Visibility="{x:Bind ViewModel.IsModLoaded, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" Value="{x:Bind ViewModel.ModModel.IsKeySwapManagementEnabled, Mode=OneWay}">
-                <controls1:Case Value="true">
-                    <StackPanel>
-                        <ItemsRepeater ItemsSource="{x:Bind ViewModel.ModModel.KeySwaps, Mode=OneWay}">
-                            <ItemsRepeater.ItemTemplate>
-                                <DataTemplate x:DataType="subViewModels:ModPaneFieldsKeySwapVm">
-                                    <Grid Margin="0,0">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <TextBox
-                                            MinWidth="100"
-                                            HorizontalAlignment="Left"
-                                            Header="Forward Key"
-                                            Text="{x:Bind ForwardHotkey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-
-                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                            <TextBlock HorizontalAlignment="Center" Text="{x:Bind SectionKey}" />
-                                            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                                                <TextBlock Margin="0,0,4,0" Text="Variations: " />
-                                                <TextBlock Text="{x:Bind VariationsCount, Mode=OneWay}" />
-                                            </StackPanel>
-                                        </StackPanel>
-                                        <TextBox
-                                            Grid.Column="2"
-                                            MinWidth="100"
-                                            HorizontalAlignment="Right"
-                                            Header="Backward Key"
-                                            Text="{x:Bind BackwardHotkey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                    </Grid>
-                                </DataTemplate>
-                            </ItemsRepeater.ItemTemplate>
-                        </ItemsRepeater>
-
-                    </StackPanel>
-                </controls1:Case>
-
-                <controls1:Case Value="false">
-                    <TextBlock
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Top"
-                        TextWrapping="WrapWholeWords"
-                        Text="该模组的键位管理已被禁用" />  
-
-                </controls1:Case>
-            </controls1:SwitchPresenter>
-        </ScrollViewer>
-
-
-        <Grid Grid.Row="4" Padding="0,12">
+        <!--  底部按钮区域  -->
+        <Grid Grid.Row="3" Padding="0,12">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />
@@ -200,7 +420,7 @@
             <Button
                 Background="{ThemeResource SystemFillColorAttentionBrush}"
                 Command="{x:Bind ViewModel.SaveModSettingsCommand}"
-                IsEnabled="{x:Bind ViewModel.IsNotReadOnly, Mode=OneWay}">
+                IsEnabled="{x:Bind ViewModel.CanSaveModSettings, Mode=OneWay}">
                 <Button.Content>
                     <StackPanel Orientation="Horizontal">
                         <FontIcon Margin="0,0,4,0" Glyph="&#xE74E;" />
@@ -210,11 +430,9 @@
                 <Button.KeyboardAccelerators>
                     <KeyboardAccelerator Key="S" Modifiers="Control" />
                 </Button.KeyboardAccelerators>
-
             </Button>
 
             <Grid Grid.Column="1" Visibility="{x:Bind ViewModel.ModModel.IsEnabled, Mode=OneWay}">
-
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
@@ -231,9 +449,7 @@
                         VerticalAlignment="Center"
                         Text="模组已启用" />
                 </Border>
-
             </Grid>
-
 
             <Button
                 Grid.Column="2"

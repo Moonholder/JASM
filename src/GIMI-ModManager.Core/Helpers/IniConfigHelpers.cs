@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 namespace GIMI_ModManager.Core.Helpers;
 
 // This class just holds code that i don't know where to put yet.
-public static class IniConfigHelpers
+public static partial class IniConfigHelpers
 {
     public static IniKeySwapSection? ParseKeySwap(ICollection<string> fileLines, string sectionLine)
     {
@@ -13,29 +13,47 @@ public static class IniConfigHelpers
             SectionKey = sectionLine.Trim()
         };
 
+        var forwardKeys = new List<string>();
+        var backwardKeys = new List<string>();
+
         foreach (var line in fileLines)
         {
             if (IsIniKey(line, IniKeySwapSection.ForwardIniKey))
-                skinModKeySwap.ForwardHotkey = GetIniValue(line);
-
-            else if (IsIniKey(line, IniKeySwapSection.BackwardIniKey))
-                skinModKeySwap.BackwardHotkey = GetIniValue(line);
-
-            else if (IsIniKey(line, IniKeySwapSection.TypeIniKey))
-                skinModKeySwap.Type = GetIniValue(line);
-
-            else if (Regex.IsMatch(line, @"^\s*\$\w+\s*=\s*\d+\s*(,\s*\d+\s*)*"))
             {
                 var value = GetIniValue(line);
                 if (!string.IsNullOrEmpty(value))
                 {
-                    skinModKeySwap.SwapVar = value.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    forwardKeys.Add(value);
+                }
+            }
+            else if (IsIniKey(line, IniKeySwapSection.BackwardIniKey))
+            {
+                var value = GetIniValue(line);
+                if (!string.IsNullOrEmpty(value))
+                {
+                    backwardKeys.Add(value);
+                }
+            }
+            else if (IsIniKey(line, IniKeySwapSection.TypeIniKey))
+                skinModKeySwap.Type = GetIniValue(line);
+
+            else if (SwapvarRegex().IsMatch(line))
+            {
+                var value = GetIniValue(line);
+                if (!string.IsNullOrEmpty(value))
+                {
+                    skinModKeySwap.SwapVar = [.. value.Split([','], StringSplitOptions.RemoveEmptyEntries)
+                        .Select(v => v.Trim())
+                        .Where(v => !string.IsNullOrEmpty(v))];
                 }
             }
 
             else if (IsSection(line))
                 break;
         }
+
+        skinModKeySwap.ForwardKeys.AddRange(forwardKeys);
+        skinModKeySwap.BackwardKeys.AddRange(backwardKeys);
 
         var result = skinModKeySwap.AnyValues() ? skinModKeySwap : null;
         return result;
@@ -67,13 +85,13 @@ public static class IniConfigHelpers
     public static bool IsSection(string line, string? sectionKey = null)
     {
         line = line.Trim();
-        if (sectionKey is null && line.StartsWith("[") && line.EndsWith("]"))
+        if (sectionKey is null && line.StartsWith('[') && line.EndsWith(']'))
             return true;
 
         if (sectionKey is not null && line.Equals($"[{sectionKey}]", StringComparison.CurrentCultureIgnoreCase))
             return true;
 
-        if (sectionKey is not null && (sectionKey.StartsWith("[") && sectionKey.EndsWith("]")) &&
+        if (sectionKey is not null && (sectionKey.StartsWith('[') && sectionKey.EndsWith(']')) &&
             line.Equals(sectionKey, StringComparison.CurrentCultureIgnoreCase))
             return true;
 
@@ -85,4 +103,6 @@ public static class IniConfigHelpers
 
     public static string? FormatIniKey(string key, string? value) =>
         value is not null ? $"{key} = {value}" : null;
+    [GeneratedRegex(@"^\s*\$\w+\s*=\s*[-\d]+\s*(,\s*[-\d]+\s*)*")]
+    private static partial Regex SwapvarRegex();
 }

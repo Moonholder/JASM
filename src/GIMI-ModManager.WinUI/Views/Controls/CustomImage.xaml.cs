@@ -1,6 +1,7 @@
 using System.Windows.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -131,5 +132,35 @@ public sealed partial class CustomImage : UserControl
     {
         get => (Visibility)GetValue(CopyButtonVisibilityProperty);
         set => SetValue(CopyButtonVisibilityProperty, value);
+    }
+
+    // MaxWidth property
+    public static readonly DependencyProperty MaxWidthProperty = DependencyProperty.Register(
+        nameof(MaxWidth), typeof(double), typeof(CustomImage), new PropertyMetadata(double.PositiveInfinity));
+
+    public double MaxWidth
+    {
+        get => (double)GetValue(MaxWidthProperty);
+        set => SetValue(MaxWidthProperty, value);
+    }
+
+    // MaxHeight property
+    public static readonly DependencyProperty MaxHeightProperty = DependencyProperty.Register(
+        nameof(MaxHeight), typeof(double), typeof(CustomImage), new PropertyMetadata(double.PositiveInfinity));
+
+    public double MaxHeight
+    {
+        get => (double)GetValue(MaxHeightProperty);
+        set => SetValue(MaxHeightProperty, value);
+    }
+
+    // Stretch property
+    public static readonly DependencyProperty StretchProperty = DependencyProperty.Register(
+        nameof(Stretch), typeof(Stretch), typeof(CustomImage), new PropertyMetadata(Stretch.Uniform));
+
+    public Stretch Stretch
+    {
+        get => (Stretch)GetValue(StretchProperty);
+        set => SetValue(StretchProperty, value);
     }
 }

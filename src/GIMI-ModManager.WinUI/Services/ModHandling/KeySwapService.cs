@@ -1,102 +1,81 @@
 ﻿using GIMI_ModManager.Core.Contracts.Services;
 using GIMI_ModManager.Core.Entities.Mods.Contract;
-using GIMI_ModManager.WinUI.Models;
-using OneOf;
-using OneOf.Types;
+using GIMI_ModManager.WinUI.Services.Notifications;
 using Serilog;
+
 
 namespace GIMI_ModManager.WinUI.Services.ModHandling;
 
-public class KeySwapService
+public interface IKeySwapService
+{
+    Task<Result<Dictionary<string, List<KeySwapSection>>>> GetAllKeySwapsAsync(Guid modId);
+    Task<Result> SaveKeySwapsAsync(
+        Guid modId, Dictionary<string, List<KeySwapSection>> keySwapsByFile);
+}
+
+public class KeySwapService : IKeySwapService
 {
     private readonly ISkinManagerService _skinManagerService;
     private readonly ILogger _logger;
-    private readonly Notifications.NotificationManager _notificationManager;
+    private readonly NotificationManager _notificationManager;
 
-    public KeySwapService(ISkinManagerService skinManagerService, ILogger logger,
-        Notifications.NotificationManager notificationManager)
+    public KeySwapService(ISkinManagerService skinManagerService,
+                          ILogger logger,
+                          NotificationManager notificationManager)
     {
         _skinManagerService = skinManagerService;
-        _notificationManager = notificationManager;
         _logger = logger.ForContext<KeySwapService>();
+        _notificationManager = notificationManager;
     }
 
-    public async Task<OneOf<Success, NotFound, ModNotFound, Error<Exception>>> SaveKeySwapsAsync(ModModel modModel)
+    public async Task<Result<Dictionary<string, List<KeySwapSection>>>> GetAllKeySwapsAsync(Guid modId)
     {
-        var skinMod = _skinManagerService.GetModById(modModel.Id);
-
-        if (skinMod is null)
-            return new ModNotFound(modModel.Id);
-
-
-        if (skinMod.KeySwaps is null)
-            return new NotFound();
-
-        var keySwapSections = new List<KeySwapSection>(modModel.SkinModKeySwaps.Count);
-
-        foreach (var modModelSkinModKeySwap in modModel.SkinModKeySwaps)
-        {
-            var variants = int.TryParse(modModelSkinModKeySwap.VariationsCount, out var variantsCount)
-                ? variantsCount
-                : -1;
-
-            var keySwapSection = new KeySwapSection()
-            {
-                SectionName = modModelSkinModKeySwap.SectionKey,
-                ForwardKey = modModelSkinModKeySwap.ForwardHotkey,
-                BackwardKey = modModelSkinModKeySwap.BackwardHotkey,
-                Variants = variants == -1 ? null : variants,
-                Type = modModelSkinModKeySwap.Type ?? "Unknown"
-            };
-
-            keySwapSections.Add(keySwapSection);
-        }
-
-
         try
         {
-            await skinMod.KeySwaps.SaveKeySwapConfiguration(keySwapSections).ConfigureAwait(false);
-            return new Success();
+            var mod = _skinManagerService.GetModById(modId);
+            if (mod is null)
+                return Result<Dictionary<string, List<KeySwapSection>>>.Error(new SimpleNotification("模组未找到", $"找不到ID为 {modId} 的模组", TimeSpan.FromSeconds(5)));
+
+            if (mod.KeySwaps is null)
+                return Result<Dictionary<string, List<KeySwapSection>>>.Success(new Dictionary<string, List<KeySwapSection>>(),
+                    new SimpleNotification("键位交换不支持", "当前模组不支持键位交换功能", TimeSpan.FromSeconds(3)));
+
+            var keySwaps = await mod.KeySwaps.ReadAllKeySwapConfigurations().ConfigureAwait(false);
+            return Result<Dictionary<string, List<KeySwapSection>>>.Success(keySwaps);
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            _logger.Error(e, "Failed to save key swap configuration for mod {ModName}", skinMod.Name);
-            _notificationManager.ShowNotification($"保存KeySwap配置失败: {skinMod.Name}",
-                $"保存时发生错误。原因是: {e.Message}", null);
-            return new Error<Exception>(e);
+            _logger.Error(ex, "加载模组键位配置失败: {ModId}", modId);
+            return Result<Dictionary<string, List<KeySwapSection>>>.Error(ex, new SimpleNotification("键位交换加载失败",
+                $"无法加载模组的键位配置: {ex.Message}", TimeSpan.FromSeconds(5)));
         }
     }
 
-    public async Task<OneOf<KeySwapSection[], NotFound, ModNotFound, Error<Exception>>> GetKeySwapsAsync(Guid modId)
+    public async Task<Result> SaveKeySwapsAsync(Guid modId, Dictionary<string, List<KeySwapSection>> keySwapsByFile)
     {
-        var skinMod = _skinManagerService.GetModById(modId);
-
-        if (skinMod is null)
-            return new ModNotFound(modId);
-
-        if (skinMod.KeySwaps is null)
-        {
-            _logger.Debug("Key swap manager for mod {ModName} is null", skinMod.Name);
-            return new NotFound();
-        }
-
-
-        var getResult = skinMod.KeySwaps.GetKeySwaps();
-
-        if (getResult.IsT0)
-            return getResult.AsT0;
-
         try
         {
-            await skinMod.KeySwaps.ReadKeySwapConfiguration().ConfigureAwait(false);
-            getResult = skinMod.KeySwaps.GetKeySwaps();
+            var mod = _skinManagerService.GetModById(modId);
+            if (mod is null)
+                return Result.Error(new SimpleNotification("模组未找到", $"找不到ID为 {modId} 的模组", TimeSpan.FromSeconds(5)));
 
-            return getResult.AsT0;
+            if (mod.KeySwaps is null)
+                return Result.Error(new SimpleNotification("键位交换不支持", "当前模组不支持键位交换功能", TimeSpan.FromSeconds(3)));
+
+
+
+            await mod.KeySwaps.SaveAllKeySwapConfigurations(keySwapsByFile).ConfigureAwait(false);
+
+            _logger.Information("保存模组键位配置成功: {ModId}, {FileCount} 文件, {SectionCount} 节",
+                modId, keySwapsByFile.Count, keySwapsByFile.Sum(f => f.Value.Count));
+
+            return Result.Success(new SimpleNotification("保存成功", "键位配置已更新", TimeSpan.FromSeconds(3)));
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            _logger.Error(e, "Failed to read key swap configuration for mod {ModName}", skinMod.Name);
-            return new Error<Exception>(e);
+            _logger.Error(ex, "保存模组键位配置失败: {ModId}", modId);
+            return Result.Error(ex, new SimpleNotification("键位交换保存失败",
+                $"保存模组的键位配置时出错: {ex.Message}", TimeSpan.FromSeconds(5)));
         }
     }
 }

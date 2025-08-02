@@ -27,7 +27,7 @@ public partial class SkinModKeySwapModel : ObservableObject, IEquatable<SkinModK
     }
 
     public static SkinModKeySwapModel[] FromKeySwapSettings(KeySwapSection[] skinSwapSettings)
-        => skinSwapSettings.Select(FromKeySwapSettings).ToArray();
+        => [.. skinSwapSettings.Select(FromKeySwapSettings)];
 
 
     public bool Equals(SkinModKeySwapModel? other)

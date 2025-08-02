@@ -400,14 +400,6 @@ public partial class CharacterGalleryViewModel : ObservableRecipient, INavigatio
         if (modSettings is not null)
             modModel.WithModSettings(modSettings);
 
-        if (skinEntry.Mod.KeySwaps is not null)
-        {
-            var keySwaps = await skinEntry.Mod.KeySwaps.ReadKeySwapConfiguration(cancellationToken)
-                .ConfigureAwait(false);
-
-            modModel.SetKeySwaps(keySwaps);
-        }
-
         return new ModGridItemVm(modModel, ToggleModCommand, OpenModFolderCommand, OpenModUrlCommand, DeleteModCommand);
     }
 
