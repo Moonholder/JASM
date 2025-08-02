@@ -1,6 +1,4 @@
-﻿using System.Runtime.InteropServices;
-using Windows.ApplicationModel.DataTransfer;
-using CommunityToolkit.WinUI.UI.Animations;
+﻿using CommunityToolkit.WinUI.UI.Animations;
 using GIMI_ModManager.WinUI.Contracts.Services;
 using GIMI_ModManager.WinUI.Helpers.Xaml;
 using GIMI_ModManager.WinUI.ViewModels.CharacterDetailsViewModels;
@@ -13,6 +11,10 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using Serilog;
+using System.Runtime.InteropServices;
+using Windows.ApplicationModel.DataTransfer;
+using Windows.System;
+using Windows.UI.Core;
 
 namespace GIMI_ModManager.WinUI.Views.CharacterDetailsPages;
 
@@ -281,6 +283,26 @@ public sealed partial class CharacterDetailsPage : Page
     {
         if (ViewModel.GoToGalleryScreenCommand.CanExecute(null))
             ViewModel.GoToGalleryScreenCommand.ExecuteAsync(null);
+    }
+
+    private void CtrlV_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        if (IsFocusOnTextInput())
+        {
+            args.Handled = true;
+            return;
+        }
+    }
+
+    private bool IsFocusOnTextInput()
+    {
+        if (XamlRoot == null) return false;
+
+        var focusedElement = FocusManager.GetFocusedElement(XamlRoot);
+
+        return focusedElement is TextBox ||
+               focusedElement is AutoSuggestBox ||
+               focusedElement is RichEditBox;
     }
 
     #region ModRowFlyout

@@ -189,7 +189,17 @@
                                                 <KeyboardAccelerator Key="O" Modifiers="Control" />
                                             </MenuFlyoutItem.KeyboardAccelerators>
                                         </MenuFlyoutItem>
-
+                                        <MenuFlyoutItem
+                                            Command="{x:Bind ViewModel.AddModFromClipboardCommand}"
+                                            Text="添加模组(剪贴板)..."
+                                            ToolTipService.ToolTip="从剪贴板中的GB链接/文件夹/压缩包添加模组">
+                                            <MenuFlyoutItem.KeyboardAccelerators>
+                                                <KeyboardAccelerator
+                                                    Key="V"
+                                                    Invoked="CtrlV_Invoked"
+                                                    Modifiers="Control" />
+                                            </MenuFlyoutItem.KeyboardAccelerators>
+                                        </MenuFlyoutItem>
                                         <MenuFlyoutSeparator />
                                         <MenuFlyoutItem Command="{x:Bind ViewModel.RefreshAllModsCommand}" Text="刷新模组">
                                             <MenuFlyoutItem.KeyboardAccelerators>

@@ -1,11 +1,17 @@
-﻿using System.Collections.ObjectModel;
-using Windows.Storage;
-using Windows.Storage.Pickers;
-using Windows.System;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.UI.Controls;
 using GIMI_ModManager.WinUI.Models.Options;
+using GIMI_ModManager.WinUI.Views;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
+using System.Collections.ObjectModel;
+using Windows.ApplicationModel.DataTransfer;
+using Windows.Storage;
+using Windows.Storage.Pickers;
+using Windows.System;
+using DispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue;
 
 namespace GIMI_ModManager.WinUI.ViewModels.CharacterDetailsViewModels;
 
@@ -18,6 +24,9 @@ public partial class CharacterDetailsViewModel
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(AddModArchiveCommand), nameof(AddModFolderCommand))]
     private bool _isAddingModFolder;
+
+    private DispatcherQueue DispatcherQueue =>
+        App.MainWindow?.DispatcherQueue ?? DispatcherQueue.GetForCurrentThread();
 
 
     private async Task InitToolbarAsync()
@@ -215,5 +224,84 @@ public partial class CharacterDetailsViewModel
                 IsAddingModFolder = false;
             }
         }).ConfigureAwait(false);
+    }
+    private bool CanAddModClipboard()
+        => !IsAddingModFolder && IsNotHardBusy;
+
+    [RelayCommand(CanExecute = nameof(CanAddModClipboard))]
+    private async Task AddModFromClipboardAsync()
+    {
+        var package = Clipboard.GetContent();
+        if (package is null) return;
+
+        if (package.Contains(StandardDataFormats.Text))
+        {
+            var text = await package.GetTextAsync();
+            if (string.IsNullOrWhiteSpace(text)) return;
+
+            if (Uri.TryCreate(text, UriKind.Absolute, out var uri) && CanDragDropModUrl(uri))
+            {
+                await CommandWrapperAsync(true, async () =>
+                {
+                    try
+                    {
+                        var windowKey = $"ModPage_{_modList.Character.InternalName}";
+                        if (_windowManagerService.GetWindow(windowKey) is { } window)
+                        {
+                            DispatcherQueue.TryEnqueue(() => window.Activate());
+                            return;
+                        }
+
+                        var modWindow = new GbModPageWindow(uri, _modList.Character);
+                        _windowManagerService.CreateWindow(modWindow, identifier: windowKey);
+                        await Task.Delay(100);
+                        modWindow.BringToFront();
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.Error(e, "Error opening mod page window from clipboard.");
+                        _notificationService.ShowNotification("打开模组页面窗口时出错", e.Message, TimeSpan.FromSeconds(5));
+                    }
+                }).ConfigureAwait(false);
+            }
+            else
+            {
+                _notificationService.ShowNotification("无法添加模组", "无法从剪切板中获取有效的GameBanana模组链接。", TimeSpan.FromSeconds(5));
+            }
+        }
+        else if (package.Contains(StandardDataFormats.StorageItems))
+        {
+            await CommandWrapperAsync(true, async () =>
+            {
+                try
+                {
+                    var items = await package.GetStorageItemsAsync();
+                    if (items is null || items.Count == 0) return;
+                    IsAddingModFolder = true;
+                    var installMonitor = await _modDragAndDropService.AddStorageItemFoldersAsync(_modList, items).ConfigureAwait(false);
+
+                    if (installMonitor is not null)
+                    {
+                        var result = await installMonitor.WaitForCloseAsync().ConfigureAwait(false);
+                        if (result?.CloseReason == CloseRequestedArgs.CloseReasons.Success)
+                        {
+                            DispatcherQueue.TryEnqueue(async () =>
+                            {
+                                await ModGridVM.ReloadAllModsAsync();
+                            });
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    _logger.Error(e, "Error while adding storage items.");
+                    _notificationService.ShowNotification("添加模组时出错.", e.Message, TimeSpan.FromSeconds(5));
+                }
+                finally
+                {
+                    IsAddingModFolder = false;
+                }
+            }).ConfigureAwait(false);
+        }
     }
 }
