@@ -24,6 +24,10 @@
         {
           "InternalName": "BelleDelicateSunlight",
           "DisplayName": "曦色玲珑"
+        },
+        {
+          "InternalName": "BelleSummerSkies",
+          "DisplayName": "夏日晴空"
         }
     ],
     "InternalName": "Belle",
@@ -46,6 +50,10 @@
        {
         "InternalName": "WiseSoaringCrane",
         "DisplayName": "鹤唳青霄"
+      },
+      {
+        "InternalName": "WisePeacefulWaves",
+        "DisplayName": "浪影闲庭"
       }
     ],
     "InternalName": "Wise",
@@ -578,7 +586,7 @@
     "DisplayName": "仪玄",
     "InGameSkins": [
       {
-        "InternalName": "Yixuan Trails of Ink",
+        "InternalName": "YixuanTrailsofInk",
         "DisplayName": "墨形影踪"
       }
     ]
@@ -593,10 +601,30 @@
   },
   {
     "InternalName": "Yuzuha",
-    "DisplayName": "浮波柚叶"
+    "DisplayName": "浮波柚叶",
+    "InGameSkins": [
+      {
+        "InternalName": "YuzuhaTanukiInBroadDayLight",
+        "DisplayName": "晴空化狸"
+      }
+    ]
   },
   {
     "InternalName": "Alice",
-    "DisplayName": "爱丽丝"
+    "DisplayName": "爱丽丝",
+    "InGameSkins": [
+      {
+        "InternalName": "AliceSeaofThyme",
+        "DisplayName": "百里香之海"
+      }
+    ]
+  },
+  {
+    "InternalName": "Seed",
+    "DisplayName": "席德"
+  },
+  {
+    "InternalName": "Orphie",
+    "DisplayName": "奥菲丝"
   }
 ]

@@ -18,6 +18,12 @@
         "Image": "BelleDelicateSunlight.png",
         "InternalName": "BelleDelicateSunlight",
         "DisplayName": "Belle Delicate Sunlight"
+      },
+      {
+        "ModFilesName": "BelleSummerSkies",
+        "Image": "BelleSummerSkies.png",
+        "InternalName": "BelleSummerSkies",
+        "DisplayName": "Belle Summer Skies"
       }
     ],
     "InternalName": "Belle",
@@ -42,6 +48,12 @@
         "Image": "WiseSoaringCrane.png",
         "InternalName": "WiseSoaringCrane",
         "DisplayName": "Wise Soaring Crane"
+      },
+      {
+        "ModFilesName": "WisePeacefulWaves",
+        "Image": "WisePeacefulWaves.png",
+        "InternalName": "WisePeacefulWaves",
+        "DisplayName": "Wise Peaceful Waves"
       }
     ],
     "InternalName": "Wise",
@@ -658,7 +670,7 @@
       {
         "ModFilesName": "YixuanTrailsOfInk",
         "Image": "YixuanTrailsofInk.png",
-        "InternalName": "Yixuan Trails of Ink",
+        "InternalName": "YixuanTrailsofInk",
         "DisplayName": "Yixuan Trails of Ink"
       }
     ],
@@ -713,7 +725,14 @@
       "Spook Shack"
     ],
     "ModFilesName": "Yuzuha",
-    "InGameSkins": [],
+    "InGameSkins": [
+      {
+        "ModFilesName": "YuzuhaTanukiInBroadDayLight",
+        "Image": "YuzuhaTanukiInBroadDayLight.png",
+        "InternalName": "YuzuhaTanukiInBroadDayLight",
+        "DisplayName": "Yuzuha Tanuki in Broad Daylight"
+      }
+    ],
     "InternalName": "Yuzuha",
     "DisplayName": "Yuzuha"
   },
@@ -731,8 +750,49 @@
       "Spooky Shack"
     ],
     "ModFilesName": "Alice",
-    "InGameSkins": [],
+    "InGameSkins": [
+      {
+        "ModFilesName": "AliceSeaofThyme",
+        "Image": "AliceSeaofThyme.png",
+        "InternalName": "AliceSeaofThyme",
+        "DisplayName": "Alice Sea of Thyme"
+      }
+    ],
     "InternalName": "Alice",
     "DisplayName": "Alice"
+  },
+  {
+    "Keys": [
+      "Seed"
+    ],
+    "ReleaseDate": "2025-09-06T00:00:00",
+    "Image": "Seed.png",
+    "Rarity": 5,
+    "Element": "Electric",
+    "Class": "Attack",
+    "Region": [
+      "OBOL"
+    ],
+    "ModFilesName": "Seed",
+    "InGameSkins": [],
+    "InternalName": "Seed",
+    "DisplayName": "Seed"
+  },
+  {
+    "Keys": [
+      "Orphie"
+    ],
+    "ReleaseDate": "2025-09-06T00:00:00",
+    "Image": "Orphie.png",
+    "Rarity": 5,
+    "Element": "Fire",
+    "Class": "Attack",
+    "Region": [
+      "OBOL"
+    ],
+    "ModFilesName": "Orphie",
+    "InGameSkins": [],
+    "InternalName": "Orphie",
+    "DisplayName": "Orphie"
   }
 ]

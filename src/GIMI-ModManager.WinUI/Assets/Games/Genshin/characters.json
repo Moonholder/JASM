@@ -1900,5 +1900,22 @@
     "InGameSkins": [],
     "InternalName": "Dahlia",
     "DisplayName": "Dahlia"
+  },
+  {
+    "Keys": [
+      "Ineffa"
+    ],
+    "ReleaseDate": "2025-07-30T00:00:00",
+    "Image": "Ineffa.png",
+    "Rarity": 5,
+    "Element": "Electro",
+    "Class": "Polearm",
+    "Region": [
+      "Nod-Krai"
+    ],
+    "ModFilesName": "Ineffa",
+    "InGameSkins": [],
+    "InternalName": "Ineffa",
+    "DisplayName": "Ineffa"
   }
 ]
