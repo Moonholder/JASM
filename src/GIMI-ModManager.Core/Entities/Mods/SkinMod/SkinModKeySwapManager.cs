@@ -17,11 +17,14 @@ public partial class SkinModKeySwapManager(ISkinMod skinMod)
     /// <summary>
     /// 读取所有INI文件中的键位交换配置
     /// </summary>
-    public async Task<Dictionary<string, List<KeySwapSection>>> ReadAllKeySwapConfigurations(CancellationToken cancellationToken = default)
+    public async Task<Dictionary<string, List<KeySwapSection>>> ReadAllKeySwapConfigurations(bool showDisabledIniFiles = false, CancellationToken cancellationToken = default)
     {
         var result = new Dictionary<string, List<KeySwapSection>>();
         var modDir = new DirectoryInfo(skinMod.FullPath);
-        var iniFiles = modDir.EnumerateFiles("*.ini", SearchOption.AllDirectories);
+        var iniFiles = modDir.GetFiles("*.ini", SearchOption.AllDirectories)
+            .Where(f => showDisabledIniFiles || !IsFileOrDirectoryDisabled(f, modDir))
+            .ToArray();
+
 
         foreach (var iniFile in iniFiles)
         {
@@ -35,6 +38,17 @@ public partial class SkinModKeySwapManager(ISkinMod skinMod)
         }
 
         return result;
+
+        static bool IsFileOrDirectoryDisabled(FileInfo file, DirectoryInfo modDir)
+        {
+            if (file.Name.StartsWith("DISABLED", StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            var directory = file.Directory;
+            return directory != null &&
+                   directory.FullName.TrimEnd(Path.DirectorySeparatorChar) != modDir.FullName.TrimEnd(Path.DirectorySeparatorChar) &&
+                   directory.Name.StartsWith("DISABLED", StringComparison.OrdinalIgnoreCase);
+        }
     }
 
     /// <summary>

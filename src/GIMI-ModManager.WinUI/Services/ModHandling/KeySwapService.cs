@@ -8,7 +8,7 @@ namespace GIMI_ModManager.WinUI.Services.ModHandling;
 
 public interface IKeySwapService
 {
-    Task<Result<Dictionary<string, List<KeySwapSection>>>> GetAllKeySwapsAsync(Guid modId);
+    Task<Result<Dictionary<string, List<KeySwapSection>>>> GetAllKeySwapsAsync(Guid modId, bool showDisabledIniFiles);
     Task<Result> SaveKeySwapsAsync(
         Guid modId, Dictionary<string, List<KeySwapSection>> keySwapsByFile);
 }
@@ -28,7 +28,7 @@ public class KeySwapService : IKeySwapService
         _notificationManager = notificationManager;
     }
 
-    public async Task<Result<Dictionary<string, List<KeySwapSection>>>> GetAllKeySwapsAsync(Guid modId)
+    public async Task<Result<Dictionary<string, List<KeySwapSection>>>> GetAllKeySwapsAsync(Guid modId, bool showDisabledIniFiles)
     {
         try
         {
@@ -40,7 +40,7 @@ public class KeySwapService : IKeySwapService
                 return Result<Dictionary<string, List<KeySwapSection>>>.Success(new Dictionary<string, List<KeySwapSection>>(),
                     new SimpleNotification("键位交换不支持", "当前模组不支持键位交换功能", TimeSpan.FromSeconds(3)));
 
-            var keySwaps = await mod.KeySwaps.ReadAllKeySwapConfigurations().ConfigureAwait(false);
+            var keySwaps = await mod.KeySwaps.ReadAllKeySwapConfigurations(showDisabledIniFiles).ConfigureAwait(false);
             return Result<Dictionary<string, List<KeySwapSection>>>.Success(keySwaps);
         }
         catch (Exception ex)

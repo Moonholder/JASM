@@ -1193,8 +1193,8 @@ public class GameService : IGameService
             }
 
 
-            if (nameable is IImageSupport imageSupportedValue && !jsonOverride.Image.IsNullOrEmpty())
-                _logger.Warning("Image override is not implemented");
+            // if (nameable is IImageSupport imageSupportedValue && !jsonOverride.Image.IsNullOrEmpty())
+            //     _logger.Warning("Image override is not implemented");
 
             if (nameable is ICategory category && !jsonOverride.DisplayNamePlural.IsNullOrEmpty())
             {

@@ -17,6 +17,7 @@
         <xaml:StringToUri x:Name="StringToUri" />
         <xaml:BoolToVisibleConverter x:Name="BoolToVisibleConverter" />
         <local:BoolInverterToVisibilityConverter x:Name="BoolInverterToVisibilityConverter" />
+        <local:StringToVisibilityConverter x:Name="StringToVisibilityConverter" />
     </UserControl.Resources>
 
     <Grid
@@ -152,14 +153,22 @@
                 HorizontalScrollBarVisibility="Disabled"
                 VerticalScrollBarVisibility="Auto">
                 <StackPanel Padding="1,0,2,0">
-                    <!--  可折叠的Keyswap提示区域  -->
+                    <!--  统一：按键绑定提示 + 右侧面板切换图标（仅在有 keyswap 时显示）  -->
                     <Grid
                         x:Name="KeyswapHelpPanel"
                         Padding="8,4"
                         CornerRadius="6"
                         Visibility="{x:Bind ViewModel.HasAnyKeySwap, Mode=OneWay, Converter={StaticResource BoolToVisibleConverter}}">
-
-                        <StackPanel>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <!--  左侧：可点击展开帮助的标题  -->
                             <HyperlinkButton
                                 Padding="0"
                                 HorizontalContentAlignment="Stretch"
@@ -172,8 +181,6 @@
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
-
-                                    <!--  提示图标  -->
                                     <FontIcon
                                         x:Name="InfoIcon"
                                         Grid.Column="0"
@@ -182,8 +189,6 @@
                                         FontSize="12"
                                         Foreground="{ThemeResource TextFillColorTertiaryBrush}"
                                         Glyph="&#xE946;" />
-
-                                    <!--  标题文本  -->
                                     <TextBlock
                                         x:Name="HelpTitle"
                                         Grid.Column="1"
@@ -191,8 +196,6 @@
                                         Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                         Style="{ThemeResource CaptionTextBlockStyle}"
                                         Text="按键绑定提示" />
-
-                                    <!--  展开图标  -->
                                     <FontIcon
                                         x:Name="ExpandIcon"
                                         Grid.Column="2"
@@ -206,206 +209,327 @@
                                     </FontIcon>
                                 </Grid>
                             </HyperlinkButton>
-
-                            <!--  详细帮助内容 (默认折叠)  -->
-                            <Grid
-                                x:Name="HelpDetails"
-                                Height="0"
-                                Margin="0,8,0,0">
-                                <Border
-                                    Padding="10"
-                                    Background="{ThemeResource ControlFillColorSecondaryBrush}"
-                                    BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
-                                    BorderThickness="1"
-                                    CornerRadius="6">
-                                    <TextBlock Style="{ThemeResource CaptionTextBlockStyle}" TextWrapping="WrapWholeWords">
-                                        <Run Text="组合按键用空格分隔，如：VK_CTRL VK_UP" />
-                                        <LineBreak />
-                                        <Run Text="支持多个按键，用逗号分隔。例如：Alt UP,XB_A" />
-                                        <LineBreak />
-                                        <Run Text="系统会自动解析为多个Key/Back行" />
-                                        <LineBreak />
-                                        <Run Text="支持NO_前缀，表示不按某键 例如：NO_VK_CTRL ALT UP" />
-                                        <LineBreak /><LineBreak />
-                                        <Run Text="详细内容请见：" />
-                                        <Hyperlink NavigateUri="https://leotorrez.github.io/modding/docs/key#key-bindings" ToolTipService.ToolTip="点击打开文档">
-                                            <Run Text="按键绑定帮助文档" />
-                                        </Hyperlink>
-                                    </TextBlock>
-                                </Border>
-                            </Grid>
-                        </StackPanel>
+                            <!--  右侧：面板切换图标按钮  -->
+                            <HyperlinkButton
+                                Grid.Column="1"
+                                Command="{x:Bind ViewModel.ToggleKeySwapsEditModeCommand}"
+                                IsEnabled="{x:Bind ViewModel.IsNotReadOnly, Mode=OneWay}"
+                                ToolTipService.ToolTip="切换编辑/查看">
+                                <FontIcon FontSize="12" Glyph="&#xE8ab;" />
+                            </HyperlinkButton>
+                        </Grid>
+                        <!--  折叠帮助区  -->
+                        <Grid
+                            x:Name="HelpDetails"
+                            Grid.Row="1"
+                            Height="0"
+                            Margin="0,0,0,0">
+                            <Border
+                                Padding="10"
+                                Background="{ThemeResource ControlFillColorSecondaryBrush}"
+                                BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+                                BorderThickness="1"
+                                CornerRadius="6">
+                                <TextBlock Style="{ThemeResource CaptionTextBlockStyle}" TextWrapping="WrapWholeWords">
+                                    <Run Text="组合按键用空格分隔，如：VK_CTRL VK_UP" />
+                                    <LineBreak />
+                                    <Run Text="支持多个按键，用逗号分隔。例如：Alt UP,XB_A" />
+                                    <LineBreak />
+                                    <Run Text="系统会自动解析为多个Key/Back行" />
+                                    <LineBreak />
+                                    <Run Text="支持NO_前缀，表示不按某键 例如：NO_VK_CTRL ALT UP" />
+                                    <LineBreak /><LineBreak />
+                                    <Run Text="详细内容请见：" />
+                                    <Hyperlink NavigateUri="https://leotorrez.github.io/modding/docs/key#key-bindings" ToolTipService.ToolTip="点击打开文档">
+                                        <Run Text="按键绑定帮助文档" />
+                                    </Hyperlink>
+                                </TextBlock>
+                            </Border>
+                        </Grid>
                     </Grid>
 
-                    <!--  显示所有 ini 文件的 keyswaps  -->
-                    <ItemsRepeater ItemsSource="{x:Bind ViewModel.IniKeySwapGroups, Mode=OneWay}" VirtualizingStackPanel.VirtualizationMode="Recycling">
-                        <ItemsRepeater.ItemTemplate>
-                            <DataTemplate x:DataType="subViewModels:IniKeySwapGroupVm">
-                                <Border
-                                    Margin="0,0,0,10"
-                                    Padding="16"
-                                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                                    CornerRadius="12">
-                                    <StackPanel>
-                                        <Grid Margin="0,0,0,6">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock
-                                                MaxWidth="300"
-                                                FontWeight="SemiBold"
-                                                Style="{ThemeResource SubtitleTextBlockStyle}"
-                                                Text="{x:Bind IniFileName}"
-                                                TextTrimming="CharacterEllipsis"
-                                                TextWrapping="NoWrap"
-                                                ToolTipService.ToolTip="{x:Bind IniFileName}" />
-                                            <Button
-                                                Grid.Column="1"
-                                                Margin="8,0,0,0"
-                                                Command="{x:Bind OpenIniFileCommand}"
-                                                CommandParameter="{x:Bind IniFileName}"
-                                                ToolTipService.ToolTip="打开配置文件">
-                                                <FontIcon FontSize="14" Glyph="&#xE8A7;" />
-                                            </Button>
-                                        </Grid>
-                                        <TextBlock
-                                            Margin="0,0,0,12"
-                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                            Style="{ThemeResource CaptionTextBlockStyle}"
-                                            Text="配置文件" />
-                                        <ItemsRepeater ItemsSource="{x:Bind KeySwaps, Mode=OneWay}" VirtualizingStackPanel.VirtualizationMode="Recycling">
-                                            <ItemsRepeater.ItemTemplate>
-                                                <DataTemplate x:DataType="subViewModels:ModPaneFieldsKeySwapVm">
-                                                    <!--  节信息区域  -->
-                                                    <Border
-                                                        Margin="0,0,0,10"
-                                                        Padding="12"
-                                                        Background="{ThemeResource ControlFillColorTertiaryBrush}"
-                                                        BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
-                                                        BorderThickness="1"
-                                                        CornerRadius="8">
-                                                        <Grid>
-                                                            <Grid.RowDefinitions>
-                                                                <RowDefinition Height="Auto" />
-                                                                <RowDefinition Height="Auto" />
-                                                                <RowDefinition Height="Auto" />
-                                                            </Grid.RowDefinitions>
+                    <!--  KeySwaps 内容区域  -->
+                    <StackPanel Visibility="{x:Bind ViewModel.HasAnyKeySwap, Mode=OneWay, Converter={StaticResource BoolToVisibleConverter}}">
+                        <!--  紧凑只读视图  -->
+                        <StackPanel Visibility="{x:Bind ViewModel.IsKeySwapsEditMode, Mode=OneWay, Converter={StaticResource BoolInverterToVisibilityConverter}}">
+                            <ItemsRepeater ItemsSource="{x:Bind ViewModel.IniKeySwapGroups, Mode=OneWay}" VirtualizingStackPanel.VirtualizationMode="Recycling">
+                                <ItemsRepeater.ItemTemplate>
+                                    <DataTemplate x:DataType="subViewModels:IniKeySwapGroupVm">
+                                        <Border
+                                            Margin="0,0,0,10"
+                                            Padding="16,6"
+                                            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                            CornerRadius="10">
+                                            <StackPanel>
+                                                <!--  文件头  -->
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock
+                                                        HorizontalAlignment="Left"
+                                                        FontWeight="SemiBold"
+                                                        Style="{ThemeResource SubtitleTextBlockStyle}"
+                                                        Text="{x:Bind IniFileName}"
+                                                        TextTrimming="CharacterEllipsis"
+                                                        TextWrapping="NoWrap"
+                                                        ToolTipService.ToolTip="{x:Bind IniFileName}" />
+                                                    <Button
+                                                        Grid.Column="1"
+                                                        Margin="8,0,0,0"
+                                                        Command="{x:Bind OpenIniFileCommand}"
+                                                        CommandParameter="{x:Bind IniFileName}"
+                                                        ToolTipService.ToolTip="打开配置文件">
+                                                        <FontIcon FontSize="14" Glyph="&#xE8A7;" />
+                                                    </Button>
+                                                </Grid>
 
-                                                            <Grid Grid.Row="0" Margin="0,0,0,8">
-                                                                <Grid.ColumnDefinitions>
-                                                                    <ColumnDefinition Width="*" MinWidth="200" />
-                                                                    <ColumnDefinition Width="Auto" />
-                                                                </Grid.ColumnDefinitions>
-
-                                                                <StackPanel
-                                                                    Grid.Column="0"
-                                                                    HorizontalAlignment="Stretch"
-                                                                    VerticalAlignment="Center"
-                                                                    Orientation="Horizontal">
+                                                <!--  按键列表  -->
+                                                <ItemsRepeater ItemsSource="{x:Bind KeySwaps, Mode=OneWay}" VirtualizingStackPanel.VirtualizationMode="Recycling">
+                                                    <ItemsRepeater.ItemTemplate>
+                                                        <DataTemplate x:DataType="subViewModels:ModPaneFieldsKeySwapVm">
+                                                            <Border
+                                                                Margin="0,4,0,4"
+                                                                Padding="8,6"
+                                                                Background="{ThemeResource ControlFillColorTertiaryBrush}"
+                                                                CornerRadius="6">
+                                                                <Grid>
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="2*" />
+                                                                        <ColumnDefinition Width="5*" />
+                                                                    </Grid.ColumnDefinitions>
+                                                                    <!--  左侧：DisplaySectionName  -->
                                                                     <TextBlock
-                                                                        MaxWidth="150"
+                                                                        Grid.Column="0"
                                                                         VerticalAlignment="Center"
                                                                         FontWeight="SemiBold"
-                                                                        Style="{ThemeResource SubtitleTextBlockStyle}"
                                                                         Text="{x:Bind DisplaySectionName}"
                                                                         TextTrimming="CharacterEllipsis"
                                                                         TextWrapping="NoWrap"
-                                                                        ToolTipService.ToolTip="{x:Bind DisplaySectionName}"
-                                                                        Visibility="{x:Bind IsEditingSectionName, Mode=OneWay, Converter={StaticResource BoolInverterToVisibilityConverter}}" />
-
-                                                                    <TextBox
-                                                                        MinWidth="100"
-                                                                        MaxWidth="200"
-                                                                        FontWeight="SemiBold"
-                                                                        PlaceholderText="输入节名称"
-                                                                        Text="{x:Bind SectionNameForEdit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                                        Visibility="{x:Bind IsEditingSectionName, Mode=OneWay}" />
-
-
-                                                                    <Button
-                                                                        Margin="8,0,0,0"
+                                                                        ToolTipService.ToolTip="{x:Bind DisplaySectionName}" />
+                                                                    <!--  右侧：Forward+Backward  -->
+                                                                    <StackPanel
+                                                                        Grid.Column="1"
+                                                                        HorizontalAlignment="Center"
                                                                         VerticalAlignment="Center"
-                                                                        Command="{x:Bind ToggleEditingSectionNameCommand}"
-                                                                        ToolTipService.ToolTip="编辑节名称">
-                                                                        <FontIcon FontSize="12" Glyph="&#xE70F;" />
-                                                                    </Button>
-                                                                </StackPanel>
+                                                                        Orientation="Horizontal"
+                                                                        Spacing="4">
+                                                                        <Border
+                                                                            Padding="4,2"
+                                                                            Background="{ThemeResource ButtonDisabledForegroundThemeBrush}"
+                                                                            CornerRadius="4"
+                                                                            Visibility="{x:Bind ForwardHotkeyFriendlyText, Converter={StaticResource StringToVisibilityConverter}}">
+                                                                            <TextBlock
+                                                                                Style="{ThemeResource CaptionTextBlockStyle}"
+                                                                                Text="{x:Bind ForwardHotkeyFriendlyText}"
+                                                                                TextTrimming="CharacterEllipsis"
+                                                                                TextWrapping="NoWrap"
+                                                                                ToolTipService.ToolTip="{x:Bind ForwardHotkeyFriendlyText}" />
+                                                                        </Border>
+                                                                        <TextBlock
+                                                                            Margin="2,0"
+                                                                            VerticalAlignment="Center"
+                                                                            Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                                                            Text="⟷"
+                                                                            Visibility="{x:Bind BackwardHotkeyFriendlyText, Converter={StaticResource StringToVisibilityConverter}}" />
+                                                                        <Border
+                                                                            Padding="4,2"
+                                                                            Background="{ThemeResource ButtonDisabledForegroundThemeBrush}"
+                                                                            CornerRadius="4"
+                                                                            Visibility="{x:Bind BackwardHotkeyFriendlyText, Converter={StaticResource StringToVisibilityConverter}}">
+                                                                            <TextBlock
+                                                                                Style="{ThemeResource CaptionTextBlockStyle}"
+                                                                                Text="{x:Bind BackwardHotkeyFriendlyText}"
+                                                                                TextTrimming="CharacterEllipsis"
+                                                                                TextWrapping="NoWrap"
+                                                                                ToolTipService.ToolTip="{x:Bind BackwardHotkeyFriendlyText}" />
+                                                                        </Border>
+                                                                    </StackPanel>
+                                                                </Grid>
+                                                            </Border>
+                                                        </DataTemplate>
+                                                    </ItemsRepeater.ItemTemplate>
+                                                </ItemsRepeater>
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsRepeater.ItemTemplate>
+                            </ItemsRepeater>
+                        </StackPanel>
 
-                                                                <StackPanel
-                                                                    Grid.Column="1"
-                                                                    HorizontalAlignment="Right"
-                                                                    VerticalAlignment="Center"
-                                                                    Orientation="Horizontal"
-                                                                    Visibility="{x:Bind VariationsCountVisibility}">
-                                                                    <TextBlock
-                                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                                        Style="{ThemeResource CaptionTextBlockStyle}"
-                                                                        Text="变体数: "
-                                                                        TextWrapping="NoWrap" />
-                                                                    <TextBlock
-                                                                        Margin="2,-1,0,0"
-                                                                        FontWeight="SemiBold"
-                                                                        Text="{x:Bind VariationsCount}"
-                                                                        TextWrapping="NoWrap" />
-                                                                </StackPanel>
-                                                            </Grid>
+                        <!--  详细编辑视图（原有内容，不再包含提示面板）  -->
+                        <StackPanel Visibility="{x:Bind ViewModel.IsKeySwapsEditMode, Mode=OneWay, Converter={StaticResource BoolToVisibleConverter}}">
+                            <!--  显示所有 ini 文件的 keyswaps  -->
+                            <ItemsRepeater ItemsSource="{x:Bind ViewModel.IniKeySwapGroups, Mode=OneWay}" VirtualizingStackPanel.VirtualizationMode="Recycling">
+                                <ItemsRepeater.ItemTemplate>
+                                    <DataTemplate x:DataType="subViewModels:IniKeySwapGroupVm">
+                                        <Border
+                                            Margin="0,0,0,10"
+                                            Padding="16,6"
+                                            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                            CornerRadius="12">
+                                            <StackPanel>
+                                                <Grid Margin="0,0,0,6">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock
+                                                        HorizontalAlignment="Left"
+                                                        FontWeight="SemiBold"
+                                                        Style="{ThemeResource SubtitleTextBlockStyle}"
+                                                        Text="{x:Bind IniFileName}"
+                                                        TextTrimming="CharacterEllipsis"
+                                                        TextWrapping="NoWrap"
+                                                        ToolTipService.ToolTip="{x:Bind IniFileName}" />
+                                                    <Button
+                                                        Grid.Column="1"
+                                                        Margin="8,0,0,0"
+                                                        Command="{x:Bind OpenIniFileCommand}"
+                                                        CommandParameter="{x:Bind IniFileName}"
+                                                        ToolTipService.ToolTip="打开配置文件">
+                                                        <FontIcon FontSize="14" Glyph="&#xE8A7;" />
+                                                    </Button>
+                                                </Grid>
+                                                <TextBlock
+                                                    Margin="0,0,0,12"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Style="{ThemeResource CaptionTextBlockStyle}"
+                                                    Text="配置文件" />
+                                                <ItemsRepeater ItemsSource="{x:Bind KeySwaps, Mode=OneWay}" VirtualizingStackPanel.VirtualizationMode="Recycling">
+                                                    <ItemsRepeater.ItemTemplate>
+                                                        <DataTemplate x:DataType="subViewModels:ModPaneFieldsKeySwapVm">
+                                                            <!--  节信息区域  -->
+                                                            <Border
+                                                                Margin="0,0,0,10"
+                                                                Padding="12"
+                                                                Background="{ThemeResource ControlFillColorTertiaryBrush}"
+                                                                BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+                                                                BorderThickness="1"
+                                                                CornerRadius="8">
+                                                                <Grid>
+                                                                    <Grid.RowDefinitions>
+                                                                        <RowDefinition Height="Auto" />
+                                                                        <RowDefinition Height="Auto" />
+                                                                        <RowDefinition Height="Auto" />
+                                                                    </Grid.RowDefinitions>
 
-                                                            <!--  前进键区域  -->
-                                                            <StackPanel Grid.Row="1" Margin="0,0,0,8">
-                                                                <TextBlock
-                                                                    Margin="0,0,0,4"
-                                                                    FontWeight="SemiBold"
-                                                                    Style="{ThemeResource CaptionTextBlockStyle}"
-                                                                    Text="前进键" />
+                                                                    <Grid Grid.Row="0" Margin="0,0,0,8">
+                                                                        <Grid.ColumnDefinitions>
+                                                                            <ColumnDefinition Width="*" />
+                                                                            <ColumnDefinition Width="Auto" />
+                                                                        </Grid.ColumnDefinitions>
 
-                                                                <TextBox
-                                                                    MinWidth="200"
-                                                                    FontFamily="Courier New"
-                                                                    Foreground="{ThemeResource TextFillColorPrimaryBrush}"
-                                                                    Text="{x:Bind ForwardHotkey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                                    ToolTipService.ToolTip="{x:Bind ForwardHotkey}" />
+                                                                        <Grid Grid.Column="0">
+                                                                            <Grid.ColumnDefinitions>
+                                                                                <ColumnDefinition Width="*" MinWidth="40" />
+                                                                                <ColumnDefinition Width="Auto" />
+                                                                            </Grid.ColumnDefinitions>
 
-                                                                <TextBlock
-                                                                    Margin="0,4,0,0"
-                                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                                    Style="{ThemeResource CaptionTextBlockStyle}"
-                                                                    Text="{x:Bind ForwardHotkeyFriendlyText, Mode=TwoWay}"
-                                                                    TextTrimming="CharacterEllipsis" />
-                                                            </StackPanel>
+                                                                            <TextBlock
+                                                                                FontWeight="SemiBold"
+                                                                                Style="{ThemeResource SubtitleTextBlockStyle}"
+                                                                                Text="{x:Bind DisplaySectionName}"
+                                                                                TextTrimming="CharacterEllipsis"
+                                                                                TextWrapping="NoWrap"
+                                                                                ToolTipService.ToolTip="{x:Bind DisplaySectionName}"
+                                                                                Visibility="{x:Bind IsEditingSectionName, Mode=OneWay, Converter={StaticResource BoolInverterToVisibilityConverter}}" />
 
-                                                            <!--  后退键区域  -->
-                                                            <StackPanel Grid.Row="2">
-                                                                <TextBlock
-                                                                    Margin="0,0,0,4"
-                                                                    FontWeight="SemiBold"
-                                                                    Style="{ThemeResource CaptionTextBlockStyle}"
-                                                                    Text="后退键" />
+                                                                            <TextBox
+                                                                                Grid.Column="0"
+                                                                                FontWeight="SemiBold"
+                                                                                PlaceholderText="输入节名称"
+                                                                                Text="{x:Bind SectionNameForEdit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                                Visibility="{x:Bind IsEditingSectionName, Mode=OneWay}" />
 
-                                                                <TextBox
-                                                                    MinWidth="200"
-                                                                    FontFamily="Courier New"
-                                                                    Foreground="{ThemeResource TextFillColorPrimaryBrush}"
-                                                                    Text="{x:Bind BackwardHotkey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                                    ToolTipService.ToolTip="{x:Bind BackwardHotkey}" />
 
-                                                                <TextBlock
-                                                                    Margin="0,4,0,0"
-                                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                                    Style="{ThemeResource CaptionTextBlockStyle}"
-                                                                    Text="{x:Bind BackwardHotkeyFriendlyText, Mode=TwoWay}"
-                                                                    TextTrimming="CharacterEllipsis" />
-                                                            </StackPanel>
-                                                        </Grid>
-                                                    </Border>
-                                                </DataTemplate>
-                                            </ItemsRepeater.ItemTemplate>
-                                        </ItemsRepeater>
-                                    </StackPanel>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsRepeater.ItemTemplate>
-                    </ItemsRepeater>
+                                                                            <Button
+                                                                                Grid.Column="1"
+                                                                                Margin="8,0,0,0"
+                                                                                VerticalAlignment="Center"
+                                                                                Command="{x:Bind ToggleEditingSectionNameCommand}"
+                                                                                ToolTipService.ToolTip="编辑节名称">
+                                                                                <FontIcon FontSize="12" Glyph="&#xE70F;" />
+                                                                            </Button>
+                                                                        </Grid>
+
+                                                                        <StackPanel
+                                                                            Grid.Column="1"
+                                                                            Margin="4,0,0,0"
+                                                                            VerticalAlignment="Center"
+                                                                            Orientation="Horizontal"
+                                                                            Visibility="{x:Bind VariationsCountVisibility}">
+                                                                            <TextBlock
+                                                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                                                Style="{ThemeResource CaptionTextBlockStyle}"
+                                                                                Text="变体数: "
+                                                                                TextWrapping="NoWrap" />
+                                                                            <TextBlock
+                                                                                Margin="2,-1,0,0"
+                                                                                FontWeight="SemiBold"
+                                                                                Text="{x:Bind VariationsCount}"
+                                                                                TextWrapping="NoWrap" />
+                                                                        </StackPanel>
+                                                                    </Grid>
+
+                                                                    <!--  前进键区域  -->
+                                                                    <StackPanel Grid.Row="1" Margin="0,0,0,8">
+                                                                        <TextBlock
+                                                                            Margin="0,0,0,4"
+                                                                            FontWeight="SemiBold"
+                                                                            Style="{ThemeResource CaptionTextBlockStyle}"
+                                                                            Text="前进键" />
+
+                                                                        <TextBox
+                                                                            MinWidth="200"
+                                                                            FontFamily="Courier New"
+                                                                            Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                                                            Text="{x:Bind ForwardHotkey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                            ToolTipService.ToolTip="{x:Bind ForwardHotkey}" />
+
+                                                                        <TextBlock
+                                                                            Margin="0,4,0,0"
+                                                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                                            Style="{ThemeResource CaptionTextBlockStyle}"
+                                                                            Text="{x:Bind ForwardHotkeyFriendlyText, Mode=TwoWay}"
+                                                                            TextTrimming="CharacterEllipsis" />
+                                                                    </StackPanel>
+
+                                                                    <!--  后退键区域  -->
+                                                                    <StackPanel Grid.Row="2">
+                                                                        <TextBlock
+                                                                            Margin="0,0,0,4"
+                                                                            FontWeight="SemiBold"
+                                                                            Style="{ThemeResource CaptionTextBlockStyle}"
+                                                                            Text="后退键" />
+
+                                                                        <TextBox
+                                                                            MinWidth="200"
+                                                                            FontFamily="Courier New"
+                                                                            Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                                                            Text="{x:Bind BackwardHotkey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                            ToolTipService.ToolTip="{x:Bind BackwardHotkey}" />
+
+                                                                        <TextBlock
+                                                                            Margin="0,4,0,0"
+                                                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                                            Style="{ThemeResource CaptionTextBlockStyle}"
+                                                                            Text="{x:Bind BackwardHotkeyFriendlyText, Mode=TwoWay}"
+                                                                            TextTrimming="CharacterEllipsis" />
+                                                                    </StackPanel>
+                                                                </Grid>
+                                                            </Border>
+                                                        </DataTemplate>
+                                                    </ItemsRepeater.ItemTemplate>
+                                                </ItemsRepeater>
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsRepeater.ItemTemplate>
+                            </ItemsRepeater>
+                        </StackPanel>
+                    </StackPanel>
                 </StackPanel>
             </ScrollViewer>
         </Grid>

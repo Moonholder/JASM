@@ -16,7 +16,6 @@ using Microsoft.UI.Xaml;
 using Serilog;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
@@ -53,6 +52,11 @@ public sealed partial class ModPaneVM(
 
     [ObservableProperty] private bool _isEditingModName;
 
+    // 紧凑显示/编辑切换
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(KeySwapsModeText))]
+    private bool _isKeySwapsEditMode;
+
     public bool IsNotReadOnly => !IsReadOnly;
 
     private Guid? _loadedModId;
@@ -64,8 +68,7 @@ public sealed partial class ModPaneVM(
     [ObservableProperty] private ModPaneFieldsVm _modModel = new();
 
     // ini keyswaps 分组
-    [ObservableProperty]
-    private ObservableCollection<IniKeySwapGroupVm> _iniKeySwapGroups = [];
+    [ObservableProperty] private ObservableCollection<IniKeySwapGroupVm> _iniKeySwapGroups = [];
 
     // 控制是否显示 DISABLED 前缀的文件
     [ObservableProperty]
@@ -135,7 +138,7 @@ public sealed partial class ModPaneVM(
             if (modSettings is null)
                 return null;
 
-            var keySwapResult = await keySwapService.GetAllKeySwapsAsync(modId);
+            var keySwapResult = await keySwapService.GetAllKeySwapsAsync(modId, ShowDisabledIniFiles);
 
             Dictionary<string, List<KeySwapSection>>? allKeySwaps = null;
 
@@ -173,7 +176,7 @@ public sealed partial class ModPaneVM(
         ModModel.PropertyChanged += ModModel_PropertyChanged;
         _loadedModId = modId;
         IsReadOnly = false;
-
+        IsKeySwapsEditMode = false; // 默认进入紧凑展示模式
         //填充 ini keyswaps 分组
         UpdateIniKeySwapGroups(modPaneData.allKeySwaps);
     }
@@ -188,15 +191,6 @@ public sealed partial class ModPaneVM(
 
         foreach (var kv in allKeySwaps)
         {
-            // 过滤 DISABLED 前缀的文件
-            var fileName = Path.GetFileName(kv.Key);
-            var folderName = Path.GetDirectoryName(kv.Key);
-            var shouldSkip = !ShowDisabledIniFiles &&
-                (fileName.StartsWith("DISABLED", StringComparison.OrdinalIgnoreCase) ||
-                 folderName?.StartsWith("DISABLED", StringComparison.OrdinalIgnoreCase) == true);
-
-            if (shouldSkip) continue;
-
             var group = new IniKeySwapGroupVm
             {
                 IniFileName = kv.Key,
@@ -355,6 +349,7 @@ public sealed partial class ModPaneVM(
     private bool DefaultCanExecute => IsModLoaded && IsNotReadOnly && BusySetter.IsNotHardBusy;
 
     #region Commands
+
     private bool CanPickImageUri() => DefaultCanExecute;
 
     [RelayCommand(CanExecute = nameof(CanPickImageUri))]
@@ -482,8 +477,8 @@ public sealed partial class ModPaneVM(
         get
         {
             return IniKeySwapGroups.All(g =>
-                 g.KeySwaps.All(k =>
-                     k.IsValid && k.SectionNameEditValid));
+                g.KeySwaps.All(k =>
+                    k is { IsValid: true, SectionNameEditValid: true }));
         }
     }
 
@@ -494,8 +489,8 @@ public sealed partial class ModPaneVM(
     }
 
     public bool CanSaveModSettings => DefaultCanExecute &&
-                        (ModModel.AnyChanges || HasKeySwapChanges()) &&
-                        AreAllKeySwapsValid;
+                                      (ModModel.AnyChanges || HasKeySwapChanges()) &&
+                                      AreAllKeySwapsValid;
 
     private void NotifyCanSaveModSettingsChanged()
     {
@@ -554,23 +549,12 @@ public sealed partial class ModPaneVM(
                             var backwardKeys = new List<string>();
                             if (!string.IsNullOrWhiteSpace(keySwap.ForwardHotkey))
                             {
-                                // 按逗号分割，但保持空格分隔的组合按键
-                                var commaParts = keySwap.ForwardHotkey.Split([','], StringSplitOptions.RemoveEmptyEntries)
-                                    .Select(p => p.Trim())
-                                    .Where(p => !string.IsNullOrEmpty(p))
-                                    .ToList();
-
-                                forwardKeys.AddRange(commaParts);
+                                forwardKeys.AddRange(ParseKeyString(keySwap.ForwardHotkey));
                             }
 
                             if (!string.IsNullOrWhiteSpace(keySwap.BackwardHotkey))
                             {
-                                var commaParts = keySwap.BackwardHotkey.Split([','], StringSplitOptions.RemoveEmptyEntries)
-                                    .Select(p => p.Trim())
-                                    .Where(p => !string.IsNullOrEmpty(p))
-                                    .ToList();
-
-                                backwardKeys.AddRange(commaParts);
+                                backwardKeys.AddRange(ParseKeyString(keySwap.BackwardHotkey));
                             }
 
                             list.Add(new KeySwapSection
@@ -593,7 +577,7 @@ public sealed partial class ModPaneVM(
                         _notificationService.ShowNotification(notification.Title, notification.Message, notification.Duration);
                     }
                 }
-            });
+            }, _cancellationToken);
 
             // 刷新视图
             Messenger.Send(new ModChangedMessage(this, _loadedMod, null));
@@ -620,6 +604,16 @@ public sealed partial class ModPaneVM(
     private void ToggleEditingModName()
     {
         IsEditingModName = !IsEditingModName;
+    }
+
+    public string KeySwapsModeText => IsKeySwapsEditMode ? "完成编辑" : "编辑键位";
+
+    private bool CanToggleKeySwapsEditMode() => IsNotReadOnly;
+
+    [RelayCommand(CanExecute = nameof(CanToggleKeySwapsEditMode))]
+    private void ToggleKeySwapsEditMode()
+    {
+        IsKeySwapsEditMode = !IsKeySwapsEditMode;
     }
 
     [RelayCommand]
@@ -687,6 +681,7 @@ public sealed partial class ModPaneVM(
     }
 
     #endregion
+
     private async Task CommandWrapper(Func<Task> command, bool hardBusy = false, Action<Exception>? uncaughtErrorHandler = null,
         bool useDefaultExceptionHandler = false, [CallerMemberName] string commandName = "")
     {
@@ -759,6 +754,53 @@ public sealed partial class ModPaneVM(
     }
 
     public bool HasAnyKeySwap => IniKeySwapGroups?.Any(g => g.KeySwaps.Count > 0) == true;
+
+    private static List<string> ParseKeyString(string value)
+    {
+        var result = new List<string>();
+
+        if (string.IsNullOrWhiteSpace(value))
+            return result;
+
+        var keyText = value.Trim();
+
+        // 使用正则分割"作为分隔符的逗号"（仅前面是非逗号且无空格的逗号）
+        var parts = VirtualKeyToFriendlyTextConverter.SeparatorCommaRegex.Split(keyText)
+            .Select(p => p.Trim())
+            .Where(p => !string.IsNullOrEmpty(p)) // 过滤空项，但保留含逗号的有效部分
+            .ToList();
+
+        foreach (var part in parts)
+        {
+            // 检查是否是 "num X" 格式（如"num 0"到"num 9"）
+            if (VirtualKeyToFriendlyTextConverter.IsNumFormat(part))
+            {
+                result.Add(part);
+            }
+            // 组合按键（含空格分隔，包括包含逗号key的组合）
+            else if (part.Contains(' '))
+            {
+                // 仅分割空格并过滤空项，不再过滤NO_前缀
+                var validSubParts = part.Split([' '], StringSplitOptions.RemoveEmptyEntries)
+                    .Select(p => p.Trim())
+                    .Where(p => !string.IsNullOrEmpty(p))
+                    .ToList();
+
+                if (validSubParts.Count > 0)
+                {
+                    // 重组有效组合键（保留空格分隔）
+                    result.Add(string.Join(" ", validSubParts));
+                }
+            }
+            // 单个按键（包括逗号key）
+            else
+            {
+                result.Add(part);
+            }
+        }
+
+        return result;
+    }
 }
 
 public partial class ModPaneFieldsVm : ObservableObject
@@ -892,10 +934,9 @@ public partial class ModPaneFieldsVm : ObservableObject
 
 // ini keyswap 分组 ViewModel
 public partial class IniKeySwapGroupVm
- : ObservableObject
+    : ObservableObject
 {
-    [ObservableProperty]
-    private string _iniFileName = string.Empty;
+    [ObservableProperty] private string _iniFileName = string.Empty;
 
     public ObservableCollection<ModPaneFieldsKeySwapVm> KeySwaps { get; } = [];
 
@@ -905,14 +946,10 @@ public partial class IniKeySwapGroupVm
     // 模组路径属性
     public string? ModPath { get; set; }
 
-    public Func<Func<Task>, bool, Action<Exception>?, bool, string> CommandWrapper;
-
-
     // 打开ini文件的命令
     [RelayCommand]
     private async Task OpenIniFileAsync()
     {
-
         try
         {
             if (string.IsNullOrWhiteSpace(IniFileName) || string.IsNullOrWhiteSpace(ModPath))
@@ -944,10 +981,10 @@ public partial class IniKeySwapGroupVm
                 return true;
 
             return KeySwaps.Zip(UnchangedValue.KeySwaps, (newKs, oldKs) =>
-                (newKs.ForwardHotkey ?? "") != (oldKs.ForwardHotkey ?? "") ||
-                (newKs.BackwardHotkey ?? "") != (oldKs.BackwardHotkey ?? "") ||
-                (newKs.SectionKey ?? "") != (oldKs.SectionKey ?? ""))
-            .Any(changed => changed);
+                    (newKs.ForwardHotkey ?? "") != (oldKs.ForwardHotkey ?? "") ||
+                    (newKs.BackwardHotkey ?? "") != (oldKs.BackwardHotkey ?? "") ||
+                    (newKs.SectionKey ?? "") != (oldKs.SectionKey ?? ""))
+                .Any(changed => changed);
         }
     }
 }
@@ -970,11 +1007,9 @@ public partial class ModPaneFieldsKeySwapVm : ObservableObject
     public ModPaneFieldsKeySwapVm? UnchangedValue { get; set; }
 
     // 添加友好文本属性
-    [ObservableProperty]
-    private string? _forwardHotkeyFriendlyText;
+    [ObservableProperty] private string? _forwardHotkeyFriendlyText;
 
-    [ObservableProperty]
-    private string? _backwardHotkeyFriendlyText;
+    [ObservableProperty] private string? _backwardHotkeyFriendlyText;
 
     [RelayCommand]
     private void ToggleEditingSectionName()
@@ -984,7 +1019,7 @@ public partial class ModPaneFieldsKeySwapVm : ObservableObject
 
     // 编辑用属性：去掉前缀和方括号
     public bool SectionNameEditValid => !string.IsNullOrWhiteSpace(SectionNameForEdit?.Trim()) &&
-                                       !SectionNameForEdit.Contains(' ');
+                                        !SectionNameForEdit.Contains(' ');
 
     public bool ForwardHotkeyValid => !string.IsNullOrWhiteSpace(ForwardHotkey?.Trim());
     public bool BackwardHotkeyValid => !string.IsNullOrWhiteSpace(BackwardHotkey?.Trim());
@@ -1001,6 +1036,7 @@ public partial class ModPaneFieldsKeySwapVm : ObservableObject
             return $"[{displayContent}]";
         }
     }
+
     public string SectionNameForEdit
     {
         get
@@ -1035,10 +1071,11 @@ public partial class ModPaneFieldsKeySwapVm : ObservableObject
                 OnPropertyChanged(nameof(IsValid));
             }
         }
-
     }
 
-    public Visibility VariationsCountVisibility => Type?.Equals("cycle", StringComparison.OrdinalIgnoreCase) == true ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility VariationsCountVisibility =>
+        Type?.Equals("cycle", StringComparison.OrdinalIgnoreCase) == true ? Visibility.Visible : Visibility.Collapsed;
+
     private static string RemoveKeyPrefixes(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
