@@ -626,8 +626,8 @@
     "Keys": [
       "Augusta"
     ],
-    "ReleaseDate": "2026-01-01T00:00:00",
-    "Image": "Augusta.webp",
+    "ReleaseDate": "2025-08-28T00:00:00",
+    "Image": "Augusta.png",
     "Rarity": 5,
     "Element": "Electro",
     "Class": "Broadblade",
@@ -643,8 +643,8 @@
     "Keys": [
       "Iuno"
     ],
-    "ReleaseDate": "2026-01-02T00:00:00",
-    "Image": "Iuno.webp",
+    "ReleaseDate": "2025-08-28T00:00:00",
+    "Image": "Iuno.png",
     "Rarity": 5,
     "Element": "Aero",
     "Class": "Gauntlets",
@@ -661,7 +661,7 @@
       "Qiuyuan"
     ],
     "ReleaseDate": "2026-01-04T00:00:00",
-    "Image": "Qiuyuan.webp",
+    "Image": "Qiuyuan.png",
     "Rarity": 5,
     "Element": "Unknown",
     "Class": "Unknown",
@@ -678,7 +678,7 @@
       "Chisa"
     ],
     "ReleaseDate": "2026-01-05T00:00:00",
-    "Image": "Chisa.webp",
+    "Image": "Chisa.png",
     "Rarity": 5,
     "Element": "Unknown",
     "Class": "Unknown",
@@ -695,7 +695,7 @@
       "Galbrena"
     ],
     "ReleaseDate": "2026-01-06T00:00:00",
-    "Image": "Galbrena.webp",
+    "Image": "Galbrena.png",
     "Rarity": 5,
     "Element": "Fusion",
     "Class": "Pistols",

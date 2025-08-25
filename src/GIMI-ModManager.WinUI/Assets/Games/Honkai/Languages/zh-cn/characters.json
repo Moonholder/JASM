@@ -161,6 +161,10 @@
     "DisplayName": "丹恒•饮月"
   },
   {
+    "InternalName": "Dan Heng PT",
+    "DisplayName": "丹恒•腾荒"
+  },
+  {
     "Keys": [
       "fu xuan"
     ],
@@ -854,19 +858,12 @@
     "DisplayName": "波提欧"
   },
   {
-    "Keys": [
-      "firefly"
+    "InGameSkins": [
+      {
+        "InternalName": "FireflySpringMissive",
+        "DisplayName": "春日手信"
+      }
     ],
-    "ReleaseDate": "2024-06-18T00:00:00",
-    "Image": "firefly.png",
-    "Rarity": 5,
-    "Element": "Fire",
-    "Class": "Destruction",
-    "Region": [
-      "Penacony"
-    ],
-    "ModFilesName": "Firefly",
-    "InGameSkins": [],
     "InternalName": "Firefly",
     "DisplayName": "流萤"
   },
@@ -1101,5 +1098,9 @@
   {
     "InternalName": "Hysilens",
     "DisplayName": "海瑟音"
+  },
+  {
+    "InternalName": "Evernight",
+    "DisplayName": "长夜月"
   }
 ]

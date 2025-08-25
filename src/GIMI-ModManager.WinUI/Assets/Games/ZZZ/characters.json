@@ -783,7 +783,7 @@
       "Orphie"
     ],
     "ReleaseDate": "2025-09-06T00:00:00",
-    "Image": "Orphie.png",
+    "Image": "OrphieMagnusson.png",
     "Rarity": 5,
     "Element": "Fire",
     "Class": "Attack",
@@ -794,5 +794,57 @@
     "InGameSkins": [],
     "InternalName": "Orphie",
     "DisplayName": "Orphie"
+  },
+  {
+    "Keys": [
+      "Komano",
+      "Manato"
+    ],
+    "ReleaseDate": "2026-01-01T00:00:00",
+    "Image": "KomanoManato.webp",
+    "Rarity": 5,
+    "Element": "Fire",
+    "Class": "Rupture",
+    "Region": [
+      "Spook Shack"
+    ],
+    "ModFilesName": "KomanoManato",
+    "InGameSkins": [],
+    "InternalName": "KomanoManato",
+    "DisplayName": "Komano Manato"
+  },
+  {
+    "Keys": [
+      "Lucia"
+    ],
+    "ReleaseDate": "2026-01-01T00:00:00",
+    "Image": "Lucia.webp",
+    "Rarity": 5,
+    "Element": "Ether",
+    "Class": "Support",
+    "Region": [
+      "Spook Shack"
+    ],
+    "ModFilesName": "Lucia",
+    "InGameSkins": [],
+    "InternalName": "Lucia",
+    "DisplayName": "Lucia"
+  },
+  {
+    "Keys": [
+      "Yidhari"
+    ],
+    "ReleaseDate": "2026-01-01T00:00:00",
+    "Image": "Yidhari.webp",
+    "Rarity": 5,
+    "Element": "Ice",
+    "Class": "Rupture",
+    "Region": [
+      "Spook Shack"
+    ],
+    "ModFilesName": "Yidhari",
+    "InGameSkins": [],
+    "InternalName": "Yidhari",
+    "DisplayName": "Yidhari"
   }
 ]

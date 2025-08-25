@@ -57,7 +57,13 @@
   },
   {
     "InternalName": "Bennett",
-    "DisplayName": "班尼特"
+    "DisplayName": "班尼特",
+    "InGameSkins": [
+      {
+        "InternalName": "Bennett Adventures in Blazing Hue",
+        "DisplayName": "炽绘奇旅"
+      }
+    ]
   },
   {
     "InternalName": "Candace",
@@ -417,7 +423,15 @@
   },
   {
     "InternalName": "Yelan",
-    "DisplayName": "夜兰"
+    "DisplayName": "夜兰",
+    "InGameSkins": [
+      {
+        "ModFilesName": "YelanTranquil",
+        "Image": "YelanTranquilBanquet.png",
+        "InternalName": "Yelan Tranquil Banquet",
+        "DisplayName": "静暇雅宴"
+      }
+    ]
   },
   {
     "InternalName": "Yoimiya",
@@ -665,5 +679,17 @@
   {
     "InternalName": "Ineffa",
     "DisplayName": "伊涅芙"
+  },
+  {
+    "InternalName": "Aino",
+    "DisplayName": "爱诺"
+  },
+  {
+    "InternalName": "Flins",
+    "DisplayName": "菲林斯"
+  },
+  {
+    "InternalName": "Lauma",
+    "DisplayName": "菈乌玛"
   }
 ]
