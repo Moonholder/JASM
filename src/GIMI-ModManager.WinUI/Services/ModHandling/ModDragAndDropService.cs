@@ -151,12 +151,15 @@ public class ModDragAndDropService
     private async Task<DragAndDropScanResult> ShowPasswordInputDialogAsync(DragAndDropScanner scanner, string filePath)
     {
         var tcs = new TaskCompletionSource<DragAndDropScanResult>();
-        var passwordDialog = new PasswordInputDialog(tcs, scanner, filePath, _notificationManager)
-        {
-            RequestedTheme = _themeSelectorService.Theme
-        };
 
-        await passwordDialog.ShowAsync();
+        App.MainWindow.DispatcherQueue.TryEnqueue(() =>
+        {
+            var passwordDialog = new PasswordInputDialog(tcs, scanner, filePath, _notificationManager)
+            {
+                RequestedTheme = _themeSelectorService.Theme
+            };
+            passwordDialog.ShowAsync();
+        });
 
         return await tcs.Task;
     }

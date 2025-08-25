@@ -159,7 +159,7 @@ public partial class CharacterDetailsViewModel
                 var result = await Task.Run(async () =>
                 {
                     var installMonitor = await _modDragAndDropService.AddStorageItemFoldersAsync(_modList,
-                        new ReadOnlyCollection<IStorageItem>([folder])).ConfigureAwait(false);
+                        new ReadOnlyCollection<IStorageItem>([folder]), SelectedSkin).ConfigureAwait(false);
 
                     if (installMonitor is not null)
                         return await installMonitor.WaitForCloseAsync().ConfigureAwait(false);
@@ -200,16 +200,18 @@ public partial class CharacterDetailsViewModel
             try
             {
                 IsAddingModFolder = true;
-                var installMonitor = await _modDragAndDropService.AddStorageItemFoldersAsync(_modList, [file]).ConfigureAwait(false);
-
-                if (installMonitor is not null)
-                {
-                    var result = await installMonitor.WaitForCloseAsync().ConfigureAwait(false);
-                    if (result?.CloseReason == CloseRequestedArgs.CloseReasons.Success)
+                var result = await Task.Run(async () =>
                     {
-                        await ModGridVM.ReloadAllModsAsync();
-                    }
-                }
+                        var installMonitor = await _modDragAndDropService.AddStorageItemFoldersAsync(_modList, [file], SelectedSkin).ConfigureAwait(false);
+
+                        if (installMonitor is not null)
+                            return await installMonitor.WaitForCloseAsync().ConfigureAwait(false);
+                        return null;
+                    },
+                    CancellationToken.None);
+
+                if (result?.CloseReason == CloseRequestedArgs.CloseReasons.Success)
+                    await ModGridVM.ReloadAllModsAsync();
 
             }
             catch (Exception e)
@@ -278,18 +280,21 @@ public partial class CharacterDetailsViewModel
                     var items = await package.GetStorageItemsAsync();
                     if (items is null || items.Count == 0) return;
                     IsAddingModFolder = true;
-                    var installMonitor = await _modDragAndDropService.AddStorageItemFoldersAsync(_modList, items).ConfigureAwait(false);
-
-                    if (installMonitor is not null)
+                    var result = await Task.Run(async () =>
                     {
-                        var result = await installMonitor.WaitForCloseAsync().ConfigureAwait(false);
-                        if (result?.CloseReason == CloseRequestedArgs.CloseReasons.Success)
-                        {
-                            DispatcherQueue.TryEnqueue(async () =>
-                            {
-                                await ModGridVM.ReloadAllModsAsync();
-                            });
-                        }
+                        var installMonitor = await _modDragAndDropService.AddStorageItemFoldersAsync(_modList, items, SelectedSkin).ConfigureAwait(false);
+                        if (installMonitor is not null)
+                            return await installMonitor.WaitForCloseAsync().ConfigureAwait(false);
+                        return null;
+                    }, CancellationToken.None);
+
+
+                    if (result?.CloseReason == CloseRequestedArgs.CloseReasons.Success)
+                    {
+                        // DispatcherQueue.TryEnqueue(async () =>
+                        // {
+                        await ModGridVM.ReloadAllModsAsync();
+                        // });
                     }
                 }
                 catch (Exception e)

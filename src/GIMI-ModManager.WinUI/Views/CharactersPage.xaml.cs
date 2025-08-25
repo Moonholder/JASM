@@ -8,6 +8,7 @@ using GIMI_ModManager.WinUI.ViewModels.SubVms;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Navigation;
 using Serilog;
 
 namespace GIMI_ModManager.WinUI.Views;
@@ -26,6 +27,14 @@ public sealed partial class CharactersPage : Page
             ViewModel.SimpleSelectProcessDialogVM.Dialog = SelectProcessDialog;
         };
         ViewModel.OnScrollToCharacter += ViewModel_OnScrollToCharacter;
+    }
+
+    protected override void OnNavigatedFrom(NavigationEventArgs e)
+    {
+        base.OnNavigatedFrom(e);
+        ViewModel.OnScrollToCharacter -= ViewModel_OnScrollToCharacter;
+        ViewModel.SimpleSelectProcessDialogVM.Dialog = null;
+        CharactersGridView.ItemsSource = null;
     }
 
     private async void ViewModel_OnScrollToCharacter(object? sender, ScrollToCharacterArgs e)

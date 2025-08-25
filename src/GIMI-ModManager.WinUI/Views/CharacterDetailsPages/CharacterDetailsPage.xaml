@@ -224,8 +224,8 @@
                                     <ToggleMenuFlyoutItem
                                         Command="{x:Bind ViewModel.ToggleSingleSelectCommand}"
                                         IsChecked="{x:Bind ViewModel.IsSingleSelectEnabled, Mode=OneWay}"
-                                        Text="只启用一个模组"
-                                        ToolTipService.ToolTip="选择此选项将只允许一次启用一个模组." />
+                                        Text="单选模式"
+                                        ToolTipService.ToolTip="选择此项后，只允许同时启用一个模组，同时禁用多选模式" />
                                     <ToggleMenuFlyoutItem
                                         Command="{x:Bind ViewModel.ToggleHideModFolderColumnCommand}"
                                         IsChecked="{x:Bind ViewModel.IsModFolderNameColumnVisible, Mode=OneWay}"

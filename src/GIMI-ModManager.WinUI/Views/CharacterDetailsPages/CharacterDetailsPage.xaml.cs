@@ -93,12 +93,25 @@ public sealed partial class CharacterDetailsPage : Page
     protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
     {
         base.OnNavigatingFrom(e);
+        ViewModel.OnModObjectLoaded -= OnModObjectLoaded;
+        ViewModel.OnModsLoaded -= OnModsLoaded;
+        ViewModel.OnInitializingFinished -= OnInitializingFinished;
+        if (ModGrid?.ViewModel is not null)
+        {
+            ModGrid.ViewModel.OnModsReloaded -= OnModsReloaded;
+        }
+        ViewModel.ContextMenuVM.CloseFlyout -= ContextMenuVM_CloseFlyout;
+
         if (e.NavigationMode == NavigationMode.Back)
         {
             var navigationService = App.GetService<INavigationService>();
             if (ViewModel.ShownModObject != null!)
                 navigationService.SetListDataItemForNextConnectedAnimation(ViewModel.ShownModObject);
         }
+
+        ModGrid.ViewModel = null!;
+        ModPane.ViewModel = null!;
+        CharacterCard.ViewModel = null!;
     }
 
 
