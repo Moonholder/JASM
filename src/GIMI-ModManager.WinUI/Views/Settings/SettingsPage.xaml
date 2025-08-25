@@ -212,7 +212,7 @@
                             <TextBlock
                                 VerticalAlignment="Center"
                                 Style="{ThemeResource BodyTextBlockStyle}"
-                                Text="{x:Bind ViewModel.ElevatorService.ElevatorStatus, Mode=OneWay}" />
+                                Text="{x:Bind ViewModel.ElevatorService.ElevatorStatusText, Mode=OneWay}" />
                         </Border>
                     </StackPanel>
 
@@ -220,6 +220,7 @@
                         Margin="0,4,0,0"
                         Command="{x:Bind ViewModel.StartElevatorCommand}"
                         Content="Start Elevator Process..."
+                        IsEnabled="{x:Bind ViewModel.ElevatorService.CanStartElevator, Mode=OneWay}"
                         l:Uids.Uid="/Settings/StartElevatorButton" />
                 </StackPanel>
 

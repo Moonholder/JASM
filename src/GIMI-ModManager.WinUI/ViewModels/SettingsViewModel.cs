@@ -479,7 +479,7 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
             }
             catch (Win32Exception e)
             {
-                _notificationManager.ShowNotification("无法启动提权进程", e.Message, TimeSpan.FromSeconds(10));
+                _notificationManager.ShowNotification("无法启动Elevator进程", e.Message, TimeSpan.FromSeconds(10));
                 _showElevatorStartDialog = true;
             }
     }

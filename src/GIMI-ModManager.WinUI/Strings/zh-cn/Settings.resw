@@ -125,10 +125,10 @@
 是否要更改语言？</value>
   </data>
   <data name="ElevatorSectionHeader.Text" xml:space="preserve">
-    <value>同步进程</value>
+    <value>Elevator 进程</value>
   </data>
   <data name="ElevatorStatusTitle.Text" xml:space="preserve">
-    <value>同步状态</value>
+    <value>同步状态:</value>
   </data>
   <data name="FolderSectionHeader.Text" xml:space="preserve">
     <value>文件夹</value>
@@ -140,7 +140,7 @@
     <value>游戏</value>
   </data>
   <data name="GameSelectorTitle.Text" xml:space="preserve">
-    <value>JASM 支持原神和崩坏星铁道</value>
+    <value>JASM 支持【原神,崩铁,鸣潮,绝区零】</value>
   </data>
   <data name="LanguageSelectionSectionHeader.Text" xml:space="preserve">
     <value>语言</value>
@@ -169,21 +169,23 @@
     <value>修改更新检查</value>
   </data>
   <data name="StartElevatorButton.Content" xml:space="preserve">
-    <value>开始同步进程</value>
+    <value>启动 Elevator</value>
   </data>
   <data name="StartElevatorDialogDontShowContent" xml:space="preserve">
     <value>不再显示此消息</value>
   </data>
   <data name="StartElevatorDialogText" xml:space="preserve">
-    <value>点击“开始”按钮启动同步进程。同步是一种管理进程，用于与3DMigoto和游戏通信。
+    <value>按下开始以启动 Elevator。Elevator 是一个提升权限（管理员）进程，用于与游戏进程通信。
 
-同步进程运行时，您可以在应用程序中按F10键更新游戏中的活动修改。
+当 Elevator 处于活动状态时，你可以在本应用中按 F10 来刷新游戏中正在运行的模组。
 
-启用或禁用修改也会自动更新游戏中的3DMigoto工作。同步进程应在关闭程序后自动完成。
+关闭本程序时，Elevator 进程应会自动关闭。
 
 按下“开始”按钮后，将出现用户帐户控制（UAC）请求，以管理员身份进行授权。
 
-（要求游戏和3Dmigoto已启动，按F10）</value>
+（要求游戏和3Dmigoto已启动，按F10）
+
+查看 JASM github 上的 FAQ 以单独下载它，因为它会被标记为恶意软件。</value>
   </data>
   <data name="StartElevatorDialogTitle" xml:space="preserve">
     <value>启动同步进程？</value>

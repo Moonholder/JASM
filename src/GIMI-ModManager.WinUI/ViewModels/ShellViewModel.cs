@@ -107,8 +107,8 @@ public partial class ShellViewModel : ObservableRecipient
 
         if (ElevatorService.ElevatorStatus == ElevatorStatus.NotRunning)
         {
-            NotificationManager.ShowNotification("Elevator is not running",
-                "Please start the Elevator first in the Settings page",
+            NotificationManager.ShowNotification("Elevator未启动",
+                "请先在设置页面启动Elevator",
                 TimeSpan.FromSeconds(5));
         }
         else

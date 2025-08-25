@@ -65,11 +65,25 @@ internal class Program
             Console.WriteLine("Connected!");
             Console.WriteLine("----------------------");
 
-
             using var reader = new StreamReader(pipeServer);
             var command = reader.ReadLine();
             Console.WriteLine("Received command: " + command);
             Console.WriteLine("From user: " + pipeServer.GetImpersonationUserName());
+
+            // 支持命令格式 0:Genshin 0:Honkai 0:WuWa 0:ZZZ
+            if (command != null && command.StartsWith("0"))
+            {
+                var game = "Genshin";
+                if (command.Contains(":"))
+                {
+                    var parts = command.Split(':');
+                    if (parts.Length > 1)
+                        game = parts[1].Trim();
+                }
+                Console.WriteLine($"Refreshing {game} Mods");
+                RefreshGameMods(game);
+                continue;
+            }
 
             switch (command)
             {
@@ -79,11 +93,6 @@ internal class Program
                     Console.WriteLine("Exiting");
                     Environment.Exit(0);
                     return;
-                case "0":
-                    Console.WriteLine("Refreshing Genshin Mods");
-                    RefreshGenshinMods();
-                    break;
-
                 default:
                     Console.Error.WriteLine($"Unknown command: {command}");
                     break;
@@ -95,12 +104,35 @@ internal class Program
     static extern int SetForegroundWindow(IntPtr point);
 
 
-    static void RefreshGenshinMods()
+    static void RefreshGameMods(string game)
     {
-        var ptr = GetGenshinProcess();
+        // 支持的游戏及其进程名
+        var gameProcessMap = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)
+        {
+            { "Genshin", new[] { "GenshinImpact", "YuanShen" } },
+            { "Honkai", new[] { "StarRail" } },
+            { "WuWa", new[] { "Client-Win64-Shipping" } },
+            { "ZZZ", new[] { "ZenlessZoneZero" } }
+        };
 
-        if (ptr == null) return;
+        if (!gameProcessMap.TryGetValue(game, out var processNames))
+        {
+            Console.Error.WriteLine($"Unknown game: {game}");
+            return;
+        }
 
+        IntPtr? ptr = null;
+        foreach (var processName in processNames)
+        {
+            ptr = GetGameProcess(processName, true);
+            if (ptr != null) break;
+        }
+
+        if (ptr == null)
+        {
+            Console.Error.WriteLine($"Game process for {game} not found (tried: {string.Join(", ", processNames)}).");
+            return;
+        }
 
         _ = SetForegroundWindow(ptr.Value);
 
@@ -111,30 +143,36 @@ internal class Program
             .Sleep(100);
     }
 
-
-    static IntPtr? GetGenshinProcess()
+    static IntPtr? GetGameProcess(string processName, bool silent = false)
     {
-        var processes = Process.GetProcessesByName("GenshinImpact");
+        var processes = Process.GetProcessesByName(processName);
 
-        foreach (var process in processes)
+        if (processes.Length == 0)
         {
-            Console.WriteLine("Title: " + process.MainWindowTitle);
+            if (!silent)
+            {
+                Console.Error.WriteLine($"{processName} process not found");
+            }
+            return null;
         }
 
         if (processes.Length > 1)
         {
-            Console.Error.WriteLine("Multiple GenshinImpact.exe processes found");
-            return null;
+            Console.Error.WriteLine($"Multiple {processName} processes found");
         }
 
-        var ptr = processes.FirstOrDefault()?.MainWindowHandle;
-        if (ptr == IntPtr.Zero)
+        var process = processes.FirstOrDefault(p => p.MainWindowHandle != IntPtr.Zero);
+
+        if (process == null)
         {
-            Console.Error.WriteLine("GenshinImpact.exe process not found");
+            if (!silent)
+            {
+                Console.Error.WriteLine($"{processName} process found, but main window handle is not available.");
+            }
             return null;
         }
 
-        return ptr;
+        return process.MainWindowHandle;
     }
 }
 

@@ -1,25 +1,49 @@
-﻿using System.Diagnostics;
-using System.IO.Pipes;
-using System.Security.Principal;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.WinUI.UI.Controls;
 using CommunityToolkitWrapper;
 using GIMI_ModManager.Core.Contracts.Services;
+using GIMI_ModManager.Core.GamesService;
 using GIMI_ModManager.Core.Helpers;
 using Microsoft.UI.Xaml;
 using Serilog;
+using System.Diagnostics;
+using System.IO.Pipes;
+using System.Security.Principal;
 
 namespace GIMI_ModManager.WinUI.Services;
 
 public partial class ElevatorService : ObservableRecipient
 {
     private readonly ISkinManagerService _skinManagerService;
+    private readonly IGameService _gameService;
     public const string ElevatorPipeName = "MyPipess";
     public const string ElevatorProcessName = "Elevator.exe";
     private readonly ILogger _logger;
     private Task? _refreshTask;
     private readonly object _refreshLock = new();
 
-    [ObservableProperty] private ElevatorStatus _elevatorStatus = ElevatorStatus.NotRunning;
+    private ElevatorStatus _elevatorStatus = ElevatorStatus.NotRunning;
+
+    public ElevatorStatus ElevatorStatus
+    {
+        get => _elevatorStatus;
+        set
+        {
+            if (SetProperty(ref _elevatorStatus, value))
+            {
+                OnPropertyChanged(nameof(ElevatorStatusText));
+            }
+        }
+    }
+
+    public string ElevatorStatusText => ElevatorStatus switch
+    {
+        ElevatorStatus.InitializingFailed => "初始化失败",
+        ElevatorStatus.NotRunning => "未运行",
+        ElevatorStatus.Running => "运行中",
+        _ => "未知"
+    };
+
     [ObservableProperty] private bool _canStartElevator;
     private Process? _elevatorProcess;
 
@@ -29,9 +53,10 @@ public partial class ElevatorService : ObservableRecipient
 
     private bool _IsInitialized;
 
-    public ElevatorService(ILogger logger, ISkinManagerService skinManagerService)
+    public ElevatorService(ILogger logger, ISkinManagerService skinManagerService, IGameService gameService)
     {
         _skinManagerService = skinManagerService;
+        _gameService = gameService;
         _logger = logger.ForContext<ElevatorService>();
     }
 
@@ -44,6 +69,12 @@ public partial class ElevatorService : ObservableRecipient
         {
             _logger.Debug(ElevatorProcessName + " found at: " + elevatorPath);
             App.MainWindow.DispatcherQueue.TryEnqueue(() => CanStartElevator = true);
+            if (!_exitHandlerRegistered)
+            {
+                App.MainWindow.Closed += MainWindowExitHandler;
+                _exitHandlerRegistered = true;
+            }
+
             _IsInitialized = true;
             return;
         }
@@ -56,10 +87,13 @@ public partial class ElevatorService : ObservableRecipient
 
     public bool StartElevator()
     {
-        if (_elevatorProcess is { HasExited: false })
+        var running = AttachToExistingElevatorProcess();
+        if (running)
         {
-            _logger.Information("Elevator.exe is already running");
-            return false;
+            _logger.Information("Attached to existing Elevator.exe process");
+            App.MainWindow.DispatcherQueue.TryEnqueue(() => ElevatorStatus = ElevatorStatus.Running);
+            App.MainWindow.DispatcherQueue.TryEnqueue(() => CanStartElevator = false);
+            return true;
         }
 
         var currentUser = WindowsIdentity.GetCurrent().Name;
@@ -82,8 +116,11 @@ public partial class ElevatorService : ObservableRecipient
             return false;
         }
 
-        App.MainWindow.DispatcherQueue.TryEnqueue(() => ElevatorStatus = ElevatorStatus.Running);
-        ;
+        App.MainWindow.DispatcherQueue.TryEnqueue(() =>
+        {
+            ElevatorStatus = ElevatorStatus.Running;
+            CanStartElevator = false;
+        });
 
         _elevatorProcess.Exited += (sender, args) =>
         {
@@ -97,12 +134,27 @@ public partial class ElevatorService : ObservableRecipient
 
         App.MainWindow.DispatcherQueue.TryEnqueue(() => CanStartElevator = false);
 
-        if (_exitHandlerRegistered) return true;
-
-
-        App.MainWindow.Closed += MainWindowExitHandler;
-        _exitHandlerRegistered = true;
         return true;
+    }
+
+    private bool AttachToExistingElevatorProcess()
+    {
+        try
+        {
+            var procs = Process.GetProcessesByName(Path.GetFileNameWithoutExtension(ElevatorProcessName));
+            var proc = procs.FirstOrDefault(p => !p.HasExited);
+            if (proc != null)
+            {
+                _elevatorProcess = proc;
+                return true;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "Failed to attach to existing Elevator.exe process");
+        }
+
+        return false;
     }
 
 
@@ -202,7 +254,8 @@ public partial class ElevatorService : ObservableRecipient
             await pipeClient.ConnectAsync(TimeSpan.FromSeconds(5), default);
             await using var writer = new StreamWriter(pipeClient);
             _logger.Debug("Sending command: {Command}", nameof(InternalRefreshGenshinMods));
-            await writer.WriteLineAsync("0");
+            var command = "0:" + _gameService.GameShortName;
+            await writer.WriteLineAsync(command);
             await writer.FlushAsync();
             _logger.Debug("Done");
             App.MainWindow.DispatcherQueue.EnqueueAsync(async () =>
@@ -220,6 +273,12 @@ public partial class ElevatorService : ObservableRecipient
 
     public ElevatorStatus CheckStatus()
     {
+        // 优先查找并附加已存在Elevator.exe进程
+        if (_elevatorProcess is null || _elevatorProcess.HasExited)
+        {
+            AttachToExistingElevatorProcess();
+        }
+
         ElevatorStatus = _elevatorProcess is { HasExited: false } ? ElevatorStatus.Running : ElevatorStatus.NotRunning;
         return ElevatorStatus;
     }
