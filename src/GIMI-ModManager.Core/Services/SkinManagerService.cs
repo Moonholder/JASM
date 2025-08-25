@@ -182,21 +182,20 @@ public sealed class SkinManagerService : ISkinManagerService
             }
 
             var orphanedMods = new List<CharacterSkinEntry>(characterModList.Mods);
+            var trackedModsByPath = characterModList.Mods.ToDictionary(x => x.Mod.FullPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar),
+                x => x, StringComparer.OrdinalIgnoreCase);
 
             foreach (var modDirectory in modsDirectory.EnumerateDirectories())
             {
-                CharacterSkinEntry? mod = null;
-
-                foreach (var x in characterModList.Mods)
+                // Mod is already tracked.
+                if (trackedModsByPath.TryGetValue(modDirectory.FullName, out var mod))
                 {
-                    if (x.Mod.FullPath.AbsPathCompare(modDirectory.FullName)
-                        &&
-                        Directory.Exists(Path.Combine(characterModList.AbsModsFolderPath,
-                            ModFolderHelpers.GetFolderNameWithDisabledPrefix(modDirectory.Name)))
-                        &&
-                        Directory.Exists(Path.Combine(characterModList.AbsModsFolderPath,
+                    // Both enabled and disabled folder exist, this is a duplicate mod folder situation.
+                    if (Directory.Exists(Path.Combine(characterModList.AbsModsFolderPath,
                             ModFolderHelpers.GetFolderNameWithoutDisabledPrefix(modDirectory.Name)))
-                       )
+                        &&
+                        Directory.Exists(Path.Combine(characterModList.AbsModsFolderPath,
+                            ModFolderHelpers.GetFolderNameWithDisabledPrefix(modDirectory.Name))))
                     {
                         var newName = modDirectory.Name;
 
@@ -207,30 +206,13 @@ public sealed class SkinManagerService : ISkinManagerService
                             "Mod '{ModName}' has both enabled and disabled folders, renaming folder",
                             modDirectory.Name);
 
-                        duplicateModsFound.Add(new DuplicateMods(x.Mod.Name, newName));
-                        x.Mod.Rename(newName);
-                        mod = x;
-                        mod.Mod.ClearCache();
-                        orphanedMods.Remove(x);
-                        break;
+                        duplicateModsFound.Add(new DuplicateMods(mod.Mod.Name, newName));
+                        mod.Mod.Rename(newName);
                     }
 
-                    if (x.Mod.FullPath.AbsPathCompare(modDirectory.FullName))
-                    {
-                        mod = x;
-                        mod.Mod.ClearCache();
-                        orphanedMods.Remove(x);
-                        break;
-                    }
-
-                    var disabledName = ModFolderHelpers.GetFolderNameWithDisabledPrefix(modDirectory.Name);
-                    if (x.Mod.FullPath.AbsPathCompare(Path.Combine(characterModList.AbsModsFolderPath, disabledName)))
-                    {
-                        mod = x;
-                        mod.Mod.ClearCache();
-                        orphanedMods.Remove(x);
-                        break;
-                    }
+                    mod.Mod.ClearCache();
+                    orphanedMods.Remove(mod);
+                    continue;
                 }
 
                 if (mod is not null) continue;
@@ -267,7 +249,6 @@ public sealed class SkinManagerService : ISkinManagerService
                 _logger.Debug("Mod '{ModName}' in '{CharacterFolder}' is no longer tracked", x.Mod.Name,
                     characterModList.Character.DisplayName);
             });
-            continue;
         }
 
         return new RefreshResult(modsUntracked, newModsFound, duplicateModsFound, errors: errors);
