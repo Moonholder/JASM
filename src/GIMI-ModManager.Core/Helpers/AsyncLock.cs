@@ -12,7 +12,7 @@ public sealed class AsyncLock : IDisposable
         return new LockReleaser(Release);
     }
 
-    private void Release() => _semaphore.Release();
+    public void Release() => _semaphore.Release();
 
     public void Dispose() => _semaphore.Dispose();
 }

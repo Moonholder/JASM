@@ -1,8 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Threading.Channels;
-using Windows.System;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using CommunityToolkit.WinUI.UI.Controls;
@@ -20,6 +16,10 @@ using GIMI_ModManager.WinUI.Services.ModHandling;
 using GIMI_ModManager.WinUI.Services.Notifications;
 using GIMI_ModManager.WinUI.Views;
 using Serilog;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Threading.Channels;
+using Windows.System;
 using DispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue;
 
 namespace GIMI_ModManager.WinUI.ViewModels.CharacterDetailsViewModels.SubViewModels;
@@ -148,6 +148,7 @@ public partial class ModGridVM(
         try
         {
             _modRefreshLock.Dispose();
+            ToggleLock.Dispose();
         }
         catch (Exception e)
         {
@@ -356,6 +357,8 @@ public partial class ModGridVM(
     }
 
 
+    public readonly AsyncLock ToggleLock = new();
+
     private async Task ToggleModAsync(ModRowVM? modVmToToggle)
     {
         if (modVmToToggle is null)
@@ -371,31 +374,36 @@ public partial class ModGridVM(
 
         try
         {
-            await Task.Run(() =>
+            using (await ToggleLock.LockAsync(cancellationToken: _navigationCt))
             {
-                try
+                await Task.Run(() =>
                 {
-                    foreach (var skinEntry in otherMods)
+                    try
                     {
-                        if (skinEntry.IsEnabled)
-                            _modList.DisableMod(skinEntry.Id);
+                        foreach (var skinEntry in otherMods)
+                        {
+                            if (skinEntry.IsEnabled)
+                                _modList.DisableMod(skinEntry.Id);
+                        }
                     }
-                }
-                catch (Exception e)
+                    catch (Exception e)
+                    {
+                        _notificationService.ShowNotification("禁用模组时出错", e.Message, TimeSpan.FromSeconds(5));
+                    }
+
+                    _modList.ToggleMod(modEntryToToggle.Id);
+                }, CancellationToken.None);
+
+                // 更新UI状态
+                await UpdateModVmAsync(modEntryToToggle, false, CancellationToken.None);
+                foreach (var otherModEntry in otherMods)
                 {
-                    _notificationService.ShowNotification("禁用模组时出错", e.Message, TimeSpan.FromSeconds(5));
+                    await UpdateModVmAsync(otherModEntry, false, CancellationToken.None);
+                    Messenger.Send(new ModChangedMessage(this, otherModEntry, null));
                 }
 
-
-                _modList.ToggleMod(modEntryToToggle.Id);
-            }, CancellationToken.None);
-
-
-            await UpdateModVmAsync(modEntryToToggle, false, CancellationToken.None);
-            foreach (var otherModEntry in otherMods)
-            {
-                await UpdateModVmAsync(otherModEntry, false, CancellationToken.None);
-                Messenger.Send(new ModChangedMessage(this, otherModEntry, null));
+                RefreshMultipleModsActiveWarning();
+                Messenger.Send(new ModChangedMessage(this, modEntryToToggle, null));
             }
         }
         catch (IOException ex)
@@ -410,9 +418,6 @@ public partial class ModGridVM(
         {
             _notificationService.ShowNotification("切换模组时出错", e.Message, TimeSpan.FromSeconds(5));
         }
-
-        RefreshMultipleModsActiveWarning();
-        Messenger.Send(new ModChangedMessage(this, modEntryToToggle, null));
     }
 
     private async Task UpdateModSettingsAsync(UpdateModSettingsArgument? arg)

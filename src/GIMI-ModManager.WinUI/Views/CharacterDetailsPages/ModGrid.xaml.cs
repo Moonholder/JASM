@@ -31,7 +31,7 @@ public sealed partial class ModGrid : UserControl
 
     public ModGridVM ViewModel
     {
-        get { return (ModGridVM)GetValue(ViewModelProperty); }
+        get => (ModGridVM)GetValue(ViewModelProperty);
         set
         {
             SetValue(ViewModelProperty, value);
@@ -39,16 +39,19 @@ public sealed partial class ModGrid : UserControl
         }
     }
 
-    private void ModListGrid_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    private async void ModListGrid_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
+        await ViewModel.ToggleLock.LockAsync();
+        ViewModel.ToggleLock.Release();
+
         ViewModel.SelectionChanged_EventHandler(
             e.AddedItems.OfType<ModRowVM>().ToArray(),
             e.RemovedItems.OfType<ModRowVM>().ToArray());
     }
 
-
     private void OnViewModelSetHandler(ModGridVM viewModel)
     {
+        if (viewModel is null) return;
         viewModel.SelectModEvent += ViewModelOnSelectModEvent;
         viewModel.SortEvent += SetSortUiEventHandler;
         viewModel.OnInitialized += ViewModel_OnInitialized;
@@ -63,6 +66,7 @@ public sealed partial class ModGrid : UserControl
 
     private void ViewModelOnSelectModEvent(object? sender, ModGridVM.SelectModRowEventArgs e)
     {
+        if (ModListGrid is null) return;
         DataGrid.SelectedIndex = e.Index;
     }
 
@@ -70,9 +74,12 @@ public sealed partial class ModGrid : UserControl
     {
         try
         {
-            ViewModel.SelectModEvent -= ViewModelOnSelectModEvent;
-            ViewModel.SortEvent -= SetSortUiEventHandler;
-            ViewModel.OnInitialized -= ViewModel_OnInitialized;
+            if (ViewModel is not null)
+            {
+                ViewModel.SelectModEvent -= ViewModelOnSelectModEvent;
+                ViewModel.SortEvent -= SetSortUiEventHandler;
+                ViewModel.OnInitialized -= ViewModel_OnInitialized;
+            }
         }
         catch (Exception)
         {
