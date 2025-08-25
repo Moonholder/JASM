@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.24.1](https://github.com/Moonholder/JASM/compare/v2.24.0...v2.24.1) (2025-08-25)
+
+
+### Bug Fixes
+
+* 修复了偶现切换启用模组异常的问题 ([cacedcc](https://github.com/Moonholder/JASM/commit/cacedccedc3566e4771c4188a22529f5d0945442))
+* 修复了安装模组时安装按钮第一下无法点击的问题 ([07daf28](https://github.com/Moonholder/JASM/commit/07daf2837fe56384d18d6e3af84d6622498b873f))
+
+
+### Miscellaneous
+
+* **Elevator:** 使Elevator支持【Honkai、WuWa、ZZZ】，重启Jasm时自动附加已启动的elevator进程 ([6a4c504](https://github.com/Moonholder/JASM/commit/6a4c504874a26c0f6352eb930d3b5273e67eb771))
+* 优化了较多模组时详细视图的加载速度 ([efda56a](https://github.com/Moonholder/JASM/commit/efda56aeb57594173895ec8fd815d147ca48a385))
+* 新增显示切换按键绑定的只读紧凑面板 ([4620b18](https://github.com/Moonholder/JASM/commit/4620b18af647d121e3071f86b9be161e24755564))
+* 更新角色配置 ([e336747](https://github.com/Moonholder/JASM/commit/e336747be078f74d59b63b38c721315934498910))
+
 ## [2.24.0](https://github.com/Moonholder/JASM/compare/v2.23.2...v2.24.0) (2025-08-02)
 
 
