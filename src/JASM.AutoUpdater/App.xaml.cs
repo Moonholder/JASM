@@ -64,6 +64,7 @@ public partial class App : Application
 
         MainWindow.Content = new MainPage(arguments.Skip(1).FirstOrDefault() ?? string.Empty);
         MainWindow.BringToFront();
+        MainWindow.CenterOnScreen();
 
         UnhandledException += OnUnhandledException;
     }

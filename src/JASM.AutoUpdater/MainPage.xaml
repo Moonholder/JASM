@@ -12,6 +12,9 @@
 
     <Page.Resources>
         <helpers:BoolToVisibleConverter x:Key="BoolToVisibilityConverter" />
+        <helpers:BoolToStringConverter x:Key="BoolToStringConverter" />
+        <helpers:BoolToColorConverter x:Key="BoolToColorConverter" />
+        <helpers:ToStringConverter x:Key="ToStringConverter" />
     </Page.Resources>
 
     <Grid Margin="32">
@@ -52,16 +55,30 @@
                 IsChecked="{x:Bind ViewModel.EnableMirrorAcceleration, Mode=TwoWay}"
                 ToolTipService.ToolTip="从镜像下载JASM更新， 如果镜像不可用，请选择其他节点." />
             <StackPanel Visibility="{x:Bind ViewModel.EnableMirrorAcceleration, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        Style="{ThemeResource BodyStrongTextBlockStyle}"
+                        Text="{x:Bind ViewModel.CurrentMirror.NodeName, Mode=OneWay}" />
+                    <TextBlock VerticalAlignment="Center" Text="{x:Bind ViewModel.CurrentMirror.Latency, Mode=OneWay, Converter={StaticResource ToStringConverter}, ConverterParameter='延迟: {0}ms'}" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Button
+                        HorizontalAlignment="Left"
+                        Command="{x:Bind ViewModel.SwitchMirrorCommand}"
+                        Content="切换镜像节点" />
+                    <ProgressRing
+                        Width="20"
+                        Height="20"
+                        IsActive="{x:Bind ViewModel.IsLoading, Mode=OneWay}"
+                        Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                </StackPanel>
                 <TextBlock
-                    Margin="0,8"
+                    Margin="0,4"
                     HorizontalAlignment="Left"
-                    Text="{x:Bind ViewModel.CurrentMirror.NodeName, Mode=OneWay}"
-                    TextWrapping="WrapWholeWords" />
-                <Button
-                    Margin="0,8"
-                    HorizontalAlignment="Left"
-                    Command="{x:Bind ViewModel.SwitchMirrorCommand}"
-                    Content="切换镜像节点" />
+                    Foreground="{x:Bind ViewModel.CurrentMirror.IsAvailable, Mode=OneWay, Converter={StaticResource BoolToColorConverter}, ConverterParameter='Green|Red'}"
+                    Style="{ThemeResource CaptionTextBlockStyle}"
+                    Text="{x:Bind ViewModel.CurrentMirror.IsAvailable, Mode=OneWay, Converter={StaticResource BoolToStringConverter}, ConverterParameter='状态: {0}'}" />
             </StackPanel>
             <Button
                 Margin="0,16,0,0"
@@ -73,14 +90,19 @@
 
 
         <Grid VerticalAlignment="Top" Visibility="{x:Bind ViewModel.UpdateProcessStarted, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
+                <!--  标题行  -->
                 <RowDefinition Height="Auto" />
+                <!--  分段控件  -->
                 <RowDefinition Height="Auto" />
+                <!--  下载进度显示  -->
                 <RowDefinition Height="Auto" />
+                <!--  按钮区域  -->
                 <RowDefinition Height="*" />
+                <!--  日志列表  -->
             </Grid.RowDefinitions>
-
 
             <Grid Grid.Row="0">
                 <Grid.ColumnDefinitions>
@@ -103,7 +125,6 @@
                 </StackPanel>
 
                 <StackPanel Grid.Column="1">
-
                     <HyperlinkButton
                         Margin="0,16,0,16"
                         HorizontalAlignment="Right"
@@ -115,7 +136,6 @@
                             </StackPanel>
                         </HyperlinkButton.Content>
                     </HyperlinkButton>
-
                     <ProgressRing
                         HorizontalAlignment="Right"
                         IsActive="{x:Bind ViewModel.IsLoading, Mode=OneWay}"
@@ -147,37 +167,85 @@
                     IsSelected="{x:Bind ViewModel.UpdateProgress.InstallingLatestUpdate, Mode=OneWay}" />
             </controls:Segmented>
 
-
-            <Button
+            <Grid
                 Grid.Row="2"
                 Margin="0,16,0,0"
-                HorizontalAlignment="Right"
-                Command="{x:Bind ViewModel.StartUpdateCancelCommand}"
-                Content="取消" />
+                Visibility="{x:Bind ViewModel.ShowDownloadProgress, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <ProgressBar
+                    Grid.Row="0"
+                    Height="20"
+                    Maximum="100"
+                    Value="{x:Bind ViewModel.DownloadProgress, Mode=OneWay}" />
+                <StackPanel
+                    Grid.Row="1"
+                    Margin="0,8,0,0"
+                    HorizontalAlignment="Center"
+                    Orientation="Horizontal"
+                    Spacing="12">
+                    <TextBlock FontWeight="SemiBold" Text="{x:Bind ViewModel.DownloadStatus, Mode=OneWay}" />
+                    <TextBlock Opacity="0.5" Text="|" />
+                    <TextBlock Text="{x:Bind ViewModel.DownloadSpeed, Mode=OneWay}" />
+                    <TextBlock Opacity="0.5" Text="|" />
+                    <TextBlock Text="{x:Bind ViewModel.FileSize, Mode=OneWay}" />
+                </StackPanel>
+                <TextBlock
+                    Grid.Row="2"
+                    Margin="0,4,0,0"
+                    HorizontalAlignment="Center"
+                    Text="{x:Bind ViewModel.DownloadProgress, Mode=OneWay, Converter={StaticResource ToStringConverter}, ConverterParameter='{}{0:0}%'}" />
+            </Grid>
 
-            <Button
-                Grid.Row="2"
-                Margin="0,16,0,0"
-                HorizontalAlignment="Left"
-                Command="{x:Bind ViewModel.StartUpdateCommand}"
-                Content="重试" />
+            <Grid Grid.Row="3">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
-            <Button
-                Grid.Row="2"
-                HorizontalAlignment="Center"
-                Background="{ThemeResource AccentFillColorSelectedTextBackgroundBrush}"
-                Command="{x:Bind ViewModel.StartJasmCommand}"
-                Content="启动 JASM..."
-                Visibility="{x:Bind ViewModel.FinishedSuccessfully, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                <!--  按钮区域  -->
+                <Grid Grid.Row="0" Margin="0,16,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
 
+                    <Button
+                        Grid.Column="0"
+                        HorizontalAlignment="Left"
+                        Command="{x:Bind ViewModel.StartUpdateCancelCommand}"
+                        Content="取消"
+                        Visibility="{x:Bind ViewModel.ShowCancelButton, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
 
-            <InfoBar
-                Grid.Row="3"
-                IsClosable="False"
-                IsOpen="{x:Bind ViewModel.Stopped, Mode=OneWay}"
-                Message="{x:Bind ViewModel.StopReason, Mode=OneWay}"
-                Severity="Error"
-                Visibility="{x:Bind ViewModel.Stopped, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                    <Button
+                        Grid.Column="0"
+                        HorizontalAlignment="Left"
+                        Command="{x:Bind ViewModel.StartUpdateCommand}"
+                        Content="重试"
+                        Visibility="{x:Bind ViewModel.ShowRetryButton, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+
+                    <Button
+                        Grid.Column="2"
+                        HorizontalAlignment="Center"
+                        Background="{ThemeResource AccentFillColorSelectedTextBackgroundBrush}"
+                        Command="{x:Bind ViewModel.StartJasmCommand}"
+                        Content="启动 JASM..."
+                        Visibility="{x:Bind ViewModel.FinishedSuccessfully, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                </Grid>
+
+                <InfoBar
+                    Grid.Row="1"
+                    IsClosable="False"
+                    IsOpen="{x:Bind ViewModel.Stopped, Mode=OneWay}"
+                    Message="{x:Bind ViewModel.StopReason, Mode=OneWay}"
+                    Severity="Error"
+                    Visibility="{x:Bind ViewModel.Stopped, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+            </Grid>
 
             <ListView
                 Grid.Row="4"
@@ -195,33 +263,26 @@
                                 <RowDefinition />
                                 <RowDefinition />
                             </Grid.RowDefinitions>
-
-
                             <TextBlock
                                 HorizontalAlignment="Left"
                                 IsTextSelectionEnabled="True"
                                 Text="{x:Bind Message, Mode=OneWay}"
                                 TextWrapping="WrapWholeWords" />
-
                             <TextBlock
                                 Grid.Row="1"
                                 IsTextSelectionEnabled="True"
                                 Text="{x:Bind Footer, Mode=OneWay}"
                                 TextWrapping="WrapWholeWords" />
-
                             <TextBlock
                                 Grid.Row="2"
                                 Margin="0,0,8,0"
                                 HorizontalAlignment="Right"
                                 IsTextSelectionEnabled="True"
                                 Text="{x:Bind TimeStamp, Mode=OneWay}" />
-
                         </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-
-
         </Grid>
 
     </Grid>

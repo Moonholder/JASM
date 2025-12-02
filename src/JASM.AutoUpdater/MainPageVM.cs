@@ -1,19 +1,21 @@
-﻿using System;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using JASM.AutoUpdater.Serialization;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.System;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Newtonsoft.Json;
 using static MirrorAddressSelector;
 
 namespace JASM.AutoUpdater;
@@ -39,23 +41,66 @@ public partial class MainPageVM : ObservableRecipient
     public UpdateProgress UpdateProgress { get; } = new();
 
     public Version InstalledVersion { get; }
-
+    [NotifyPropertyChangedFor(nameof(CanStartUpdate))]
+    [NotifyCanExecuteChangedFor(nameof(StartUpdateCommand))]
     [ObservableProperty] private bool _isLoading = false;
+    [NotifyPropertyChangedFor(nameof(ShowCancelButton), nameof(ShowRetryButton))]
     [ObservableProperty] private bool _finishedSuccessfully = false;
-
+    [NotifyPropertyChangedFor(nameof(ShowCancelButton), nameof(ShowRetryButton))]
     [ObservableProperty] private bool _stopped;
     [ObservableProperty] private string? _stopReason;
     [ObservableProperty] private bool _enableMirrorAcceleration = true;
     [ObservableProperty] private MirrorInfo _currentMirror;
+    [ObservableProperty] private double _downloadProgress;
+    [ObservableProperty] private string _downloadSpeed = "0 KB/s";
+    [ObservableProperty] private string _downloadStatus = "等待下载...";
+    [ObservableProperty] private string _fileSize = "";
+
+    private long _totalBytes;
+    private long _bytesReceived;
+    private Stopwatch _downloadStopwatch;
+    private HttpClient _httpClient;
+
 
     private bool RetryMirrorAcceleration = false;
+    public MainPageVM() { }
     public MainPageVM(string installedJasmVersion)
     {
         InstalledVersion = Version.TryParse(installedJasmVersion, out var version) ? version : new Version(0, 0, 0, 0);
-        CurrentMirror = MirrorAddressSelector.GetNextMirror();
+        // 监听UpdateProgress的属性变化
+        UpdateProgress.PropertyChanged += (s, e) =>
+        {
+            if (e.PropertyName == nameof(UpdateProgress.DownloadingLatestUpdate))
+            {
+                OnPropertyChanged(nameof(ShowDownloadProgress));
+            }
+        };
+
+        InitializeAsync().ConfigureAwait(false);
     }
 
-    [RelayCommand(IncludeCancelCommand = true)]
+    public bool ShowDownloadProgress => UpdateProgress.DownloadingLatestUpdate && !Stopped;
+
+    // 在Stopped属性变化时触发ShowDownloadProgress的更新
+    partial void OnStoppedChanged(bool value)
+    {
+        OnPropertyChanged(nameof(ShowDownloadProgress));
+    }
+
+    public async Task InitializeAsync()
+    {
+        IsLoading = true;
+        CurrentMirror = await GetBestMirrorAsync();
+        IsLoading = false;
+    }
+
+    public bool CanStartUpdate => !IsLoading;
+
+    public bool ShowCancelButton => !Stopped && !FinishedSuccessfully;
+
+    public bool ShowRetryButton => Stopped && !FinishedSuccessfully;
+
+    [RelayCommand(IncludeCancelCommand = true, CanExecute = nameof(CanStartUpdate))]
     private async Task StartUpdateAsync(CancellationToken cancellationToken)
     {
         UpdateProgress.Reset();
@@ -76,6 +121,7 @@ public partial class MainPageVM : ObservableRecipient
             {
                 CurrentMirror = MirrorAddressSelector.GetNextMirror();
                 RetryMirrorAcceleration = false;
+                Log($"已切换到镜像节点: {CurrentMirror.NodeName}");
             }
 
             var release = await IsNewerVersionAvailable(cancellationToken);
@@ -84,8 +130,8 @@ public partial class MainPageVM : ObservableRecipient
                 return;
 
             await Task.Delay(1000, cancellationToken);
-            await DownloadLatestVersion(release, cancellationToken);
             UpdateProgress.NextStage();
+            await DownloadLatestVersion(release, cancellationToken);
 
             if (Stopped)
             {
@@ -144,7 +190,24 @@ public partial class MainPageVM : ObservableRecipient
     }
 
     [RelayCommand]
-    private void SwitchMirror() => CurrentMirror = MirrorAddressSelector.GetNextMirror();
+    private async Task SwitchMirror()
+    {
+        IsLoading = true;
+        try
+        {
+            CurrentMirror = MirrorAddressSelector.GetNextMirror();
+            await MirrorAddressSelector.TestMirrorAsync(CurrentMirror);
+            Log($"已切换到镜像节点: {CurrentMirror.NodeName}");
+        }
+        catch (Exception e)
+        {
+            Log("切换镜像节点失败!", e.Message);
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
 
     private void Finish()
     {
@@ -156,13 +219,13 @@ public partial class MainPageVM : ObservableRecipient
     {
         var newestVersionFound = await GetLatestVersionAsync(cancellationToken);
 
-        Log($"找到最新版本: {newestVersionFound?.tag_name}");
+        Log($"找到最新版本: {newestVersionFound?.TagName}");
 
         var release = new GitHubRelease()
         {
-            Version = new Version(newestVersionFound?.tag_name?.Trim('v') ?? ""),
-            PreRelease = newestVersionFound?.prerelease ?? false,
-            PublishedAt = newestVersionFound?.published_at ?? DateTime.MinValue
+            Version = new Version(newestVersionFound?.TagName?.Trim('v') ?? ""),
+            PreRelease = newestVersionFound?.Prerelease ?? false,
+            PublishedAt = newestVersionFound?.PublishedAt ?? DateTime.MinValue
         };
 
         if (release.Version <= InstalledVersion)
@@ -171,9 +234,9 @@ public partial class MainPageVM : ObservableRecipient
             return null;
         }
 
-        var getJasmAsset = newestVersionFound?.assets?.FirstOrDefault(a => a.name?.StartsWith("JASM_") ?? false);
+        var getJasmAsset = newestVersionFound?.Assets?.FirstOrDefault(a => a.Name?.StartsWith("JASM_") ?? false);
 
-        if (getJasmAsset?.browser_download_url is null)
+        if (getJasmAsset?.BrowserDownloadUrl is null)
         {
             Stop(
                 "在GitHub上的最新版本中找不到JASM存档。这可能是由于开发人员必须手动上传zip，这可能需要几分钟. " +
@@ -181,9 +244,9 @@ public partial class MainPageVM : ObservableRecipient
             return null;
         }
 
-        release.DownloadUrl = EnableMirrorAcceleration ? new Uri(CurrentMirror.Address + getJasmAsset.browser_download_url) : new Uri(getJasmAsset.browser_download_url);
-        release.BrowserUrl = new Uri(newestVersionFound?.html_url ?? "https://github.com/Moonholder/JASM/releases");
-        release.FileName = getJasmAsset.name ?? "JASM.zip";
+        release.DownloadUrl = EnableMirrorAcceleration ? new Uri(CurrentMirror.Address + getJasmAsset.BrowserDownloadUrl) : new Uri(getJasmAsset.BrowserDownloadUrl);
+        release.BrowserUrl = new Uri(newestVersionFound?.HtmlUrl ?? "https://github.com/Moonholder/JASM/releases");
+        release.FileName = getJasmAsset.Name ?? "JASM.zip";
 
         LatestVersion = release.Version.ToString();
 
@@ -200,13 +263,12 @@ public partial class MainPageVM : ObservableRecipient
 
     private async Task DownloadLatestVersion(GitHubRelease gitHubRelease, CancellationToken cancellationToken)
     {
+        UpdateProgress.DownloadingLatestUpdate = true;
         if (Directory.Exists(WorkDir))
         {
             Directory.Delete(WorkDir, true);
         }
-
         Directory.CreateDirectory(WorkDir);
-
 
         _zipPath = Path.Combine(WorkDir, gitHubRelease.FileName);
         if (File.Exists(_zipPath))
@@ -214,32 +276,136 @@ public partial class MainPageVM : ObservableRecipient
             File.Delete(_zipPath);
         }
 
-        var httpClient = CreateHttpClient();
-        httpClient.DefaultRequestHeaders.Add("Accept", "application/octet-stream");
+        _httpClient = CreateHttpClient();
+        _httpClient.DefaultRequestHeaders.Add("Accept", "application/octet-stream");
 
         Log("正在下载最新版本...");
-        var result = await httpClient.GetAsync(gitHubRelease.DownloadUrl, HttpCompletionOption.ResponseHeadersRead,
-            cancellationToken);
 
-        if (!result.IsSuccessStatusCode)
+        // 重置下载状态
+        DownloadProgress = 0;
+        DownloadSpeed = "0 KB/s";
+        DownloadStatus = "准备下载...";
+        _bytesReceived = 0;
+        _totalBytes = 0;
+        _downloadStopwatch = Stopwatch.StartNew();
+
+        UpdateDownloadProgress();
+
+        try
         {
-            if (EnableMirrorAcceleration)
+            var result = await _httpClient.GetAsync(gitHubRelease.DownloadUrl, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+
+            if (!result.IsSuccessStatusCode)
             {
-                RetryMirrorAcceleration = true;
-                Stop($"下载最新版本失败. 状态码: {result.StatusCode}, 原因: 当前镜像节点 [{CurrentMirror.NodeName}] 可能已失效,重试自动切换其他节点");
+                if (EnableMirrorAcceleration)
+                {
+                    RetryMirrorAcceleration = true;
+                    Stop($"下载最新版本失败. 状态码: {result.StatusCode}, 原因: 当前镜像节点 [{CurrentMirror.NodeName}] 可能已失效,重试自动切换其他节点");
+                }
+                else
+                {
+                    Stop($"下载最新版本失败. 状态码: {result.StatusCode}, 原因: {result.ReasonPhrase}");
+                }
+                return;
             }
-            else
+
+            // 获取文件大小
+            _totalBytes = result.Content.Headers.ContentLength ?? 0;
+            FileSize = _totalBytes > 0 ? FormatFileSize(_totalBytes) : "未知大小";
+
+            await using var stream = await result.Content.ReadAsStreamAsync(cancellationToken);
+            await using var fileStream = File.Create(_zipPath);
+
+            var buffer = new byte[8192];
+            int bytesRead;
+            var lastUpdateTime = DateTime.Now;
+
+            DownloadStatus = "下载中...";
+
+            while ((bytesRead = await stream.ReadAsync(buffer, cancellationToken)) > 0)
             {
-                Stop($"下载最新版本失败. 状态码: {result.StatusCode}, 原因: {result.ReasonPhrase}");
+                await fileStream.WriteAsync(buffer, 0, bytesRead, cancellationToken);
+
+                _bytesReceived += bytesRead;
+
+                // 每500毫秒更新一次UI状态
+                if ((DateTime.Now - lastUpdateTime).TotalMilliseconds > 500)
+                {
+                    UpdateDownloadProgress();
+                    lastUpdateTime = DateTime.Now;
+                }
             }
-            return;
+
+            // 更新进度
+            UpdateDownloadProgress();
+            _downloadStopwatch.Stop();
+
+            Log($"从 {gitHubRelease.DownloadUrl} 下载最新版本成功.");
+            DownloadStatus = "下载完成";
+            DownloadProgress = 100;
+            await Task.Delay(500, cancellationToken);
+        }
+        catch (Exception)
+        {
+            _downloadStopwatch?.Stop();
+            DownloadStatus = "下载失败";
+            throw;
+        }
+        finally
+        {
+            if (Stopped)
+            {
+                DownloadStatus = "下载已取消";
+            }
+        }
+    }
+
+    private void UpdateDownloadProgress()
+    {
+        if (_totalBytes > 0)
+        {
+            DownloadProgress = (_bytesReceived / (double)_totalBytes) * 100;
         }
 
-        await using var stream = await result.Content.ReadAsStreamAsync(cancellationToken);
+        // 计算下载速度
+        var elapsedSeconds = _downloadStopwatch.Elapsed.TotalSeconds;
+        if (elapsedSeconds > 0)
+        {
+            var bytesPerSecond = _bytesReceived / elapsedSeconds;
+            DownloadSpeed = FormatSpeed(bytesPerSecond);
+        }
 
-        await using var fileStream = File.Create(_zipPath);
-        await stream.CopyToAsync(fileStream, cancellationToken);
-        Log($"从 {gitHubRelease.DownloadUrl} 下载最新版本成功.");
+        // 更新状态信息
+        DownloadStatus = $"{FormatFileSize(_bytesReceived)} / {FileSize}";
+    }
+
+    private string FormatFileSize(long bytes)
+    {
+        string[] sizes = { "B", "KB", "MB", "GB" };
+        int order = 0;
+        double len = bytes;
+        while (len >= 1024 && order < sizes.Length - 1)
+        {
+            order++;
+            len = len / 1024;
+        }
+        return $"{len:0.##} {sizes[order]}";
+    }
+
+    private string FormatSpeed(double bytesPerSecond)
+    {
+        if (bytesPerSecond >= 1024 * 1024)
+        {
+            return $"{bytesPerSecond / (1024 * 1024):0.##} MB/s";
+        }
+        else if (bytesPerSecond >= 1024)
+        {
+            return $"{bytesPerSecond / 1024:0.##} KB/s";
+        }
+        else
+        {
+            return $"{bytesPerSecond:0} B/s";
+        }
     }
 
     private async Task UnzipLatestVersion(CancellationToken cancellationToken)
@@ -422,11 +588,19 @@ public partial class MainPageVM : ObservableRecipient
 
         var text = await result.Content.ReadAsStringAsync(cancellationToken);
 
-        var gitHubReleases =
-            (JsonConvert.DeserializeObject<ApiGitHubRelease[]>(text)) ?? Array.Empty<ApiGitHubRelease>();
+        ApiGitHubRelease[]? gitHubReleases = null;
+        try
+        {
+            gitHubReleases = JsonSerializer.Deserialize<ApiGitHubRelease[]>(text, AutoUpdaterGitHubJsonContext.Default.ApiGitHubReleaseArray);
+        }
+        catch (JsonException ex)
+        {
+            Serilog.Log.Warning(ex, "Failed to deserialize GitHub releases JSON");
+            gitHubReleases = Array.Empty<ApiGitHubRelease>();
+        }
 
-        var latestReleases = gitHubReleases.Where(r => !r.prerelease);
-        var latestVersion = latestReleases.OrderByDescending(r => new Version(r.tag_name?.Trim('v') ?? ""));
+        var latestReleases = (gitHubReleases ?? Array.Empty<ApiGitHubRelease>()).Where(r => !r.Prerelease);
+        var latestVersion = latestReleases.OrderByDescending(r => new Version(r.TagName?.Trim('v') ?? ""));
 
         return latestVersion.FirstOrDefault();
     }
@@ -443,17 +617,7 @@ public partial class MainPageVM : ObservableRecipient
         return httpClient;
     }
 
-    private class ApiGitHubRelease
-    {
-        public string? html_url;
-        public string? target_commitish;
-        public string? browser_download_url;
-        public string? tag_name;
-        public bool prerelease;
-        public DateTime published_at = DateTime.MinValue;
 
-        public ApiAssets[]? assets;
-    }
 
     private class GitHubRelease
     {
@@ -464,6 +628,7 @@ public partial class MainPageVM : ObservableRecipient
         public Uri BrowserUrl = null!;
         public Uri DownloadUrl = null!;
         public string FileName = null!;
+        public GitHubRelease() { }
     }
 
     private void Log(string logMessage, string? footer = null)
@@ -544,10 +709,13 @@ public partial class MainPageVM : ObservableRecipient
     }
 }
 
-internal class ApiAssets
+public class ApiAssets
 {
-    public string? name;
-    public string? browser_download_url;
+    [JsonPropertyName("name")]
+    public string? Name { get; set; }
+
+    [JsonPropertyName("browser_download_url")]
+    public string? BrowserDownloadUrl { get; set; }
 }
 
 public class LogEntry
