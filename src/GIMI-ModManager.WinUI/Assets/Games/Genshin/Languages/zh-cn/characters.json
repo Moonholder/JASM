@@ -215,7 +215,13 @@
   },
   {
     "InternalName": "Kirara",
-    "DisplayName": "绮良良"
+    "DisplayName": "绮良良",
+    "InGameSkins": [
+      {
+        "InternalName": "Kirara Phantom in Boots",
+        "DisplayName": "倩影游侠"
+      }
+    ]
   },
   {
     "InGameSkins": [
@@ -285,7 +291,13 @@
   },
   {
     "InternalName": "Nilou",
-    "DisplayName": "妮露"
+    "DisplayName": "妮露",
+    "InGameSkins": [
+      {
+        "InternalName": "Nilou Breeze of Sabaa",
+        "DisplayName": "莎邦之息"
+      }
+    ] 
   },
   {
     "InGameSkins": [
@@ -691,5 +703,21 @@
   {
     "InternalName": "Lauma",
     "DisplayName": "菈乌玛"
+  },
+  {
+    "InternalName": "Nefer",
+    "DisplayName": "奈芙尔"
+  },
+  {
+    "InternalName": "Manekin",
+    "DisplayName": "奇域人偶"
+  },
+  {
+    "InternalName": "Durin",
+    "DisplayName": "杜林"
+  },
+  {
+    "InternalName": "Jahoda",
+    "DisplayName": "雅珂达"
   }
 ]

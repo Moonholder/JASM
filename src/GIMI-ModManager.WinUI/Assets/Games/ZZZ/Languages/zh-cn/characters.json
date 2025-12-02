@@ -575,7 +575,13 @@
   },
   {
     "InternalName": "Vivian",
-    "DisplayName": "薇薇安 "
+    "DisplayName": "薇薇安 ",
+    "InGameSkins": [
+      {
+        "InternalName": "IrisOfTheShore",
+        "DisplayName": "鸢花池畔"
+      }
+    ]
   },
   {
     "InternalName": "Hugo",
@@ -629,7 +635,13 @@
   },
   {
     "InternalName": "KomanoManato",
-    "DisplayName": "狛野真斗"
+    "DisplayName": "狛野真斗",
+    "InGameSkins": [
+      {
+        "InternalName": "WhiteHeartSilhouette",
+        "DisplayName": "白心旧影"
+      }
+    ]
   },
   {
     "InternalName": "Lucia",
@@ -638,5 +650,13 @@
   {
     "InternalName": "Yidhari",
     "DisplayName": "伊德海莉"
+  },
+  {
+    "InternalName": "Banyue",
+    "DisplayName": "般岳"
+  },
+  {
+    "InternalName": "Dialyn",
+    "DisplayName": "琉音"
   }
 ]

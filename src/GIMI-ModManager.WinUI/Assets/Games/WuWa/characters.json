@@ -658,13 +658,30 @@
   },
   {
     "Keys": [
+      "Galbrena"
+    ],
+    "ReleaseDate": "2025-10-09T00:00:00",
+    "Image": "Galbrena.png",
+    "Rarity": 5,
+    "Element": "Fusion",
+    "Class": "Pistols",
+    "Region": [
+      "Rinascita"
+    ],
+    "ModFilesName": "Galbrena",
+    "InGameSkins": [],
+    "InternalName": "Galbrena",
+    "DisplayName": "Galbrena"
+  },
+  {
+    "Keys": [
       "Qiuyuan"
     ],
-    "ReleaseDate": "2026-01-04T00:00:00",
+    "ReleaseDate": "2025-10-09T00:00:00",
     "Image": "Qiuyuan.png",
     "Rarity": 5,
-    "Element": "Unknown",
-    "Class": "Unknown",
+    "Element": "Aero",
+    "Class": "Sword",
     "Region": [
       "Huanglong"
     ],
@@ -677,13 +694,13 @@
     "Keys": [
       "Chisa"
     ],
-    "ReleaseDate": "2026-01-05T00:00:00",
+    "ReleaseDate": "2025-11-20T00:00:00",
     "Image": "Chisa.png",
     "Rarity": 5,
-    "Element": "Unknown",
-    "Class": "Unknown",
+    "Element": "Havoc",
+    "Class": "Broadblade",
     "Region": [
-      "Unknown"
+      "Startorch Academy"
     ],
     "ModFilesName": "Chisa",
     "InGameSkins": [],
@@ -692,19 +709,105 @@
   },
   {
     "Keys": [
-      "Galbrena"
+      "Buling"
     ],
-    "ReleaseDate": "2026-01-06T00:00:00",
-    "Image": "Galbrena.png",
+    "ReleaseDate": "2025-11-20T00:00:00",
+    "Image": "Buling.png",
+    "Rarity": 4,
+    "Element": "Electro",
+    "Class": "Rectifier",
+    "Region": [
+      "Bshores"
+    ],
+    "ModFilesName": "Buling",
+    "InGameSkins": [],
+    "InternalName": "Buling",
+    "DisplayName": "Buling"
+  },
+  {
+    "Keys": [
+      "Lynae"
+    ],
+    "ReleaseDate": "2025-12-25T00:00:00",
+    "Image": "Lynae.webp",
     "Rarity": 5,
-    "Element": "Fusion",
+    "Element": "Spectro",
     "Class": "Pistols",
     "Region": [
-      "Rinascita"
+      "Lahai-Roi"
     ],
-    "ModFilesName": "Galbrena",
+    "ModFilesName": "Lynae",
     "InGameSkins": [],
-    "InternalName": "Galbrena",
-    "DisplayName": "Galbrena"
+    "InternalName": "Lynae",
+    "DisplayName": "Lynae"
+  },
+  {
+    "Keys": [
+      "Mornye"
+    ],
+    "ReleaseDate": "2025-12-25T00:00:00",
+    "Image": "Mornye.webp",
+    "Rarity": 5,
+    "Element": "Fusion",
+    "Class": "Broadblade",
+    "Region": [
+      "Lahai-Roi"
+    ],
+    "ModFilesName": "Mornye",
+    "InGameSkins": [],
+    "InternalName": "Mornye",
+    "DisplayName": "Mornye"
+  },
+  {
+    "Keys": [
+      "Luuk",
+      "Herssen"
+    ],
+    "ReleaseDate": "2026-01-01T00:00:00",
+    "Image": "Luuk.webp",
+    "Rarity": 5,
+    "Element": "Unknown",
+    "Class": "Unknown",
+    "Region": [
+      "Lahai-Roi"
+    ],
+    "ModFilesName": "Luuk",
+    "InGameSkins": [],
+    "InternalName": "Luuk",
+    "DisplayName": "Luuk"
+  },
+  {
+    "Keys": [
+      "Lucilla"
+    ],
+    "ReleaseDate": "2026-01-01T00:00:00",
+    "Image": "Lucilla.webp",
+    "Rarity": 5,
+    "Element": "Unknown",
+    "Class": "Unknown",
+    "Region": [
+      "Lahai-Roi"
+    ],
+    "ModFilesName": "Lucilla",
+    "InGameSkins": [],
+    "InternalName": "Lucilla",
+    "DisplayName": "Lucilla"
+  },
+  {
+    "Keys": [
+      "Sigrika"
+    ],
+    "ReleaseDate": "2026-01-01T00:00:00",
+    "Image": "Sigrika.webp",
+    "Rarity": 5,
+    "Element": "Unknown",
+    "Class": "Unknown",
+    "Region": [
+      "Lahai-Roi"
+    ],
+    "ModFilesName": "Sigrika",
+    "InGameSkins": [],
+    "InternalName": "Sigrika",
+    "DisplayName": "Sigrika"
   }
 ]

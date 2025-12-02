@@ -1982,5 +1982,74 @@
     "InGameSkins": [],
     "InternalName": "Lauma",
     "DisplayName": "Lauma"
+  },
+  {
+    "Keys": [
+      "Nefer"
+    ],
+    "ReleaseDate": "2025-10-22T00:00:00",
+    "Image": "Nefer.png",
+    "Rarity": 5,
+    "Element": "Dendro",
+    "Class": "Catalyst",
+    "Region": [
+      "Nod-Krai"
+    ],
+    "ModFilesName": "Nefer",
+    "InGameSkins": [],
+    "InternalName": "Nefer",
+    "DisplayName": "Nefer"
+  },
+  {
+    "Keys": [
+      "Wonderland",
+      "Manekin"
+    ],
+    "ReleaseDate": "2025-10-22T00:00:00",
+    "Image": "Manekin.png",
+    "Rarity": 5,
+    "Element": "Anemo",
+    "Class": "Sword",
+    "Region": [
+      "Wonderland"
+    ],
+    "ModFilesName": "Manekin",
+    "InGameSkins": [],
+    "InternalName": "Manekin",
+    "DisplayName": "Manekin"
+  },
+  {
+    "Keys": [
+      "Durin"
+    ],
+    "ReleaseDate": "2025-12-22T00:00:00",
+    "Image": "Durin.webp",
+    "Rarity": 5,
+    "Element": "Pyro",
+    "Class": "Sword",
+    "Region": [
+      "Mondstadt"
+    ],
+    "ModFilesName": "Durin",
+    "InGameSkins": [],
+    "InternalName": "Durin",
+    "DisplayName": "Durin"
+  },
+  {
+    "Keys": [
+      "Jahoda"
+    ],
+    "ReleaseDate": "2025-12-22T00:00:00",
+    "Image": "Jahoda.webp",
+    "Rarity": 4,
+    "Element": "Anemo",
+    "Class": "Bow",
+    "Region": [
+      "Nod-Krai"
+    ],
+    "ModFilesName": "Jahoda",
+    "InGameSkins": [],
+    "InternalName": "Jahoda",
+    "DisplayName": "Jahoda"
   }
 ]

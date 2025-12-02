@@ -482,6 +482,10 @@
     "DisplayName": "露帕"
   },
   {
+    "InternalName": "Phrolova",
+    "DisplayName": "弗洛洛"
+  },
+  {
     "InternalName": "Augusta",
     "DisplayName": "奥古斯塔"
   },
@@ -490,8 +494,8 @@
     "DisplayName": "尤诺"
   },
   {
-    "InternalName": "Phrolova",
-    "DisplayName": "弗洛洛"
+    "InternalName": "Galbrena",
+    "DisplayName": "嘉贝莉娜"
   },
   {
     "InternalName": "Qiuyuan",
@@ -502,7 +506,27 @@
     "DisplayName": "千咲"
   },
   {
-    "InternalName": "Galbrena",
-    "DisplayName": "嘉贝莉娜"
+    "InternalName": "Buling",
+    "DisplayName": "卜灵"
+  },
+  {
+    "InternalName": "Lynae",
+    "DisplayName": "琳奈"
+  },
+  {
+    "InternalName": "Mornye",
+    "DisplayName": "莫宁"
+  },
+  {
+    "InternalName": "Luuk",
+    "DisplayName": "陆 • 赫斯"
+  },
+  {
+    "InternalName": "Lucilla",
+    "DisplayName": "洛瑟菈"
+  },
+  {
+    "InternalName": "Sigrika",
+    "DisplayName": "西格莉卡"
   }
 ]

@@ -8,8 +8,8 @@
       "DisplayName": "New Federation"
     },
     {
-      "InternalName": "Fraxinus",
-      "DisplayName": "Fraxinus"
+      "InternalName": "Fractsidus",
+      "DisplayName": "Fractsidus"
     },
     {
         "InternalName": "BShores",
@@ -18,5 +18,9 @@
     {
         "InternalName": "Rinascita",
         "DisplayName": "Rinascita"
+    },
+    {
+        "InternalName": "Lahai-Roi",
+        "DisplayName": "Lahai-Roi"
     }
   ]
