@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.24.2](https://github.com/Moonholder/JASM/compare/v2.24.1...v2.24.2) (2025-12-02)
+
+
+### Bug Fixes
+
+* 修复管理员运行下点击浏览文件夹时程序崩溃的问题 ([4d1dd15](https://github.com/Moonholder/JASM/commit/4d1dd15500043d5c09770a7efb026f2f5310757a))
+
+
+### Miscellaneous
+
+* 为预设添加模组时允许多选，部分窗口背景颜色主题适配，汉化文本补充 ([8eaa1b6](https://github.com/Moonholder/JASM/commit/8eaa1b6b5cc0aed78f267efef65b74c9bd85663e))
+* 允许自定义角色编辑发布日期、稀有度、属性 ([7a45f27](https://github.com/Moonholder/JASM/commit/7a45f2792ee7d3b79165ad07b51cc28d73d5052a))
+* 更新器下载更新增加下载进度显示 ([59233f7](https://github.com/Moonholder/JASM/commit/59233f7661f3fe153f0e6ef95512059acb60ba92))
+* 更新角色配置 ([090b37b](https://github.com/Moonholder/JASM/commit/090b37bd9db0bdd226b340e3f6e73c9fd3ccccad))
+* 调整Keyswap节的识别策略 ([5288cfd](https://github.com/Moonholder/JASM/commit/5288cfde5cf78e488a33408f18a56c28e0be09c2))
+
 ## [2.24.1](https://github.com/Moonholder/JASM/compare/v2.24.0...v2.24.1) (2025-08-25)
 
 
