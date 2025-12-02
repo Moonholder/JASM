@@ -117,7 +117,7 @@ public interface IRegion : INameable
 
 public interface IRarity
 {
-    public int Rarity { get; }
+    public int Rarity { get; internal set; }
 }
 
 /// <summary>

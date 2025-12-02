@@ -16,7 +16,6 @@
     <Grid
         x:Name="EditCharacterPageGrid"
         Padding="4"
-        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
         CornerRadius="10">
 
         <Grid.RowDefinitions>
@@ -34,8 +33,8 @@
                 <TextBlock VerticalAlignment="Center" Text="角色模组文件夹:" />
                 <controls:LinkButton
                     Link="{x:Bind ViewModel.ModFolderUri, Mode=TwoWay}"
-                    ToolTipService.ToolTip="打开角色的模组文件夹"
-                    Text="{x:Bind ViewModel.ModFolderString, Mode=TwoWay}" />
+                    Text="{x:Bind ViewModel.ModFolderString, Mode=TwoWay}"
+                    ToolTipService.ToolTip="打开角色的模组文件夹" />
 
                 <Button Command="{x:Bind ViewModel.GoToCharacterCommand}">转到角色</Button>
             </StackPanel>
@@ -148,6 +147,41 @@
                             </local:InputWrapper.Input>
                         </local:InputWrapper>
 
+                        <local:InputWrapper InputField="{x:Bind ViewModel.Form.ReleaseDate}" Visibility="{x:Bind ViewModel.CharacterStatus.IsCustomCharacter, Mode=OneWay}">
+                            <local:InputWrapper.Input>
+
+                                <CalendarDatePicker Date="{x:Bind ViewModel.Form.ReleaseDate.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Header="发布日期" />
+                            </local:InputWrapper.Input>
+                        </local:InputWrapper>
+
+
+                        <local:InputWrapper InputField="{x:Bind ViewModel.Form.Rarity}" Visibility="{x:Bind ViewModel.CharacterStatus.IsCustomCharacter, Mode=OneWay}">
+                            <local:InputWrapper.Input>
+                                <StackPanel Orientation="Horizontal" Spacing="16">
+                                    <Slider
+                                        Width="200"
+                                        AutomationProperties.Name="Slider with ticks"
+                                        Header="稀有度"
+                                        Maximum="6"
+                                        Minimum="0"
+                                        SnapsTo="Ticks"
+                                        TickFrequency="1"
+                                        TickPlacement="Outside"
+                                        Value="{x:Bind ViewModel.Form.Rarity.Value, Mode=TwoWay}" />
+                                    <TextBlock VerticalAlignment="Center" Text="{x:Bind ViewModel.Form.Rarity.Value, Mode=OneWay}" />
+                                </StackPanel>
+                            </local:InputWrapper.Input>
+                        </local:InputWrapper>
+
+                        <local:InputWrapper InputField="{x:Bind ViewModel.Form.Element}" Visibility="{x:Bind ViewModel.CharacterStatus.IsCustomCharacter, Mode=OneWay}">
+                            <local:InputWrapper.Input>
+                                <ComboBox
+                                    Header="属性"
+                                    ItemsSource="{x:Bind ViewModel.Elements}"
+                                    SelectedItem="{x:Bind ViewModel.SelectedElement, Mode=TwoWay}" />
+                            </local:InputWrapper.Input>
+                        </local:InputWrapper>
+
                         <local:InputWrapper InputField="{x:Bind ViewModel.Form.IsMultiMod}">
                             <local:InputWrapper.Input>
                                 <CheckBox Content="允许启用多个模组" IsChecked="{x:Bind ViewModel.Form.IsMultiMod.Value, Mode=TwoWay}" />
@@ -193,16 +227,16 @@
                                         Grid.Column="1"
                                         HorizontalAlignment="Right"
                                         IsTextSelectionEnabled="True"
-                                        ToolTipService.ToolTip="添加至 JASM 的日期"
-                                        Text="{x:Bind DateAdded}" />
+                                        Text="{x:Bind DateAdded}"
+                                        ToolTipService.ToolTip="添加至 JASM 的日期" />
 
                                     <TextBlock
                                         Grid.Column="0"
                                         HorizontalAlignment="Left"
                                         IsTextSelectionEnabled="True"
+                                        Text="{x:Bind DisplayName}"
                                         TextTrimming="CharacterEllipsis"
-                                        ToolTipService.ToolTip="{x:Bind Path=DisplayName}"
-                                        Text="{x:Bind DisplayName}" />
+                                        ToolTipService.ToolTip="{x:Bind Path=DisplayName}" />
 
 
 
@@ -256,8 +290,8 @@
                                 <Grid MaxWidth="200">
                                     <TextBlock
                                         IsTextSelectionEnabled="True"
-                                        TextWrapping="WrapWholeWords"
-                                        Text="JASM 利用关键词来助力提升搜索功能。有些角色可能拥有多个名称，因此你可以添加额外的名称或搜索词条作为关键词。" />
+                                        Text="JASM 利用关键词来助力提升搜索功能。有些角色可能拥有多个名称，因此你可以添加额外的名称或搜索词条作为关键词。"
+                                        TextWrapping="WrapWholeWords" />
                                 </Grid>
                             </Flyout>
                         </Button.Flyout>
@@ -340,7 +374,7 @@
                     HorizontalAlignment="Stretch"
                     Command="{x:Bind ViewModel.ShowCharacterModelCommand}">
                     <Button.Content>
-                        <TextBlock TextWrapping="WrapWholeWords" Text="显示角色数据模型..." />
+                        <TextBlock Text="显示角色数据模型..." TextWrapping="WrapWholeWords" />
                     </Button.Content>
                 </Button>
 

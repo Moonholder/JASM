@@ -15,7 +15,7 @@ public interface ICharacter : IRarity, IDateSupport, IModdableObject, IEquatable
     public ICharacter DefaultCharacter { get; }
 
     public IGameClass Class { get; }
-    public IGameElement Element { get; }
+    public IGameElement Element { get; internal set; }
     public ICollection<string> Keys { get; internal set; }
 
     public ICollection<IRegion> Regions { get; }

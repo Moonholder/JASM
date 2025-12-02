@@ -5,7 +5,7 @@ namespace GIMI_ModManager.Core.GamesService.Models;
 
 public class Weapon : BaseModdableObject, IWeapon
 {
-    public int Rarity { get; private init; }
+    public int Rarity { get; set; }
     public IGameClass GameClass { get; }
 
     private Weapon(IModdableObject moddableObject, IGameClass gameClass) : base(moddableObject)

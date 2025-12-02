@@ -11,6 +11,12 @@ public class EditCustomCharacterRequest
 
     public NewValue<Uri?> Image { get; set; }
 
+    public NewValue<DateTime> ReleaseDate { get; set; }
+
+    public NewValue<int> Rarity { get; set; }
+
+    public NewValue<string> Element { get; set; }
+
     public NewValue<string[]> Keys { get; set; }
 
 

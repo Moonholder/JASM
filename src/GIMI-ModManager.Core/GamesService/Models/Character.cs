@@ -15,7 +15,7 @@ public class Character : ICharacter, IEquatable<Character>
     public string ModFilesName { get; set; } = string.Empty;
     public bool IsMultiMod { get; set; }
     public string DisplayName { get; set; } = null!;
-    public int Rarity { get; internal set; }
+    public int Rarity { get; set; }
     public bool IsCustomModObject { get; private init; }
 
     public Uri? ImageUri
@@ -31,7 +31,7 @@ public class Character : ICharacter, IEquatable<Character>
 
     public ICharacter DefaultCharacter { get; internal set; } = null!;
     public IGameClass Class { get; internal set; } = null!;
-    public IGameElement Element { get; internal set; } = null!;
+    public IGameElement Element { get; set; } = null!;
     public ICollection<string> Keys { get; set; } = Array.Empty<string>();
     public DateTime? ReleaseDate { get; set; }
     public ICollection<IRegion> Regions { get; internal set; } = Array.Empty<IRegion>();

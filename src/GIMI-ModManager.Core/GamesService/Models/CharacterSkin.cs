@@ -9,7 +9,7 @@ public class CharacterSkin : ICharacterSkin
 {
     public bool IsDefault { get; internal set; }
     public string ModFilesName { get; internal set; } = null!;
-    public int Rarity { get; internal set; } = -1;
+    public int Rarity { get; set; } = -1;
     public Uri? ImageUri { get; set; } = null;
     public string DisplayName { get; set; } = null!;
     public InternalName InternalName { get; init; } = null!;

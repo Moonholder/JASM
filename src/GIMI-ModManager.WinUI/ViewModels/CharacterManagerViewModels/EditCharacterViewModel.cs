@@ -1,7 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Diagnostics;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GIMI_ModManager.Core.Contracts.Services;
 using GIMI_ModManager.Core.GamesService;
@@ -19,6 +16,10 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Newtonsoft.Json;
 using Serilog;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Diagnostics;
+using static GIMI_ModManager.WinUI.ViewModels.CharacterManagerViewModels.CreateCharacterViewModel;
 
 namespace GIMI_ModManager.WinUI.ViewModels;
 
@@ -49,11 +50,14 @@ public partial class EditCharacterViewModel : ObservableRecipient, INavigationAw
 
     public EditCharacterForm Form { get; } = new();
 
+    [ObservableProperty] private ElementItemVM _selectedElement;
+    public ObservableCollection<ElementItemVM> Elements { get; } = [];
+
     public ObservableCollection<ModModel> Mods { get; } = new();
 
-
+    public ElementTheme CurrentTheme { get; set; }
     public EditCharacterViewModel(IGameService gameService, ILogger logger, ISkinManagerService skinManagerService,
-        ImageHandlerService imageHandlerService, NotificationManager notificationManager, INavigationService navigationService)
+        ImageHandlerService imageHandlerService, NotificationManager notificationManager, INavigationService navigationService, IThemeSelectorService themeSelectorService)
     {
         _gameService = gameService;
         _logger = logger.ForContext<EditCharacterViewModel>();
@@ -61,6 +65,13 @@ public partial class EditCharacterViewModel : ObservableRecipient, INavigationAw
         _imageHandlerService = imageHandlerService;
         _notificationManager = notificationManager;
         _navigationService = navigationService;
+
+        CurrentTheme = themeSelectorService.Theme;
+        PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName == nameof(SelectedElement) && SelectedElement is not null)
+                Form.Element.Value = SelectedElement.InternalName;
+        };
         Form.PropertyChanged += NotifyAllCommands;
     }
 
@@ -108,13 +119,19 @@ public partial class EditCharacterViewModel : ObservableRecipient, INavigationAw
 
 
         var allModObjects = _gameService.GetAllModdableObjects(GetOnly.Both);
+        var elements = _gameService.GetElements();
+        Elements.Clear();
+        Elements.AddRange(elements.Select(e => new ElementItemVM(e.InternalName, e.DisplayName)));
+        SelectedElement = Elements.FirstOrDefault(e => e.InternalName.Equals(character.Element.InternalName, StringComparison.OrdinalIgnoreCase), Elements.First(e => e.InternalName.Equals("None", StringComparison.OrdinalIgnoreCase)));
+        Form.Element.Value = SelectedElement.InternalName;
 
-        Form.Initialize(character, allModObjects);
+        Form.Initialize(character, allModObjects, elements);
         NotifyAllCommands();
     }
 
     public void OnNavigatedFrom()
     {
+
     }
 
     [RelayCommand]
@@ -224,7 +241,8 @@ public partial class EditCharacterViewModel : ObservableRecipient, INavigationAw
             PrimaryButtonText = "是,禁用这个角色",
             CloseButtonText = "不,取消",
             DefaultButton = ContentDialogButton.Primary,
-            XamlRoot = App.MainWindow.Content.XamlRoot
+            XamlRoot = App.MainWindow.Content.XamlRoot,
+            RequestedTheme = CurrentTheme
         };
 
         var result = await disableDialog.ShowAsync();
@@ -281,7 +299,8 @@ public partial class EditCharacterViewModel : ObservableRecipient, INavigationAw
             PrimaryButtonText = "是,删除这个角色",
             CloseButtonText = "不，取消",
             DefaultButton = ContentDialogButton.Primary,
-            XamlRoot = App.MainWindow.Content.XamlRoot
+            XamlRoot = App.MainWindow.Content.XamlRoot,
+            RequestedTheme = CurrentTheme
         };
 
         var result = await disableDialog.ShowAsync();
@@ -323,7 +342,8 @@ public partial class EditCharacterViewModel : ObservableRecipient, INavigationAw
             PrimaryButtonText = "是,启用这个角色",
             CloseButtonText = "不,取消",
             DefaultButton = ContentDialogButton.Primary,
-            XamlRoot = App.MainWindow.Content.XamlRoot
+            XamlRoot = App.MainWindow.Content.XamlRoot,
+            RequestedTheme = CurrentTheme
         };
 
         var result = await enableDialog.ShowAsync();
@@ -407,6 +427,23 @@ public partial class EditCharacterViewModel : ObservableRecipient, INavigationAw
                     editRequest.Keys = NewValue<string[]>.Set(Form.Keys.Items.ToArray());
                 }
 
+                if (Form.Element.IsDirty)
+                {
+                    Debug.Assert(Form.Element.IsValid);
+                    editRequest.Element = NewValue<string>.Set(Form.Element.Value);
+                }
+
+                if (Form.ReleaseDate.IsDirty)
+                {
+                    Debug.Assert(Form.ReleaseDate.IsValid);
+                    editRequest.ReleaseDate = NewValue<DateTime>.Set(Form.ReleaseDate.Value.Date);
+                }
+
+                if (Form.Rarity.IsDirty)
+                {
+                    Debug.Assert(Form.Rarity.IsValid);
+                    editRequest.Rarity = NewValue<int>.Set(Form.Rarity.Value);
+                }
 
                 Debug.Assert(editRequest.AnyValuesSet);
                 await Task.Run(() => _gameService.EditCustomCharacterAsync(_character.InternalName, editRequest)).ConfigureAwait(false);
@@ -527,6 +564,7 @@ public partial class EditCharacterViewModel : ObservableRecipient, INavigationAw
             CloseButtonText = "关闭",
             DefaultButton = ContentDialogButton.Close,
             XamlRoot = App.MainWindow.Content.XamlRoot,
+            RequestedTheme = CurrentTheme,
             Resources =
             {
                 ["ContentDialogMaxWidth"] = 8000,
