@@ -1,5 +1,6 @@
 using GIMI_ModManager.Core.Helpers;
 namespace GIMI_ModManager.Core.Services.GameBanana;
+
 public static class IgnorePollyLimiterScope
 {
     private static readonly AsyncLocal<bool> _ignorePollyLimiterScope = new();

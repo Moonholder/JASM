@@ -1,4 +1,5 @@
 namespace GIMI_ModManager.WinUI.Helpers;
+
 public abstract class Sorter<T>
 {
     public string SortingMethodType { get; }

@@ -2,6 +2,7 @@ using System.Runtime.CompilerServices;
 using GIMI_ModManager.WinUI.Services.ModHandling;
 using GIMI_ModManager.WinUI.Services.Notifications;
 namespace GIMI_ModManager.WinUI.Helpers;
+
 public static class HandlerServiceHelpers
 {
     public static async Task<Result<T>> CommandWrapperAsync<T>(Func<Task<Result<T>>> command, bool catchException = true,

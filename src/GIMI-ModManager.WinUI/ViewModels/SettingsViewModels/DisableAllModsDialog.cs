@@ -7,6 +7,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Serilog;
 namespace GIMI_ModManager.WinUI.ViewModels.SettingsViewModels;
+
 public class DisableAllModsDialog
 {
     private readonly ISkinManagerService _skinManagerService = App.GetService<ISkinManagerService>();

@@ -1,4 +1,5 @@
 namespace GIMI_ModManager.Core.Helpers;
+
 public readonly struct DisposableAction : IDisposable
 {
     private readonly Action _action;

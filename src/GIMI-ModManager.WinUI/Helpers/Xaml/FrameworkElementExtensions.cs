@@ -2,6 +2,7 @@ using System.Diagnostics;
 using CommunityToolkit.WinUI.UI.Controls;
 using Microsoft.UI.Xaml;
 namespace GIMI_ModManager.WinUI.Helpers.Xaml;
+
 public static class FrameworkElementExtensions
 {
     public static async Task AwaitUiElementLoaded(this FrameworkElement element, TimeSpan timeout)

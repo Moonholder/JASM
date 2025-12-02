@@ -7,6 +7,7 @@ using GIMI_ModManager.Core.GamesService.Interfaces;
 using GIMI_ModManager.Core.Services.ModPresetService;
 using GIMI_ModManager.Core.Services.ModPresetService.Models;
 namespace GIMI_ModManager.WinUI.Services.ModExport;
+
 public class JsonExporterService(ISkinManagerService skinManagerService, ModPresetService modPresetService)
 {
     private readonly ISkinManagerService _skinManagerService = skinManagerService;
