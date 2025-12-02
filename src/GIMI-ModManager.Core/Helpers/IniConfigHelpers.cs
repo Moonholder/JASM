@@ -85,15 +85,26 @@ public static partial class IniConfigHelpers
     public static bool IsSection(string line, string? sectionKey = null)
     {
         line = line.Trim();
-        if (sectionKey is null && line.StartsWith('[') && line.EndsWith(']'))
-            return true;
 
-        if (sectionKey is not null && line.Equals($"[{sectionKey}]", StringComparison.CurrentCultureIgnoreCase))
-            return true;
+        if (sectionKey is null && !string.IsNullOrEmpty(line))
+        {
+            return line.StartsWith('[') && line.IndexOf(']') > 0;
+        }
 
-        if (sectionKey is not null && (sectionKey.StartsWith('[') && sectionKey.EndsWith(']')) &&
-            line.Equals(sectionKey, StringComparison.CurrentCultureIgnoreCase))
-            return true;
+        if (!string.IsNullOrEmpty(sectionKey) && line.StartsWith('[') && line.IndexOf(']') > 0)
+        {
+            var bracketIndex = line.IndexOf(']');
+            var sectionName = line[..(bracketIndex + 1)].Trim();
+            if (sectionName.Equals($"[{sectionKey}]", StringComparison.CurrentCultureIgnoreCase))
+            {
+                return true;
+            }
+
+            if (sectionKey.StartsWith('[') && sectionKey.EndsWith(']') && sectionKey.Equals(sectionName, StringComparison.CurrentCultureIgnoreCase))
+            {
+                return true;
+            }
+        }
 
         return false;
     }

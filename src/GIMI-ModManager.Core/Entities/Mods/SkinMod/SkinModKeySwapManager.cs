@@ -10,7 +10,6 @@ namespace GIMI_ModManager.Core.Entities.Mods.SkinMod;
 public partial class SkinModKeySwapManager(ISkinMod skinMod)
 {
     private List<KeySwapSection>? _keySwaps;
-    private static readonly Regex KeySectionPattern = KeySectionRegex();
 
     public void ClearKeySwaps() => _keySwaps = null;
 
@@ -103,6 +102,12 @@ public partial class SkinModKeySwapManager(ISkinMod skinMod)
 
     private static void ProcessCurrentKeySwapBlock(List<string> keySwapLines, string sectionLine, List<IniKeySwapSection> iniKeySwaps)
     {
+        var bracketIndex = sectionLine.IndexOf(']');
+        if (bracketIndex > 0 && bracketIndex + 1 < sectionLine.Length)
+        {
+            sectionLine = sectionLine[..(bracketIndex + 1)].Trim();
+        }
+
         var keySwap = IniConfigHelpers.ParseKeySwap(keySwapLines, sectionLine);
         keySwap ??= new IniKeySwapSection
         {
@@ -116,7 +121,7 @@ public partial class SkinModKeySwapManager(ISkinMod skinMod)
 
     private static bool IsKeySection(string line)
     {
-        return IniConfigHelpers.IsSection(line) && KeySectionPattern.IsMatch(line.Trim());
+        return IniConfigHelpers.IsSection(line) && line.Trim().StartsWith("[key", StringComparison.OrdinalIgnoreCase);
     }
 
     private static bool ShouldEndKeySwapBlock(string line, bool isBlockActive, int lineCount)
@@ -371,9 +376,6 @@ public partial class SkinModKeySwapManager(ISkinMod skinMod)
             ? new KeySwapsNotLoaded()
             : _keySwaps.ToArray();
     }
-
-    [GeneratedRegex(@"^\[key.*\]$", RegexOptions.IgnoreCase, "zh-CN")]
-    private static partial Regex KeySectionRegex();
 }
 
 public struct KeySwapsNotLoaded
