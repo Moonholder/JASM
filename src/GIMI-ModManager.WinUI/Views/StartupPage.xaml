@@ -46,7 +46,7 @@
                 ItemsSource="{x:Bind ViewModel.Games}"
                 SelectedItem="{x:Bind ViewModel.SelectedGame, Mode=TwoWay}"
                 SelectionChanged="GameSelector_OnSelectionChanged"
-                ToolTipService.ToolTip="Select the game you want to manage mods for. This can be changed at any time on the settings page"
+                ToolTipService.ToolTip="选择您希望管理修改的游戏。您可以随时在设置页面更改此选项"
                 l:Uids.Uid="/Startup/GameSelectorBox" />
         </Grid>
 

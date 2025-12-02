@@ -111,20 +111,20 @@ public abstract partial class BaseProcessManager<TProcessOptions> : ObservableOb
         {
             if (result.Exception is Win32Exception e)
             {
-                var message = $"Failed to start {ProcessName}";
+                var message = $"启动 {ProcessName} 失败";
 
                 if (e.NativeErrorCode == 1223)
                 {
                     message =
-                        $"Failed to start {ProcessName}, this can happen due to the user cancelling the UAC (admin) prompt";
+                        $"启动 {ProcessName} 失败, 这可能是因为用户取消了 UAC（管理员）提示";
                 }
                 else if (e.NativeErrorCode == 740)
                 {
                     message =
-                        $"Failed to start {ProcessName}, this can happen if the exe has the 'Run as administrator' option enabled in the exe properties";
+                        $"启动 {ProcessName} 失败, 若该可执行文件（exe）的属性中启用了 “以管理员身份运行” 选项，可能会出现此问题";
                 }
 
-                _notificationManager.ShowNotification("Could not start process", message, null);
+                _notificationManager.ShowNotification("无法启动进程", message, null);
                 return;
             }
 
@@ -135,7 +135,7 @@ public abstract partial class BaseProcessManager<TProcessOptions> : ObservableOb
                 return;
             }
 
-            _notificationManager.ShowNotification("Could not start process", "An unknown error occurred", null);
+            _notificationManager.ShowNotification("无法启动进程", "发生未知错误", null);
             return;
         }
 

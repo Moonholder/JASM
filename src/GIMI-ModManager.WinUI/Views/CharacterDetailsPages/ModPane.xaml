@@ -358,7 +358,7 @@
                             </ItemsRepeater>
                         </StackPanel>
 
-                        <!--  详细编辑视图（原有内容，不再包含提示面板）  -->
+                        <!--  详细编辑视图 -->
                         <StackPanel Visibility="{x:Bind ViewModel.IsKeySwapsEditMode, Mode=OneWay, Converter={StaticResource BoolToVisibleConverter}}">
                             <!--  显示所有 ini 文件的 keyswaps  -->
                             <ItemsRepeater ItemsSource="{x:Bind ViewModel.IniKeySwapGroups, Mode=OneWay}" VirtualizingStackPanel.VirtualizationMode="Recycling">

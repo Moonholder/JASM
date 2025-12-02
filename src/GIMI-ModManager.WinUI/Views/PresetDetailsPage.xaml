@@ -34,8 +34,8 @@
             <TextBlock
                 Grid.Column="0"
                 Style="{StaticResource TitleTextBlockStyle}"
-                TextWrapping="NoWrap"
-                Text="{x:Bind ViewModel.GetPageTitle, Mode=OneWay}" />
+                Text="{x:Bind ViewModel.GetPageTitle, Mode=OneWay}"
+                TextWrapping="NoWrap" />
 
             <ProgressRing
                 Grid.Column="1"
@@ -109,7 +109,7 @@
 
 
                             <Button
-                                MaxHeight="32"
+                                MaxHeight="48"
                                 VerticalAlignment="Center"
                                 Command="{x:Bind NavigateToModCommand}"
                                 CommandParameter="{Binding Mode=OneTime}"
@@ -151,8 +151,8 @@
                                         <MenuFlyoutItem
                                             Command="{x:Bind ReplaceMissingModCommand}"
                                             CommandParameter="{Binding Mode=OneWay}"
-                                            Visibility="{x:Bind IsMissing, Converter={StaticResource BoolToVisibilityConverter}}"
-                                            Text="寻找替代Mod">
+                                            Text="寻找替代Mod"
+                                            Visibility="{x:Bind IsMissing, Converter={StaticResource BoolToVisibilityConverter}}">
                                             <MenuFlyoutItem.Icon>
                                                 <FontIcon Glyph="&#xE8DA;" />
                                             </MenuFlyoutItem.Icon>
@@ -160,9 +160,9 @@
                                         <MenuFlyoutItem
                                             Command="{x:Bind ReadAndSavePreferencesCommand}"
                                             CommandParameter="{Binding Mode=OneWay}"
+                                            Text="读取并保存首选项"
                                             ToolTipService.ToolTip="读取当前 3Dmigoto 用户的 ini 文件(d3dxUser.ini)，并为该预设保存偏好设置"
-                                            Visibility="{x:Bind IsNotMissing, Converter={StaticResource BoolToVisibilityConverter}}"
-                                            Text="读取并保存首选项">
+                                            Visibility="{x:Bind IsNotMissing, Converter={StaticResource BoolToVisibilityConverter}}">
                                             <MenuFlyoutItem.Icon>
                                                 <FontIcon Glyph="&#xE74E;" />
                                             </MenuFlyoutItem.Icon>
@@ -206,14 +206,14 @@
                                 <TextBlock
                                     FontSize="16"
                                     IsTextSelectionEnabled="True"
-                                    TextWrapping="WrapWholeWords"
-                                    Text="{x:Bind Name}" />
+                                    Text="{x:Bind Name}"
+                                    TextWrapping="WrapWholeWords" />
 
                                 <controls1:LinkButton
                                     HorizontalAlignment="Center"
                                     Link="{x:Bind SourceUrl}"
-                                    Visibility="{x:Bind HasSourceUrl, Converter={StaticResource BoolToVisibilityConverter}}"
-                                    Text="{x:Bind ModUrlName}" />
+                                    Text="{x:Bind ModUrlName}"
+                                    Visibility="{x:Bind HasSourceUrl, Converter={StaticResource BoolToVisibilityConverter}}" />
 
                                 <StackPanel>
                                     <TextBlock HorizontalAlignment="Center" Text="预设添加于:" />
@@ -236,9 +236,9 @@
                                     <TextBlock
                                         HorizontalAlignment="Center"
                                         IsTextSelectionEnabled="True"
+                                        Text="{x:Bind FullPath}"
                                         TextWrapping="Wrap"
-                                        ToolTipService.ToolTip="{x:Bind FullPath}"
-                                        Text="{x:Bind FullPath}" />
+                                        ToolTipService.ToolTip="{x:Bind FullPath}" />
                                 </StackPanel>
                             </StackPanel>
 

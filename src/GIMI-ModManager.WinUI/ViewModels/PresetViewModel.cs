@@ -116,7 +116,7 @@ public partial class PresetViewModel(
         }
         catch (Exception e)
         {
-            _notificationManager.ShowNotification("Failed to create preset", e.Message, TimeSpan.FromSeconds(5));
+            _notificationManager.ShowNotification("预设创建失败", e.Message, TimeSpan.FromSeconds(5));
         }
 
         ReloadPresets();
@@ -138,7 +138,7 @@ public partial class PresetViewModel(
         }
         catch (Exception e)
         {
-            _notificationManager.ShowNotification("Failed to duplicate preset", e.Message, TimeSpan.FromSeconds(5));
+            _notificationManager.ShowNotification("预设复制失败", e.Message, TimeSpan.FromSeconds(5));
         }
 
         ReloadPresets();

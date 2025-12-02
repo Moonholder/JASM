@@ -14,6 +14,7 @@ public sealed partial class EditCharacterPage : Page
     public EditCharacterPage()
     {
         ViewModel = App.GetService<EditCharacterViewModel>();
+        RequestedTheme = ViewModel.CurrentTheme;
         InitializeComponent();
 
         ViewModel.CharacterStatus.PropertyChanged += CharacterStatus_PropertyChanged;
@@ -29,7 +30,11 @@ public sealed partial class EditCharacterPage : Page
 
     private void SetBackground()
     {
-        var background = Application.Current.Resources["CardBackgroundFillColorDefaultBrush"] as SolidColorBrush;
+        var background = null as SolidColorBrush;
+        if (ActualTheme != ElementTheme.Dark)
+        {
+            background = Application.Current.Resources["CardBackgroundFillColorDefaultBrush"] as SolidColorBrush;
+        }
         if (ViewModel.CharacterStatus.IsDisabled)
             background = Application.Current.Resources["SmokeFillColorDefaultBrush"] as SolidColorBrush;
 

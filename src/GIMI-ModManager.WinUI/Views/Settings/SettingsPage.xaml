@@ -159,7 +159,7 @@
                 <StackPanel Margin="{StaticResource SmallTopBottomMargin}">
                     <ComboBox
                         x:Name="LanguageSelectorComboBox"
-                        Header="Select Display Language:"
+                        Header="选择显示语言："
                         ItemsSource="{x:Bind ViewModel.Languages, Mode=TwoWay}"
                         SelectedItem="{x:Bind ViewModel.SelectedLanguage, Mode=TwoWay}"
                         SelectionChanged="LanguageSelectorComboBox_OnSelectionChanged"
@@ -184,7 +184,7 @@
 
                     <ComboBox
                         x:Name="GameSelectorComboBox"
-                        Header="Selected Game:"
+                        Header="选择游戏："
                         ItemsSource="{x:Bind ViewModel.Games}"
                         SelectedItem="{x:Bind ViewModel.SelectedGame, Mode=TwoWay}"
                         SelectionChanged="GameSelectorComboBox_OnSelectionChanged"
@@ -425,7 +425,7 @@
                         NavigateUri="https://github.com/Jorixon/JASM" />
                     <HyperlinkButton
                         Margin="{StaticResource SettingsPageHyperlinkButtonMargin}"
-                        Content="Just Another Skin Manager 汉化版 Github"
+                        Content="Just Another Skin Manager 中文版 Github"
                         NavigateUri="https://github.com/Moonholder/JASM" />
                     <HyperlinkButton
                         Margin="{StaticResource SettingsPageHyperlinkButtonMargin}"

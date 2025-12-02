@@ -8,6 +8,6 @@ public static class UnloadedModsValidators
     public static IEnumerable<AbstractValidator<PathPicker>> Validators => new AbstractValidator<PathPicker>[]
     {
         new IsValidPathFormat(),
-        new FolderExists("Folder does not exist and will be created", true)
+        new FolderExists("文件夹不存在，将被创建", true)
     };
 }

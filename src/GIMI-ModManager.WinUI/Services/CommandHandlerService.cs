@@ -143,16 +143,16 @@ public class CommandHandlerService(CommandService commandService, ILogger logger
 
         if (command is null)
         {
-            return Result<ProcessCommand>.Error(new SimpleNotification("Command not found",
-                $"Command with id '{commandId}' not found"));
+            return Result<ProcessCommand>.Error(new SimpleNotification("命令未找到",
+                $"ID为 '{commandId}' 的命令未找到"));
         }
 
         var errors = await InternalCanRunCommandAsync(commandId, variablesInput, cancellationToken);
 
         if (errors.Count > 0)
         {
-            return Result<ProcessCommand>.Error(new SimpleNotification("Command cannot be started",
-                $"Command '{command.CommandDisplayName}' cannot be started due to the following errors: {string.Join(", ", errors)}"));
+            return Result<ProcessCommand>.Error(new SimpleNotification("命令无法启动",
+                $"命令 '{command.CommandDisplayName}' 因以下错误无法启动： {string.Join(", ", errors)}"));
         }
 
         var processCommand = _commandService.CreateCommand(command, variablesInput);
@@ -160,8 +160,8 @@ public class CommandHandlerService(CommandService commandService, ILogger logger
         processCommand.Start();
 
 
-        return Result<ProcessCommand>.Success(processCommand, new SimpleNotification("Command started",
-            $"Command '{command.CommandDisplayName}' started"));
+        return Result<ProcessCommand>.Success(processCommand, new SimpleNotification("命令已启动",
+            $"命令  '{command.CommandDisplayName}' 已启动"));
     }
 
     public async Task<List<CommandDefinition>> GetCommandsThatContainSpecialVariablesAsync(

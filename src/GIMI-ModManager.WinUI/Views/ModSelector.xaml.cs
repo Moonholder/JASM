@@ -32,7 +32,10 @@ public sealed partial class ModSelector : Page, IDisposable
 
     public static (ModSelector, Task<SelectionResult?>) Create(InitOptions options)
     {
-        var modSelector = new ModSelector(options);
+        var modSelector = new ModSelector(options)
+        {
+            RequestedTheme = options.Theme
+        };
         return (modSelector, modSelector._taskCompletionSource.Task);
     }
 

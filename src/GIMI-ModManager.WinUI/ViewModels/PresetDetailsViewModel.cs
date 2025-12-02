@@ -1,5 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkitWrapper;
 using GIMI_ModManager.Core.Contracts.Services;
@@ -16,6 +15,7 @@ using GIMI_ModManager.WinUI.ViewModels.CharacterDetailsViewModels;
 using GIMI_ModManager.WinUI.Views;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using System.Collections.ObjectModel;
 
 namespace GIMI_ModManager.WinUI.ViewModels;
 
@@ -28,7 +28,8 @@ public sealed partial class PresetDetailsViewModel(
     IWindowManagerService windowManagerService,
     BusyService busyService,
     ElevatorService elevatorService,
-    UserPreferencesService userPreferencesService)
+    UserPreferencesService userPreferencesService,
+    IThemeSelectorService themeSelectorService)
     : ObservableRecipient, INavigationAware
 {
     private readonly ImageHandlerService _imageHandlerService = imageHandlerService;
@@ -40,7 +41,7 @@ public sealed partial class PresetDetailsViewModel(
     private readonly BusyService _busyService = busyService;
     private readonly ElevatorService _elevatorService = elevatorService;
     private readonly UserPreferencesService _userPreferencesService = userPreferencesService;
-
+    private readonly IThemeSelectorService _themeSelectorService = themeSelectorService;
     private const string SelectModsWindowKey = "SelectModsWindow";
 
     private CancellationTokenSource? _cancellationTokenSource;
@@ -187,7 +188,7 @@ public sealed partial class PresetDetailsViewModel(
             await Task.Run(() => _modPresetService.DeleteModEntryAsync(PresetName, modPresetEntryVm.ModId));
 
             ModEntries.Remove(modPresetEntryVm);
-
+            OnPropertyChanged(nameof(GetPageTitle));
             _notificationManager.ShowNotification("模组已从预设中移除",
                 $"从预设 {PresetName} 中移除了{(modPresetEntryVm.IsMissing ? "缺失的" : "")}模组 '{modPresetEntryVm.Name}'",
                 null);
@@ -209,9 +210,11 @@ public sealed partial class PresetDetailsViewModel(
         try
         {
             IsBusy = true;
-            var presetModIds = ModEntries.Select(m => m.ModId).ToList();
-            var selectableMods = _skinManagerService
-                .GetAllMods(GetOptions.All)
+
+            var presetModIds = ModEntries.Select(m => m.ModId).ToHashSet();
+            var allMods = _skinManagerService.GetAllMods(GetOptions.All);
+
+            var selectableMods = allMods
                 .Where(mod => !presetModIds.Contains(mod.Id))
                 .ToList();
 
@@ -220,31 +223,92 @@ public sealed partial class PresetDetailsViewModel(
             if (result is null || result.ModIds.Count == 0)
                 return;
 
-            var modId = result.ModIds.First();
+            var addedModEntries = new List<ModPresetEntryDetailedVm>();
+            var failedMods = new List<(string modId, Exception exception)>();
+            var modsToAdd = selectableMods
+                .Where(mod => result.ModIds.Contains(mod.Id))
+                .ToDictionary(mod => mod.Id, mod => mod);
 
-            var modEntry = await Task.Run(() => _modPresetService.AddModEntryAsync(PresetName, modId));
-
-            var modSettings = await selectableMods.First(m => m.Id == modId).Mod.Settings.TryReadSettingsAsync();
-
-            var modEntryVm = new ModPresetEntryDetailedVm(modEntry,
-                modSettings?.ImagePath ?? _imageHandlerService.PlaceholderImageUri)
+            foreach (var modId in result.ModIds)
             {
-                NavigateToModCommand = NavigateToModCommand,
-                RemoveModFromPresetCommand = RemoveModFromPresetCommand,
-                ReplaceMissingModCommand = ReplaceMissingModCommand,
-                ReadAndSavePreferencesCommand = ReadAndSavePreferencesCommand
-            };
+                try
+                {
+                    if (!modsToAdd.TryGetValue(modId, out var modInfo))
+                        continue;
 
-            ModEntries.Insert(0, modEntryVm);
-            _backendModEntries.Insert(0, modEntryVm);
+                    var modEntry = await Task.Run(() =>
+                        _modPresetService.AddModEntryAsync(PresetName, modId));
 
-            _notificationManager.ShowNotification("模组已添加到预设中",
-                $"已将模组 '{modEntryVm.Name}' 添加到预设 {PresetName}",
-                null);
+                    var modSettings = await modInfo.Mod.Settings.TryReadSettingsAsync();
+
+                    var modEntryVm = new ModPresetEntryDetailedVm(modEntry,
+                        modSettings?.ImagePath ?? _imageHandlerService.PlaceholderImageUri)
+                    {
+                        NavigateToModCommand = NavigateToModCommand,
+                        RemoveModFromPresetCommand = RemoveModFromPresetCommand,
+                        ReplaceMissingModCommand = ReplaceMissingModCommand,
+                        ReadAndSavePreferencesCommand = ReadAndSavePreferencesCommand
+                    }.WithModdableObject(modInfo.ModList.Character);
+
+                    addedModEntries.Add(modEntryVm);
+                }
+                catch (Exception ex)
+                {
+                    failedMods.Add((modId.ToString(), ex));
+                    _notificationManager.ShowNotification($"添加模组失败",
+                        $"模组 {modId} 添加失败: {ex.Message}", null);
+                }
+            }
+
+            if (addedModEntries.Count > 0)
+            {
+                var dispatcherQueue = App.MainWindow?.DispatcherQueue;
+
+                if (dispatcherQueue != null)
+                {
+                    await dispatcherQueue.EnqueueAsync(async () =>
+                    {
+                        foreach (var modEntry in addedModEntries)
+                        {
+                            ModEntries.Insert(0, modEntry);
+                            _backendModEntries.Insert(0, modEntry);
+                        }
+                        await Task.CompletedTask;
+                    });
+                }
+                else
+                {
+                    foreach (var modEntry in addedModEntries)
+                    {
+                        ModEntries.Insert(0, modEntry);
+                        _backendModEntries.Insert(0, modEntry);
+                    }
+                }
+
+                if (failedMods.Count == 0)
+                {
+                    _notificationManager.ShowNotification("模组批量添加成功",
+                        $"成功将 {addedModEntries.Count} 个模组添加到预设 {PresetName}",
+                        null);
+                }
+                else
+                {
+                    _notificationManager.ShowNotification("模组批量添加完成",
+                        $"成功添加 {addedModEntries.Count} 个模组，失败 {failedMods.Count} 个",
+                        null);
+                }
+                OnPropertyChanged(nameof(GetPageTitle));
+            }
+            else if (failedMods.Count > 0)
+            {
+                _notificationManager.ShowNotification("添加模组到预设失败",
+                    $"所有 {failedMods.Count} 个模组添加均失败", null);
+            }
         }
         catch (Exception e)
         {
-            _notificationManager.ShowNotification("添加模组到预设失败", e.Message, null);
+            _notificationManager.ShowNotification("批量添加模组到预设失败",
+                $"操作过程中发生错误: {e.Message}", null);
         }
         finally
         {
@@ -397,7 +461,8 @@ public sealed partial class PresetDetailsViewModel(
         var options = new InitOptions
         {
             SelectableMods = selectableMods.ToArray(),
-            SelectionMode = ListViewSelectionMode.Single
+            SelectionMode = ListViewSelectionMode.Multiple,
+            Theme = _themeSelectorService.Theme,
         };
 
         var (modSelector, task) = ModSelector.Create(options);
@@ -410,7 +475,7 @@ public sealed partial class PresetDetailsViewModel(
             Width = 1200,
             Height = 750,
             MinHeight = 415,
-            MinWidth = 1024
+            MinWidth = 1024,
         };
 
         modSelector.CloseRequested += (_, _) => { window.Close(); };

@@ -5,7 +5,7 @@ namespace GIMI_ModManager.WinUI.Validators;
 
 public class FolderExists : AbstractValidator<PathPicker>
 {
-    public FolderExists(string message = "Folder does not exist", bool warning = false)
+    public FolderExists(string message = "文件夹不存在", bool warning = false)
     {
         RuleFor(x => x.Path).Must(Directory.Exists)
             .WithMessage(message)
