@@ -1,8 +1,9 @@
-﻿using System.Collections.ObjectModel;
-using Windows.Storage.Pickers;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using FluentValidation;
+using Microsoft.UI;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.Windows.Storage.Pickers;
+using System.Collections.ObjectModel;
 
 namespace GIMI_ModManager.WinUI.ViewModels.SubVms;
 
@@ -21,6 +22,12 @@ public partial class PathPicker : ObservableRecipient
     public ReadOnlyCollection<AbstractValidator<PathPicker>> Validators => _validators.AsReadOnly();
 
     public event EventHandler? IsValidChanged;
+
+    public string CommitButtonText = "选择";
+
+    public PickerLocationId SuggestedStartLocation = PickerLocationId.ComputerFolder;
+
+    public IList<string> FileTypeFilter = ["*"];
 
     private void RaiseIsValidChanged()
     {
@@ -43,7 +50,6 @@ public partial class PathPicker : ObservableRecipient
         _validators.AddRange(validators);
         Validate();
     }
-
 
     public void Validate(string? pathToSett = null)
     {
@@ -83,24 +89,65 @@ public partial class PathPicker : ObservableRecipient
 
     public async Task BrowseFolderPathAsync(WindowEx window)
     {
-        var folderPicker = new FolderPicker();
-        folderPicker.FileTypeFilter.Add("*");
-        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(window);
-        WinRT.Interop.InitializeWithWindow.Initialize(folderPicker, hwnd);
+        var windowId = GetWindowId(window);
+
+        var folderPicker = new FolderPicker(windowId)
+        {
+            SuggestedStartLocation = SuggestedStartLocation,
+            CommitButtonText = CommitButtonText
+        };
 
         var folder = await folderPicker.PickSingleFolderAsync();
         Path = folder?.Path;
     }
 
-    public async Task BrowseFilePathAsync(WindowEx window, string extensionFilter = "*")
+    public async Task BrowseFilePathAsync(WindowEx window)
     {
-        var filePicker = new FileOpenPicker();
-        filePicker.FileTypeFilter.Add(extensionFilter);
-        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(window);
-        WinRT.Interop.InitializeWithWindow.Initialize(filePicker, hwnd);
+        var windowId = GetWindowId(window);
+
+        var filePicker = new FileOpenPicker(windowId)
+        {
+            SuggestedStartLocation = SuggestedStartLocation,
+            CommitButtonText = CommitButtonText
+        };
+        foreach (var filter in FileTypeFilter)
+        {
+            filePicker.FileTypeFilter.Add(filter);
+        }
 
         var file = await filePicker.PickSingleFileAsync();
         Path = file?.Path;
+    }
+
+    public async Task<string?> BrowseSaveFilePathAsync(WindowEx window, string defaultFileName = "")
+    {
+        var windowId = GetWindowId(window);
+
+        var filePicker = new FileSavePicker(windowId)
+        {
+            SuggestedStartLocation = SuggestedStartLocation,
+            CommitButtonText = CommitButtonText
+        };
+
+        filePicker.FileTypeChoices.Add("Files", FileTypeFilter);
+
+        if (!string.IsNullOrEmpty(defaultFileName))
+        {
+            filePicker.SuggestedFileName = defaultFileName;
+        }
+
+        var file = await filePicker.PickSaveFileAsync();
+        return file?.Path;
+    }
+
+    // 辅助方法：从 WindowEx 获取 WindowId
+    private static WindowId GetWindowId(WindowEx window)
+    {
+        // 获取窗口句柄
+        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(window);
+
+        // 从窗口句柄获取 WindowId
+        return Win32Interop.GetWindowIdFromWindow(hwnd);
     }
 }
 

@@ -10,9 +10,11 @@ using GIMI_ModManager.Core.Helpers;
 using GIMI_ModManager.WinUI.Services;
 using GIMI_ModManager.WinUI.Services.ModHandling;
 using GIMI_ModManager.WinUI.Services.Notifications;
+using GIMI_ModManager.WinUI.ViewModels.SubVms;
 using GIMI_ModManager.WinUI.Views.CharacterDetailsPages;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
+using Microsoft.Windows.Storage.Pickers;
 using Serilog;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -22,7 +24,6 @@ using System.Runtime.ExceptionServices;
 using System.Threading.Channels;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
-using Windows.Storage.Pickers;
 
 namespace GIMI_ModManager.WinUI.ViewModels.CharacterDetailsViewModels.SubViewModels;
 
@@ -373,20 +374,21 @@ public sealed partial class ModPaneVM(
             _logger.Error(e, "An error occured while trying to copy mod folder path to clipboard when picking image");
         }
 
-        var filePicker = new FileOpenPicker
+        var pathPicker = new PathPicker()
         {
             CommitButtonText = "设置图片",
             SuggestedStartLocation = PickerLocationId.PicturesLibrary,
-            SettingsIdentifier = "ImagePicker"
+            FileTypeFilter = [.. Constants.SupportedImageExtensions]
         };
 
-        foreach (var supportedImageExtension in Constants.SupportedImageExtensions)
-            filePicker.FileTypeFilter.Add(supportedImageExtension);
+        await pathPicker.BrowseFilePathAsync(App.MainWindow);
 
-        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
-        WinRT.Interop.InitializeWithWindow.Initialize(filePicker, hwnd);
+        if (string.IsNullOrEmpty(pathPicker.Path))
+        {
+            return;
+        }
 
-        var file = await filePicker.PickSingleFileAsync();
+        var file = await StorageFile.GetFileFromPathAsync(pathPicker.Path);
 
         if (file == null)
             return;

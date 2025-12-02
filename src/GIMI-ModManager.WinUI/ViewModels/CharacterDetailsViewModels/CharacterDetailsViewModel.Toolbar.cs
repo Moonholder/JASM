@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.UI.Controls;
 using GIMI_ModManager.WinUI.Models.Options;
+using GIMI_ModManager.WinUI.ViewModels.SubVms;
 using GIMI_ModManager.WinUI.Views;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -9,7 +10,6 @@ using Microsoft.UI.Xaml.Input;
 using System.Collections.ObjectModel;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
-using Windows.Storage.Pickers;
 using Windows.System;
 using DispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue;
 
@@ -141,12 +141,14 @@ public partial class CharacterDetailsViewModel
     {
         await CommandWrapperAsync(true, async () =>
         {
-            var folderPicker = new FolderPicker();
-            folderPicker.FileTypeFilter.Add("*");
-            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
-            WinRT.Interop.InitializeWithWindow.Initialize(folderPicker, hwnd);
+            var pathPicker = new PathPicker();
+            await pathPicker.BrowseFolderPathAsync(App.MainWindow);
+            if (string.IsNullOrEmpty(pathPicker.Path))
+            {
+                return;
+            }
+            var folder = await StorageFolder.GetFolderFromPathAsync(pathPicker.Path);
 
-            var folder = await folderPicker.PickSingleFolderAsync();
             if (folder is null)
             {
                 _logger.Debug("User cancelled folder picker.");
@@ -184,13 +186,16 @@ public partial class CharacterDetailsViewModel
     {
         await CommandWrapperAsync(true, async () =>
         {
-            var filePicker = new FileOpenPicker();
-            filePicker.FileTypeFilter.Add(".zip");
-            filePicker.FileTypeFilter.Add(".rar");
-            filePicker.FileTypeFilter.Add(".7z");
-            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
-            WinRT.Interop.InitializeWithWindow.Initialize(filePicker, hwnd);
-            var file = await filePicker.PickSingleFileAsync();
+            var pathPicker = new PathPicker()
+            {
+                FileTypeFilter = [".zip", ".rar", ".7z"]
+            };
+            await pathPicker.BrowseFilePathAsync(App.MainWindow);
+            if (string.IsNullOrEmpty(pathPicker.Path))
+            {
+                return;
+            }
+            var file = await StorageFile.GetFileFromPathAsync(pathPicker.Path);
             if (file is null)
             {
                 _logger.Debug("User cancelled file picker.");

@@ -31,7 +31,10 @@ public partial class SimpleSelectProcessDialogVM : ObservableObject
 
     public SimpleSelectProcessDialogVM()
     {
-        PathPicker = new PathPicker([new IsValidPathFormat(), new FileExists()]);
+        PathPicker = new PathPicker([new IsValidPathFormat(), new FileExists()])
+        {
+            FileTypeFilter = [".exe"]
+        };
         PathPicker.PropertyChanged += (sender, args) =>
         {
             if (args.PropertyName == nameof(PathPicker.Path))
@@ -80,7 +83,7 @@ public partial class SimpleSelectProcessDialogVM : ObservableObject
     [RelayCommand]
     private async Task BrowseSimpleAsync()
     {
-        await PathPicker.BrowseFilePathAsync(App.MainWindow, ".exe").ConfigureAwait(false);
+        await PathPicker.BrowseFilePathAsync(App.MainWindow).ConfigureAwait(false);
     }
 
     [RelayCommand]
@@ -103,10 +106,16 @@ public partial class SimpleSelectProcessDialogVM : ObservableObject
         switch (Type)
         {
             case StartType.Game:
-                await GenshinProcessManager.TryInitialize();
+                App.MainWindow.DispatcherQueue.TryEnqueue(async () =>
+                {
+                    await GenshinProcessManager.TryInitialize();
+                });
                 break;
             case StartType.ModelImporter:
-                await ThreeDMigtoProcessManager.TryInitialize();
+                App.MainWindow.DispatcherQueue.TryEnqueue(async () =>
+                {
+                    await ThreeDMigtoProcessManager.TryInitialize();
+                });
                 break;
             default:
                 throw new ArgumentOutOfRangeException();

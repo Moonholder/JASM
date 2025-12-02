@@ -1,9 +1,10 @@
-﻿using Windows.ApplicationModel.DataTransfer;
-using Windows.Storage;
-using Windows.Storage.Pickers;
-using Windows.Storage.Streams;
-using GIMI_ModManager.Core.Helpers;
+﻿using GIMI_ModManager.Core.Helpers;
+using GIMI_ModManager.WinUI.ViewModels.SubVms;
 using Microsoft.UI.Xaml;
+using Microsoft.Windows.Storage.Pickers;
+using Windows.ApplicationModel.DataTransfer;
+using Windows.Storage;
+using Windows.Storage.Streams;
 
 namespace GIMI_ModManager.WinUI.Services;
 
@@ -26,17 +27,18 @@ public class ImageHandlerService
 
     public async Task<IStorageFile?> PickImageAsync(bool copyToTmpFolder = true, Window? window = null)
     {
-        var filePicker = new FileOpenPicker();
-        foreach (var supportedImageExtension in Constants.SupportedImageExtensions)
-            filePicker.FileTypeFilter.Add(supportedImageExtension);
-
-        filePicker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
-        filePicker.SettingsIdentifier = "PickImage";
-
-        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(window ?? App.MainWindow);
-        WinRT.Interop.InitializeWithWindow.Initialize(filePicker, hwnd);
-
-        var file = await filePicker.PickSingleFileAsync();
+        var filePicker = new PathPicker()
+        {
+            SuggestedStartLocation = PickerLocationId.PicturesLibrary,
+            FileTypeFilter = [.. Constants.SupportedImageExtensions]
+        };
+        await filePicker.BrowseFilePathAsync(App.MainWindow);
+        var path = filePicker.Path;
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return null;
+        }
+        var file = await StorageFile.GetFileFromPathAsync(path);
 
         if (file == null) return null;
 

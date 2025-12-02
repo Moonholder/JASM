@@ -1,4 +1,3 @@
-using Windows.Storage.Pickers;
 using GIMI_ModManager.Core.Contracts.Services;
 using GIMI_ModManager.Core.GamesService;
 using GIMI_ModManager.Core.GamesService.Models;
@@ -46,14 +45,18 @@ public sealed partial class DebugPage : Page
             Keys = new[] { "DebugTest", "Debugger" }
         };
 
-        var filePicker = new FileOpenPicker();
-        var hwnd = WindowNative.GetWindowHandle(App.MainWindow);
-        InitializeWithWindow.Initialize(filePicker, hwnd);
+        var pathPicker = new ViewModels.SubVms.PathPicker()
+        {
+            FileTypeFilter = [.. Constants.SupportedImageExtensions],
+        };
 
-        Constants.SupportedImageExtensions.ForEach(x => filePicker.FileTypeFilter.Add(x));
+        await pathPicker.BrowseFilePathAsync(App.MainWindow);
+        if (string.IsNullOrEmpty(pathPicker.Path))
+        {
+            return;
+        }
 
-        var file = await filePicker.PickSingleFileAsync();
-
+        var file = await Windows.Storage.StorageFile.GetFileFromPathAsync(pathPicker.Path);
         if (file != null)
         {
             createCharacterRequest.Image = new Uri(file.Path);

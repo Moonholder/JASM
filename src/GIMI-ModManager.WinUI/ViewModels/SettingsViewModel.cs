@@ -2,7 +2,6 @@
 using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
-using Windows.Storage.Pickers;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ErrorOr;
@@ -30,6 +29,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using Serilog;
+using Windows.Storage;
 
 namespace GIMI_ModManager.WinUI.ViewModels;
 
@@ -303,14 +303,17 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
     [RelayCommand(CanExecute = nameof(ValidFolderSettings))]
     private async Task SaveSettings()
     {
-        var dialog = new ContentDialog();
-        dialog.XamlRoot = App.MainWindow.Content.XamlRoot;
-        dialog.Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style;
-        dialog.Title = "更新文件夹路径?";
-        dialog.CloseButtonText = "取消";
-        dialog.PrimaryButtonText = "保存";
-        dialog.DefaultButton = ContentDialogButton.Primary;
-        dialog.Content = "要保存新的文件夹路径吗？之后应用程序将重新启动.";
+        var dialog = new ContentDialog
+        {
+            XamlRoot = App.MainWindow.Content.XamlRoot,
+            Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
+            Title = "更新文件夹路径?",
+            CloseButtonText = "取消",
+            PrimaryButtonText = "保存",
+            DefaultButton = ContentDialogButton.Primary,
+            RequestedTheme = ElementTheme,
+            Content = "要保存新的文件夹路径吗？之后应用程序将重新启动."
+        };
 
         var result = await dialog.ShowAsync();
 
@@ -558,13 +561,11 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
         if (result != ContentDialogResult.Primary)
             return;
 
-        var folderPicker = new FolderPicker();
-        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
-        WinRT.Interop.InitializeWithWindow.Initialize(folderPicker, hwnd);
-        folderPicker.FileTypeFilter.Add("*");
-        var folder = await folderPicker.PickSingleFolderAsync();
-        if (folder == null)
+        var pathPicker = new PathPicker();
+        await pathPicker.BrowseFolderPathAsync(App.MainWindow);
+        if (string.IsNullOrEmpty(pathPicker.Path))
             return;
+        var folder = await StorageFolder.GetFolderFromPathAsync(pathPicker.Path);
 
         ExportingMods = true;
         _navigationViewService.IsEnabled = false;

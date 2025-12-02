@@ -1,6 +1,3 @@
-using Windows.Storage.Pickers;
-using Windows.Win32;
-using Windows.Win32.Foundation;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GIMI_ModManager.Core.Helpers;
@@ -8,8 +5,11 @@ using GIMI_ModManager.Core.Services.CommandService;
 using GIMI_ModManager.Core.Services.CommandService.Models;
 using GIMI_ModManager.WinUI.Services.AppManagement;
 using GIMI_ModManager.WinUI.Services.Notifications;
+using GIMI_ModManager.WinUI.ViewModels.SubVms;
 using GIMI_ModManager.WinUI.Views.Settings;
 using Serilog;
+using Windows.Win32;
+using Windows.Win32.Foundation;
 
 namespace GIMI_ModManager.WinUI.ViewModels.SettingsViewModels;
 
@@ -19,6 +19,8 @@ public partial class CreateCommandViewModel : ObservableObject
     private readonly CommandService _commandService;
     private readonly NotificationManager _notificationManager;
     private readonly SelectedGameService _selectedGameService;
+    public PathPicker ExecutablePicker { get; }
+    public PathPicker WorkingDirectoryPicker { get; }
 
     private CreateCommandOptions? _createOptions;
 
@@ -46,6 +48,15 @@ public partial class CreateCommandViewModel : ObservableObject
         };
         SetEffectiveWorkingDirectory();
         ValidateCommand();
+        ExecutablePicker = new PathPicker()
+        {
+            Path = string.Empty,
+            FileTypeFilter = [".exe", ".py", ".bat"]
+        };
+        WorkingDirectoryPicker = new PathPicker
+        {
+            Path = string.Empty
+        };
     }
 
     [ObservableProperty] private string _commandDisplayName = string.Empty;
@@ -89,9 +100,10 @@ public partial class CreateCommandViewModel : ObservableObject
         {
             var command = options.CommandDefinition;
             CommandDisplayName = command.CommandDisplayName;
-            Command = command.ExecutionOptions.Command;
+            Command = ExecutablePicker.Path = command.ExecutionOptions.Command;
             Arguments = command.ExecutionOptions.Arguments ?? string.Empty;
-            WorkingDirectory = command.ExecutionOptions.WorkingDirectory ?? string.Empty;
+            WorkingDirectory = WorkingDirectoryPicker.Path = command.ExecutionOptions.WorkingDirectory ?? string.Empty;
+
             RunAsAdmin = command.ExecutionOptions.RunAsAdmin;
             UseShellExecute = command.ExecutionOptions.UseShellExecute;
             CreateWindow = command.ExecutionOptions.CreateWindow;
@@ -134,13 +146,13 @@ public partial class CreateCommandViewModel : ObservableObject
 
     private string? SetEffectiveWorkingDirectory()
     {
-        const string prefix = "Effective working directory: ";
+        const string prefix = "有效工作目录: ";
         var jasmWorkingDirectory = App.ROOT_DIR;
         string? workingDirectory = null;
 
         if (!IsValidWorkingDirectory())
         {
-            EffectiveWorkingDirectory = prefix + "Invalid working directory";
+            EffectiveWorkingDirectory = prefix + "无效工作目录";
             return null;
         }
 
@@ -227,17 +239,14 @@ public partial class CreateCommandViewModel : ObservableObject
     [RelayCommand]
     private async Task SelectExecutableAsync()
     {
-        var filePicker = new FileOpenPicker
+        await ExecutablePicker.BrowseFilePathAsync(App.MainWindow);
+        if (string.IsNullOrEmpty(ExecutablePicker.Path))
         {
-            SuggestedStartLocation = PickerLocationId.ComputerFolder,
-            FileTypeFilter = { "*", ".exe", ".py" },
-            CommitButtonText = "Select"
-        };
+            return;
+        }
+        Command = ExecutablePicker.Path;
+        var file = await Windows.Storage.StorageFile.GetFileFromPathAsync(ExecutablePicker.Path);
 
-
-        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
-        WinRT.Interop.InitializeWithWindow.Initialize(filePicker, hwnd);
-        var file = await filePicker.PickSingleFileAsync();
         if (file is null)
         {
             _logger.Debug("User cancelled file picker.");
@@ -276,24 +285,8 @@ public partial class CreateCommandViewModel : ObservableObject
     [RelayCommand]
     private async Task SelectWorkingDirectoryAsync()
     {
-        var folderPicker = new FolderPicker()
-        {
-            SuggestedStartLocation = PickerLocationId.ComputerFolder,
-            CommitButtonText = "Select Folder"
-        };
-
-
-        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
-        WinRT.Interop.InitializeWithWindow.Initialize(folderPicker, hwnd);
-        var folder = await folderPicker.PickSingleFolderAsync();
-
-        if (folder is null)
-        {
-            _logger.Debug("User cancelled folder picker.");
-            return;
-        }
-
-        WorkingDirectory = folder.Path;
+        await WorkingDirectoryPicker.BrowseFolderPathAsync(App.MainWindow);
+        WorkingDirectory = WorkingDirectoryPicker.Path ?? WorkingDirectory;
     }
 
 
@@ -307,7 +300,7 @@ public partial class CreateCommandViewModel : ObservableObject
         catch (Exception e)
         {
             _notificationManager.ShowNotification(
-                IsEditingCommand ? "Failed to update command." : "Failed to create command.", e.Message,
+                IsEditingCommand ? "命令更新失败." : "命令创建失败.", e.Message,
                 TimeSpan.FromSeconds(5));
 
             CloseRequested?.Invoke(this, EventArgs.Empty);
@@ -341,7 +334,7 @@ public partial class CreateCommandViewModel : ObservableObject
                 .ConfigureAwait(false);
             CloseRequested?.Invoke(this, EventArgs.Empty);
 
-            _notificationManager.ShowNotification($"Command '{createOptions.CommandDisplayName}' 更新成功.",
+            _notificationManager.ShowNotification($"命令 '{createOptions.CommandDisplayName}' 更新成功.",
                 "", TimeSpan.FromSeconds(3));
 
             await _commandService.SetSpecialCommands(_createOptions.CommandDefinition.Id,
