@@ -1,0 +1,9 @@
+﻿<linker>
+	<assembly fullname="JASM - Just Another Skin Manager">
+		<type fullname="GIMI_ModManager.WinUI.ViewModels.SubVms.GameComboBoxEntryVM" />
+		<type fullname="GIMI_ModManager.WinUI.ViewModels.StartupViewModel" />
+		<type fullname="GIMI_ModManager.WinUI.ViewModels.ShellViewModel" />
+		<type fullname="GIMI_ModManager.WinUI.ViewModels.CharacterDetailsViewModels.SubViewModels.ModRowVM" />
+		<type fullname="GIMI_ModManager.WinUI.ViewModels.ModPageViewModels.ModFileInfoVm" />
+	</assembly>
+</linker>

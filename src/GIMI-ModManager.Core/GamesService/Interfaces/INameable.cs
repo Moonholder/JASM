@@ -25,4 +25,6 @@ public interface INameable : IEquatable<INameable>
 
     /// <inheritdoc cref="InternalNameEquals(string?)"/>
     public bool InternalNameEquals(INameable other) => InternalNameEquals(other.InternalName);
+
+    public ICharacter? DefaultCharacter => null;
 }

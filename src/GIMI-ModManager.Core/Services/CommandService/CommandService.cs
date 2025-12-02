@@ -42,7 +42,8 @@ public sealed class CommandService(ILogger logger)
             try
             {
                 var json = await File.ReadAllTextAsync(_jsonCommandFilePath).ConfigureAwait(false);
-                var jsonCommands = JsonSerializer.Deserialize<JsonCommandRoot>(json) ?? new JsonCommandRoot();
+                var jsonCommands = JsonSerializer.Deserialize<JsonCommandRoot>(json,
+                    Serialization.CommandJsonContext.Default.JsonCommandRoot) ?? new JsonCommandRoot();
 
                 _commands = jsonCommands.Commands.Select(j => CommandDefinition.FromJson(j)).ToList();
                 if (jsonCommands.StartGameCommand is not null)
@@ -57,7 +58,8 @@ public sealed class CommandService(ILogger logger)
                 _logger.Error(e, "Failed to read command root json. Creating new one");
                 File.Move(_jsonCommandFilePath, _jsonCommandFilePath + ".invalid", overwrite: true);
                 await File.WriteAllTextAsync(_jsonCommandFilePath,
-                        JsonSerializer.Serialize(new JsonCommandRoot(), _jsonOptions))
+                        JsonSerializer.Serialize(new JsonCommandRoot(),
+                            Serialization.CommandJsonContext.Default.JsonCommandRoot))
                     .ConfigureAwait(false);
             }
         }
@@ -65,7 +67,7 @@ public sealed class CommandService(ILogger logger)
         {
             _logger.Information("No command root json found, creating new one");
             await File.WriteAllTextAsync(_jsonCommandFilePath,
-                    JsonSerializer.Serialize(new JsonCommandRoot(), _jsonOptions))
+                    JsonSerializer.Serialize(new JsonCommandRoot(), Serialization.CommandJsonContext.Default.JsonCommandRoot))
                 .ConfigureAwait(false);
         }
 
@@ -275,8 +277,9 @@ public sealed class CommandService(ILogger logger)
             jsonRoot.StartGameModelImporter = modelImporterCommand.ToJson();
 
 
-        await File.WriteAllTextAsync(_jsonCommandFilePath, JsonSerializer.Serialize(jsonRoot, _jsonOptions))
-                .ConfigureAwait(false);
+        await File.WriteAllTextAsync(_jsonCommandFilePath, JsonSerializer.Serialize(jsonRoot,
+            Serialization.CommandJsonContext.Default.JsonCommandRoot))
+            .ConfigureAwait(false);
     }
 
 

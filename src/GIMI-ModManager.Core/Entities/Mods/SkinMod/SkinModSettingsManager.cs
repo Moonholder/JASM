@@ -98,7 +98,8 @@ public class SkinModSettingsManager
             ImagePath = image?.LocalPath,
             DateAdded = DateTime.Now.ToString(CultureInfo.CurrentCulture)
         };
-        var json = JsonSerializer.Serialize(settings, _serializerOptions);
+        var json = JsonSerializer.Serialize(settings,
+            Serialization.ModSettingsJsonContext.Default.JsonModSettings);
 
         await File.WriteAllTextAsync(_settingsFilePath, json).ConfigureAwait(false);
         await ReadSettingsAsync().ConfigureAwait(false);
@@ -150,11 +151,9 @@ public class SkinModSettingsManager
 
     private static async Task<ModSettings> InternalReadSettingsAsync(ISkinMod? skinMod, Stream json, CancellationToken cancellationToken = default)
     {
-        var settings = await JsonSerializer.DeserializeAsync<JsonModSettings>(json, _serializerOptions, cancellationToken).ConfigureAwait(false);
 
-        if (settings is null)
-            throw new JsonSerializationException("Failed to deserialize settings file. Return value is null");
-
+        var settings = await JsonSerializer.DeserializeAsync<JsonModSettings>(json,
+            Serialization.ModSettingsJsonContext.Default.JsonModSettings, cancellationToken).ConfigureAwait(false) ?? throw new JsonSerializationException("Failed to deserialize settings file. Return value is null");
         var modSettings = ModSettings.FromJsonSkinSettings(skinMod, settings);
 
         return modSettings;
@@ -162,19 +161,20 @@ public class SkinModSettingsManager
 
     private static ModSettings InternalReadSettings(ISkinMod? skinMod, string json)
     {
-        var settings = JsonSerializer.Deserialize<JsonModSettings>(json, _serializerOptions);
+        var settings = JsonSerializer.Deserialize<JsonModSettings>(json,
+            Serialization.ModSettingsJsonContext.Default.JsonModSettings);
 
         if (settings is null)
             throw new JsonSerializationException("Failed to deserialize settings file. Return value is null");
 
-        var modSettings = ModSettings.FromJsonSkinSettings(skinMod, settings);
+        return ModSettings.FromJsonSkinSettings(skinMod, settings);
 
-        return modSettings;
     }
 
     private Task SaveSettingsAsync(JsonModSettings settings)
     {
-        var json = JsonSerializer.Serialize(settings, _serializerOptions);
+        var json = JsonSerializer.Serialize(settings,
+                Serialization.ModSettingsJsonContext.Default.JsonModSettings);
         return File.WriteAllTextAsync(_settingsFilePath, json);
     }
 

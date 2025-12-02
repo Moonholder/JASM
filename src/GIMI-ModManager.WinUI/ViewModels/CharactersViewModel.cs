@@ -625,9 +625,11 @@ public partial class CharactersViewModel : ObservableRecipient, INavigationAware
     [RelayCommand]
     private Task CharacterClicked(CharacterGridItemModel characterModel)
     {
-        _navigationService.SetListDataItemForNextConnectedAnimation(characterModel);
-
-        _navigationService.NavigateToCharacterDetails(characterModel.Character.InternalName);
+        if (characterModel is not null)
+        {
+            _navigationService.SetListDataItemForNextConnectedAnimation(characterModel);
+            _navigationService.NavigateToCharacterDetails(characterModel.Character.InternalName);
+        }
 
         return Task.CompletedTask;
     }

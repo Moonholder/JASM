@@ -45,7 +45,8 @@ public class ModNotificationManager(
         {
             var fileStream = _modNotificationsFile.Create();
 
-            await JsonSerializer.SerializeAsync(fileStream, new ModNotificationsRoot("1.0"), _jsonSerializerOptions)
+            await JsonSerializer.SerializeAsync(fileStream, new ModNotificationsRoot("1.0"),
+                    Services.Serialization.NotificationsJsonContext.Default.ModNotificationsRoot)
                 .ConfigureAwait(false);
             await fileStream.DisposeAsync().ConfigureAwait(false);
             return;
@@ -60,7 +61,8 @@ public class ModNotificationManager(
             _modNotificationsFile.CopyTo(_modNotificationsFile.FullName + ".invalid", true);
             modNotificationRoot = new ModNotificationsRoot("1.0");
             var fileStream = _modNotificationsFile.Create();
-            await JsonSerializer.SerializeAsync(fileStream, modNotificationRoot, _jsonSerializerOptions)
+            await JsonSerializer.SerializeAsync(fileStream, modNotificationRoot,
+                    Services.Serialization.NotificationsJsonContext.Default.ModNotificationsRoot)
                 .ConfigureAwait(false);
             await fileStream.DisposeAsync().ConfigureAwait(false);
         }
@@ -76,7 +78,8 @@ public class ModNotificationManager(
     {
         try
         {
-            var root = JsonSerializer.Deserialize<ModNotificationsRoot>(jsonContent, _jsonSerializerOptions);
+            var root = JsonSerializer.Deserialize<ModNotificationsRoot>(jsonContent,
+                Services.Serialization.NotificationsJsonContext.Default.ModNotificationsRoot);
             if (root?.Version is not null)
                 return root;
         }
@@ -91,7 +94,8 @@ public class ModNotificationManager(
         try
         {
             modNotificationsRootLegacy =
-                JsonSerializer.Deserialize<ModNotificationsRootLegacy>(jsonContent, _jsonSerializerOptions);
+                JsonSerializer.Deserialize<ModNotificationsRootLegacy>(jsonContent,
+                    Services.Serialization.NotificationsJsonContext.Default.ModNotificationsRootLegacy);
         }
         catch (Exception e)
         {
@@ -129,7 +133,8 @@ public class ModNotificationManager(
 
         await using var fileStream =
             new FileStream(_modNotificationsFile.FullName, FileMode.Truncate, FileAccess.Write);
-        await JsonSerializer.SerializeAsync(fileStream, modNotificationsRoot, _jsonSerializerOptions);
+        await JsonSerializer.SerializeAsync(fileStream, modNotificationsRoot,
+            Services.Serialization.NotificationsJsonContext.Default.ModNotificationsRoot);
         _modNotifications.ForEach(x => x.IsPersistent = true);
     }
 

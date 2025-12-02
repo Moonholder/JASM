@@ -137,7 +137,8 @@ public class GameService : IGameService
             return null;
 
         var jsonGameInfo =
-            JsonSerializer.Deserialize<JsonGame>(await File.ReadAllTextAsync(gameFilePath).ConfigureAwait(false));
+            JsonSerializer.Deserialize<JsonGame>(await File.ReadAllTextAsync(gameFilePath).ConfigureAwait(false),
+                Serialization.GameAssetsJsonContext.Default.JsonGame);
 
         if (jsonGameInfo is null)
             throw new InvalidOperationException($"{gameFilePath} file is empty");
@@ -167,10 +168,10 @@ public class GameService : IGameService
             try
             {
                 var json = await File.ReadAllTextAsync(jsonFilePath).ConfigureAwait(false);
-                var jsonBaseNameables = JsonSerializer.Deserialize<IEnumerable<JsonBaseNameable>>(json,
-                    _jsonSerializerOptions);
+                var jsonBaseNameables = JsonSerializer.Deserialize<List<JsonBaseNameable>>(json,
+                    Serialization.GameAssetsJsonContext.Default.ListJsonBaseNameable);
 
-                jsonBaseNameables ??= Array.Empty<JsonBaseNameable>();
+                jsonBaseNameables ??= new List<JsonBaseNameable>();
 
                 foreach (var jsonBaseNameable in jsonBaseNameables)
                 {
@@ -546,6 +547,23 @@ public class GameService : IGameService
             character.Keys = characterRequest.Keys.ValueToSet;
         }
 
+        if (characterRequest.ReleaseDate.IsSet)
+        {
+            revertsIfError.Add(() => character.ReleaseDate = character.DefaultCharacter.ReleaseDate);
+            character.ReleaseDate = characterRequest.ReleaseDate;
+        }
+
+        if (characterRequest.Rarity.IsSet)
+        {
+            revertsIfError.Add(() => character.Rarity = character.DefaultCharacter.Rarity);
+            character.Rarity = characterRequest.Rarity;
+        }
+
+        if (characterRequest.Element.IsSet)
+        {
+            revertsIfError.Add(() => character.Element = character.DefaultCharacter.Element);
+            character.Element = Elements.AllElements.FirstOrDefault(x => x.InternalNameEquals(characterRequest.Element), Element.NoneElement());
+        }
 
         try
         {
@@ -765,7 +783,8 @@ public class GameService : IGameService
             throw new FileNotFoundException($"{gameFileName} File not found at path: {gameFilePath}");
 
         var jsonGameInfo =
-            JsonSerializer.Deserialize<JsonGame>(await File.ReadAllTextAsync(gameFilePath).ConfigureAwait(false));
+            JsonSerializer.Deserialize<JsonGame>(await File.ReadAllTextAsync(gameFilePath).ConfigureAwait(false),
+                Serialization.GameAssetsJsonContext.Default.JsonGame);
 
         if (jsonGameInfo is null)
             throw new InvalidOperationException($"{gameFilePath} file is empty");
@@ -782,9 +801,8 @@ public class GameService : IGameService
             throw new FileNotFoundException($"{regionFileName} File not found at path: {regionsFilePath}");
 
         var regions =
-            JsonSerializer.Deserialize<IEnumerable<JsonRegion>>(
-                await File.ReadAllTextAsync(regionsFilePath).ConfigureAwait(false),
-                _jsonSerializerOptions) ?? throw new InvalidOperationException("Regions file is empty");
+            JsonSerializer.Deserialize<List<JsonRegion>>(await File.ReadAllTextAsync(regionsFilePath).ConfigureAwait(false),
+                Serialization.GameAssetsJsonContext.Default.ListJsonRegion) ?? throw new InvalidOperationException("Regions file is empty");
 
         Regions = Regions.InitializeRegions(regions);
 
@@ -1071,9 +1089,30 @@ public class GameService : IGameService
                 return Array.Empty<T>();
         }
 
-        return JsonSerializer.Deserialize<IEnumerable<T>>(
-            await File.ReadAllTextAsync(filePath).ConfigureAwait(false),
-            _jsonSerializerOptions) ?? throw new InvalidOperationException($"{filePath} is empty");
+        var fileText = await File.ReadAllTextAsync(filePath).ConfigureAwait(false);
+
+        // Use source-generated contexts for known game JSON types so trimming doesn't break reflection-based serialization
+        if (typeof(T) == typeof(JsonRegion))
+            return (IEnumerable<T>)(object)(JsonSerializer.Deserialize<List<JsonRegion>>(fileText, Serialization.GameAssetsJsonContext.Default.ListJsonRegion) ?? new List<JsonRegion>());
+        if (typeof(T) == typeof(JsonCharacter))
+            return (IEnumerable<T>)(object)(JsonSerializer.Deserialize<List<JsonCharacter>>(fileText, Serialization.GameAssetsJsonContext.Default.ListJsonCharacter) ?? new List<JsonCharacter>());
+        if (typeof(T) == typeof(JsonNpc))
+            return (IEnumerable<T>)(object)(JsonSerializer.Deserialize<List<JsonNpc>>(fileText, Serialization.GameAssetsJsonContext.Default.ListJsonNpc) ?? new List<JsonNpc>());
+        if (typeof(T) == typeof(JsonWeapon))
+            return (IEnumerable<T>)(object)(JsonSerializer.Deserialize<List<JsonWeapon>>(fileText, Serialization.GameAssetsJsonContext.Default.ListJsonWeapon) ?? new List<JsonWeapon>());
+        if (typeof(T) == typeof(JsonClasses))
+            return (IEnumerable<T>)(object)(JsonSerializer.Deserialize<List<JsonClasses>>(fileText, Serialization.GameAssetsJsonContext.Default.ListJsonClasses) ?? new List<JsonClasses>());
+        if (typeof(T) == typeof(JsonElement))
+            return (IEnumerable<T>)(object)(JsonSerializer.Deserialize<List<JsonElement>>(fileText, Serialization.GameAssetsJsonContext.Default.ListJsonElement) ?? new List<JsonElement>());
+        if (typeof(T) == typeof(JsonBaseNameable))
+            return (IEnumerable<T>)(object)(JsonSerializer.Deserialize<List<JsonBaseNameable>>(fileText, Serialization.GameAssetsJsonContext.Default.ListJsonBaseNameable) ?? new List<JsonBaseNameable>());
+        if (typeof(T) == typeof(JsonBaseModdableObject))
+            return (IEnumerable<T>)(object)(JsonSerializer.Deserialize<List<JsonBaseModdableObject>>(fileText, Serialization.GameAssetsJsonContext.Default.ListJsonBaseModdableObject) ?? new List<JsonBaseModdableObject>());
+        if (typeof(T) == typeof(JsonCustom))
+            return (IEnumerable<T>)(object)(JsonSerializer.Deserialize<List<JsonCustom>>(fileText, Serialization.GameAssetsJsonContext.Default.ListJsonCustom) ?? new List<JsonCustom>());
+
+        // Fallback to runtime serialization for types we didn't enumerate above
+        return JsonSerializer.Deserialize<IEnumerable<T>>(fileText, _jsonSerializerOptions) ?? throw new InvalidOperationException($"{filePath} is empty");
     }
 
     public string OtherCharacterInternalName => "Others";
@@ -1094,6 +1133,7 @@ public class GameService : IGameService
             Class = Classes.AllClasses.First(),
             IsMultiMod = true
         };
+        character.DefaultCharacter = character.Clone();
         AddDefaultSkin(character);
         return character;
     }
@@ -1117,6 +1157,7 @@ public class GameService : IGameService
             Class = Classes.AllClasses.First(),
             IsMultiMod = true
         };
+        character.DefaultCharacter = character.Clone();
         AddDefaultSkin(character);
         return character;
     }
@@ -1140,7 +1181,7 @@ public class GameService : IGameService
             Class = Classes.AllClasses.First(),
             IsMultiMod = true
         };
-
+        character.DefaultCharacter = character.Clone();
         AddDefaultSkin(character);
         return character;
     }
@@ -1171,16 +1212,25 @@ public class GameService : IGameService
             return;
         }
 
-        var json = JsonSerializer.Deserialize<ICollection<JsonOverride>>(
-            await File.ReadAllTextAsync(filePath).ConfigureAwait(false),
-            _jsonSerializerOptions);
+        var json = JsonSerializer.Deserialize<List<JsonOverride>>(await File.ReadAllTextAsync(filePath).ConfigureAwait(false),
+            Serialization.GameAssetsJsonContext.Default.ListJsonOverride);
 
         if (json is null)
             return;
 
         foreach (var nameable in nameables)
         {
-            var jsonOverride = json.FirstOrDefault(x => nameable.InternalNameEquals(x.InternalName));
+
+            var jsonOverride = json.FirstOrDefault(x =>
+                x.InternalName is not null &&
+                nameable.InternalNameEquals(x.InternalName));
+            if (_options.CharacterSkinsAsCharacters && jsonOverride is null)
+            {
+                jsonOverride = json.SelectMany(x => x.InGameSkins ?? Enumerable.Empty<JsonOverride>())
+                      .FirstOrDefault(skin => nameable is ICharacter character &&
+                                             nameable.InternalNameEquals(skin.InternalName));
+            }
+
             if (jsonOverride is null)
             {
                 _logger.Debug("Nameable {NameableName} not found in {FilePath}", nameable.InternalName, filePath);
@@ -1190,6 +1240,7 @@ public class GameService : IGameService
             if (!jsonOverride.DisplayName.IsNullOrEmpty())
             {
                 nameable.DisplayName = jsonOverride.DisplayName;
+                nameable.DefaultCharacter?.DisplayName = jsonOverride.DisplayName;
             }
 
 
@@ -1219,6 +1270,7 @@ public class GameService : IGameService
                 if (skinOverride.DisplayName.IsNullOrEmpty()) return;
 
                 skin.DisplayName = skinOverride.DisplayName;
+                skin.DefaultCharacter?.DisplayName = skinOverride.DisplayName;
 
                 if (skinOverride.Image.IsNullOrEmpty()) return;
                 _logger.Warning("Image override is not implemented for character skins");

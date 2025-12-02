@@ -1,10 +1,11 @@
-﻿using System.Collections.ObjectModel;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GIMI_ModManager.Core.Entities;
 using GIMI_ModManager.Core.Entities.Mods.Contract;
 using GIMI_ModManager.WinUI.Helpers;
 using GIMI_ModManager.WinUI.Services.Notifications;
+using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace GIMI_ModManager.WinUI.ViewModels.CharacterDetailsViewModels.SubViewModels;
 
@@ -62,6 +63,7 @@ public partial class ModRowVM : ObservableObject
         SearchableText = $"{DisplayName}{FolderName}{Author}{string.Join(null, Presets)}{DateAdded:d}{Description}";
     }
 
+    [DynamicDependency(DynamicallyAccessedMemberTypes.PublicProperties, typeof(ModRowVM))]
     public void TriggerPropertyChanged(string? propertyName) => OnPropertyChanged(propertyName ?? string.Empty);
 
     public string SearchableText { get; private set; } = string.Empty;

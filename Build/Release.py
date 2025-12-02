@@ -54,17 +54,12 @@ else:
 	print("Skipping Elevator")
 	print()
 
-
-if (SelfContained == False):
-	print("Building JASM - Auto Updater...")
-	jasmUpdaterPublishCommand = "dotnet publish " + JASM_Updater_CSPROJ + " /p:PublishProfile=FolderProfile.pubxml -c Release"
-	print(jasmUpdaterPublishCommand)
-	checkSuccessfulExitCode(os.system(jasmUpdaterPublishCommand))
-	print()
-	print("Finished building JASM - Auto Updater")
-else:
-	print("Skipping JASM - Auto Updater build because it is not supported for self-contained build")
-	print()
+print("Building JASM - Auto Updater...")
+jasmUpdaterPublishCommand = "dotnet publish " + JASM_Updater_CSPROJ + (" /p:PublishProfile=FolderProfileSelfContained.pubxml" if SelfContained else " /p:PublishProfile=FolderProfile.pubxml") + " -c Release"
+print(jasmUpdaterPublishCommand)
+checkSuccessfulExitCode(os.system(jasmUpdaterPublishCommand))
+print()
+print("Finished building JASM - Auto Updater")
 
 print("Building JASM...")
 jasmPublishCommand = "dotnet publish " + JASM_CSPROJ + (" /p:PublishProfile=FolderProfileSelfContained.pubxml" if SelfContained else " /p:PublishProfile=FolderProfile.pubxml") + " -c Release" 
@@ -88,12 +83,12 @@ shutil.copytree(JASM_OUTPUT, JASM_RELEASE_DIR, dirs_exist_ok=True)
 print()
 print("Finished copying JASM to release directory")
 
-if (SelfContained == False):
-	print("Copying JASM - Auto Updater to output...")
-	os.mkdir(JASM_RELEASE_DIR + "\\" + JASM_Updater_FolderName)
-	shutil.copytree(JASM_Updater_OUTPUT, JASM_RELEASE_DIR + "\\" + JASM_Updater_FolderName, dirs_exist_ok=True)
-	print()
-	print("Finished copying JASM - Auto Updater to release directory")
+# if (SelfContained == False):
+print("Copying JASM - Auto Updater to output...")
+os.mkdir(JASM_RELEASE_DIR + "\\" + JASM_Updater_FolderName)
+shutil.copytree(JASM_Updater_OUTPUT, JASM_RELEASE_DIR + "\\" + JASM_Updater_FolderName, dirs_exist_ok=True)
+print()
+print("Finished copying JASM - Auto Updater to release directory")
 
 print("Copying text files to RELEASE_DIR...")
 shutil.copy("Build\\README.txt", RELEASE_DIR)
@@ -104,8 +99,8 @@ print("Finished copying text files to release directory")
 print("Zipping release directory...")
 print("7z a -t7z -xm4 JASM.7z " + RELEASE_DIR)
 releaseArchiveName = "JASM_v" + versionNumber + ".7z"
-if (SelfContained):
-	releaseArchiveName = "SelfContained_" + releaseArchiveName
+# if (SelfContained):
+# 	releaseArchiveName = "SelfContained_" + releaseArchiveName
 
 checkSuccessfulExitCode(os.system(f"7z a -mx4 {releaseArchiveName} .\\{RELEASE_DIR}\\*"))
 print()

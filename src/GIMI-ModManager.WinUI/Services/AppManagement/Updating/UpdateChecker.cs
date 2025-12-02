@@ -1,7 +1,8 @@
 ﻿using System.Reflection;
 using GIMI_ModManager.WinUI.Contracts.Services;
 using GIMI_ModManager.WinUI.Models.Options;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Serilog;
 
 namespace GIMI_ModManager.WinUI.Services.AppManagement.Updating;
@@ -138,10 +139,10 @@ public sealed class UpdateChecker
 
         var text = await result.Content.ReadAsStringAsync(cancellationToken);
         var gitHubReleases =
-            JsonConvert.DeserializeObject<GitHubRelease[]>(text) ?? Array.Empty<GitHubRelease>();
+            JsonSerializer.Deserialize<GitHubRelease[]>(text, GitHubJsonContext.Default.GitHubReleaseArray) ?? Array.Empty<GitHubRelease>();
 
-        var latestReleases = gitHubReleases.Where(r => !r.prerelease);
-        var latestVersion = latestReleases.Select(r => new Version(r.tag_name?.Trim('v') ?? "")).Max();
+        var latestReleases = gitHubReleases.Where(r => !r.Prerelease);
+        var latestVersion = latestReleases.Select(r => new Version(r.TagName?.Trim('v') ?? "")).Max();
         return latestVersion;
     }
 
@@ -180,13 +181,27 @@ public sealed class UpdateChecker
             Version = version;
         }
     }
+}
 
+public class GitHubRelease
+{
+    [JsonPropertyName("target_commitish")]
+    public string? TargetCommitish { get; set; }
 
-    private class GitHubRelease
+    [JsonPropertyName("tag_name")]
+    public string? TagName { get; set; }
+
+    [JsonPropertyName("prerelease")]
+    public bool Prerelease { get; set; }
+
+    [JsonPropertyName("published_at")]
+    public DateTime PublishedAt { get; set; } = DateTime.MinValue;
+
+    [JsonPropertyName("url")]
+    public string? Url { get; set; }
+
+    [JsonConstructor]
+    public GitHubRelease()
     {
-        public string? target_commitish;
-        public string? tag_name;
-        public bool prerelease;
-        public DateTime published_at = DateTime.MinValue;
     }
 }

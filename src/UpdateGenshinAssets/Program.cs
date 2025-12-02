@@ -15,7 +15,7 @@ var response = await client.GetAsync("https://raw.githubusercontent.com/tokafew4
 
 var content = await response.Content.ReadAsStringAsync();
 
-var root = JsonSerializer.Deserialize<JsonWeaponRoot>(content);
+var root = JsonSerializer.Deserialize<JsonWeaponRoot>(content, UpdateGenshinAssets.Serialization.UpdateGenshinJsonContext.Default.JsonWeaponRoot);
 
 
 var weaponsJson = new List<JsonWeapon>();
@@ -35,9 +35,6 @@ foreach (var jsonWeaponRoot in root!.data)
     weaponsJson.Add(jsonWeapon);
 }
 
-var json = JsonSerializer.Serialize(weaponsJson, new JsonSerializerOptions()
-{
-    WriteIndented = true
-});
+var json = JsonSerializer.Serialize(weaponsJson, UpdateGenshinAssets.Serialization.UpdateGenshinJsonContext.Default.ListJsonWeapon);
 
 await File.WriteAllTextAsync("weapons.json", json);

@@ -57,7 +57,8 @@ public sealed class ApiGameBananaClient(
 
         var apiResponse =
             await JsonSerializer.DeserializeAsync<ApiModProfile>(contentStream,
-                cancellationToken: cancellationToken).ConfigureAwait(false);
+                Serialization.GameBananaApiJsonContext.Default.ApiModProfile, cancellationToken)
+            .ConfigureAwait(false);
 
 
         if (apiResponse == null)
@@ -85,7 +86,8 @@ public sealed class ApiGameBananaClient(
 
         var apiResponse =
             await JsonSerializer.DeserializeAsync<ApiModFilesInfo>(contentStream,
-                cancellationToken: cancellationToken).ConfigureAwait(false);
+                Serialization.GameBananaApiJsonContext.Default.ApiModFilesInfo, cancellationToken)
+            .ConfigureAwait(false);
 
 
         if (apiResponse == null)

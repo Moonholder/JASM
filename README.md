@@ -1,10 +1,8 @@
-# JASM - 只是又一款皮肤管理器（汉化版）
+# JASM - Just Another Skin Manager
 
 > 原项目地址：[https://github.com/Jorixon/JASM](https://github.com/Jorixon/JASM)
 
-**这仍处于开发的早期阶段。请自行备份并自行承担风险⚠️**
-
-未处理的异常也会写入日志文件。可以在 appsettings.json 中启用调试日志记录
+未处理的异常会写入 JASM 应用程序目录中的 Logs 文件。
 
 ## 功能
 - 精美的用户界面 👀
@@ -33,9 +31,9 @@
 
 ## 系统要求
 - Windows 10 1809 版本或更高版本（[据称](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/))
-- [.NET 桌面运行时](https://aka.ms/dotnet-core-applaunch?missing_runtime=true&arch=x64&rid=win10-x64&apphost_version=9.0.0&gui=true)
-- [Windows App SDK](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads)
-- [WebP 映像扩展](https://apps.microsoft.com/detail/9pg2dk419drg?hl=zh-CN&gl=CN) (仅限Windows 10)
+- ~~[.NET 桌面运行时](https://aka.ms/dotnet-core-applaunch?missing_runtime=true&arch=x64&rid=win10-x64&apphost_version=9.0.0&gui=true)~~
+- ~~[Windows App SDK](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads)~~
+- [WebP 映像扩展](https://apps.microsoft.com/detail/9pg2dk419drg?hl=zh-CN&gl=CN) (如果有角色图无法显示可安装)
 
 如果未下载这些，应用程序会提示你下载必要的依赖项并提供相应链接。
 
@@ -55,16 +53,6 @@ Elevator进程是一个小程序，可从应用程序中以提升权限的方式
 ## 常见问题
 
 
-### 为什么JASM打不开/弹出错误框?  
-请确保安装了对应**Release要求的.NET 桌面运行时和Windows App SDK版本**。  
-未安装对应版本的WinAppSDK，JASM会提示下载，点击“是”浏览器会打开下载页面，下载完成后，点击“是”安装。  
-如果在弹出的中文网页未找到对应的WinAppSDK，可去英文页面下载对应版本的[WinAppSDK](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads)。
-> [!NOTE]
-> 下载了正确的WinAppSDK运行后，JASM仍提示需安装WinAppSDK，那么可能您需要打开  
-> **设置**->**更新与安全**->**开发者选项**-> 选择“**<ins>开发人员模式</ins>**”  
-> 重启电脑后，再次运行WindowsAppRuntimeInstall安装程序  
-> ![image](https://github.com/user-attachments/assets/5e2b3a34-a4c5-4326-9bac-d764cb6c07c2)
-> ![image](https://github.com/user-attachments/assets/c3d58c36-3d5e-42f0-86a7-7cabe2f5c716)
 
 #### 为什么角色只能启用一个模组了?  
 在角色详情页面左上角点击显示按钮， 取消选中"只启用一个模组"
@@ -86,17 +74,22 @@ JASM会识别Mod文件夹中的ini文件，并提取其中的按键切换信息�
 ---
 ### JASM 不能启动
 
-我认为这是由于 WinAppSdk 安装不正确而导致的一些异常。我不知道是什么原因造成的。一个临时（永久？）解决方案是使用不需要 WinAppSdk 或 .NET 的独立版本的 JASM。请参阅发布页面 [SelfContainted_JASM_vx.x.x.7z](https://github.com/Moonholder/JASM/releases)。参考 [#72](https://github.com/Jorixon/JASM/issues/72) 和 [#171](https://github.com/Jorixon/JASM/issues/171)
 
-<ins>需要注意的是**独立版本(SelfContainted)的JASM**不支持自动更新</ins>
-
-如果 JASM 之前能正常工作，另一个可能的修复方法是删除 JASM 的用户设置文件夹。这会清除你的设置，比如预设、文件夹路径等。不过，你的模组以及模组设置（如自定义显示名称和图片）不会受到影响。JASM 设置存储在以下位置：`%localappdata%\JASM` / `C:\Users\<username>\AppData\Local\JASM`。你可以先尝试删除每个游戏的设置文件夹，看看是否有帮助，或者也可以直接删除整个文件夹。预设存储在预设文件夹内。最好先备份一下。
+如果 JASM 之前能正常工作，一个可能的修复方法是删除 JASM 的用户设置文件夹。这会清除你的设置，比如预设、文件夹路径等。不过，你的模组以及模组设置（如自定义显示名称和图片）不会受到影响。JASM 设置存储在以下位置：`%localappdata%\JASM` / `C:\Users\<username>\AppData\Local\JASM`。你可以先尝试删除每个游戏的设置文件夹，看看是否有帮助，或者也可以直接删除整个文件夹。预设存储在预设文件夹内。最好先备份一下。
 
 ### XXMI 兼容性
 截至目前，JASM 尚未完全兼容。在那之前，在你为 XXMI 中的 MI 设置的文件夹中创建一个名为 “3dmigoto loader.exe” 的空白文件。
 
-或者，如果你清楚自己在做什么，并且希望能够通过 JASM 在 XXMI 中启动游戏，创建一个指向快捷方式的符号链接。（在 XXMI 中 “开始” 按钮旁边的下拉菜单中为特定游戏创建快捷方式）。
+或者，如果你清楚自己在做什么，并且希望能够通过 JASM 在 XXMI 中启动游戏，在点击```启动游戏```弹出的窗口中点击```创建高级命令```，具体如下:
+![image](https://github.com/user-attachments/assets/2b0d48a7-25d9-46c9-9102-313632445181)
 
+### 更多参数参考
+```powershell
+--nogui --xxmi GIMI
+--nogui --xxmi ZZMI
+--nogui --xxmi SRMI
+--nogui --xxmi WWMI
+```
 
 ### 缺失图像
 你很可能正在使用 Windows 10 系统，并且缺少[Webp 图像扩展程序](https://apps.microsoft.com/detail/9pg2dk419drg?hl=zh-CN&gl=CN)。

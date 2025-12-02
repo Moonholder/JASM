@@ -73,7 +73,7 @@ jobs:
       matrix:
         configuration: [Release]
         platform: [x64]
-        build_type: [Regular, SelfContained]
+        build_type: [SelfContained]
 
     runs-on: windows-latest
     steps:
@@ -119,11 +119,6 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Download regular version build artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: JASM_Regular
-
       - name: Download self-contained version build artifact
         uses: actions/download-artifact@v4
         with:
@@ -146,7 +141,7 @@ jobs:
           $uploadUrl = $response.upload_url
           echo "UPLOAD_URL=$uploadUrl" >> $env:GITHUB_ENV
         
-      - name: Upload regular version release asset
+      - name: Upload self-contained version release asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -154,14 +149,4 @@ jobs:
           upload_url: ${{ env.UPLOAD_URL }}
           asset_path: ./JASM_${{ steps.get_version.outputs.VERSION }}.7z
           asset_name: JASM_${{ steps.get_version.outputs.VERSION }}.7z
-          asset_content_type: application/x-7z-compressed
-
-      - name: Upload self-contained version release asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ env.UPLOAD_URL }}
-          asset_path: ./SelfContained_JASM_${{ steps.get_version.outputs.VERSION }}.7z
-          asset_name: SelfContained_JASM_${{ steps.get_version.outputs.VERSION }}.7z
           asset_content_type: application/x-7z-compressed

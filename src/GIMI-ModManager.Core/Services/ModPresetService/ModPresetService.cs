@@ -60,7 +60,8 @@ public sealed class ModPresetService(
             {
                 var preset =
                     JsonSerializer.Deserialize<JsonModPreset>(await File.ReadAllTextAsync(jsonPreset.FullName)
-                        .ConfigureAwait(false));
+                        .ConfigureAwait(false),
+                        Serialization.ModPresetJsonContext.Default.JsonModPreset);
 
                 if (preset is not null)
                     _presets.Add(ModPreset.FromJson(Path.GetFileNameWithoutExtension(jsonPreset.Name), preset));
@@ -140,10 +141,10 @@ public sealed class ModPresetService(
 
         var modEntry = allMods.FirstOrDefault(m => m.ModId == modId);
         if (modEntry is null)
-            throw new InvalidOperationException("Mod to add to preset not found");
+            throw new InvalidOperationException("未找到需添加至预设的模组");
 
         if (preset.Mods.Any(m => m.ModId == modId))
-            throw new InvalidOperationException("Mod already exists in preset");
+            throw new InvalidOperationException("模组已存在于预设中");
 
         preset.AddMods([modEntry]);
 
@@ -160,13 +161,13 @@ public sealed class ModPresetService(
         AssertIsEditable(preset.Name);
 
         var existingModEntry = preset.Mods.FirstOrDefault(m => m.ModId == modId)
-                               ?? throw new InvalidOperationException("Mod to update in preset not found");
+                               ?? throw new InvalidOperationException("未找到需在预设中更新的模组");
 
         var mod = _skinManagerService.GetModById(modId) ??
-                  throw new InvalidOperationException("Mod to update in preset not found");
+                  throw new InvalidOperationException("未找到需在预设中更新的模组");
 
         var modSettings = await mod.Settings.TryReadSettingsAsync(useCache: false).ConfigureAwait(false) ??
-                          throw new ModSettingsNotFoundException($"Could not read mod settings for {mod.FullPath}");
+                          throw new ModSettingsNotFoundException($"无法读取 {mod.FullPath} 对应的模组设置");
 
 
         var updatedModEntry = ModPresetEntry.FromSkinMod(mod, modSettings);
@@ -187,20 +188,20 @@ public sealed class ModPresetService(
         using var _ = await LockAsync().ConfigureAwait(false);
 
         if (oldModId == newModId)
-            throw new InvalidOperationException("Old mod Id and new mod Id are the same");
+            throw new InvalidOperationException("旧模组 ID 与新模组 ID 相同");
 
         var preset = GetFirstModPreset(presetName);
         AssertIsEditable(preset.Name);
 
         var oldModEntry = preset.Mods.FirstOrDefault(m => m.ModId == oldModId)
-                          ?? throw new InvalidOperationException("Mod to update in preset not found");
+                          ?? throw new InvalidOperationException("未找到需在预设中更新的模组");
 
         var newMod = _skinManagerService.GetModById(newModId) ??
-                     throw new InvalidOperationException("New mod to replace in preset not found");
+                     throw new InvalidOperationException("未找到需在预设中替换的新模组");
 
         var newModSettings = await newMod.Settings.TryReadSettingsAsync(useCache: false).ConfigureAwait(false) ??
                              throw new ModSettingsNotFoundException(
-                                 $"Could not read mod settings for {newMod.FullPath}");
+                                 $"无法读取 {newMod.FullPath} 对应的模组设置");
 
         var updatedModEntry = ModPresetEntry.FromSkinMod(newMod, newModSettings);
 
@@ -248,7 +249,7 @@ public sealed class ModPresetService(
         newName = newName.Trim();
 
         if (oldName.IsNullOrEmpty())
-            throw new ArgumentException("Old name cannot be null or whitespace", nameof(oldName));
+            throw new ArgumentException("旧名称不能为空或仅含空白字符", nameof(oldName));
 
         AssertIsValidPresetName(newName);
 
@@ -321,7 +322,7 @@ public sealed class ModPresetService(
 
                     if (modSettings is null)
                         throw new ModSettingsNotFoundException(
-                            $"Could not read mod settings for {characterSkinEntry.Mod.FullPath}");
+                            $"无法读取 {characterSkinEntry.Mod.FullPath} 对应的模组设置");
                 }
                 catch (Exception e)
                 {
@@ -374,7 +375,7 @@ public sealed class ModPresetService(
         var presetOrder = presetNamesOrder.ToList();
 
         if (presetOrder.Count != _presets.Count)
-            throw new ArgumentException("Preset order count does not match preset count");
+            throw new ArgumentException("预设顺序数量与预设数量不匹配");
 
         var index = 0;
         foreach (var presetName in presetOrder)
@@ -415,7 +416,8 @@ public sealed class ModPresetService(
         foreach (var preset in _presets)
         {
             var presetPath = GetPresetPath(preset.Name);
-            var json = JsonSerializer.Serialize(preset.ToJson(), _jsonSerializerOptions);
+            var json = JsonSerializer.Serialize(preset.ToJson(),
+                Serialization.ModPresetJsonContext.Default.JsonModPreset);
             await File.WriteAllTextAsync(presetPath, json).ConfigureAwait(false);
         }
 
@@ -449,7 +451,7 @@ public sealed class ModPresetService(
 
             if (modSettings is null)
                 throw new ModSettingsNotFoundException(
-                    $"Could not read mod settings for {characterSkinEntry.Mod.FullPath}");
+                    $"无法读取 {characterSkinEntry.Mod.FullPath} 对应的模组设置");
 
             var modEntry = ModPresetEntry.FromSkinMod(characterSkinEntry.Mod, modSettings);
             modEntries.Add(modEntry);
@@ -465,7 +467,7 @@ public sealed class ModPresetService(
     /// </summary>
     private ModPreset GetFirstModPreset(string presetName) =>
         GetPresetOrDefault(presetName) ??
-        throw new ArgumentException($"Preset with name {presetName} not found", nameof(presetName));
+        throw new ArgumentException($"未找到名称为 {presetName} 的预设", nameof(presetName));
 
     private bool IsValidPresetName([NotNullWhen(true)] string? name) =>
         !name.IsNullOrEmpty() && name.IndexOfAny(Path.GetInvalidFileNameChars()) == -1 &&
@@ -475,7 +477,7 @@ public sealed class ModPresetService(
     {
         if (!IsValidPresetName(name))
             throw new InvalidOperationException(
-                $"The preset name '{name}' cannot be empty and must be unique among preset names");
+                $"预设名称  '{name}' 不能为空，且在所有预设名称中必须唯一");
     }
 
     private void AssertIsEditable(string presetName)
@@ -483,7 +485,7 @@ public sealed class ModPresetService(
         var preset = GetFirstModPreset(presetName);
 
         if (preset.IsReadOnly)
-            throw new InvalidOperationException($"Preset '{presetName}' is set to read-only");
+            throw new InvalidOperationException($"预设 '{presetName}' 已设为只读模式");
     }
 
     // To avoid race conditions, we lock all the preset methods
@@ -511,7 +513,7 @@ public sealed class ModPresetService(
 
                 if (characterSkinEntry is null)
                 {
-                    _logger.Information("Could not resolve mod preset entry at path {ModFullPath}", mod.FullPath);
+                    _logger.Information("无法解析路径 {ModFullPath} 下的模组预设项", mod.FullPath);
 
                     mod.IsMissing = true;
                     anyChanges = true;
@@ -521,7 +523,7 @@ public sealed class ModPresetService(
                 if (characterSkinEntry.Id != mod.ModId)
                 {
                     _logger.Information(
-                        "Resolved mod preset entry {ModFullPath} to {CharacterSkinEntryFullPath}, updating preset modId",
+                        "已将路径 {ModFullPath} 下的模组预设项解析至 {CharacterSkinEntryFullPath}，正在更新预设的 modId",
                         mod.FullPath,
                         characterSkinEntry.Mod.FullPath);
 
