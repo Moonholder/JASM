@@ -550,7 +550,14 @@
       "Rinascita"
     ],
     "ModFilesName": "Zani",
-    "InGameSkins": [],
+    "InGameSkins": [
+      {
+        "ModFilesName": "ZaniDowntownRepose",
+        "Image": "ZaniDowntownRepose.webp",
+        "InternalName": "Zani Downtown Repose",
+        "DisplayName": "Downtown Repose"
+      }
+    ],
     "InternalName": "Zani",
     "DisplayName": "Zani"
   },

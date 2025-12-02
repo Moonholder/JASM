@@ -467,7 +467,13 @@
   },
   {
     "InternalName": "Zani",
-    "DisplayName": "赞妮"
+    "DisplayName": "赞妮",
+    "InGameSkins": [
+      {
+        "InternalName": "Zani Downtown Repose",
+        "DisplayName": "城市午茶"
+      }
+    ]
   },
   {
     "InternalName": "Ciaccona",
