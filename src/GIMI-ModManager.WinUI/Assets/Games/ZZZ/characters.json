@@ -396,7 +396,14 @@
       "ResponseTeam"
     ],
     "ModFilesName": "Jane",
-    "InGameSkins": [],
+    "InGameSkins": [
+      {
+        "ModFilesName": "JaneNocturneOfLight",
+        "Image": "JaneNocturneOfLight.webp",
+        "InternalName": "JaneNocturneOfLight",
+        "DisplayName": "Nocturne of Light"
+      }
+    ],
     "InternalName": "Jane",
     "DisplayName": "Jane"
   },
@@ -867,7 +874,7 @@
     "Keys": [
       "Banyue"
     ],
-    "ReleaseDate": "2026-01-01T00:00:00",
+    "ReleaseDate": "2025-12-17T00:00:00",
     "Image": "Banyue.webp",
     "Rarity": 5,
     "Element": "Fire",
@@ -884,7 +891,7 @@
     "Keys": [
       "Dialyn"
     ],
-    "ReleaseDate": "2026-01-01T00:00:00",
+    "ReleaseDate": "2025-11-26T00:00:00",
     "Image": "Dialyn.webp",
     "Rarity": 5,
     "Element": "Physical",
@@ -896,5 +903,46 @@
     "InGameSkins": [],
     "InternalName": "Dialyn",
     "DisplayName": "Dialyn"
+  },
+  {
+    "Keys": [
+      "Ye Shunguang"
+    ],
+    "ReleaseDate": "2025-12-30T00:00:00",
+    "Image": "YeShunguang.webp",
+    "Rarity": 5,
+    "Element": "Physical",
+    "Class": "Attack",
+    "Region": [
+      "Yunkui"
+    ],
+    "ModFilesName": "YeShunguang",
+    "InGameSkins": [
+      {
+        "ModFilesName": "YeShunguangTouchOfDawnlight",
+        "Image": "YeShunguangTouchOfDawnlight.webp",
+        "InternalName": "YeShunguangTouchOfDawnlight",
+        "DisplayName": "Touch of Dawnlight"
+      }
+    ],
+    "InternalName": "YeShunguang",
+    "DisplayName": "Ye Shunguang"
+  },
+    {
+    "Keys": [
+      "Zhao"
+    ],
+    "ReleaseDate": "2025-12-30T00:00:00",
+    "Image": "Zhao.webp",
+    "Rarity": 5,
+    "Element": "Ice",
+    "Class": "Defense",
+    "Region": [
+      "Krampus"
+    ],
+    "ModFilesName": "Zhao",
+    "InGameSkins": [],
+    "InternalName": "Zhao",
+    "DisplayName": "Zhao"
   }
 ]

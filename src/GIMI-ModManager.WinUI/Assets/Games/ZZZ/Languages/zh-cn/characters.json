@@ -379,20 +379,12 @@
     "DisplayName": "雅"
   },
   {
-    "Keys": [
-      "Jane",
-      "Doe"
+    "InGameSkins": [
+      {
+        "InternalName": "JaneNocturneOfLight",
+        "DisplayName": "漪光夜曲"
+      }
     ],
-    "ReleaseDate": "2024-08-14T00:00:00",
-    "Image": "Jane.webp",
-    "Rarity": 5,
-    "Element": "Physical",
-    "Class": "Anomoly",
-    "Region": [
-      "ResponseTeam"
-    ],
-    "ModFilesName": "Jane",
-    "InGameSkins": [],
     "InternalName": "Jane",
     "DisplayName": "简"
   },
@@ -658,5 +650,19 @@
   {
     "InternalName": "Dialyn",
     "DisplayName": "琉音"
+  },
+  {
+    "InternalName": "YeShunguang",
+    "DisplayName": "叶瞬光",
+    "InGameSkins":[
+      {
+        "InternalName": "YeShunguangTouchOfDawnlight",
+        "DisplayName": "暖霞拾光"
+      }
+    ]
+  },
+  {
+    "InternalName": "Zhao",
+    "DisplayName": "照"
   }
 ]
