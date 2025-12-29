@@ -28,6 +28,7 @@ using GIMI_ModManager.WinUI.Views.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using Polly;
@@ -75,7 +76,7 @@ public partial class App : Application
     public static string ROOT_DIR { get; } = AppDomain.CurrentDomain.BaseDirectory;
     public static string ASSET_DIR { get; } = Path.Combine(ROOT_DIR, "Assets");
 
-    public static WindowEx MainWindow { get; } = new MainWindow();
+    public static WindowEx MainWindow { get; private set; } = null!;
     public static UIElement? AppTitlebar { get; set; }
 
     public static bool OverrideShutdown { get; set; }
@@ -93,16 +94,14 @@ public partial class App : Application
             .UseSerilog((context, configuration) =>
             {
                 configuration.MinimumLevel.Override("System.Net.Http.HttpClient", LogEventLevel.Warning);
-
                 configuration.Filter.ByExcluding(logEvent =>
-                    logEvent.Exception is RateLimiterRejectedException);
+                    logEvent.Exception is RateLimiterRejectedException ||
+                    logEvent.Exception is OperationCanceledException);
                 configuration.Enrich.FromLogContext();
-
-
                 configuration.ReadFrom.Configuration(context.Configuration);
                 var mt = new ExpressionTemplate(
                     "[{@t:yyyy-MM-dd'T'HH:mm:ss} {@l:u3} {Substring(SourceContext, LastIndexOf(SourceContext, '.') + 1)}] {@m}\n{@x}");
-                configuration.WriteTo.File(formatter: mt, "logs\\log.txt");
+                configuration.WriteTo.File(formatter: mt, "logs\\log.txt", rollingInterval: RollingInterval.Day, retainedFileCountLimit: 7);
                 if (Debugger.IsAttached) configuration.WriteTo.Debug();
             })
             .ConfigureServices((context, services) =>
@@ -167,20 +166,24 @@ public partial class App : Application
                 // Also tried with httpclientfactory, but that didn't work either
 
                 services.AddHttpClient<IApiGameBananaClient, ApiGameBananaClient>(client =>
-                    {
-                        client.DefaultRequestHeaders.Add("User-Agent", "JASM-Just_Another_Skin_Manager-Update-Checker");
-                        client.DefaultRequestHeaders.Add("Jasm-Version", $"{Assembly.GetExecutingAssembly().GetName().Version!}");
-                        client.DefaultRequestHeaders.Add("Accept", "application/json");
-                    })
+                {
+                    client.DefaultRequestHeaders.Add("User-Agent", "JASM-Just_Another_Skin_Manager-Update-Checker");
+                    client.DefaultRequestHeaders.Add("Jasm-Version", $"{Assembly.GetExecutingAssembly().GetName().Version!}");
+                    client.DefaultRequestHeaders.Add("Accept", "application/json");
+                    client.Timeout = TimeSpan.FromSeconds(30);
+                })
                     .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler()
                     {
-                        PooledConnectionLifetime = TimeSpan.FromMinutes(10)
-                    }).AddHttpMessageHandler<HttpLoggerHandler>();
+                        PooledConnectionLifetime = TimeSpan.FromMinutes(2),
+                        ConnectTimeout = TimeSpan.FromSeconds(10),
+                        MaxConnectionsPerServer = 10
+                    })
+                    .AddHttpMessageHandler<HttpLoggerHandler>();
 
-                // I'm preeeetty sure this is not correctly set up, not used to polly 8.x.x
-                // But it does rate limit, so I guess it's fine for now
+                // Resilience Pipeline 配置
                 services.AddResiliencePipeline(ApiGameBananaClient.HttpClientName, (builder, context) =>
                 {
+                    // Rate Limiter
                     var limiter = new TokenBucketRateLimiter(new TokenBucketRateLimiterOptions()
                     {
                         QueueProcessingOrder = QueueProcessingOrder.NewestFirst,
@@ -199,30 +202,24 @@ public partial class App : Application
                         .AddRateLimiter(limiter)
                         .AddRetry(new RetryStrategyOptions()
                         {
-                            BackoffType = DelayBackoffType.Linear,
+                            BackoffType = DelayBackoffType.Exponential,
                             UseJitter = true,
-                            MaxRetryAttempts = 8,
-                            Delay = TimeSpan.FromMilliseconds(200)
+                            MaxRetryAttempts = 5,
+                            Delay = TimeSpan.FromMilliseconds(500),
+                            ShouldHandle = new PredicateBuilder().Handle<HttpRequestException>().Handle<TimeoutException>() // 明确处理哪些异常
                         });
 
-                    builder.TelemetryListener = null;
-                    context.OnPipelineDisposed(() =>
-                    {
-                        // This is never called, so I'm not sure if this is correct
-                        Log.Debug("Disposing rate limiter");
-                        limiter.Dispose();
-                    });
                 });
+
                 services.AddSingleton<ModUpdateAvailableChecker>();
                 services.AddSingleton<ModInstallerService>();
 
-
                 services.AddHttpClient(Options.DefaultName, (client) =>
-                    {
-                        client.DefaultRequestHeaders.Add("User-Agent", "JASM-Just_Another_Skin_Manager");
-                        client.DefaultRequestHeaders.Add("Jasm-Version", $"{Assembly.GetExecutingAssembly().GetName().Version!}");
-                        client.DefaultRequestHeaders.Add("Accept", "application/json");
-                    })
+                {
+                    client.DefaultRequestHeaders.Add("User-Agent", "JASM-Just_Another_Skin_Manager");
+                    client.DefaultRequestHeaders.Add("Jasm-Version", $"{Assembly.GetExecutingAssembly().GetName().Version!}");
+                    client.DefaultRequestHeaders.Add("Accept", "application/json");
+                })
                     .AddHttpMessageHandler<HttpLoggerHandler>()
                     .AddPolicyHandler(
                         HttpPolicyExtensions.HandleTransientHttpError()
@@ -283,8 +280,6 @@ public partial class App : Application
         UnhandledException += App_UnhandledException;
     }
 
-    // Incremented when an error window is opened, decremented when it is closed
-    // Just avoid spamming the user with error windows
     private int _ErrorWindowsOpen = 0;
 
     private void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
@@ -313,34 +308,53 @@ public partial class App : Application
                                --------------------------------------------------------------------
                                """);
 
-        // show error dialog
-        var window = new ErrorWindow(e.Exception, () => _ErrorWindowsOpen--)
+        var dispatcher = MainWindow?.DispatcherQueue ?? DispatcherQueue.GetForCurrentThread();
+
+        if (dispatcher != null)
         {
-            IsAlwaysOnTop = true,
-            Title = "JASM - Unhandled Exception",
-            SystemBackdrop = new MicaBackdrop()
-        };
-
-        window.Activate();
-        _ErrorWindowsOpen++;
-        window.CenterOnScreen();
-
-        GetService<NotificationManager>()
-            .ShowNotification("发生错误!",
-                "JASM可能处于不稳定状态，随时可能崩溃。建议重新启动应用.",
-                TimeSpan.FromMinutes(60));
-
-        if (_ErrorWindowsOpen > 4)
-        {
-            // If there are too many error windows open, just close the app
-            // This is to prevent the app from spamming the user with error windows
-            Environment.Exit(1);
+            dispatcher.TryEnqueue(() => ShowErrorWindow(e.Exception));
         }
     }
 
+    private void ShowErrorWindow(Exception exception)
+    {
+        if (_ErrorWindowsOpen > 4)
+        {
+            Environment.Exit(1);
+            return;
+        }
+
+        try
+        {
+            var window = new ErrorWindow(exception, () => _ErrorWindowsOpen--)
+            {
+                IsAlwaysOnTop = true,
+                Title = "JASM - Unhandled Exception",
+                SystemBackdrop = new MicaBackdrop()
+            };
+
+            window.Activate();
+            _ErrorWindowsOpen++;
+            window.CenterOnScreen();
+
+            try
+            {
+                GetService<NotificationManager>()
+                    .ShowNotification("发生错误!",
+                        "JASM可能处于不稳定状态，建议重新启动应用.",
+                        TimeSpan.FromMinutes(60));
+            }
+            catch { /* 忽略通知服务的错误 */ }
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Failed to show Error Window");
+        }
+    }
 
     protected override async void OnLaunched(LaunchActivatedEventArgs args)
     {
+        MainWindow = new MainWindow();
         Environment.SetEnvironmentVariable("WEBVIEW2_USE_VISUAL_HOSTING_FOR_OWNED_WINDOWS", "1");
         await GetService<ILanguageLocalizer>().InitializeAsync();
         NotImplemented.NotificationManager = GetService<NotificationManager>();

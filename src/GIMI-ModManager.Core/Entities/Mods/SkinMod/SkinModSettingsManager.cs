@@ -9,7 +9,6 @@ using GIMI_ModManager.Core.Entities.Mods.Exceptions;
 using GIMI_ModManager.Core.Entities.Mods.FileModels;
 using GIMI_ModManager.Core.Entities.Mods.Helpers;
 using GIMI_ModManager.Core.Helpers;
-using Newtonsoft.Json;
 using OneOf;
 using Serilog;
 using JsonSerializer = System.Text.Json.JsonSerializer;
@@ -153,7 +152,7 @@ public class SkinModSettingsManager
     {
 
         var settings = await JsonSerializer.DeserializeAsync<JsonModSettings>(json,
-            Serialization.ModSettingsJsonContext.Default.JsonModSettings, cancellationToken).ConfigureAwait(false) ?? throw new JsonSerializationException("Failed to deserialize settings file. Return value is null");
+            Serialization.ModSettingsJsonContext.Default.JsonModSettings, cancellationToken).ConfigureAwait(false) ?? throw new JsonException("Failed to deserialize settings file. Return value is null");
         var modSettings = ModSettings.FromJsonSkinSettings(skinMod, settings);
 
         return modSettings;
@@ -165,7 +164,7 @@ public class SkinModSettingsManager
             Serialization.ModSettingsJsonContext.Default.JsonModSettings);
 
         if (settings is null)
-            throw new JsonSerializationException("Failed to deserialize settings file. Return value is null");
+            throw new JsonException("Failed to deserialize settings file. Return value is null");
 
         return ModSettings.FromJsonSkinSettings(skinMod, settings);
 

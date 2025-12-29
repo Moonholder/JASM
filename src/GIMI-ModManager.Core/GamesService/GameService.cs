@@ -1,7 +1,4 @@
-﻿using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Text.Json;
-using FuzzySharp;
+﻿using FuzzySharp;
 using GIMI_ModManager.Core.Contracts.Services;
 using GIMI_ModManager.Core.GamesService.Exceptions;
 using GIMI_ModManager.Core.GamesService.Interfaces;
@@ -12,6 +9,9 @@ using GIMI_ModManager.Core.Helpers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Serilog;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 using JsonElement = GIMI_ModManager.Core.GamesService.JsonModels.JsonElement;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
@@ -128,8 +128,8 @@ public class GameService : IGameService
 
     public static async Task<GameInfo?> GetGameInfoAsync(SupportedGames game)
     {
-        string gameAssetDir = Path.Combine(AppContext.BaseDirectory, "Assets", "Games", game.ToString()), assetDir = gameAssetDir;
-        assetDir = Path.Combine(AppContext.BaseDirectory, "Assets", "Games", game.ToString(), "Languages", "zh-cn");
+        var gameAssetDir = Path.Combine(AppContext.BaseDirectory, "Assets", "Games", game.ToString());
+        var assetDir = Path.Combine(AppContext.BaseDirectory, "Assets", "Games", game.ToString(), "Languages", "zh-cn");
 
         var gameFilePath = Path.Combine(assetDir, "game.json");
 
@@ -778,7 +778,10 @@ public class GameService : IGameService
     private async Task InitializeGameInfoAsync()
     {
         const string gameFileName = "game.json";
-        var gameFilePath = Path.Combine(_assetsDirectory.FullName, gameFileName);
+
+        var langCode = _localizer.CurrentLanguage.LanguageCode;
+        var gameFilePath = langCode.Equals("en-us", StringComparison.CurrentCultureIgnoreCase) ? Path.Combine(_assetsDirectory.FullName, gameFileName) : Path.Combine(_assetsDirectory.FullName, "Languages", langCode, gameFileName);
+
         if (!File.Exists(gameFilePath))
             throw new FileNotFoundException($"{gameFileName} File not found at path: {gameFilePath}");
 

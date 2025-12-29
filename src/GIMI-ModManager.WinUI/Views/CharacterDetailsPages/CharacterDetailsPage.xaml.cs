@@ -239,7 +239,13 @@ public sealed partial class CharacterDetailsPage : Page
         var deferral = e.GetDeferral();
         try
         {
-            if (e.DataView.Contains(StandardDataFormats.WebLink))
+            if (e.DataView.Contains("application/x-td-forward") && e.DataView.Contains(StandardDataFormats.StorageItems))
+            {
+                var storageItems = await e.DataView.GetStorageItemsAsync();
+                if (ViewModel.CanDragDropMod(storageItems))
+                    e.AcceptedOperation = DataPackageOperation.Copy;
+            }
+            else if (e.DataView.Contains(StandardDataFormats.WebLink))
             {
                 var uri = await e.DataView.GetWebLinkAsync();
                 if (ViewModel.CanDragDropModUrl(uri))
@@ -277,7 +283,11 @@ public sealed partial class CharacterDetailsPage : Page
         var deferral = e.GetDeferral();
         try
         {
-            if (e.DataView.Contains(StandardDataFormats.WebLink))
+            if (e.DataView.Contains("application/x-td-forward") && e.DataView.Contains(StandardDataFormats.StorageItems))
+            {
+                await ViewModel.DragDropModAsync(await e.DataView.GetStorageItemsAsync(), ViewModel.SelectedSkin);
+            }
+            else if (e.DataView.Contains(StandardDataFormats.WebLink))
             {
                 await ViewModel.DragDropModUrlAsync(await e.DataView.GetWebLinkAsync());
             }

@@ -13,28 +13,20 @@ public partial class ModRowVM : ObservableObject
 {
     public Guid Id { get; init; }
     [ObservableProperty] private bool _isSelected;
-
     [ObservableProperty] private bool _isEnabled;
-
     [ObservableProperty] private string _displayName = string.Empty;
-
     [ObservableProperty] private string _folderName = string.Empty;
-
     [ObservableProperty] private string _absFolderPath = string.Empty;
-
     [ObservableProperty] private DateTime _dateAdded;
-
     [ObservableProperty] private string _dateAddedFormated = string.Empty;
-
     [ObservableProperty] private string _author = string.Empty;
     [ObservableProperty] private string[] _presets = [];
     [ObservableProperty] private string _inPresets = string.Empty;
-
     [ObservableProperty] private string _description = string.Empty;
-
 
     public ObservableCollection<ModRowVM_ModNotificationVM> ModNotifications { get; } = new();
 
+    public string SearchableText { get; private set; } = string.Empty;
 
     public ModRowVM(CharacterSkinEntry characterSkinEntry, ModSettings? modSettings, IEnumerable<string> presetNames,
         IEnumerable<ModNotification> modNotifications)
@@ -54,22 +46,30 @@ public partial class ModRowVM : ObservableObject
         DateAddedFormated = DateAdded.ToString("d");
         Author = modSettings?.Author ?? string.Empty;
         Description = modSettings?.Description ?? string.Empty;
-        Presets = presetNames.ToArray();
+
+        Presets = presetNames as string[] ?? presetNames.ToArray();
         InPresets = string.Join(',', Presets);
+
         ModNotifications.Clear();
-        ModNotifications.AddRange(modNotifications.Select(m => new ModRowVM_ModNotificationVM(m)));
 
+        foreach (var n in modNotifications)
+        {
+            ModNotifications.Add(new ModRowVM_ModNotificationVM(n));
+        }
 
-        SearchableText = $"{DisplayName}{FolderName}{Author}{string.Join(null, Presets)}{DateAdded:d}{Description}";
+        SearchableText = $"{DisplayName}{FolderName}{Author}{InPresets}{DateAdded:d}{Description}";
     }
 
     [DynamicDependency(DynamicallyAccessedMemberTypes.PublicProperties, typeof(ModRowVM))]
     public void TriggerPropertyChanged(string? propertyName) => OnPropertyChanged(propertyName ?? string.Empty);
 
-    public string SearchableText { get; private set; } = string.Empty;
-
     public required IAsyncRelayCommand ToggleEnabledCommand { get; init; }
     public required IAsyncRelayCommand UpdateModSettingsCommand { get; set; }
+
+    public void Cleanup()
+    {
+        ModNotifications.Clear();
+    }
 }
 
 /// Referencing nested types does not work from xaml

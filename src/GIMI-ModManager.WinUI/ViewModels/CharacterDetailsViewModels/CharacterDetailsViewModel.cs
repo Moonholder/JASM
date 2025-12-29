@@ -36,13 +36,14 @@ public partial class CharacterDetailsViewModel : ObservableObject, INavigationAw
     private readonly ModDragAndDropService _modDragAndDropService = App.GetService<ModDragAndDropService>();
     private readonly IWindowManagerService _windowManagerService = App.GetService<IWindowManagerService>();
     private readonly ModPresetService _presetService = App.GetService<ModPresetService>();
+    private readonly ElevatorService _elevatorService = App.GetService<ElevatorService>();
 
     public Func<Task>? GridLoadedAwaiter { get; set; }
 
-    private readonly CancellationTokenSource _navigationCancellationTokenSource = new();
+    private CancellationTokenSource? _navigationCancellationTokenSource;
     public CancellationToken CancellationToken;
 
-    private bool IsReturning => CancellationToken.IsCancellationRequested || _isErrorNavigateBack;
+    private bool IsReturning => (_navigationCancellationTokenSource?.IsCancellationRequested ?? true) || _isErrorNavigateBack;
     private bool _isErrorNavigateBack;
     private ICharacterModList _modList = null!;
     [ObservableProperty] private bool _isNavigationFinished;
@@ -76,6 +77,8 @@ public partial class CharacterDetailsViewModel : ObservableObject, INavigationAw
     public bool IsNotSoftBusy => !IsSoftBusy;
     public bool IsNotHardBusy => !IsHardBusy;
 
+    public bool CanToggleAutoSync => IsNotHardBusy && _elevatorService.ElevatorStatus == ElevatorStatus.Running;
+
     public bool IsWorking => IsSoftBusy || IsHardBusy;
 
 
@@ -91,35 +94,34 @@ public partial class CharacterDetailsViewModel : ObservableObject, INavigationAw
 
     public async void OnNavigatedTo(object parameter)
     {
+        _navigationCancellationTokenSource = new CancellationTokenSource();
+        CancellationToken = _navigationCancellationTokenSource.Token;
+
         try
         {
             await InitAsync(parameter, _busySetter.StartHardBusy()).ConfigureAwait(false);
         }
-        catch (TaskCanceledException)
-        {
-        }
         catch (OperationCanceledException)
         {
+            // 正常取消，无需处理
         }
         catch (Exception e)
         {
             ErrorNavigateBack(e);
-            return;
         }
     }
 
     private async Task InitAsync(object parameter, BusySetter.CommandTracker commandTracker)
     {
-        CancellationToken = _navigationCancellationTokenSource.Token;
-        if (IsReturning)
-            return;
+        if (IsReturning) return;
+
         OnInitializingStarted?.Invoke(this, EventArgs.Empty);
 
         // Init character card
         InitCharacterCard(parameter);
         LoadingItemText = "模组";
 
-        // Yield to UI, render character card, specifically the image
+        // Yield to UI
         await Task.Delay(100, CancellationToken);
         if (IsReturning) return;
 
@@ -130,7 +132,7 @@ public partial class CharacterDetailsViewModel : ObservableObject, INavigationAw
 
         if (IsReturning) return;
 
-        // Yield to UI, render grid
+        // Yield to UI
         await Task.Delay(50, CancellationToken);
         commandTracker.Finish();
         if (IsReturning) return;
@@ -149,21 +151,33 @@ public partial class CharacterDetailsViewModel : ObservableObject, INavigationAw
 
         // Wait for the grid to load the datasource
         if (GridLoadedAwaiter is not null)
-            await GridLoadedAwaiter();
+        {
+            try
+            {
+                await GridLoadedAwaiter();
+            }
+            catch (Exception ex)
+            {
+                _logger.Warning(ex, "GridLoadedAwaiter failed");
+            }
+        }
         GridLoadedAwaiter = null;
 
         // Now that the grid is loaded, we can select the first mod
-        AutoSelectFirstMod();
+        if (!IsReturning)
+        {
+            AutoSelectFirstMod();
 
-
-        // Finished initializing
-        IsNavigationFinished = true;
-        OnInitializingFinished?.Invoke(this, EventArgs.Empty);
-        NotifyCommands();
+            // Finished initializing
+            IsNavigationFinished = true;
+            OnInitializingFinished?.Invoke(this, EventArgs.Empty);
+            NotifyCommands();
+        }
     }
 
     private void AutoSelectFirstMod()
     {
+        if (IsReturning) return;
         var modToSelect = ModGridVM.GridMods.FirstOrDefault(m => m.IsEnabled) ?? ModGridVM.GridMods.FirstOrDefault();
 
         if (modToSelect is null)
@@ -174,11 +188,18 @@ public partial class CharacterDetailsViewModel : ObservableObject, INavigationAw
 
     private async Task SetSortOrder()
     {
-        var settings = await ReadSettingsAsync();
-        if (settings.SortByDescending == null || settings.SortingMethod == null)
-            return;
+        try
+        {
+            var settings = await ReadSettingsAsync();
+            if (settings.SortByDescending == null || settings.SortingMethod == null)
+                return;
 
-        ModGridVM.SetModSorting(settings.SortingMethod, settings.SortByDescending.Value);
+            ModGridVM.SetModSorting(settings.SortingMethod, settings.SortByDescending.Value);
+        }
+        catch (Exception ex)
+        {
+            _logger.Warning(ex, "Failed to load sort order settings");
+        }
     }
 
 
@@ -187,12 +208,14 @@ public partial class CharacterDetailsViewModel : ObservableObject, INavigationAw
         ModGridVM.BusySetter = _busySetter;
         ModGridVM.OnModsReloaded += OnModsReloaded;
         ModGridVM.DeleteModKeyTriggered += ModGridVM_DeleteModKeyTriggered;
-        await SetSortOrder();
-        await ModGridVM.InitializeAsync(CreateContext(), CancellationToken);
-        ModGridVM.OnModsSelected += OnModsSelected;
-        if (IsReturning)
-            return;
 
+        await SetSortOrder();
+
+        await ModGridVM.InitializeAsync(CreateContext(), CancellationToken);
+
+        ModGridVM.OnModsSelected += OnModsSelected;
+
+        if (IsReturning) return;
 
         ModGridVM.IsBusy = false;
         OnModsLoaded?.Invoke(this, EventArgs.Empty);
@@ -222,6 +245,8 @@ public partial class CharacterDetailsViewModel : ObservableObject, INavigationAw
 
     private async void OnModsSelected(object? sender, ModGridVM.ModRowSelectedEventArgs args)
     {
+        if (IsReturning) return;
+
         ContextMenuVM.SetSelectedMods(args.Mods.Select(m => m.Id));
         IsSingleModSelected = args.Mods.Count == 1;
         DeleteModsCommand.NotifyCanExecuteChanged();
@@ -248,70 +273,62 @@ public partial class CharacterDetailsViewModel : ObservableObject, INavigationAw
                 if (notification is not null) newModModel.ModNotifications.Remove(notification);
             }
         }
-
-
-        // TODO: Handle notification
     }
 
     private async Task InitModPaneAsync()
     {
-        // Init Mod Pane
         ModPaneVM.BusySetter = _busySetter;
+        // 传递 DispatcherQueue 以确保 UI 更新在正确线程
         await ModPaneVM.OnNavigatedToAsync(DispatcherQueue.GetForCurrentThread(), CancellationToken);
-        if (IsReturning)
-            return;
     }
 
     public async void OnNavigatedFrom()
     {
         try
         {
-            await _navigationCancellationTokenSource.CancelAsync();
+            if (_navigationCancellationTokenSource != null)
+            {
+                await _navigationCancellationTokenSource.CancelAsync();
+            }
+
             ModGridVM.OnModsSelected -= OnModsSelected;
             ModGridVM.OnModsReloaded -= OnModsReloaded;
             ContextMenuVM.ModsMoved -= ContextMenuVM_ModsMoved;
             ContextMenuVM.ModCharactersSkinOverriden -= ContextMenuVM_ModsMoved;
             ModGridVM.DeleteModKeyTriggered -= ModGridVM_DeleteModKeyTriggered;
 
-            try
-            {
-                await Task.Run(() => _navigationCancellationTokenSource.Token.WaitHandle.WaitOne(TimeSpan.FromMilliseconds(500)));
-            }
-            catch (Exception e)
-            {
-                // ignored
-            }
-
             if (ModGridVM.IsInitialized)
                 ModGridVM.OnNavigateFrom();
             if (ModPaneVM.IsInitialized)
                 ModPaneVM.OnNavigatedFrom();
 
+            var sortingMethod = ModGridVM.CurrentSortingMethod.SortingMethodType;
+            var isDescending = ModGridVM.IsDescendingSort;
 
-            await Task.Run(async () =>
+            _ = Task.Run(async () =>
             {
-                var delay = Task.Delay(TimeSpan.FromSeconds(2), CancellationToken.None);
-
-                var settings = await ReadSettingsAsync().ConfigureAwait(false);
-                settings.SortingMethod = ModGridVM.CurrentSortingMethod.SortingMethodType;
-                settings.SortByDescending = ModGridVM.IsDescendingSort;
-                await SaveSettingsAsync(settings).ConfigureAwait(false);
-                await delay.ConfigureAwait(false);
-
                 try
                 {
-                    _navigationCancellationTokenSource?.Dispose();
+                    var settings = await _localSettingsService.ReadOrCreateSettingAsync<CharacterDetailsSettings>(CharacterDetailsSettings.Key, SettingScope.App);
+                    settings.SortingMethod = sortingMethod;
+                    settings.SortByDescending = isDescending;
+                    await _localSettingsService.SaveSettingAsync(CharacterDetailsSettings.Key, settings, SettingScope.App);
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    // ignored
+                    Log.Error(ex, "Failed to save settings on navigation from CharacterDetails");
                 }
-            }, CancellationToken.None);
+            });
+
+            _navigationCancellationTokenSource?.Dispose();
+            _navigationCancellationTokenSource = null;
         }
         catch (Exception e)
         {
             _logger.Error(e, "Error while navigating from CharacterDetailsViewModel");
+#if DEBUG
             Debugger.Break();
+#endif
         }
     }
 
@@ -334,22 +351,19 @@ public partial class CharacterDetailsViewModel : ObservableObject, INavigationAw
             return;
         _isErrorNavigateBack = true;
 
-        Task.Run(async () =>
+        App.MainWindow.DispatcherQueue.TryEnqueue(() =>
         {
-            await Task.Delay(500);
             if (exception is not null)
                 _notificationService.ShowNotification("An error occurred while loading the character details page.",
                     exception.Message, null);
             else
                 _notificationService.ShowNotification("An error occurred while loading the character details page.", "",
                     null);
-            App.MainWindow.DispatcherQueue.TryEnqueue(() =>
-            {
-                if (_navigationService.CanGoBack)
-                    _navigationService.GoBack();
-                else
-                    _navigationService.NavigateTo(typeof(CharactersViewModel).FullName!);
-            });
+
+            if (_navigationService.CanGoBack)
+                _navigationService.GoBack();
+            else
+                _navigationService.NavigateTo(typeof(CharactersViewModel).FullName!);
         });
     }
 
@@ -451,8 +465,12 @@ public partial class BusySetter(CharacterDetailsViewModel viewModel) : Observabl
 
         IsSoftBusy = !_trackedSoftCommands.IsEmpty;
         IsHardBusy = !_trackedHardCommands.IsEmpty;
-        _viewModel.IsHardBusy = IsHardBusy;
-        _viewModel.IsSoftBusy = IsSoftBusy;
+
+        if (_viewModel != null)
+        {
+            _viewModel.IsHardBusy = IsHardBusy;
+            _viewModel.IsSoftBusy = IsSoftBusy;
+        }
 
         if (oldSoftBusy != IsSoftBusy)
             SoftBusyChanged?.Invoke(this, EventArgs.Empty);

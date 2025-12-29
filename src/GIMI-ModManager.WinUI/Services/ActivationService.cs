@@ -415,6 +415,7 @@ public class ActivationService : IActivationService
             Text = "您正在以管理员身份运行 JASM。这不推荐这样做.\n" +
                    "JASM 并非设计为在管理员权限下运行.\n" +
                    "尽管不太可能，但简单的漏洞有可能会对您的文件系统造成严重损害.\n\n" +
+                   "拖放功能在管理员权限下由于UIPI隔离机制无法使用.\n" +
                    "请考虑在无管理员权限的情况下运行 JASM.\n\n" +
                    "自行承担使用风险，已对您做出警告",
             TextWrapping = TextWrapping.WrapWholeWords

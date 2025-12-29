@@ -1,8 +1,10 @@
-using System.Reflection;
 using GIMI_ModManager.Core.Helpers;
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 
 namespace GIMI_ModManager.Core.GamesService.Requests;
 
+[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)]
 public class OverrideCharacterRequest
 {
     public NewValue<string> DisplayName { get; set; }

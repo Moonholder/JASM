@@ -5,45 +5,47 @@ namespace GIMI_ModManager.WinUI.Helpers.Xaml;
 
 public static class FrameworkElementExtensions
 {
-    public static async Task AwaitUiElementLoaded(this FrameworkElement element, TimeSpan timeout)
+    public static async Task<bool> AwaitUiElementLoaded(this FrameworkElement element, CancellationToken ct)
     {
-        if (element.IsLoaded)
-            return;
+        if (element.IsLoaded) return true;
         var tcs = new TaskCompletionSource<bool>();
-        element.Loaded += OnLoaded;
-        var delayTask = Task.Delay(timeout);
-        var resultTask = await Task.WhenAny(tcs.Task, delayTask);
-        if (resultTask == delayTask)
+        using var reg = ct.Register(() => tcs.TrySetCanceled());
+
+        void OnLoaded(object s, RoutedEventArgs e) => tcs.TrySetResult(true);
+
+        try
         {
-            try
-            {
-                element.Loaded -= OnLoaded;
-            }
-            catch (Exception e)
-            {
-                // ignored
-            }
-            Debugger.Break();
+            element.Loaded += OnLoaded;
+            await tcs.Task;
+            return true;
         }
-        return;
-        void OnLoaded(object? sender, RoutedEventArgs e)
+        catch (TaskCanceledException)
+        {
+            return false;
+        }
+        finally
         {
             element.Loaded -= OnLoaded;
-            tcs.TrySetResult(true);
         }
     }
+
     private const int PollingTime = 100;
     public static async Task AwaitItemsSourceLoaded(this DataGrid dataGrid, TimeSpan timeout)
     {
         if (dataGrid.ItemsSource is not null)
             return;
+
         var startTime = DateTime.Now;
-        do
+        while (dataGrid.ItemsSource is null)
         {
-            await Task.Delay(PollingTime);
-            if (startTime.Add(timeout) > DateTime.Now)
+            if (DateTime.Now > startTime.Add(timeout))
+            {
+                Debug.WriteLine("AwaitItemsSourceLoaded Timed out");
                 return;
-        } while (dataGrid.ItemsSource is null);
+            }
+
+            await Task.Delay(PollingTime);
+        }
     }
     public static async Task AwaitItemsSourceLoaded(this DataGrid dataGrid, CancellationToken cancellationToken)
     {
