@@ -3,6 +3,7 @@ using System.IO.Pipes;
 using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 using System.Security.Principal;
+using System.Threading.Tasks;
 using WindowsInput;
 
 
@@ -18,7 +19,10 @@ using WindowsInput;
 
 internal class Program
 {
-    public static void Main(string[] args)
+    private static readonly SemaphoreSlim _actionLock = new(1, 1);
+
+    private static readonly InputSimulator _inputSimulator = new InputSimulator();
+    static async Task Main(string[] args)
     {
         var userName = "";
         try
@@ -33,7 +37,17 @@ internal class Program
 
         try
         {
-            StartPipeServer(userName);
+            var specificUserAccount = new NTAccount(userName);
+            var specificUserSid = (SecurityIdentifier)specificUserAccount.Translate(typeof(SecurityIdentifier));
+
+            var ps = new PipeSecurity();
+
+            var userAccessRule = new PipeAccessRule(specificUserSid,
+                PipeAccessRights.FullControl, AccessControlType.Allow);
+
+            ps.AddAccessRule(userAccessRule);
+
+            await StartPipeServerAsync(ps);
         }
         catch (Exception e)
         {
@@ -43,68 +57,94 @@ internal class Program
     }
 
 
-    static void StartPipeServer(string userName)
+    static async Task StartPipeServerAsync(PipeSecurity ps)
     {
-        var specificUserAccount = new NTAccount(userName);
-        var specificUserSid = (SecurityIdentifier)specificUserAccount.Translate(typeof(SecurityIdentifier));
-
-        var ps = new PipeSecurity();
-
-        var userAccessRule = new PipeAccessRule(specificUserSid,
-            PipeAccessRights.FullControl, AccessControlType.Allow);
-        ps.AddAccessRule(userAccessRule);
-
         while (true)
         {
-            using var pipeServer = NamedPipeServerStreamConstructors.New("MyPipess", PipeDirection.In, 1,
-                PipeTransmissionMode.Message,
-                PipeOptions.Asynchronous, pipeSecurity: ps);
-            Console.WriteLine("Waiting for connection...");
-
-            pipeServer.WaitForConnection();
-            Console.WriteLine("Connected!");
-            Console.WriteLine("----------------------");
-
-            using var reader = new StreamReader(pipeServer);
-            var command = reader.ReadLine();
-            Console.WriteLine("Received command: " + command);
-            Console.WriteLine("From user: " + pipeServer.GetImpersonationUserName());
-
-            // 支持命令格式 0:Genshin 0:Honkai 0:WuWa 0:ZZZ
-            if (command != null && command.StartsWith("0"))
+            try
             {
-                var game = "Genshin";
-                if (command.Contains(":"))
-                {
-                    var parts = command.Split(':');
-                    if (parts.Length > 1)
-                        game = parts[1].Trim();
-                }
-                Console.WriteLine($"Refreshing {game} Mods");
-                RefreshGameMods(game);
-                continue;
+                var pipeServer = NamedPipeServerStreamConstructors.New("MyPipess",
+                    PipeDirection.InOut,
+                    NamedPipeServerStream.MaxAllowedServerInstances,
+                    PipeTransmissionMode.Message,
+                    PipeOptions.Asynchronous,
+                    pipeSecurity: ps);
+
+                Console.WriteLine("Waiting for connection...");
+                await pipeServer.WaitForConnectionAsync();
+
+                _ = HandleClientAsync(pipeServer);
             }
-
-            switch (command)
+            catch (Exception ex)
             {
-                case "-2":
-                    break;
-                case "-1":
-                    Console.WriteLine("Exiting");
-                    Environment.Exit(0);
-                    return;
-                default:
-                    Console.Error.WriteLine($"Unknown command: {command}");
-                    break;
+                Console.Error.WriteLine($"Listener error: {ex.Message}");
+                await Task.Delay(1000);
             }
         }
     }
 
-    [DllImport("User32.dll")]
+    static async Task HandleClientAsync(NamedPipeServerStream pipeServer)
+    {
+        await using (pipeServer)
+        using (var reader = new StreamReader(pipeServer))
+        using (var writer = new StreamWriter(pipeServer) { AutoFlush = true })
+        {
+            try
+            {
+                var command = await reader.ReadLineAsync();
+                if (string.IsNullOrEmpty(command)) return;
+
+                await _actionLock.WaitAsync();
+                try
+                {
+                    if (command.StartsWith("0"))
+                    {
+                        var game = "Genshin";
+                        int clientPid = -1;
+                        if (command.Contains(':'))
+                        {
+                            var parts = command.Split(':');
+                            if (parts.Length > 1)
+                                game = parts[1].Trim();
+
+                            if (parts.Length > 2 && int.TryParse(parts[2], out int pid))
+                            {
+                                clientPid = pid;
+                            }
+                        }
+
+                        Console.WriteLine($"Refreshing {game}...");
+
+                        RefreshGameMods(game, clientPid);
+
+                        await writer.WriteLineAsync("OK");
+                        Console.WriteLine("Sent OK to client.");
+                    }
+                }
+                finally
+                {
+                    _actionLock.Release();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+            }
+        }
+    }
+
+    [DllImport("user32.dll")]
+    static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+    [DllImport("user32.dll")]
     static extern int SetForegroundWindow(IntPtr point);
 
+    [DllImport("user32.dll")]
+    private static extern IntPtr GetForegroundWindow();
 
-    static void RefreshGameMods(string game)
+    private const int SW_RESTORE = 9;
+
+    static void RefreshGameMods(string game, int restorePid)
     {
         // 支持的游戏及其进程名
         var gameProcessMap = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)
@@ -134,13 +174,43 @@ internal class Program
             return;
         }
 
-        _ = SetForegroundWindow(ptr.Value);
+        IntPtr gameHandle = ptr.Value;
 
-        new InputSimulator().Keyboard
+        if (gameHandle != IntPtr.Zero)
+        {
+            ShowWindow(gameHandle, SW_RESTORE);
+            SetForegroundWindow(gameHandle);
+
+            Thread.Sleep(300);
+
+            _inputSimulator.Keyboard
             .KeyDown(VirtualKeyCode.F10)
             .Sleep(100)
-            .KeyUp(VirtualKeyCode.F10)
-            .Sleep(100);
+            .KeyUp(VirtualKeyCode.F10);
+
+            Thread.Sleep(100);
+        }
+
+        if (restorePid > 0)
+        {
+            Thread.Sleep(100);
+
+            try
+            {
+                Console.WriteLine($"Restoring focus to client (PID: {restorePid})...");
+                var clientProc = Process.GetProcessById(restorePid);
+
+                if (clientProc != null && !clientProc.HasExited && clientProc.MainWindowHandle != IntPtr.Zero)
+                {
+                    ShowWindow(clientProc.MainWindowHandle, SW_RESTORE);
+                    SetForegroundWindow(clientProc.MainWindowHandle);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Failed to restore client focus: {ex.Message}");
+            }
+        }
     }
 
     static IntPtr? GetGameProcess(string processName, bool silent = false)

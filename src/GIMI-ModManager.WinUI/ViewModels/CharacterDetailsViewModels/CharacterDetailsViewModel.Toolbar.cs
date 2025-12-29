@@ -2,6 +2,8 @@
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.UI.Controls;
 using GIMI_ModManager.WinUI.Models.Options;
+using GIMI_ModManager.WinUI.Models.Settings;
+using GIMI_ModManager.WinUI.ViewModels.CharacterDetailsViewModels.SubViewModels;
 using GIMI_ModManager.WinUI.ViewModels.SubVms;
 using GIMI_ModManager.WinUI.Views;
 using Microsoft.UI.Xaml;
@@ -20,6 +22,7 @@ public partial class CharacterDetailsViewModel
     [ObservableProperty] private bool _isSingleSelectEnabled;
     [ObservableProperty] private bool _isModFolderNameColumnVisible;
     [ObservableProperty] private bool _isSingleModSelected;
+    [ObservableProperty] private bool _autoSync3DMigotoConfig;
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(AddModArchiveCommand), nameof(AddModFolderCommand))]
@@ -35,6 +38,8 @@ public partial class CharacterDetailsViewModel
         IsSingleSelectEnabled = settings.SingleSelect;
         ModGridVM.GridSelectionMode = IsSingleSelectEnabled ? DataGridSelectionMode.Single : DataGridSelectionMode.Extended;
         IsModFolderNameColumnVisible = settings.ModFolderNameColumnVisible;
+        var modPresetSettings = await _localSettingsService.ReadOrCreateSettingAsync<ModPresetSettings>(ModPresetSettings.Key);
+        ModGridVM.AutoSync3DMigotoConfig = AutoSync3DMigotoConfig = modPresetSettings.AutoSyncMods & _elevatorService.ElevatorStatus == Services.ElevatorStatus.Running;
     }
 
     [RelayCommand]
@@ -130,6 +135,19 @@ public partial class CharacterDetailsViewModel
 
             IsModFolderNameColumnVisible = settings.ModFolderNameColumnVisible;
             ModGridVM.IsModFolderNameColumnVisible = settings.ModFolderNameColumnVisible;
+        }).ConfigureAwait(false);
+    }
+
+    [RelayCommand(CanExecute = nameof(CanToggleAutoSync))]
+    private async Task ToggleAutoSync()
+    {
+        await CommandWrapperAsync(false, async () =>
+        {
+            AutoSync3DMigotoConfig = !AutoSync3DMigotoConfig;
+
+            var settings = await _localSettingsService.ReadOrCreateSettingAsync<ModPresetSettings>(ModPresetSettings.Key);
+            ModGridVM.AutoSync3DMigotoConfig = settings.AutoSyncMods = AutoSync3DMigotoConfig;
+            await _localSettingsService.SaveSettingAsync(ModPresetSettings.Key, settings);
         }).ConfigureAwait(false);
     }
 

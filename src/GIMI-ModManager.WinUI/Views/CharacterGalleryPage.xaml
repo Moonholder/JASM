@@ -179,7 +179,14 @@
                                         Command="{x:Bind ViewModel.ToggleSingleSelectionCommand}"
                                         IsChecked="{x:Bind ViewModel.IsSingleSelection, Mode=OneWay}"
                                         ToolTipService.ToolTip="选择此选项将只允许一次启用一个模组.">
-                                        仅允许单选
+                                        单选模式
+                                    </CheckBox>
+                                    <CheckBox
+                                        HorizontalAlignment="Right"
+                                        Command="{x:Bind ViewModel.ToggleAutoSyncCommand}"
+                                        IsChecked="{x:Bind ViewModel.AutoSync3DMigotoConfig, Mode=OneWay}"
+                                        ToolTipService.ToolTip="启用此项后，切换时将自动刷新模组到游戏，并从d3dx_user.ini文件中同步模组切换项到ini文件.">
+                                        自动同步
                                     </CheckBox>
                                 </StackPanel>
                             </StackPanel>

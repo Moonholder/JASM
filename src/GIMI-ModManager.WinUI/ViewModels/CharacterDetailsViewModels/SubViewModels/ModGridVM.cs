@@ -7,10 +7,12 @@ using GIMI_ModManager.Core.Contracts.Entities;
 using GIMI_ModManager.Core.Contracts.Services;
 using GIMI_ModManager.Core.Entities;
 using GIMI_ModManager.Core.Helpers;
+using GIMI_ModManager.Core.Services;
 using GIMI_ModManager.Core.Services.ModPresetService;
 using GIMI_ModManager.Core.Services.ModPresetService.Models;
 using GIMI_ModManager.WinUI.Contracts.Services;
 using GIMI_ModManager.WinUI.Helpers;
+using GIMI_ModManager.WinUI.Services;
 using GIMI_ModManager.WinUI.Services.AppManagement;
 using GIMI_ModManager.WinUI.Services.ModHandling;
 using GIMI_ModManager.WinUI.Services.Notifications;
@@ -32,6 +34,8 @@ public partial class ModGridVM(
     ILocalSettingsService localSettingsService,
     ModNotificationManager modNotificationManager,
     ModSettingsService modSettingsService,
+    ElevatorService elevatorService,
+    UserPreferencesService userPreferencesService,
     IWindowManagerService windowManagerService)
     : ObservableRecipient, IRecipient<ModChangedMessage>
 {
@@ -42,18 +46,22 @@ public partial class ModGridVM(
     private readonly ILocalSettingsService _localSettingsService = localSettingsService;
     private readonly ModNotificationManager _modNotificationManager = modNotificationManager;
     private readonly ModSettingsService _modSettingsService = modSettingsService;
+    private readonly ElevatorService _elevatorService = elevatorService;
+    private readonly UserPreferencesService _userPreferencesService = userPreferencesService;
     private readonly IWindowManagerService _windowManagerService = windowManagerService;
     private readonly ILogger _logger = Log.ForContext<ModGridVM>();
 
-    private DispatcherQueue _dispatcherQueue = null!;
+    private DispatcherQueue? _dispatcherQueue; // 设为可空
     private CancellationToken _navigationCt = default;
-    private ICharacterModList _modList = null!;
+    private ICharacterModList? _modList; // 设为可空
     private ModDetailsPageContext _context = null!;
     private readonly AsyncLock _modRefreshLock = new();
-    public BusySetter BusySetter { get; set; }
+    public BusySetter BusySetter { get; set; } = null!; // 假设会被父 VM 注入
     public bool IsDescendingSort { get; private set; } = true;
     public ModGridSortingMethod CurrentSortingMethod { get; private set; } = new(ModRowSorter.IsEnabledSorter);
 
+    // 防止重复 Dispose
+    private bool _isDisposed = false;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsNotBusy))]
@@ -67,6 +75,8 @@ public partial class ModGridVM(
     [ObservableProperty] private bool _isModFolderNameColumnVisible;
 
     [ObservableProperty] private bool _showMultipleModsActiveWarning;
+
+    [ObservableProperty] private bool _autoSync3DMigotoConfig;
 
     public bool IsInitialized { get; private set; }
 
@@ -99,52 +109,103 @@ public partial class ModGridVM(
 
     private async Task ModRefreshLoopAsync()
     {
-        // Runs on the UI thread
-        await foreach (var loadModMessage in _modRefreshChannel.Reader.ReadAllAsync(CancellationToken.None))
+        try
         {
-            if (_navigationCt.IsCancellationRequested)
-                break;
-            try
+            // Runs on the UI thread
+            await foreach (var loadModMessage in _modRefreshChannel.Reader.ReadAllAsync(CancellationToken.None))
             {
-                await ReloadAllModsAsync(loadModMessage.MinWaitTime);
+                if (_navigationCt.IsCancellationRequested || _isDisposed)
+                    break;
+                try
+                {
+                    await ReloadAllModsAsync(loadModMessage.MinWaitTime);
+                }
+                catch (OperationCanceledException)
+                {
+                }
+                catch (Exception e)
+                {
+                    _notificationService?.ShowNotification("刷新模组时发生错误", e.Message, null);
+                }
             }
-            catch (OperationCanceledException)
-            {
-            }
-            catch (Exception e)
-            {
-                _notificationService.ShowNotification("刷新模组时发生错误", e.Message, null);
-            }
+        }
+        catch (ChannelClosedException)
+        {
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "Error in ModRefreshLoopAsync");
         }
     }
 
     public async Task InitializeAsync(ModDetailsPageContext context, CancellationToken navigationCt = default)
     {
+        _isDisposed = false;
         _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
         _navigationCt = navigationCt;
         _context = context;
+
         _modList = _skinManagerService.GetCharacterModList(_context.ShownModObject);
+
+        _modList.ModsChanged -= ModListOnModsChanged;
+        _modList.ModsChanged += ModListOnModsChanged;
+
+        _modNotificationManager.OnModNotification -= _modNotificationManager_OnModNotification;
+        _modNotificationManager.OnModNotification += _modNotificationManager_OnModNotification;
+
+        Messenger.UnregisterAll(this);
+        Messenger.RegisterAll(this);
+
         var settings = await _localSettingsService.ReadCharacterDetailsSettingsAsync();
         GridSelectionMode = settings.SingleSelect ? DataGridSelectionMode.Single : DataGridSelectionMode.Extended;
         IsModFolderNameColumnVisible = settings.ModFolderNameColumnVisible;
+
         await InitModsAsync();
-        _modList.ModsChanged += ModListOnModsChanged;
-        _modNotificationManager.OnModNotification += _modNotificationManager_OnModNotification;
-        Messenger.RegisterAll(this);
-        _ = _dispatcherQueue.EnqueueAsync(ModRefreshLoopAsync);
+
+        if (_dispatcherQueue != null)
+        {
+            _ = _dispatcherQueue.EnqueueAsync(ModRefreshLoopAsync);
+        }
+
         IsBusy = false;
         IsInitialized = true;
         OnInitialized?.Invoke(this, EventArgs.Empty);
     }
 
-    private void _modNotificationManager_OnModNotification(object? sender, ModNotificationManager.ModNotificationEvent e) => QueueModRefresh();
+    private void _modNotificationManager_OnModNotification(object? sender, ModNotificationManager.ModNotificationEvent e)
+    {
+        if (_isDisposed) return;
+        QueueModRefresh();
+    }
 
     public void OnNavigateFrom()
     {
+        if (_isDisposed) return;
+        _isDisposed = true;
+
         _modRefreshChannel.Writer.TryComplete();
+
         Messenger.UnregisterAll(this);
-        _modList.ModsChanged -= ModListOnModsChanged;
+
+        if (_modList != null)
+        {
+            _modList.ModsChanged -= ModListOnModsChanged;
+        }
         _modNotificationManager.OnModNotification -= _modNotificationManager_OnModNotification;
+
+        foreach (var mod in GridMods)
+        {
+            mod.Cleanup();
+        }
+        GridMods.Clear();
+        SelectedMods.Clear();
+        _gridModsBackend.Clear();
+        _modsBackend.Clear();
+        _modToPresetMapping.Clear();
+
         try
         {
             _modRefreshLock.Dispose();
@@ -152,39 +213,58 @@ public partial class ModGridVM(
         }
         catch (Exception e)
         {
-            _logger.Warning(e, "Failed to dispose mod refresh lock");
+            _logger.Warning(e, "Failed to dispose locks");
         }
+
+        _modList = null;
+        IsInitialized = false;
     }
 
     private async Task InitModsAsync()
     {
+        if (_isDisposed) return;
+
         GridMods.Clear();
         _gridModsBackend.Clear();
         SelectedMods.Clear();
 
-        await Task.Run(async () =>
+        try
         {
-            var refreshResult = await _skinManagerService
-                .RefreshModsAsync(_context.ShownModObject.InternalName, ct: _navigationCt)
-                .ConfigureAwait(false);
-
-            await LoadModsAsync().ConfigureAwait(false);
-
-            if (refreshResult.ModsDuplicate.Any())
+            await Task.Run(async () =>
             {
-                var message = $"在 {_context.ModObjectDisplayName} 的模组文件夹中检测到重复的模组.\n";
+                if (_navigationCt.IsCancellationRequested) return;
 
-                message = refreshResult.ModsDuplicate.Aggregate(message,
-                    (current, duplicateMod) =>
-                        current +
-                        $"模组: '{duplicateMod.ExistingFolderName}' 已重命名为 '{duplicateMod.RenamedFolderName}' 以避免冲突.\n");
+                var refreshResult = await _skinManagerService
+                    .RefreshModsAsync(_context.ShownModObject.InternalName, ct: _navigationCt)
+                    .ConfigureAwait(false);
 
-                _notificationService.ShowNotification("检测到重复模组",
-                    message,
-                    TimeSpan.FromSeconds(10));
-            }
-        }, _navigationCt);
+                await LoadModsAsync().ConfigureAwait(false);
 
+                if (refreshResult.ModsDuplicate.Any() && !_isDisposed)
+                {
+                    var message = $"在 {_context.ModObjectDisplayName} 的模组文件夹中检测到重复的模组.\n";
+
+                    message = refreshResult.ModsDuplicate.Aggregate(message,
+                        (current, duplicateMod) =>
+                            current +
+                            $"模组: '{duplicateMod.ExistingFolderName}' 已重命名为 '{duplicateMod.RenamedFolderName}' 以避免冲突.\n");
+
+                    _notificationService?.ShowNotification("检测到重复模组",
+                        message,
+                        TimeSpan.FromSeconds(10));
+                }
+            }, _navigationCt);
+        }
+        catch (TaskCanceledException)
+        {
+            return;
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+
+        if (_isDisposed) return;
 
         GridMods.AddRange(_gridModsBackend);
         SetModSorting(CurrentSortingMethod.SortingMethodType, IsDescendingSort);
@@ -231,6 +311,8 @@ public partial class ModGridVM(
 
     private async Task LoadModsAsync()
     {
+        if (_isDisposed) return;
+
         if (_context.IsCharacter && _context.Skins.Count > 1)
         {
             _modsBackend = await _characterSkinService
@@ -238,10 +320,12 @@ public partial class ModGridVM(
                     cancellationToken: _navigationCt)
                 .ToListAsync().ConfigureAwait(false);
         }
-        else
+        else if (_modList != null)
         {
             _modsBackend = _modList.Mods.ToList();
         }
+
+        if (_isDisposed) return;
 
         _modToPresetMapping = await _presetService
             .FindPresetsForModsAsync(_modsBackend.Select(m => m.Id))
@@ -249,14 +333,15 @@ public partial class ModGridVM(
 
         foreach (var x in _modsBackend)
         {
-            _navigationCt.ThrowIfCancellationRequested();
+            if (_navigationCt.IsCancellationRequested || _isDisposed) break;
 
             var modVm = await CreateModRowVM(x, _navigationCt).ConfigureAwait(false);
             _gridModsBackend.Add(modVm);
         }
 
-        _dispatcherQueue.TryEnqueue(() =>
+        _dispatcherQueue?.TryEnqueue(() =>
         {
+            if (_isDisposed) return;
             RefreshMultipleModsActiveWarning();
             OnModsReloaded?.Invoke(this, EventArgs.Empty);
         });
@@ -361,16 +446,27 @@ public partial class ModGridVM(
 
     private async Task ToggleModAsync(ModRowVM? modVmToToggle)
     {
-        if (modVmToToggle is null)
-            return;
+        if (modVmToToggle is null || _isDisposed) return;
 
         using var _ = BusySetter.StartSoftBusy();
 
         var modEntryToToggle = _modsBackend.FirstOrDefault(x => x.Id == modVmToToggle.Id);
-        if (modEntryToToggle is null)
-            return;
+        if (modEntryToToggle is null) return;
 
-        var otherMods = SingleSelect ? _modsBackend.Where(mod => modVmToToggle.Id != mod.Id && mod.IsEnabled).ToArray() : [];
+        var modsToDisable = SingleSelect
+        ? [.. _modsBackend.Where(mod => modVmToToggle.Id != mod.Id && mod.IsEnabled)]
+        : new List<CharacterSkinEntry>();
+
+        List<CharacterSkinEntry> modsToSync = [];
+
+        if (AutoSync3DMigotoConfig)
+        {
+            modsToSync.AddRange(modsToDisable);
+            if (modEntryToToggle.IsEnabled)
+            {
+                modsToSync.Add(modEntryToToggle);
+            }
+        }
 
         try
         {
@@ -378,25 +474,48 @@ public partial class ModGridVM(
             {
                 await Task.Run(() =>
                 {
-                    try
+                    foreach (var skinEntry in modsToDisable)
                     {
-                        foreach (var skinEntry in otherMods)
-                        {
-                            if (skinEntry.IsEnabled)
-                                _modList.DisableMod(skinEntry.Id);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        _notificationService.ShowNotification("禁用模组时出错", e.Message, TimeSpan.FromSeconds(5));
+                        if (skinEntry.IsEnabled)
+                            _modList.DisableMod(skinEntry.Id);
                     }
 
                     _modList.ToggleMod(modEntryToToggle.Id);
+
                 }, CancellationToken.None);
 
-                // 更新UI状态
+                if (AutoSync3DMigotoConfig)
+                {
+                    try
+                    {
+                        await _elevatorService.RefreshGenshinMods();
+
+                        if (modsToSync.Count > 0)
+                        {
+                            await Task.Delay(50);
+                            await Parallel.ForEachAsync(modsToSync, async (mod, ct) =>
+                            {
+                                try
+                                {
+                                    await _userPreferencesService.SyncPreferencesToModLocalFilesAsync(mod.Id);
+                                }
+                                catch (Exception ex)
+                                {
+                                    _logger.Error(ex, "Failed to sync preferences for mod {ModName}", mod.Mod.Name);
+                                }
+                            });
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Error(ex, "Error during AutoSync sequence");
+                    }
+                }
+
                 await UpdateModVmAsync(modEntryToToggle, false, CancellationToken.None);
-                foreach (var otherModEntry in otherMods)
+                Messenger.Send(new ModChangedMessage(this, modEntryToToggle, null));
+
+                foreach (var otherModEntry in modsToDisable)
                 {
                     await UpdateModVmAsync(otherModEntry, false, CancellationToken.None);
                     Messenger.Send(new ModChangedMessage(this, otherModEntry, null));
@@ -411,12 +530,11 @@ public partial class ModGridVM(
             var message = ex.Message.Contains("Access to the path")
                 ? "无法切换模组状态，目标文件正被其他程序占用。\n\n请：\n1. 关闭资源管理器中打开的模组文件夹\n2. 关闭可能正在编辑模组文件的程序\n3. 稍后重试"
                 : ex.Message;
-
             _notificationService.ShowNotification("操作失败", message, TimeSpan.FromSeconds(10));
         }
         catch (Exception e)
         {
-            _notificationService.ShowNotification("切换模组时出错", e.Message, TimeSpan.FromSeconds(5));
+            _notificationService.ShowNotification("出错", e.Message, TimeSpan.FromSeconds(5));
         }
     }
 
@@ -502,14 +620,16 @@ public partial class ModGridVM(
 
     private void ModListOnModsChanged(object? sender, ModFolderChangedArgs e)
     {
-        if (!IsInitialized)
+        if (!IsInitialized || _isDisposed)
             return;
 
-        _notificationService.ShowNotification(
-            $"在 {_context.ShownModObject.DisplayName} 的模组文件夹中检测到文件夹活动",
-            "角色模组文件夹中的文件/文件夹已被更改，模组已刷新.",
-            TimeSpan.FromSeconds(5));
-
+        _dispatcherQueue?.TryEnqueue(() =>
+        {
+            _notificationService?.ShowNotification(
+               $"在 {_context.ShownModObject.DisplayName} 的模组文件夹中检测到文件夹活动",
+               "角色模组文件夹中的文件/文件夹已被更改，模组已刷新.",
+               TimeSpan.FromSeconds(5));
+        });
 
         QueueModRefresh();
     }

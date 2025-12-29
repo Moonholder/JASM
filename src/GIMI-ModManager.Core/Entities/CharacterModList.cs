@@ -1,12 +1,11 @@
 ﻿#nullable enable
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using GIMI_ModManager.Core.Contracts.Entities;
 using GIMI_ModManager.Core.Entities.Mods.SkinMod;
 using GIMI_ModManager.Core.GamesService.Interfaces;
 using GIMI_ModManager.Core.Helpers;
 using Serilog;
-
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 namespace GIMI_ModManager.Core.Entities;
 
 public sealed class CharacterModList : ICharacterModList
@@ -277,7 +276,7 @@ public sealed class CharacterModList : ICharacterModList
     {
         try
         {
-            _watcher.EnableRaisingEvents = false;
+            _watcher?.EnableRaisingEvents = false;
 
             var mod = _mods.First(m => m.Id == modId).Mod;
 
@@ -299,7 +298,7 @@ public sealed class CharacterModList : ICharacterModList
         }
         finally
         {
-            _watcher.EnableRaisingEvents = true;
+            _watcher?.EnableRaisingEvents = true;
         }
     }
 
@@ -307,8 +306,9 @@ public sealed class CharacterModList : ICharacterModList
     {
         try
         {
-            _watcher.EnableRaisingEvents = false;
-            var mod = _mods.First(m => m.Id == modId).Mod;
+            _watcher?.EnableRaisingEvents = false;
+            var modEntry = _mods.First(m => m.Id == modId);
+            var mod = modEntry.Mod;
 
             if (!ModAlreadyAdded(mod))
                 throw new InvalidOperationException("Mod not added");
@@ -322,11 +322,11 @@ public sealed class CharacterModList : ICharacterModList
                 throw new InvalidOperationException("Cannot disable a mod with the same name as a disabled mod");
 
             mod.Rename(newName);
-            _mods.First(m => m.Mod.Equals(mod)).IsEnabled = false;
+            modEntry.IsEnabled = false;
         }
         finally
         {
-            _watcher.EnableRaisingEvents = true;
+            _watcher?.EnableRaisingEvents = true;
         }
     }
 

@@ -1,7 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using GIMI_ModManager.Core.Contracts.Entities;
 using GIMI_ModManager.Core.Contracts.Services;
 using GIMI_ModManager.Core.Entities;
@@ -9,6 +6,7 @@ using GIMI_ModManager.Core.GamesService;
 using GIMI_ModManager.Core.GamesService.Interfaces;
 using GIMI_ModManager.Core.GamesService.Models;
 using GIMI_ModManager.Core.Helpers;
+using GIMI_ModManager.Core.Services;
 using GIMI_ModManager.WinUI.Contracts.Services;
 using GIMI_ModManager.WinUI.Contracts.ViewModels;
 using GIMI_ModManager.WinUI.Models;
@@ -17,6 +15,9 @@ using GIMI_ModManager.WinUI.Models.Settings;
 using GIMI_ModManager.WinUI.Services;
 using GIMI_ModManager.WinUI.Services.ModHandling;
 using Serilog;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace GIMI_ModManager.WinUI.ViewModels.CharacterGalleryViewModels;
 
@@ -25,6 +26,7 @@ public partial class CharacterGalleryViewModel : ObservableRecipient, INavigatio
     private readonly ISkinManagerService _skinManagerService;
     private readonly ILocalSettingsService _localSettingsService;
     private readonly CharacterSkinService _characterSkinService;
+    private readonly UserPreferencesService _userPreferencesService;
     private readonly ElevatorService _elevatorService;
     private readonly INavigationService _navigationService;
     private readonly IGameService _gameService;
@@ -46,8 +48,11 @@ public partial class CharacterGalleryViewModel : ObservableRecipient, INavigatio
 
     [ObservableProperty] private string _selectedSortingMethod;
     [ObservableProperty] private bool _sortByDescending;
+    [ObservableProperty] private bool _autoSync3DMigotoConfig;
 
     public bool MultipleCharacterSkins => CharacterSkins.Count > 1;
+
+    public bool CanToggleAutoSync => _elevatorService.ElevatorStatus == ElevatorStatus.Running;
 
     public string ModdableObjectName
     {
@@ -107,11 +112,13 @@ public partial class CharacterGalleryViewModel : ObservableRecipient, INavigatio
         ISkinManagerService skinManagerService,
         ILocalSettingsService localSettingsService,
         CharacterSkinService characterSkinService,
+        UserPreferencesService userPreferencesService,
         ElevatorService elevatorService, ILogger logger)
     {
         _skinManagerService = skinManagerService;
         _localSettingsService = localSettingsService;
         _characterSkinService = characterSkinService;
+        _userPreferencesService = userPreferencesService;
         _elevatorService = elevatorService;
         _logger = logger.ForContext<CharacterGalleryViewModel>();
         _navigationService = navigationService;
@@ -125,6 +132,10 @@ public partial class CharacterGalleryViewModel : ObservableRecipient, INavigatio
         _selectedSortingMethod = settings.SortingMethod ?? "Name";
         _sortByDescending = settings.SortByDescending;
         IsNavPaneVisible = settings.IsNavPaneOpen;
+
+        var modPresetSettings = _localSettingsService.ReadSetting<ModPresetSettings>(ModPresetSettings.Key) ??
+                       new ModPresetSettings();
+        AutoSync3DMigotoConfig = modPresetSettings.AutoSyncMods & CanToggleAutoSync;
     }
 
     public async void OnNavigatedTo(object parameter)

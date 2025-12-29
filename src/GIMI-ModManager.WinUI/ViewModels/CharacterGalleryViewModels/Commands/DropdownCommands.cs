@@ -100,6 +100,19 @@ public partial class CharacterGalleryViewModel
         try
         {
             _modList.DeleteModBySkinEntryId(vm.Id);
+
+            if (vm.IsEnabled && AutoSync3DMigotoConfig)
+            {
+                try
+                {
+                    await _elevatorService.RefreshGenshinMods();
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, "Failed to refresh game after deleting mods");
+                }
+            }
+
             await ReloadModsAsync();
         }
         catch (Exception e)

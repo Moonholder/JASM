@@ -1,11 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.WinUI.UI.Controls;
-using CommunityToolkitWrapper;
 using GIMI_ModManager.Core.Contracts.Services;
 using GIMI_ModManager.Core.GamesService;
 using GIMI_ModManager.Core.Helpers;
 using Microsoft.UI.Xaml;
 using Serilog;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO.Pipes;
 using System.Security.Principal;
@@ -76,6 +75,7 @@ public partial class ElevatorService : ObservableRecipient
             }
 
             _IsInitialized = true;
+            StartElevator();
             return;
         }
 
@@ -99,14 +99,21 @@ public partial class ElevatorService : ObservableRecipient
         var currentUser = WindowsIdentity.GetCurrent().Name;
         currentUser = currentUser.Split("\\").LastOrDefault() ?? currentUser;
 
-        _elevatorProcess = Process.Start(new ProcessStartInfo(ElevatorProcessName)
+        try
         {
-            UseShellExecute = true,
-            CreateNoWindow = false,
-            WindowStyle = ProcessWindowStyle.Hidden,
-            Verb = "runas",
-            ArgumentList = { currentUser }
-        });
+            _elevatorProcess = Process.Start(new ProcessStartInfo(ElevatorProcessName)
+            {
+                UseShellExecute = true,
+                CreateNoWindow = false,
+                WindowStyle = ProcessWindowStyle.Hidden,
+                Verb = "runas",
+                ArgumentList = { currentUser }
+            });
+        }
+        catch (Win32Exception)
+        {
+            _logger.Error("Failed to start Elevator.exe with elevated privileges");
+        }
 
         if (_elevatorProcess == null || _elevatorProcess.HasExited)
         {
@@ -246,28 +253,61 @@ public partial class ElevatorService : ObservableRecipient
         }
     }
 
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern bool AllowSetForegroundWindow(int dwProcessId);
+
+    private const int ASFW_ANY = -1;
     private async Task InternalRefreshGenshinMods()
     {
         try
         {
-            await using var pipeClient = new NamedPipeClientStream(".", ElevatorPipeName, PipeDirection.Out);
-            await pipeClient.ConnectAsync(TimeSpan.FromSeconds(5), default);
-            await using var writer = new StreamWriter(pipeClient);
-            _logger.Debug("Sending command: {Command}", nameof(InternalRefreshGenshinMods));
-            var command = "0:" + _gameService.GameShortName;
-            await writer.WriteLineAsync(command);
-            await writer.FlushAsync();
-            _logger.Debug("Done");
-            App.MainWindow.DispatcherQueue.EnqueueAsync(async () =>
+            AllowSetForegroundWindow(ASFW_ANY);
+            await using var pipeClient = new NamedPipeClientStream(".", ElevatorPipeName, PipeDirection.InOut);
+            try
             {
-                await Task.Delay(500);
-                App.MainWindow.SetForegroundWindow();
-                App.MainWindow.Activate();
-            });
+                await pipeClient.ConnectAsync(TimeSpan.FromSeconds(2), default);
+            }
+            catch (TimeoutException)
+            {
+                _logger.Error("Failed to connect to Elevator (Timeout).");
+                return;
+            }
+
+            await using var writer = new StreamWriter(pipeClient, System.Text.Encoding.UTF8, 1024, leaveOpen: true)
+            {
+                AutoFlush = true
+            };
+
+            using var reader = new StreamReader(pipeClient, System.Text.Encoding.UTF8, true, 1024, leaveOpen: true);
+
+            var command = $"0:{_gameService.GameShortName}:{Environment.ProcessId}";
+            await writer.WriteLineAsync(command);
+
+            var readTask = reader.ReadLineAsync();
+            var timeoutTask = Task.Delay(3000);
+
+            var completedTask = await Task.WhenAny(readTask, timeoutTask);
+
+            if (completedTask == timeoutTask)
+            {
+                _logger.Warning("Elevator request timed out. Continuing without confirmation.");
+            }
+            else
+            {
+                string? response = await readTask;
+                if (response == "OK")
+                {
+                    _logger.Debug("Elevator confirmed action.");
+                }
+                else
+                {
+                    _logger.Warning($"Elevator returned unexpected response: {response}");
+                }
+            }
         }
-        catch (TimeoutException e)
+        catch (Exception e)
         {
-            _logger.Error(e, "Failed to Refresh Genshin Mods");
+            _logger.Error(e, "Failed to communicate with Elevator");
         }
     }
 

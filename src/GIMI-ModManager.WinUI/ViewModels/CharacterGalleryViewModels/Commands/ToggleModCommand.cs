@@ -16,41 +16,81 @@ public partial class CharacterGalleryViewModel
     [RelayCommand(CanExecute = nameof(CanToggleMod))]
     private async Task ToggleMod(ModGridItemVm thisMod)
     {
-        if (IsNavigating)
-            return;
+        if (IsNavigating) return;
 
         IsBusy = true;
         try
         {
-            CharacterSkinEntry thisSkinMod = null!;
-            var mods = new List<CharacterSkinEntry>();
+            CharacterSkinEntry modEntryToToggle = null!;
+            var modsInScope = new List<CharacterSkinEntry>();
 
             await Task.Run(async () =>
             {
                 var allSkinMods = _modList.Mods;
-                thisSkinMod = allSkinMods.First(m => m.Id == thisMod.Id);
+                modEntryToToggle = allSkinMods.First(m => m.Id == thisMod.Id);
 
-                if (_moddableObject is ICharacter { Skins.Count: > 1 } character)
+                if (_moddableObject is ICharacter { Skins.Count: > 1 })
                 {
                     var selectedSkin = _selectedSkin!;
-
                     var skinEntries = _characterSkinService.GetModsForSkinAsync(selectedSkin);
-
-
                     await foreach (var skinEntry in skinEntries.ConfigureAwait(false))
                     {
                         var mod = allSkinMods.FirstOrDefault(m => m.Id == skinEntry.Id);
-                        if (mod is not null)
-                            mods.Add(mod);
+                        if (mod is not null) modsInScope.Add(mod);
                     }
                 }
                 else
-                    mods.AddRange(allSkinMods);
+                {
+                    modsInScope.AddRange(allSkinMods);
+                }
             });
 
+            var shouldEnable = !modEntryToToggle.IsEnabled;
+            var modsToDisable = (shouldEnable && IsSingleSelection)
+                ? modsInScope.Where(m => m.Id != modEntryToToggle.Id && m.IsEnabled).ToList()
+                : new List<CharacterSkinEntry>();
 
-            await ToggleOnlyMod(mods, thisSkinMod);
-            await _elevatorService.RefreshGenshinMods();
+            var modsToSync = new List<CharacterSkinEntry>();
+            if (AutoSync3DMigotoConfig)
+            {
+                modsToSync.AddRange(modsToDisable);
+                if (modEntryToToggle.IsEnabled) modsToSync.Add(modEntryToToggle);
+            }
+
+            foreach (var skinEntry in modsToDisable)
+            {
+                if (skinEntry.IsEnabled) _modList.DisableMod(skinEntry.Id);
+            }
+            if (shouldEnable) _modList.EnableMod(modEntryToToggle.Id);
+            else _modList.DisableMod(modEntryToToggle.Id);
+
+            if (AutoSync3DMigotoConfig)
+            {
+                try
+                {
+                    await _elevatorService.RefreshGenshinMods();
+
+                    if (modsToSync.Count > 0)
+                    {
+                        await Task.Delay(50);
+                        await Parallel.ForEachAsync(modsToSync, async (mod, ct) =>
+                        {
+                            await _userPreferencesService.SyncPreferencesToModLocalFilesAsync(mod.Id);
+                        });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, "Error during AutoSync sequence");
+                }
+            }
+
+            await UpdateGridItemAsync(modEntryToToggle);
+
+            foreach (var otherModEntry in modsToDisable)
+            {
+                await UpdateGridItemAsync(otherModEntry);
+            }
         }
         catch (Exception e)
         {
@@ -59,44 +99,6 @@ public partial class CharacterGalleryViewModel
         finally
         {
             IsBusy = false;
-        }
-    }
-
-
-    private async Task ToggleOnlyMod(IEnumerable<CharacterSkinEntry> skinEntries, CharacterSkinEntry modToEnable)
-    {
-        if (IsNavigating)
-            return;
-
-        var disableOtherMods = modToEnable.IsEnabled == false;
-
-        foreach (var skinEntry in skinEntries)
-        {
-            if (skinEntry.Id == modToEnable.Id)
-            {
-                await SetModIsEnabled(skinEntry, !skinEntry.IsEnabled);
-                continue;
-            }
-
-            if (disableOtherMods && IsSingleSelection)
-                await SetModIsEnabled(skinEntry, false);
-        }
-    }
-
-    private async Task SetModIsEnabled(CharacterSkinEntry skinEntry, bool setStatus)
-    {
-        // TODO: Update entire item instead of just the IsEnabled property
-
-        switch (setStatus)
-        {
-            case true when !skinEntry.IsEnabled:
-                _modList!.EnableMod(skinEntry.Id);
-                await UpdateGridItemAsync(skinEntry).ConfigureAwait(false);
-                break;
-            case false when skinEntry.IsEnabled:
-                _modList!.DisableMod(skinEntry.Id);
-                await UpdateGridItemAsync(skinEntry).ConfigureAwait(false);
-                break;
         }
     }
 }

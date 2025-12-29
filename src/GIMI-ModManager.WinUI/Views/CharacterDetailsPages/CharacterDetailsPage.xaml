@@ -231,17 +231,13 @@
                                         IsChecked="{x:Bind ViewModel.IsModFolderNameColumnVisible, Mode=OneWay}"
                                         Text="显示 '模组文件夹名' 列" />
                                 </MenuBarItem>
-
-                                <MenuBarItem
-                                    Title="模组偏好设置"
-                                    IsEnabled="{x:Bind ViewModel.IsSingleModSelected, Mode=OneWay}"
-                                    Visibility="Collapsed">
-                                    <ToggleMenuFlyoutItem Text="保存所选模组的偏好设置" ToolTipService.ToolTip="读取所选模组的3Dmigoto模组偏好设置（d3dx_user.ini）并将设置存储在模组的.JASM_Config.json文件中" />
-                                    <MenuFlyoutSeparator />
-                                    <ToggleMenuFlyoutItem Text="读取所选模组的偏好设置" ToolTipService.ToolTip="从当前选定的模组的.JASM_Config.json文件中读取偏好设置，并将其写入d3dx_user.ini文件供3Dmigoto读取" />
-                                </MenuBarItem>
                             </MenuBar>
-
+                            <ToggleButton
+                                VerticalAlignment="Center"
+                                Command="{x:Bind ViewModel.ToggleAutoSyncCommand}"
+                                Content="自动同步"
+                                IsChecked="{x:Bind ViewModel.AutoSync3DMigotoConfig, Mode=OneWay}"
+                                ToolTipService.ToolTip="启用此项后，切换时将自动刷新模组到游戏，并从d3dx_user.ini文件中同步模组切换项到ini文件"/>
                         </StackPanel>
 
 

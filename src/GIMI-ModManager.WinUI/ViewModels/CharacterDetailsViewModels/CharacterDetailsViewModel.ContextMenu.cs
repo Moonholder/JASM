@@ -31,7 +31,7 @@ public partial class CharacterDetailsViewModel
         if (selectedMods.Count == 0)
             return;
 
-
+        var hasEnabledMods = ModGridVM.SelectedMods.Any(m => m.IsEnabled);
         var shownCharacterName = ShownModObject.DisplayName;
         var selectedModsCount = selectedMods.Count;
 
@@ -152,6 +152,18 @@ public partial class CharacterDetailsViewModel
                     }
                 }
             });
+
+            if (hasEnabledMods && AutoSync3DMigotoConfig)
+            {
+                try
+                {
+                    await _elevatorService.RefreshGenshinMods();
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, "Failed to refresh game after deleting mods");
+                }
+            }
 
             ModGridVM.QueueModRefresh();
 

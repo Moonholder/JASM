@@ -1,11 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
-using Windows.ApplicationModel.DataTransfer;
-using Windows.Storage;
-using Windows.Win32;
-using Windows.Win32.Media.Audio;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkitWrapper;
 using GIMI_ModManager.Core.Contracts.Entities;
@@ -13,6 +6,7 @@ using GIMI_ModManager.Core.Contracts.Services;
 using GIMI_ModManager.Core.Entities.Mods.Helpers;
 using GIMI_ModManager.Core.GamesService.Interfaces;
 using GIMI_ModManager.Core.Helpers;
+using GIMI_ModManager.Core.Services;
 using GIMI_ModManager.Core.Services.GameBanana.Models;
 using GIMI_ModManager.Core.Services.ModPresetService;
 using GIMI_ModManager.Core.Services.ModPresetService.Models;
@@ -25,8 +19,15 @@ using GIMI_ModManager.WinUI.Services.ModHandling;
 using GIMI_ModManager.WinUI.Services.Notifications;
 using Microsoft.UI.Dispatching;
 using Serilog;
-using Constants = GIMI_ModManager.Core.Helpers.Constants;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using Windows.ApplicationModel.DataTransfer;
+using Windows.Storage;
+using Windows.Win32;
+using Windows.Win32.Media.Audio;
 using static GIMI_ModManager.WinUI.ViewModels.CloseRequestedArgs;
+using Constants = GIMI_ModManager.Core.Helpers.Constants;
 
 namespace GIMI_ModManager.WinUI.ViewModels;
 
@@ -44,6 +45,8 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
     private readonly ModSettingsService _modSettingsService;
     private readonly Uri _placeholderImageUri;
     private readonly ModPresetService _modPresetService;
+    private readonly ElevatorService _elevatorService;
+    private readonly UserPreferencesService _userPreferencesService;
 
     private ICharacterModList _characterModList = null!;
     private ICharacterSkin? _inGameSkin = null;
@@ -108,6 +111,7 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
 
     [ObservableProperty] private bool _replaceModToUpdateInPreset;
     [ObservableProperty] private bool _replaceDuplicateModInPreset;
+    [ObservableProperty] private bool _autoSync3DMigotoConfig;
 
     public bool IsUpdatingMod => _installOptions?.ExistingModIdToUpdate is not null;
     private ISkinMod? _existingModToUpdate;
@@ -127,6 +131,7 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
         NotificationManager notificationManager, IWindowManagerService windowManagerService,
         ModNotificationManager modNotificationManager, ILocalSettingsService localSettingsService,
         CharacterSkinService characterSkinService, ModSettingsService modSettingsService,
+        ElevatorService elevatorService, UserPreferencesService userPreferencesService,
         GameBananaService gameBananaService, ModPresetService modPresetService, ISkinManagerService skinManagerService)
     {
         _logger = logger;
@@ -138,6 +143,8 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
         _localSettingsService = localSettingsService;
         _characterSkinService = characterSkinService;
         _modSettingsService = modSettingsService;
+        _elevatorService = elevatorService;
+        _userPreferencesService = userPreferencesService;
         _gameBananaService = gameBananaService;
         _modPresetService = modPresetService;
         _skinManagerService = skinManagerService;
@@ -164,6 +171,9 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
 
         EnableThisMod = !_characterModList.Character.IsMultiMod && installerSettings.EnableModOnInstall;
         AlwaysOnTop = installerSettings.ModInstallerWindowOnTop;
+
+        var modPresetSetting = await _localSettingsService.ReadOrCreateSettingAsync<ModPresetSettings>(ModPresetSettings.Key);
+        AutoSync3DMigotoConfig = modPresetSetting.AutoSyncMods & _elevatorService.ElevatorStatus == ElevatorStatus.Running;
 
         await Task.Run(async () =>
         {
@@ -916,7 +926,7 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
             ModUrl = ModUrl,
             Author = Author,
             Description = Description,
-            CharacterSkinOverride = _inGameSkin?.InternalName ?? string.Empty,
+            CharacterSkinOverride = _inGameSkin?.InternalName ?? "default_" + _characterModList.Character.InternalName,
             ModImage = ModPreviewImagePath == _placeholderImageUri ? null : ModPreviewImagePath
         };
     }
@@ -975,14 +985,19 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
 
     private async Task EnableOnlyMod(ISkinMod installedMod)
     {
+        var modsToSync = new List<Guid>();
+
         if (_characterModList.Character is ICharacter { Skins.Count: <= 1 } ||
             _characterModList.Character is not ICharacter character)
         {
             var enabledMods = _characterModList.Mods
-                .Where(mod => mod.IsEnabled && mod.Mod.Id != installedMod.Id).ToArray();
+                .Where(mod => mod.IsEnabled && mod.Mod.Id != installedMod.Id)
+                .ToArray();
+
             foreach (var mod in enabledMods)
             {
                 DisableMod(mod.Mod);
+                modsToSync.Add(mod.Mod.Id);
             }
 
             EnableMod(installedMod);
@@ -990,48 +1005,81 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
             _logger.Debug("Disabled {disabledMods} and enabled {enabledMod}",
                 string.Join(',', enabledMods.Select(mod => mod.Mod.Name)),
                 installedMod.Name);
-            return;
         }
-
-        var detectedSkin = await _characterSkinService.GetFirstSkinForModAsync(installedMod, character)
-            .ConfigureAwait(false);
-
-        if (_inGameSkin is null)
+        else
         {
-            if (detectedSkin is not null)
+            var detectedSkin = await _characterSkinService.GetFirstSkinForModAsync(installedMod, character);
+
+            if (_inGameSkin is null)
             {
-                _inGameSkin = detectedSkin;
+                if (detectedSkin is not null)
+                {
+                    _inGameSkin = detectedSkin;
+                }
+                else
+                {
+                    _notificationManager.QueueNotification("无法确定新模组的皮肤",
+                        "JASM 无法确定该模组对应的游戏内皮肤，因此无法确定需要禁用哪些模组.");
+                    return;
+                }
             }
-            else
+
+            var disabledModsNames = new List<string>();
+
+            await foreach (var skinMod in _characterSkinService.GetModsForSkinAsync(_inGameSkin))
             {
-                _notificationManager.QueueNotification("无法确定新模组的皮肤",
-                    "JASM 无法确定该模组对应的游戏内皮肤，因此无法确定需要禁用哪些模组.");
-                return;
+                if (skinMod.Id == installedMod.Id)
+                    continue;
+
+                if (_characterModList.IsModEnabled(skinMod))
+                {
+                    _characterModList.DisableMod(skinMod.Id);
+                    modsToSync.Add(skinMod.Id);
+                    disabledModsNames.Add(skinMod.Name);
+                }
+            }
+
+            if (detectedSkin is not null && !detectedSkin.InternalNameEquals(_inGameSkin.InternalName))
+            {
+                await _modSettingsService.SetCharacterSkinOverrideLegacy(installedMod.Id, _inGameSkin.InternalName);
+            }
+
+            EnableMod(installedMod);
+
+            _logger.Debug("Disabled {disabledMods} and enabled {enabledMod}, also set skin override for mod to {SkinName}",
+                string.Join(',', disabledModsNames),
+                installedMod.Name, _inGameSkin.InternalName.Id);
+        }
+
+
+        if (AutoSync3DMigotoConfig)
+        {
+            try
+            {
+                await Task.Delay(500);
+                await _elevatorService.RefreshGenshinMods();
+
+                if (modsToSync.Count > 0)
+                {
+                    await Task.Delay(50);
+                    await Parallel.ForEachAsync(modsToSync, async (modId, ct) =>
+                    {
+                        try
+                        {
+                            await _userPreferencesService.SyncPreferencesToModLocalFilesAsync(modId);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.Error(ex, "Failed to sync preferences for mod ID {ModId}", modId);
+                        }
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error during AutoSync sequence");
             }
         }
-
-        var disabledMods = new List<ISkinMod>();
-        await foreach (var skinMod in _characterSkinService.GetModsForSkinAsync(_inGameSkin).ConfigureAwait(false))
-        {
-            if (skinMod.Id == installedMod.Id)
-                continue;
-            DisableMod(skinMod);
-            disabledMods.Add(skinMod);
-        }
-
-        if (detectedSkin is not null && !detectedSkin.InternalNameEquals(_inGameSkin.InternalName))
-        {
-            await _modSettingsService.SetCharacterSkinOverrideLegacy(installedMod.Id, _inGameSkin.InternalName)
-                .ConfigureAwait(false);
-        }
-
-
-        EnableMod(installedMod);
-
-
-        _logger.Debug("Disabled {disabledMods} and enabled {enabledMod}, also set skin override for mod to {SkinName}",
-            string.Join(',', disabledMods.Select(mod => mod.Name)),
-            installedMod.Name, _inGameSkin.InternalName.Id);
     }
 
     [RelayCommand]

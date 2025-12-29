@@ -23,6 +23,15 @@ public partial class CharacterGalleryViewModel
         IsSingleSelection = settings.IsSingleSelection;
     }
 
+    [RelayCommand(CanExecute = nameof(CanToggleAutoSync))]
+    private async Task ToggleAutoSync()
+    {
+        AutoSync3DMigotoConfig = !AutoSync3DMigotoConfig;
+        var settings = await _localSettingsService.ReadOrCreateSettingAsync<ModPresetSettings>(ModPresetSettings.Key);
+        AutoSync3DMigotoConfig = settings.AutoSyncMods = AutoSync3DMigotoConfig;
+        await _localSettingsService.SaveSettingAsync(ModPresetSettings.Key, settings);
+    }
+
     private bool CanSetHeightWidth(SetHeightWidth _)
     {
         return !IsNavigating && !IsBusy;

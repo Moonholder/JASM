@@ -1,8 +1,8 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using GIMI_ModManager.Core.Contracts.Services;
+﻿using GIMI_ModManager.Core.Contracts.Services;
 using GIMI_ModManager.Core.Entities;
 using GIMI_ModManager.Core.Helpers;
 using Serilog;
+using System.Diagnostics.CodeAnalysis;
 
 namespace GIMI_ModManager.Core.Services;
 
@@ -158,9 +158,14 @@ public class UserPreferencesService(ILogger logger, ISkinManagerService skinMana
             if (modSettings is null || !modSettings.Preferences.Any())
                 continue;
 
+            var explicitNamespace = TryGetExplicitNamespace(characterSkinEntry.Mod.FullPath);
 
             var modSettingsPref = modSettings.Preferences
-                .Select(kv => CreateUserIniPreference(_activeModsFolder.FullName, characterSkinEntry, kv))
+                .Select(kv => CreateUserIniPreference(
+                                    _activeModsFolder.FullName,
+                                    characterSkinEntry,
+                                    kv,
+                                    explicitNamespace))
                 .Where(pref => pref.HasKeyValue)
                 .ToArray();
 
@@ -199,6 +204,160 @@ public class UserPreferencesService(ILogger logger, ISkinManagerService skinMana
         return true;
     }
 
+    /// <summary>
+    /// Reads the current values from d3dx_user.ini for a specific mod,
+    /// and updates the initialization values in the mod's local .ini files (under [Constants]).
+    /// </summary>
+    public async Task<bool> SyncPreferencesToModLocalFilesAsync(Guid guid)
+    {
+        var skinEntry = _skinManagerService.GetModEntryById(guid);
+
+        if (skinEntry is null)
+        {
+            _logger.Warning("Mod with ID {ModId} not found among active mods", guid);
+            return false;
+        }
+
+        // 2. 读取 d3dx_user.ini 配置
+        if (!_threeMigotoFolder.Exists) return false;
+        var d3dxUserIniPath = Path.Combine(_threeMigotoFolder.FullName, D3DX_USER_INI);
+        if (!File.Exists(d3dxUserIniPath)) return false;
+
+        string? explicitNamespace = TryGetExplicitNamespace(skinEntry.Mod.FullPath);
+        var d3dxLines = await File.ReadAllLinesAsync(d3dxUserIniPath).ConfigureAwait(false);
+
+        var globalPreferences = FindExistingModPref(_activeModsFolder.FullName, d3dxLines, skinEntry)
+            .Where(p => p.HasKeyValue)
+            .ToDictionary(
+                p => p.KeyValuePair!.Value.Key,
+                p => p.KeyValuePair!.Value.Value,
+                StringComparer.OrdinalIgnoreCase);
+
+        if (globalPreferences.Count == 0)
+            return true;
+
+        var modFolderPath = skinEntry.Mod.FullPath;
+        if (!Directory.Exists(modFolderPath)) return false;
+
+        // 3. 获取并过滤 .ini 文件
+        var allIniFiles = Directory.GetFiles(modFolderPath, "*.ini", SearchOption.AllDirectories);
+
+        var validIniFiles = allIniFiles.Where(filePath =>
+        {
+            var relativePath = Path.GetRelativePath(modFolderPath, filePath);
+            var parts = relativePath.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+
+            return !parts.Any(p => p.StartsWith(ModFolderHelpers.ALT_DISABLED_PREFIX, StringComparison.OrdinalIgnoreCase));
+        });
+
+        bool anyFileUpdated = false;
+
+        // 4. 遍历处理
+        foreach (var iniFile in validIniFiles)
+        {
+            var relativePath = Path.GetRelativePath(modFolderPath, iniFile);
+
+            var fileContent = await File.ReadAllLinesAsync(iniFile).ConfigureAwait(false);
+
+            var updatedContent = UpdateIniContent(fileContent, relativePath, globalPreferences, explicitNamespace != null, out bool isModified);
+
+            if (isModified)
+            {
+                await File.WriteAllLinesAsync(iniFile, updatedContent).ConfigureAwait(false);
+                anyFileUpdated = true;
+                _logger.Information($"Synced preferences to {relativePath}");
+            }
+        }
+
+        return anyFileUpdated;
+    }
+
+    /// <summary>
+    /// Update local INI content by matching keys with relative path context
+    /// </summary>
+    private List<string> UpdateIniContent(
+        string[] lines,
+        string relativeFilePath,
+        Dictionary<string, string> preferences,
+        bool hasExplicitNamespace,
+        out bool isModified)
+    {
+        var result = new List<string>(lines.Length);
+        isModified = false;
+        bool inConstantsSection = false;
+
+        var variableRegex = new System.Text.RegularExpressions.Regex(
+            @"^\s*(?<keywords>(?:global\s+|persist\s+)*)\$?(?<key>\w+)\s*=\s*(?<value>.*?)\s*(?<comment>(?:;|//).*)?$",
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+        foreach (var line in lines)
+        {
+            var trimLine = line.Trim();
+
+            // 检测 Section
+            if (trimLine.StartsWith("[") && trimLine.EndsWith("]"))
+            {
+                inConstantsSection = trimLine.Equals("[Constants]", StringComparison.OrdinalIgnoreCase);
+                result.Add(line);
+                continue;
+            }
+
+            if (inConstantsSection && !string.IsNullOrWhiteSpace(trimLine))
+            {
+                var match = variableRegex.Match(line);
+                if (match.Success)
+                {
+                    var varName = match.Groups["key"].Value;
+
+                    string lookupKey;
+
+                    if (hasExplicitNamespace)
+                    {
+                        // 显式命名空间模式：
+                        // d3dx_user.ini 里存的是 "$\Namespace\var=val"
+                        lookupKey = varName.ToLower();
+                    }
+                    else
+                    {
+                        // 默认路径模式：
+                        // d3dx_user.ini 里存的是 "$\Mods\...\folder\file.ini\var=val"
+                        lookupKey = Path.Combine(relativeFilePath, varName).Replace('/', '\\').ToLower();
+                    }
+
+                    if (preferences.TryGetValue(lookupKey, out var newValue))
+                    {
+                        var currentValue = match.Groups["value"].Value;
+
+                        if (!currentValue.Trim().Equals(newValue.Trim(), StringComparison.OrdinalIgnoreCase))
+                        {
+                            var keywords = match.Groups["keywords"].Value;
+                            var comment = match.Groups["comment"].Value;
+
+                            var indent = line.TakeWhile(char.IsWhiteSpace).ToArray();
+                            var hasDollar = line.Contains($"${varName}", StringComparison.OrdinalIgnoreCase);
+                            var varPart = hasDollar ? $"${varName}" : varName;
+
+                            var newLine = $"{new string(indent)}{keywords}{varPart} = {newValue}";
+
+                            if (!string.IsNullOrEmpty(comment))
+                            {
+                                newLine += $" {comment}";
+                            }
+
+                            result.Add(newLine);
+                            isModified = true;
+                            continue;
+                        }
+                    }
+                }
+            }
+
+            result.Add(line);
+        }
+
+        return result;
+    }
+
 
     public async Task ResetPreferencesAsync(bool resetOnlyEnabledMods)
     {
@@ -221,11 +380,12 @@ public class UserPreferencesService(ILogger logger, ISkinManagerService skinMana
     private List<IniPreference> FindExistingModPref(string rootModFolderPath, ICollection<string> lines,
         CharacterSkinEntry skinEntry)
     {
-        // => $\Mods\Character\dehya\modfolder\
-        var modNameSpace = CreateUserIniPreference(rootModFolderPath, skinEntry);
+        string? explicitNamespace = TryGetExplicitNamespace(skinEntry.Mod.FullPath);
+
+        var searchPref = CreateUserIniPreference(rootModFolderPath, skinEntry, null, explicitNamespace);
+        var modNameSpace = searchPref.FullPath;
 
         var modIndexes = new List<IniPreference>();
-
 
         for (var i = 0; i < lines.Count; i++)
         {
@@ -233,32 +393,95 @@ public class UserPreferencesService(ILogger logger, ISkinManagerService skinMana
 
             if (line.StartsWith(modNameSpace, StringComparison.OrdinalIgnoreCase))
             {
-                var keyValue = line.Replace(modNameSpace, "").Split("=", StringSplitOptions.TrimEntries);
+                var content = line.Substring(modNameSpace.Length);
+
+                var keyValue = content.Split("=", StringSplitOptions.TrimEntries);
 
                 if (keyValue.Length != 2)
                     continue;
 
-                modIndexes.Add(CreateUserIniPreference(rootModFolderPath, skinEntry,
-                    new KeyValuePair<string, string>(keyValue[0], keyValue[1])));
+                var foundPref = CreateUserIniPreference(
+                    rootModFolderPath,
+                    skinEntry,
+                    new KeyValuePair<string, string>(keyValue[0], keyValue[1]),
+                    explicitNamespace
+                );
 
-                modIndexes.Last().Index = i;
+                foundPref.Index = i;
+                modIndexes.Add(foundPref);
             }
         }
 
         return modIndexes;
     }
 
-    private IniPreference CreateUserIniPreference(string rootModFolderPath, CharacterSkinEntry skinEntry,
-        KeyValuePair<string, string>? keyValueTuple = null)
+    private IniPreference CreateUserIniPreference(
+            string rootModFolderPath,
+            CharacterSkinEntry skinEntry,
+            KeyValuePair<string, string>? keyValueTuple = null,
+            string? explicitNamespace = null)
     {
         // => $\mods\
-        var rootPath = CreateModRootPrefix(rootModFolderPath);
+        var rootPath =
+            CreateModRootPrefix(rootModFolderPath);
 
-        return new IniPreference(rootPath,
+        var prefix = ModFolderHelpers.DISABLED_PREFIX;
+        var modName = skinEntry.Mod.Name;
+        var cleanName = modName.StartsWith(prefix)
+           ? modName[prefix.Length..]
+           : modName;
+
+        return new IniPreference(
+            rootPath,
             skinEntry.ModList.Character.ModCategory.InternalName,
             skinEntry.ModList.Character.InternalName,
-            skinEntry.Mod.Name,
-            keyValueTuple);
+            cleanName,
+            keyValueTuple,
+            explicitNamespace);
+    }
+
+    /// <summary>
+    /// 尝试从 Mod 的 .ini 文件中获取显式声明的 namespace。
+    /// 规则：查找不在 [] 节下的 namespace = value
+    /// </summary>
+    private string? TryGetExplicitNamespace(string modFolderPath)
+    {
+        if (!Directory.Exists(modFolderPath)) return null;
+
+        var iniFiles = Directory.GetFiles(modFolderPath, "*.ini", SearchOption.AllDirectories)
+            .Where(path =>
+            {
+                var relative = Path.GetRelativePath(modFolderPath, path);
+                var parts = relative.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+                return !parts.Any(p => p.StartsWith("DISABLED", StringComparison.OrdinalIgnoreCase));
+            });
+
+        // 匹配 namespace = value，忽略大小写，允许周围有空格
+        // 捕获组 <ns> 提取值，遇到空白、换行或分号(注释)截止
+        var namespaceRegex = new System.Text.RegularExpressions.Regex(
+            @"^\s*namespace\s*=\s*(?<ns>[^;\s]+)",
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+        foreach (var file in iniFiles)
+        {
+            foreach (var line in File.ReadLines(file))
+            {
+                var trimmed = line.Trim();
+                if (string.IsNullOrWhiteSpace(trimmed)) continue;
+                if (trimmed.StartsWith(";") || trimmed.StartsWith("//")) continue;
+
+                if (trimmed.StartsWith("["))
+                    break;
+
+                var match = namespaceRegex.Match(trimmed);
+                if (match.Success)
+                {
+                    return match.Groups["ns"].Value;
+                }
+            }
+        }
+
+        return null;
     }
 
     private string CreateModRootPrefix(string rootModFolderPath)
@@ -286,22 +509,36 @@ public class UserPreferencesService(ILogger logger, ISkinManagerService skinMana
             string category,
             string character,
             string modName,
-            KeyValuePair<string, string>? keyValueTuple = null)
+            KeyValuePair<string, string>? keyValueTuple = null,
+            string? explicitNamespace = null)
         {
             Category = category.ToLower();
             Character = character.ToLower();
             ModName = modName.ToLower();
-            KeyValuePair = keyValueTuple is null
-                ? null
-                : new KeyValuePair<string, string>(keyValueTuple.Value.Key.ToLower(),
-                    keyValueTuple.Value.Value.ToLower());
 
-            var separator = Path.DirectorySeparatorChar;
-
-
-            FullPath = modRoot + category + separator + character + separator + modName + separator;
             if (keyValueTuple is not null)
-                FullPath += $"{keyValueTuple.Value.Key} = {keyValueTuple.Value.Value}";
+            {
+                KeyValuePair = new KeyValuePair<string, string>(
+                    keyValueTuple.Value.Key.ToLower(),
+                    keyValueTuple.Value.Value.ToLower());
+            }
+
+            if (!string.IsNullOrWhiteSpace(explicitNamespace))
+            {
+                // 使用显式命名空间
+                // 格式: $\MyNamespace\key = value
+                FullPath = "$" + Path.DirectorySeparatorChar + explicitNamespace.ToLower() + Path.DirectorySeparatorChar;
+            }
+            else
+            {
+                // 使用基于路径的命名空间
+                // 格式: $\Mods\Category\Character\ModName\key = value
+                var separator = Path.DirectorySeparatorChar;
+                FullPath = modRoot + category + separator + character + separator + modName + separator;
+            }
+
+            if (keyValueTuple is not null)
+                FullPath += $"{KeyValuePair.Value.Key} = {KeyValuePair.Value.Value}";
 
             FullPath = FullPath.ToLower();
         }

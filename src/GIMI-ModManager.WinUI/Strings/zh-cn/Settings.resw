@@ -125,7 +125,7 @@
 是否要更改语言？</value>
   </data>
   <data name="ElevatorSectionHeader.Text" xml:space="preserve">
-    <value>Elevator 进程</value>
+    <value>同步进程</value>
   </data>
   <data name="ElevatorStatusTitle.Text" xml:space="preserve">
     <value>同步状态:</value>
@@ -183,9 +183,8 @@
 
 按下“开始”按钮后，将出现用户帐户控制（UAC）请求，以管理员身份进行授权。
 
-（要求游戏和3Dmigoto已启动，按F10）
-
-查看 JASM github 上的 FAQ 以单独下载它，因为它会被标记为恶意软件。</value>
+（要求游戏和3Dmigoto已启动）
+  </value>
   </data>
   <data name="StartElevatorDialogTitle" xml:space="preserve">
     <value>启动同步进程？</value>
