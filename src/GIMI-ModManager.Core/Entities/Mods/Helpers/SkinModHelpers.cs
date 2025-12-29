@@ -6,50 +6,41 @@ namespace GIMI_ModManager.Core.Entities.Mods.Helpers;
 
 public static class SkinModHelpers
 {
+    /// <summary>
+    /// 将 URI 路径转换为相对于 Mod 根目录的路径
+    /// </summary>
     public static string? UriPathToModRelativePath(ISkinMod mod, string? uriPath)
     {
         if (string.IsNullOrWhiteSpace(uriPath))
             return null;
 
-        var modPath = mod.FullPath;
-
-        var modUri = Uri.TryCreate(modPath, UriKind.Absolute, out var result) &&
-                     result.Scheme == Uri.UriSchemeFile
-            ? result
-            : null;
-
-        var uri = Uri.TryCreate(uriPath, UriKind.Absolute, out var uriResult) &&
-                  uriResult.Scheme == Uri.UriSchemeFile
-            ? uriResult
-            : null;
-
-        // This is technically the only path that should be used.
-        if (modUri is not null && uri is not null)
+        try
         {
-            var relativeUri = modUri.MakeRelativeUri(uri);
+            string fullPathToCheck;
+            if (Uri.TryCreate(uriPath, UriKind.Absolute, out var uriResult) && uriResult.Scheme == Uri.UriSchemeFile)
+            {
+                fullPathToCheck = uriResult.LocalPath;
+            }
+            else
+            {
+                fullPathToCheck = uriPath;
+            }
 
-            var modName = Uri.UnescapeDataString(modUri.Segments.LastOrDefault(string.Empty));
-            if (string.IsNullOrWhiteSpace(modName))
-                modName = mod.Name;
+            var relativePath = Path.GetRelativePath(mod.FullPath, fullPathToCheck);
 
-            // var relativePath = relativeUri.OriginalString.Replace($"{modName}/", "");
-            var regex = new Regex(Regex.Escape($"{modName}/"));
-            var decodedRelativeUri = Uri.UnescapeDataString(relativeUri.OriginalString);
-            var relativePath = regex.Replace(decodedRelativeUri, "", 1);
+            if (relativePath.StartsWith("..") || Path.IsPathRooted(relativePath))
+            {
+                var filename = Path.GetFileName(fullPathToCheck);
+                return string.IsNullOrWhiteSpace(filename) ? null : filename;
+            }
+
             return relativePath;
         }
-
-
-        if (Uri.IsWellFormedUriString(uriPath, UriKind.Absolute))
+        catch
         {
             var filename = Path.GetFileName(uriPath);
             return string.IsNullOrWhiteSpace(filename) ? null : filename;
         }
-
-        var absPath = Path.GetFileName(uriPath);
-
-        var file = Path.GetFileName(absPath);
-        return string.IsNullOrWhiteSpace(file) ? null : file;
     }
 
     public static Uri? RelativeModPathToAbsPath(string modPath, string? relativeModPath)
@@ -57,12 +48,9 @@ public static class SkinModHelpers
         if (string.IsNullOrWhiteSpace(relativeModPath))
             return null;
 
-        var uri = Uri.TryCreate(Path.Combine(modPath, relativeModPath), UriKind.Absolute, out var result) &&
-                  result.Scheme == Uri.UriSchemeFile
-            ? result
-            : null;
+        var fullPath = Path.GetFullPath(Path.Combine(modPath, relativeModPath));
 
-        return uri;
+        return new Uri(fullPath);
     }
 
     public static bool IsInModFolder(ISkinMod mod, Uri path)
@@ -70,19 +58,18 @@ public static class SkinModHelpers
         if (path.Scheme != Uri.UriSchemeFile)
             return false;
 
-        var fsPath = path.LocalPath;
+        var modFullPath = Path.GetFullPath(mod.FullPath).TrimEnd(Path.DirectorySeparatorChar);
+        var targetFullPath = Path.GetFullPath(path.LocalPath);
 
-
-        return fsPath.StartsWith(mod.FullPath, StringComparison.OrdinalIgnoreCase);
+        return targetFullPath.StartsWith(modFullPath, StringComparison.OrdinalIgnoreCase);
     }
-
 
     public static Uri? StringUrlToUri(string? url)
     {
         if (string.IsNullOrWhiteSpace(url))
             return null;
 
-        return Uri.IsWellFormedUriString(url, UriKind.Absolute) ? new Uri(url) : null;
+        return Uri.TryCreate(url, UriKind.Absolute, out var result) ? result : null;
     }
 
     public static Guid StringToGuid(string? guid)
@@ -93,7 +80,12 @@ public static class SkinModHelpers
         return Guid.TryParse(guid, out var result) ? result : Guid.NewGuid();
     }
 
+
     public static readonly string[] _imageNamePriority = [".jasm_cover", "preview", "cover"];
+
+    private static readonly HashSet<string> _supportedExtensions = Constants.SupportedImageExtensions
+        .Select(e => e.ToLowerInvariant())
+        .ToHashSet();
 
     public static Uri[] DetectModPreviewImages(string modDirPath)
     {
@@ -101,27 +93,31 @@ public static class SkinModHelpers
         if (!modDir.Exists)
             return [];
 
-        var supportedExtensions = Constants.SupportedImageExtensions
-            .Select(e => e.ToLowerInvariant())
-            .ToHashSet();
-
         var images = modDir.EnumerateFiles("*", SearchOption.AllDirectories)
-            .Where(file => _imageNamePriority.Any(prefix =>
-                file.Name.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)))
-            .Where(file => supportedExtensions.Contains(file.Extension.ToLowerInvariant()))
-            .ToList();
+            .Where(file => _supportedExtensions.Contains(file.Extension.ToLowerInvariant()))
+            .Select(file => new
+            {
+                FileInfo = file,
+                Priority = GetImagePriority(file.Name)
+            })
 
-        // Sort images by priority
-        foreach (var imageName in _imageNamePriority.Reverse())
+            .OrderBy(x => x.Priority)
+            .ThenBy(x => x.FileInfo.Name)
+            .Select(x => new Uri(x.FileInfo.FullName))
+            .ToArray();
+
+        return images;
+    }
+
+    private static int GetImagePriority(string fileName)
+    {
+        for (int i = 0; i < _imageNamePriority.Length; i++)
         {
-            var image = images.FirstOrDefault(x => x.Name.StartsWith(imageName, StringComparison.CurrentCultureIgnoreCase));
-            if (image is null)
-                continue;
-
-            images.Remove(image);
-            images.Insert(0, image);
+            if (fileName.StartsWith(_imageNamePriority[i], StringComparison.OrdinalIgnoreCase))
+            {
+                return i;
+            }
         }
-
-        return images.Select(x => new Uri(x.FullName)).ToArray();
+        return int.MaxValue;
     }
 }
