@@ -1,5 +1,23 @@
 # Changelog
 
+## [2.25.0](https://github.com/Moonholder/JASM/compare/v2.24.2...v2.25.0) (2025-12-30)
+
+
+### Features
+
+* 支持自动刷新模组至游戏及同步模组切换项 ([0ee4b89](https://github.com/Moonholder/JASM/commit/0ee4b89744fdcf1af7720bc1a510ecb7d8a1b67b))
+
+
+### Tweaks
+
+* 减轻角色页导航时的内存泄漏问题, 允许拖放已下载的Tg文件 ([ea9c859](https://github.com/Moonholder/JASM/commit/ea9c859524867e093c963b869e14ca74f2e28fe5))
+
+
+### Miscellaneous
+
+* 更新角色配置 ([ca0b02f](https://github.com/Moonholder/JASM/commit/ca0b02faef65a0f54acf9831855955fc094b0645))
+* 调整预览图选取策略 ([37dd610](https://github.com/Moonholder/JASM/commit/37dd610644782b9f7b2c2e6dc85c9940b6d9c5b1))
+
 ## [2.24.2](https://github.com/Moonholder/JASM/compare/v2.24.1...v2.24.2) (2025-12-02)
 
 
