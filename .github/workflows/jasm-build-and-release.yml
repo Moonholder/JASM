@@ -92,7 +92,7 @@ jobs:
 
     - name: Build, publish and zip the app
       run: |
-        python ${{ github.workspace }}\Build\Release.py ${{ matrix.build_type == 'SelfContained' && 'SelfContained' || '' }} ExcludeElevator
+        python ${{ github.workspace }}\Build\Release.py ${{ matrix.build_type == 'SelfContained' && 'SelfContained' || '' }}
         echo "zipFile=JASM_v${{ github.ref }}_${{ matrix.build_type }}.7z" >> $GITHUB_ENV
 
     - name: List build directory
