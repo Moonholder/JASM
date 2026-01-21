@@ -1,5 +1,5 @@
-using Windows.System;
 using CommunityToolkitWrapper;
+using GIMI_ModManager.Core.Contracts.Services;
 using GIMI_ModManager.Core.GamesService;
 using GIMI_ModManager.WinUI.Contracts.Services;
 using GIMI_ModManager.WinUI.Helpers;
@@ -12,6 +12,7 @@ using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
+using Windows.System;
 
 namespace GIMI_ModManager.WinUI.Views;
 
@@ -19,9 +20,12 @@ public sealed partial class ShellPage : Page
 {
     public ShellViewModel ViewModel { get; }
 
-    public ShellPage(ShellViewModel viewModel)
+    private readonly ILanguageLocalizer _localizer;
+
+    public ShellPage(ShellViewModel viewModel, ILanguageLocalizer localizer)
     {
         ViewModel = viewModel;
+        _localizer = localizer;
         InitializeComponent();
 
         ViewModel.NavigationService.Frame = NavigationFrame;
@@ -79,20 +83,29 @@ public sealed partial class ShellPage : Page
             var index = 0;
             foreach (var category in categories)
             {
+                string contentText;
+
+                if (category.ModCategory == ModCategory.Character)
+                {
+                    contentText = _localizer.GetLocalizedStringOrDefault("/Shell/CharacterOverview", "Character Overview");
+                }
+                else
+                {
+                    contentText = category.DisplayNamePlural;
+                }
+
                 var categoryViewItem = new NavigationViewItem()
                 {
-                    Content = category.DisplayNamePlural == "角色" ? "角色概览" : category.DisplayNamePlural,
+                    Content = contentText,
                     Tag = category.InternalName.Id
                 };
                 NavigationHelper.SetNavigateToParameter(categoryViewItem, category);
                 NavigationHelper.SetNavigateTo(categoryViewItem, typeof(CharactersViewModel).FullName!);
 
-
                 switch (category.ModCategory)
                 {
                     case ModCategory.Character:
                         categoryViewItem.Icon = new FontIcon() { Glyph = "\uE716" };
-
                         ViewModel.NavigationViewService.MenuItems!.Insert(index, categoryViewItem);
                         break;
                     case ModCategory.NPC:
@@ -101,12 +114,10 @@ public sealed partial class ShellPage : Page
                             UriSource = new Uri($"{App.ASSET_DIR}/NPC_Icon.png"),
                             ShowAsMonochrome = true
                         };
-
                         ViewModel.NavigationViewService.MenuItems!.Insert(index, categoryViewItem);
                         break;
                     case ModCategory.Object:
                         categoryViewItem.Icon = new FontIcon() { Glyph = "\uE8FC" };
-
                         ViewModel.NavigationViewService.MenuItems!.Insert(index, categoryViewItem);
                         break;
                     case ModCategory.Weapons:
@@ -115,11 +126,8 @@ public sealed partial class ShellPage : Page
                             UriSource = new Uri($"{App.ASSET_DIR}/Weapon_Icon.png"),
                             ShowAsMonochrome = false
                         };
-
                         ViewModel.NavigationViewService.MenuItems!.Insert(index, categoryViewItem);
                         break;
-
-
                     case ModCategory.Ui:
                     case ModCategory.Gliders:
                     case ModCategory.Custom:
@@ -130,30 +138,6 @@ public sealed partial class ShellPage : Page
                 }
 
                 index++;
-
-                //const string menuName = "Categories";
-                //if (NavigationViewControl.MenuItems[1] is NavigationViewItem { Tag: not null } menuItem &&
-                //    menuItem.Tag.Equals(menuName))
-                //{
-                //    menuItem.MenuItems.Add(categoryViewItem);
-                //}
-                //else
-                //{
-                //    var categoriesItem = new NavigationViewItem()
-                //    {
-                //        Content = menuName,
-                //        Icon = new FontIcon() { Glyph = "\uE712" },
-                //        Tag = menuName,
-                //        SelectsOnInvoked = false
-                //    };
-
-
-                //    categoriesItem.MenuItems.Add(categoryViewItem);
-
-                //    NavigationHelper.SetNavigateToParameter(categoryViewItem, category);
-                //    NavigationViewControl.MenuItems.Insert(1, categoriesItem);
-                //    categoriesItem.IsExpanded = true;
-                //}
             }
         });
 
@@ -168,7 +152,8 @@ public sealed partial class ShellPage : Page
                     Orientation = Orientation.Horizontal
                 };
 
-                var gameInfo = await GameService.GetGameInfoAsync(game);
+                var currentLangCode = _localizer.CurrentLanguage.LanguageCode;
+                var gameInfo = await GameService.GetGameInfoAsync(game, currentLangCode);
 
                 if (gameInfo is null)
                     return;
@@ -179,12 +164,12 @@ public sealed partial class ShellPage : Page
                     Height = 20,
                     CornerRadius = new CornerRadius(8),
                     Children =
-                {
-                    new Image()
                     {
-                        Source = new BitmapImage(new Uri(gameInfo.GameIcon)) { DecodePixelWidth = 20 }
+                        new Image()
+                        {
+                            Source = new BitmapImage(new Uri(gameInfo.GameIcon)) { DecodePixelWidth = 20 }
+                        }
                     }
-                }
                 });
 
                 content.Children.Add(new TextBlock()
@@ -204,9 +189,11 @@ public sealed partial class ShellPage : Page
                 NavigationViewControl.FooterMenuItems.Insert(0, navigationItem);
                 navigationItem.DoubleTapped += SwitchGameButtonOnDoubleTapped;
 
+                var tooltipFormat = _localizer.GetLocalizedStringOrDefault("/Shell/SwitchGameTooltip", "Double click to switch to {0}");
+
                 var toolTip = new ToolTip
                 {
-                    Content = $"双击可切换到 {gameInfo.GameName}"
+                    Content = string.Format(tooltipFormat, gameInfo.GameName)
                 };
 
                 ToolTipService.SetToolTip(navigationItem, toolTip);

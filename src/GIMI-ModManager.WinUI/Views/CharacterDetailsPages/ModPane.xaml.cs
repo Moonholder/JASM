@@ -1,6 +1,7 @@
 using GIMI_ModManager.WinUI.ViewModels.CharacterDetailsViewModels.SubViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using Windows.ApplicationModel.DataTransfer;
 
@@ -14,7 +15,135 @@ namespace GIMI_ModManager.WinUI.Views.CharacterDetailsPages;
 /// </summary>
 public class VirtualKeyToFriendlyTextConverter : Microsoft.UI.Xaml.Data.IValueConverter
 {
-    private static readonly Dictionary<string, string> VirtualKeyMappings = new(StringComparer.OrdinalIgnoreCase)
+    private static readonly Dictionary<string, string> EnglishMappings = new(StringComparer.OrdinalIgnoreCase)
+    {
+        // Directional
+        { "VK_UP", "↑" },
+        { "VK_DOWN", "↓" },
+        { "VK_LEFT", "←" },
+        { "VK_RIGHT", "→" },
+
+        // Function Keys
+        { "VK_F1", "F1" }, { "VK_F2", "F2" }, { "VK_F3", "F3" }, { "VK_F4", "F4" },
+        { "VK_F5", "F5" }, { "VK_F6", "F6" }, { "VK_F7", "F7" }, { "VK_F8", "F8" },
+        { "VK_F9", "F9" }, { "VK_F10", "F10" }, { "VK_F11", "F11" }, { "VK_F12", "F12" },
+
+        // Numbers
+        { "VK_0", "0" }, { "VK_1", "1" }, { "VK_2", "2" }, { "VK_3", "3" },
+        { "VK_4", "4" }, { "VK_5", "5" }, { "VK_6", "6" }, { "VK_7", "7" },
+        { "VK_8", "8" }, { "VK_9", "9" },
+
+        // Letters (Usually same as key code, but kept for consistency)
+        { "VK_A", "A" }, { "VK_B", "B" }, { "VK_C", "C" }, { "VK_D", "D" },
+        { "VK_E", "E" }, { "VK_F", "F" }, { "VK_G", "G" }, { "VK_H", "H" },
+        { "VK_I", "I" }, { "VK_J", "J" }, { "VK_K", "K" }, { "VK_L", "L" },
+        { "VK_M", "M" }, { "VK_N", "N" }, { "VK_O", "O" }, { "VK_P", "P" },
+        { "VK_Q", "Q" }, { "VK_R", "R" }, { "VK_S", "S" }, { "VK_T", "T" },
+        { "VK_U", "U" }, { "VK_V", "V" }, { "VK_W", "W" }, { "VK_X", "X" },
+        { "VK_Y", "Y" }, { "VK_Z", "Z" },
+
+        // Numpad
+        { "VK_NUMPAD0", "Numpad 0" },
+        { "VK_NUMPAD1", "Numpad 1" },
+        { "VK_NUMPAD2", "Numpad 2" },
+        { "VK_NUMPAD3", "Numpad 3" },
+        { "VK_NUMPAD4", "Numpad 4" },
+        { "VK_NUMPAD5", "Numpad 5" },
+        { "VK_NUMPAD6", "Numpad 6" },
+        { "VK_NUMPAD7", "Numpad 7" },
+        { "VK_NUMPAD8", "Numpad 8" },
+        { "VK_NUMPAD9", "Numpad 9" },
+        { "VK_MULTIPLY", "Numpad *" },
+        { "VK_ADD", "Numpad +" },
+        { "VK_SUBTRACT", "Numpad -" },
+        { "VK_DECIMAL", "Numpad ." },
+        { "VK_DIVIDE", "Numpad /" },
+
+        // Special Keys
+        { "VK_ESCAPE", "Esc" },
+        { "VK_TAB", "Tab" },
+        { "VK_CAPITAL", "Caps Lock" },
+        { "VK_SHIFT", "Shift" },
+        { "VK_CONTROL", "Ctrl" },
+        { "VK_MENU", "Alt" },
+        { "VK_SPACE", "Space" },
+        { "VK_RETURN", "Enter" },
+        { "VK_BACK", "Backspace" },
+        { "VK_Backspace", "Backspace" },
+        { "VK_DELETE", "Delete" },
+        { "VK_INSERT", "Insert" },
+        { "VK_HOME", "Home" },
+        { "VK_END", "End" },
+        { "VK_PRIOR", "Page Up" },
+        { "VK_NEXT", "Page Down" },
+        { "VK_SLASH", "/" },
+        { "VK_COMMA", "," },
+        { "VK_TILDE", "~" },
+        { "VK_PERIOD", "." },
+        
+        // Mouse
+        { "VK_LBUTTON", "Left Mouse" },
+        { "VK_RBUTTON", "Right Mouse" },
+        { "VK_MBUTTON", "Middle Mouse" },
+        { "VK_XBUTTON1", "Mouse X1" },
+        { "VK_XBUTTON2", "Mouse X2" },
+
+        // OEM Symbols
+        { "VK_OEM_1", ";" },
+        { "VK_OEM_2", "?" },
+        { "VK_OEM_3", "`" },
+        { "VK_OEM_4", "[" },
+        { "VK_OEM_5", "\\" },
+        { "VK_OEM_6", "]" },
+        { "VK_OEM_7", "'" },
+        { "VK_OEM_PLUS", "=" },
+        { "VK_OEM_MINUS", "-" },
+        { "VK_OEM_PERIOD", "." },
+        { "VK_OEM_COMMA", "Comma" },
+        { ",", "Comma" },
+        { "，", "Comma" },
+
+        // Gamepad / Controller
+        { "XB_A", "Gamepad A" },
+        { "XB_B", "Gamepad B" },
+        { "XB_X", "Gamepad X" },
+        { "XB_Y", "Gamepad Y" },
+        { "XB_RIGHT_SHOULDER", "Gamepad RB" },
+        { "XB_LEFT_SHOULDER", "Gamepad LB" },
+        { "XB_RIGHT_TRIGGER", "Gamepad RT" },
+        { "XB_LEFT_TRIGGER", "Gamepad LT" },
+        { "XB_DPAD_UP", "Gamepad ↑" },
+        { "XB_DPAD_DOWN", "Gamepad ↓" },
+        { "XB_DPAD_LEFT", "Gamepad ←" },
+        { "XB_DPAD_RIGHT", "Gamepad →" },
+        { "XB_START", "Gamepad Start" },
+        { "XB_BACK", "Gamepad Back" },
+        { "XB_GUIDE", "Gamepad Guide" },
+        { "XB_LEFT_THUMB", "Left Stick" },
+        { "XB_RIGHT_THUMB", "Right Stick" },
+        { "XB_LEFT_THUMB_PRESS", "L3" },
+        { "XB_RIGHT_THUMB_PRESS", "R3" },
+        { "XB_LEFT_STICK_PRESS", "L3" },
+        { "XB_RIGHT_STICK_PRESS", "R3" },
+
+        // Modifiers
+        { "MODIFIERS", "Modifiers" },
+        { "ALT", "Alt" },
+        { "SHIFT", "Shift" },
+        { "CTRL", "Ctrl" },
+        { "RCTRL", "Right Ctrl" },
+        { "VK_LSHIFT", "Left Shift" },
+        { "VK_RSHIFT", "Right Shift" },
+        { "VK_LCONTROL", "Left Ctrl" },
+        { "VK_RCONTROL", "Right Ctrl" },
+        { "VK_LMENU", "Left Alt" },
+        { "VK_RMENU", "Right Alt" },
+        { "VK_LWIN", "Left Win" },
+        { "VK_RWIN", "Right Win" },
+        { "WIN", "Win" }
+    };
+
+    private static readonly Dictionary<string, string> ChineseMappings = new(StringComparer.OrdinalIgnoreCase)
     {
         // 方向键
         { "VK_UP", "↑" },
@@ -23,58 +152,23 @@ public class VirtualKeyToFriendlyTextConverter : Microsoft.UI.Xaml.Data.IValueCo
         { "VK_RIGHT", "→" },
 
         // 功能键
-        { "VK_F1", "F1" },
-        { "VK_F2", "F2" },
-        { "VK_F3", "F3" },
-        { "VK_F4", "F4" },
-        { "VK_F5", "F5" },
-        { "VK_F6", "F6" },
-        { "VK_F7", "F7" },
-        { "VK_F8", "F8" },
-        { "VK_F9", "F9" },
-        { "VK_F10", "F10" },
-        { "VK_F11", "F11" },
-        { "VK_F12", "F12" },
+        { "VK_F1", "F1" }, { "VK_F2", "F2" }, { "VK_F3", "F3" }, { "VK_F4", "F4" },
+        { "VK_F5", "F5" }, { "VK_F6", "F6" }, { "VK_F7", "F7" }, { "VK_F8", "F8" },
+        { "VK_F9", "F9" }, { "VK_F10", "F10" }, { "VK_F11", "F11" }, { "VK_F12", "F12" },
 
         // 数字键
-        { "VK_0", "0" },
-        { "VK_1", "1" },
-        { "VK_2", "2" },
-        { "VK_3", "3" },
-        { "VK_4", "4" },
-        { "VK_5", "5" },
-        { "VK_6", "6" },
-        { "VK_7", "7" },
-        { "VK_8", "8" },
-        { "VK_9", "9" },
+        { "VK_0", "0" }, { "VK_1", "1" }, { "VK_2", "2" }, { "VK_3", "3" },
+        { "VK_4", "4" }, { "VK_5", "5" }, { "VK_6", "6" }, { "VK_7", "7" },
+        { "VK_8", "8" }, { "VK_9", "9" },
 
         // 字母键
-        { "VK_A", "A" },
-        { "VK_B", "B" },
-        { "VK_C", "C" },
-        { "VK_D", "D" },
-        { "VK_E", "E" },
-        { "VK_F", "F" },
-        { "VK_G", "G" },
-        { "VK_H", "H" },
-        { "VK_I", "I" },
-        { "VK_J", "J" },
-        { "VK_K", "K" },
-        { "VK_L", "L" },
-        { "VK_M", "M" },
-        { "VK_N", "N" },
-        { "VK_O", "O" },
-        { "VK_P", "P" },
-        { "VK_Q", "Q" },
-        { "VK_R", "R" },
-        { "VK_S", "S" },
-        { "VK_T", "T" },
-        { "VK_U", "U" },
-        { "VK_V", "V" },
-        { "VK_W", "W" },
-        { "VK_X", "X" },
-        { "VK_Y", "Y" },
-        { "VK_Z", "Z" },
+        { "VK_A", "A" }, { "VK_B", "B" }, { "VK_C", "C" }, { "VK_D", "D" },
+        { "VK_E", "E" }, { "VK_F", "F" }, { "VK_G", "G" }, { "VK_H", "H" },
+        { "VK_I", "I" }, { "VK_J", "J" }, { "VK_K", "K" }, { "VK_L", "L" },
+        { "VK_M", "M" }, { "VK_N", "N" }, { "VK_O", "O" }, { "VK_P", "P" },
+        { "VK_Q", "Q" }, { "VK_R", "R" }, { "VK_S", "S" }, { "VK_T", "T" },
+        { "VK_U", "U" }, { "VK_V", "V" }, { "VK_W", "W" }, { "VK_X", "X" },
+        { "VK_Y", "Y" }, { "VK_Z", "Z" },
 
         // 小键盘
         { "VK_NUMPAD0", "小键盘 0" },
@@ -133,7 +227,6 @@ public class VirtualKeyToFriendlyTextConverter : Microsoft.UI.Xaml.Data.IValueCo
         { ",", "逗号" },
         { "，", "逗号" },
 
-
         // 手柄按键
         { "XB_A", "手柄 A" },
         { "XB_B", "手柄 B" },
@@ -180,22 +273,24 @@ public class VirtualKeyToFriendlyTextConverter : Microsoft.UI.Xaml.Data.IValueCo
             return string.Empty;
 
         var keyText = value.Trim();
-
+        var isChinese = CultureInfo.CurrentUICulture.Name.StartsWith("zh", StringComparison.OrdinalIgnoreCase);
+        var orSeparator = isChinese ? " 或 " : " or ";
 
         // 分割"作为分隔符的逗号"（仅前面是非逗号且无空格的逗号）
         var orParts = SeparatorCommaRegex.Split(keyText)
             .Select(p => p.Trim())
-            .Where(p => !string.IsNullOrEmpty(p)) // 过滤空项
+            .Where(p => !string.IsNullOrEmpty(p))
             .ToList();
-
         // 处理每个"或"部分（空格分隔的组合键，包括逗号key）
-        var friendlyOrParts = orParts.Select(ProcessValidCombinationKey).Where(processedPart => !string.IsNullOrEmpty(processedPart)).ToList();
+        var friendlyOrParts = orParts.Select(ProcessValidCombinationKey)
+            .Where(processedPart => !string.IsNullOrEmpty(processedPart))
+            .ToList();
 
         // 特殊情况：全是逗号的输入（允许连续逗号，只要有空格分隔）
         if (friendlyOrParts.Count == 0 && IsAllCommasWithValidSpace(keyText))
             return GetFriendlyText(",");
 
-        return string.Join(" 或 ", friendlyOrParts);
+        return string.Join(orSeparator, friendlyOrParts);
     }
 
     // 处理合法的组合键（必须用空格分隔，逗号作为key时需空格分隔）
@@ -231,6 +326,16 @@ public class VirtualKeyToFriendlyTextConverter : Microsoft.UI.Xaml.Data.IValueCo
         return string.Join(" + ", friendlySubParts);
     }
 
+    private static Dictionary<string, string> GetCurrentMappings()
+    {
+        var currentCulture = CultureInfo.CurrentUICulture.Name;
+        if (currentCulture.StartsWith("zh", StringComparison.OrdinalIgnoreCase))
+        {
+            return ChineseMappings;
+        }
+        return EnglishMappings;
+    }
+
     // 转换单个键
     private static string GetFriendlyText(string keyText)
     {
@@ -238,26 +343,33 @@ public class VirtualKeyToFriendlyTextConverter : Microsoft.UI.Xaml.Data.IValueCo
             return string.Empty;
 
         var trimmedKey = keyText.Trim();
+        var mappings = GetCurrentMappings();
 
-        // 处理num格式
+        // 1. 处理 "num X" 格式的特殊本地化
         if (NumFormatRegex.IsMatch(trimmedKey))
         {
             var digit = Regex.Match(trimmedKey, @"\d+").Value;
-            return $"小键盘 {digit}";
+            var isChinese = CultureInfo.CurrentUICulture.Name.StartsWith("zh", StringComparison.OrdinalIgnoreCase);
+            return isChinese ? $"小键盘 {digit}" : $"Numpad {digit}";
         }
 
-        // 字典匹配（包括逗号key）
-        if (VirtualKeyMappings.TryGetValue(trimmedKey, out var friendlyText))
+        // 2. 尝试完全匹配 (包括逗号 key)
+        if (mappings.TryGetValue(trimmedKey, out var friendlyText))
             return friendlyText;
 
-        // VK_前缀转换
-        if (!trimmedKey.StartsWith("VK_", StringComparison.OrdinalIgnoreCase) &&
-            VirtualKeyMappings.TryGetValue("VK_" + trimmedKey, out friendlyText))
-            return friendlyText;
-
-        if (trimmedKey.StartsWith("VK_", StringComparison.OrdinalIgnoreCase) &&
-            VirtualKeyMappings.TryGetValue(trimmedKey[3..], out friendlyText))
-            return friendlyText;
+        // 3. 尝试去除 VK_ 前缀匹配
+        if (!trimmedKey.StartsWith("VK_", StringComparison.OrdinalIgnoreCase))
+        {
+            if (mappings.TryGetValue("VK_" + trimmedKey, out friendlyText))
+                return friendlyText;
+        }
+        else
+        {
+            // 如果输入本身带 VK_，尝试去字典找 (字典里大部分 key 是带 VK_ 的)
+            // 如果找不到，尝试去掉前缀找 (防止字典里有些 key 没带 VK_)
+            if (mappings.TryGetValue(trimmedKey[3..], out friendlyText))
+                return friendlyText;
+        }
 
         return trimmedKey;
     }

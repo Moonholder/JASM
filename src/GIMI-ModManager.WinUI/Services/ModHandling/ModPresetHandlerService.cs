@@ -1,4 +1,5 @@
-﻿using GIMI_ModManager.Core.Helpers;
+﻿using GIMI_ModManager.Core.Contracts.Services;
+using GIMI_ModManager.Core.Helpers;
 using GIMI_ModManager.Core.Services;
 using GIMI_ModManager.Core.Services.ModPresetService;
 using GIMI_ModManager.Core.Services.ModPresetService.Models;
@@ -15,7 +16,8 @@ public sealed class ModPresetHandlerService(
     UserPreferencesService preferencesService,
     NotificationManager notificationManager,
     ElevatorService elevatorService,
-    ILocalSettingsService localSettingsService)
+    ILocalSettingsService localSettingsService,
+    ILanguageLocalizer localizer)
 {
     private readonly ILogger _logger = logger.ForContext<ModPresetHandlerService>();
     private readonly ModPresetService _modPresetService = modPresetService;
@@ -23,6 +25,7 @@ public sealed class ModPresetHandlerService(
     private readonly NotificationManager _notificationManager = notificationManager;
     private readonly ElevatorService _elevatorService = elevatorService;
     private readonly ILocalSettingsService _localSettingsService = localSettingsService;
+    private readonly ILanguageLocalizer _localizer = localizer;
 
 
     public Task<IEnumerable<ModPreset>> GetModPresetsAsync()
@@ -41,7 +44,8 @@ public sealed class ModPresetHandlerService(
 #endif
 
             _logger.Error(e, "An error occured when applying preset {PresetName}", presetName);
-            return Result.Error(new SimpleNotification("应用模组预设失败", e.Message, null));
+            var title = _localizer.GetLocalizedStringOrDefault("/PresetPage/ApplyPresetFailedTitle", "Failed to apply mod preset");
+            return Result.Error(new SimpleNotification(title, e.Message, null));
         }
     }
 
@@ -57,8 +61,10 @@ public sealed class ModPresetHandlerService(
 
         if (!preferencesResult)
         {
-            _notificationManager.ShowNotification("无法写入模组设置到 3Dmigoto user .ini",
-                "详细信息请参见日志", null);
+            _notificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/PresetPage/WriteSettingsFailedTitle", "Could not write mod settings to 3Dmigoto user .ini"),
+                _localizer.GetLocalizedStringOrDefault("/PresetPage/SeeLogDetails", "See log for details"),
+                null);
         }
 
 
@@ -67,8 +73,8 @@ public sealed class ModPresetHandlerService(
 
         var simpleNotification = new SimpleNotification
         (
-            "应用模组预设",
-            $"模组预设 {modPreset.Name} 已应用",
+            _localizer.GetLocalizedStringOrDefault("/PresetPage/ApplyPresetSuccessTitle", "Apply Mod Preset"),
+            string.Format(_localizer.GetLocalizedStringOrDefault("/PresetPage/ApplyPresetSuccessMessage", "Mod preset {0} applied"), modPreset.Name),
             TimeSpan.FromSeconds(5)
         );
 
@@ -128,7 +134,8 @@ public sealed class ModPresetHandlerService(
 #endif
 
             _logger.Error(e, "An error occured when saving active preferences");
-            return Result.Error(new SimpleNotification("保存激活的偏好设置失败", e.Message, null));
+            var title = _localizer.GetLocalizedStringOrDefault("/PresetPage/SavePreferencesFailedTitle", "Failed to save active preferences");
+            return Result.Error(new SimpleNotification(title, e.Message, null));
         }
     }
 
@@ -136,8 +143,9 @@ public sealed class ModPresetHandlerService(
     {
         await _userPreferencesService.SaveModPreferencesAsync().ConfigureAwait(false);
 
-        return Result.Success(new SimpleNotification("激活的偏好设置已保存",
-            $"存储在 {Constants.UserIniFileName} 的偏好设置已为启用的模组保存",
+        return Result.Success(new SimpleNotification(
+            _localizer.GetLocalizedStringOrDefault("/PresetPage/SavePreferencesSuccessTitle", "Active preferences saved"),
+            string.Format(_localizer.GetLocalizedStringOrDefault("/PresetPage/SavePreferencesSuccessMessage", "Preferences stored in {0} have been saved for enabled mods"), Constants.UserIniFileName),
             TimeSpan.FromSeconds(5)));
     }
 
@@ -155,7 +163,8 @@ public sealed class ModPresetHandlerService(
 #endif
 
             _logger.Error(e, "An error occured when applying active preferences");
-            return Result.Error(new SimpleNotification("应用保存的偏好设置失败", e.Message, null));
+            var title = _localizer.GetLocalizedStringOrDefault("/PresetPage/ApplyPreferencesFailedTitle", "Failed to apply saved preferences");
+            return Result.Error(new SimpleNotification(title, e.Message, null));
         }
     }
 
@@ -164,8 +173,9 @@ public sealed class ModPresetHandlerService(
         await _userPreferencesService.SetModPreferencesAsync(cancellationToken: cancellationToken)
             .ConfigureAwait(false);
 
-        return Result.Success(new SimpleNotification("已应用保存的偏好设置",
-            $"模组偏好设置已写入 3DMigoto {Constants.UserIniFileName}",
+        return Result.Success(new SimpleNotification(
+            _localizer.GetLocalizedStringOrDefault("/PresetPage/ApplyPreferencesSuccessTitle", "Applied saved preferences"),
+            string.Format(_localizer.GetLocalizedStringOrDefault("/PresetPage/ApplyPreferencesSuccessMessage", "Mod preferences written to 3DMigoto {0}"), Constants.UserIniFileName),
             TimeSpan.FromSeconds(5)));
     }
 }

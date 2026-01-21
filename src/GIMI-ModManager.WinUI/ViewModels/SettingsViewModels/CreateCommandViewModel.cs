@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using GIMI_ModManager.Core.Contracts.Services;
 using GIMI_ModManager.Core.Helpers;
 using GIMI_ModManager.Core.Services.CommandService;
 using GIMI_ModManager.Core.Services.CommandService.Models;
@@ -19,6 +20,7 @@ public partial class CreateCommandViewModel : ObservableObject
     private readonly CommandService _commandService;
     private readonly NotificationManager _notificationManager;
     private readonly SelectedGameService _selectedGameService;
+    private readonly ILanguageLocalizer _localizer;
     public PathPicker ExecutablePicker { get; }
     public PathPicker WorkingDirectoryPicker { get; }
 
@@ -28,11 +30,12 @@ public partial class CreateCommandViewModel : ObservableObject
     public bool IsEditingCommand => _createOptions?.IsEditingCommand == true;
 
     public CreateCommandViewModel(ILogger logger, CommandService commandService,
-        NotificationManager notificationManager, SelectedGameService selectedGameService)
+        NotificationManager notificationManager, SelectedGameService selectedGameService, ILanguageLocalizer localizer)
     {
         _commandService = commandService;
         _notificationManager = notificationManager;
         _selectedGameService = selectedGameService;
+        _localizer = localizer;
         _logger = logger.ForContext<CreateCommandViewModel>();
         PropertyChanged += (_, e) =>
         {
@@ -111,7 +114,8 @@ public partial class CreateCommandViewModel : ObservableObject
         }
         else if (options.GameStartCommand)
         {
-            CommandDisplayName = $"Start {await _selectedGameService.GetSelectedGameAsync()}";
+            var gameName = await _selectedGameService.GetSelectedGameAsync();
+            CommandDisplayName = string.Format(_localizer.GetLocalizedStringOrDefault("/Settings/CreateCommand_DefaultStartGameName", "Start {0}"), gameName);
         }
         else if (options.GameModelImporterCommand)
         {
@@ -146,13 +150,13 @@ public partial class CreateCommandViewModel : ObservableObject
 
     private string? SetEffectiveWorkingDirectory()
     {
-        const string prefix = "有效工作目录: ";
+        var prefix = _localizer.GetLocalizedStringOrDefault("/Settings/CreateCommand_EffectiveWorkDirPrefix", "Effective Working Directory: ");
         var jasmWorkingDirectory = App.ROOT_DIR;
         string? workingDirectory = null;
 
         if (!IsValidWorkingDirectory())
         {
-            EffectiveWorkingDirectory = prefix + "无效工作目录";
+            EffectiveWorkingDirectory = prefix + _localizer.GetLocalizedStringOrDefault("/Settings/CreateCommand_InvalidWorkDir", "Invalid Working Directory");
             return null;
         }
 
@@ -299,9 +303,11 @@ public partial class CreateCommandViewModel : ObservableObject
         }
         catch (Exception e)
         {
-            _notificationManager.ShowNotification(
-                IsEditingCommand ? "命令更新失败." : "命令创建失败.", e.Message,
-                TimeSpan.FromSeconds(5));
+            var title = IsEditingCommand
+                ? _localizer.GetLocalizedStringOrDefault("/Settings/CreateCommand_UpdateFailedTitle", "Command update failed.")
+                : _localizer.GetLocalizedStringOrDefault("/Settings/CreateCommand_CreateFailedTitle", "Command creation failed.");
+
+            _notificationManager.ShowNotification(title, e.Message, TimeSpan.FromSeconds(5));
 
             CloseRequested?.Invoke(this, EventArgs.Empty);
         }
@@ -334,8 +340,8 @@ public partial class CreateCommandViewModel : ObservableObject
                 .ConfigureAwait(false);
             CloseRequested?.Invoke(this, EventArgs.Empty);
 
-            _notificationManager.ShowNotification($"命令 '{createOptions.CommandDisplayName}' 更新成功.",
-                "", TimeSpan.FromSeconds(3));
+            var msg = string.Format(_localizer.GetLocalizedStringOrDefault("/Settings/CreateCommand_UpdateSuccessMessage", "Command '{0}' updated successfully."), createOptions.CommandDisplayName);
+            _notificationManager.ShowNotification(msg, "", TimeSpan.FromSeconds(3));
 
             await _commandService.SetSpecialCommands(_createOptions.CommandDefinition.Id,
                 _createOptions.GameStartCommand, _createOptions.GameModelImporterCommand);
@@ -345,9 +351,8 @@ public partial class CreateCommandViewModel : ObservableObject
             await _commandService.SaveCommandDefinitionAsync(createOptions).ConfigureAwait(false);
             CloseRequested?.Invoke(this, EventArgs.Empty);
 
-            _notificationManager.ShowNotification($"命令 '{createOptions.CommandDisplayName}' 创建成功.",
-                "",
-                TimeSpan.FromSeconds(3));
+            var msg = string.Format(_localizer.GetLocalizedStringOrDefault("/Settings/CreateCommand_CreateSuccessMessage", "Command '{0}' created successfully."), createOptions.CommandDisplayName);
+            _notificationManager.ShowNotification(msg, "", TimeSpan.FromSeconds(3));
 
             if (_createOptions is not null)
                 await _commandService.SetSpecialCommands(createOptions.Id, _createOptions.GameStartCommand,

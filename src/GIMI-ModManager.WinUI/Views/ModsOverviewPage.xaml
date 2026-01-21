@@ -6,6 +6,7 @@
     xmlns:controls="using:GIMI_ModManager.WinUI.Views.Controls"
     xmlns:converters="using:CommunityToolkit.WinUI.UI.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:l="using:WinUI3Localizer"
     xmlns:local="using:GIMI_ModManager.WinUI.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="using:GIMI_ModManager.WinUI.Models"
@@ -163,7 +164,8 @@
                         x:Name="GoToCharacterButton"
                         Grid.Column="1"
                         Click="GoToCharacterButton_OnClick"
-                        Content="跳转详情页" />
+                        Content="Go to Details"
+                        l:Uids.Uid="/ModsOverview/GoToDetailsButton" />
 
                 </Grid>
 
@@ -226,18 +228,23 @@
                     FontSize="28"
                     Style="{StaticResource TitleTextBlockStyle}"
                     TextTrimming="CharacterEllipsis"
-                    Text="模组概览" />
+                    Text="Mods Overview"
+                    l:Uids.Uid="/ModsOverview/PageTitle" />
 
 
                 <StackPanel
                     Orientation="Horizontal"
                     Spacing="16"
                     Visibility="Collapsed">
-                    <Button Command="{x:Bind ViewModel.CloseOpenAllCommand}" Content="Open All" />
+                    <Button 
+                        Command="{x:Bind ViewModel.CloseOpenAllCommand}" 
+                        Content="Open All"
+                        l:Uids.Uid="/ModsOverview/OpenAllButton" />
                     <Button
                         Command="{x:Bind ViewModel.CloseOpenAllCommand}"
                         CommandParameter="Close"
-                        Content="关闭全部" />
+                        Content="Close All"
+                        l:Uids.Uid="/ModsOverview/CloseAllButton" />
                 </StackPanel>
             </StackPanel>
 
@@ -252,8 +259,9 @@
                     x:Name="SearchBox"
                     MinWidth="200"
                     VerticalAlignment="Center"
-                    PlaceholderText="按回车键搜索..."
-                    QuerySubmitted="SearchBox_OnQuerySubmitted" />
+                    PlaceholderText="Press Enter to search..."
+                    QuerySubmitted="SearchBox_OnQuerySubmitted"
+                    l:Uids.Uid="/ModsOverview/SearchBox" />
             </StackPanel>
 
 

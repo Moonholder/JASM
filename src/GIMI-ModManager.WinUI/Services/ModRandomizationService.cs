@@ -24,6 +24,7 @@ public class ModRandomizationService
     private readonly ElevatorService _elevatorService;
     private readonly NotificationManager _notificationManager;
     private readonly ILogger _logger;
+    private readonly ILanguageLocalizer _localizer;
     private static readonly Random Random = new();
 
     public ModRandomizationService(
@@ -33,6 +34,7 @@ public class ModRandomizationService
         CharacterSkinService characterSkinService,
         ElevatorService elevatorService,
         NotificationManager notificationManager,
+        ILanguageLocalizer localizer,
         ILogger logger)
     {
         _gameService = gameService;
@@ -41,6 +43,7 @@ public class ModRandomizationService
         _characterSkinService = characterSkinService;
         _elevatorService = elevatorService;
         _notificationManager = notificationManager;
+        _localizer = localizer;
         _logger = logger.ForContext<ModRandomizationService>();
     }
 
@@ -48,9 +51,9 @@ public class ModRandomizationService
     {
         var dialog = new ContentDialog
         {
-            Title = "随机启用模组",
-            PrimaryButtonText = "随机",
-            CloseButtonText = "取消",
+            Title = _localizer.GetLocalizedStringOrDefault("/PresetPage/RandomizeDialog_Title", "Randomize Enabled Mods"),
+            PrimaryButtonText = _localizer.GetLocalizedStringOrDefault("/PresetPage/RandomizeDialog_ConfirmButton", "Randomize"),
+            CloseButtonText = _localizer.GetLocalizedStringOrDefault("/PresetPage/RandomizeDialog_CancelButton", "Cancel"),
             DefaultButton = ContentDialogButton.Primary
         };
 
@@ -59,12 +62,13 @@ public class ModRandomizationService
 
         stackPanel.Children.Add(new TextBlock
         {
-            Text = "选择你想要对其模组进行随机化处理的类别:"
+            Text = _localizer.GetLocalizedStringOrDefault("/PresetPage/RandomizeDialog_SelectCategoryLabel", "Select categories to randomize:")
         });
 
         stackPanel.Children.Add(new TextBlock
         {
-            Text = "注意：此操作只会随机化那些按设计仅允许一个模组处于激活状态的模组文件夹。因此，“Others _” 这类文件夹不会被随机化。并且，每个游戏角色皮肤仅会启用一个模组",
+            Text = _localizer.GetLocalizedStringOrDefault("/PresetPage/RandomizeDialog_WarningText",
+                "Note: This will only randomize mod folders that allow only one active mod by design. Therefore, 'Others' folders will not be randomized. Also, only one mod per game character skin will be enabled."),
             TextWrapping = TextWrapping.WrapWholeWords,
             Margin = new Thickness(0, 0, 0, 10)
         });
@@ -82,16 +86,17 @@ public class ModRandomizationService
         stackPanel.Children.Add(new CheckBox
         {
             Margin = new Thickness(0, 10, 0, 0),
-            Content = "允许最终不使用任何模组。这意味着某个模组文件夹有可能不启用任何模组",
+            Content = _localizer.GetLocalizedStringOrDefault("/PresetPage/RandomizeDialog_AllowNoMods", "Allow no mods enabled. This means it is possible for a mod folder to have no mods enabled."),
             IsChecked = false
         });
 
         stackPanel.Children.Add(new TextBlock
         {
-            Text = "如果你启用了大量模组，我建议在进行随机化操作之前，为你的模组创建一个预设（或备份）",
+            Text = _localizer.GetLocalizedStringOrDefault("/PresetPage/RandomizeDialog_SuggestionText", "If you have a lot of mods enabled, I suggest creating a preset (or backup) of your mods before randomizing."),
             TextWrapping = TextWrapping.WrapWholeWords,
             Margin = new Thickness(0, 10, 0, 0)
         });
+
 
         dialog.Content = stackPanel;
 
@@ -115,7 +120,9 @@ public class ModRandomizationService
 
         if (selectedCategories.Count == 0)
         {
-            _notificationManager.ShowNotification("未选择任何类别", "未选择任何要进行随机化的类别.",
+            _notificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/PresetPage/RandomizeDialog_NoCategoryTitle", "No category selected"),
+                _localizer.GetLocalizedStringOrDefault("/PresetPage/RandomizeDialog_NoCategoryMessage", "No categories selected for randomization."),
                 TimeSpan.FromSeconds(5));
             return;
         }
@@ -184,7 +191,9 @@ public class ModRandomizationService
         catch (Exception e)
         {
             _logger.Error(e, "Failed to randomize mods");
-            _notificationManager.ShowNotification("模组随机化失败", e.Message, TimeSpan.FromSeconds(5));
+            _notificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/PresetPage/RandomizeDialog_FailedTitle", "Randomization failed"),
+                e.Message, TimeSpan.FromSeconds(5));
             return;
         }
 
@@ -193,9 +202,10 @@ public class ModRandomizationService
             await Task.Run(() => _elevatorService.RefreshGenshinMods());
         }
 
-        _notificationManager.ShowNotification("已随机启用模组",
-            "已针对所选类别完成模组随机化: " +
-            string.Join(", ", selectedCategories.Select(c => c.DisplayNamePlural)),
+        var successMsgPrefix = _localizer.GetLocalizedStringOrDefault("/PresetPage/RandomizeDialog_SuccessMessagePrefix", "Completed randomization for categories: ");
+        _notificationManager.ShowNotification(
+            _localizer.GetLocalizedStringOrDefault("/PresetPage/RandomizeDialog_SuccessTitle", "Mods randomized"),
+            successMsgPrefix + string.Join(", ", selectedCategories.Select(c => c.DisplayNamePlural)),
             TimeSpan.FromSeconds(5));
     }
 }

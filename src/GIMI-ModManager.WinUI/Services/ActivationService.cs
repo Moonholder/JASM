@@ -412,12 +412,13 @@ public class ActivationService : IActivationService
         var stackPanel = new StackPanel();
         var textWarning = new TextBlock()
         {
-            Text = "您正在以管理员身份运行 JASM。这不推荐这样做.\n" +
-                   "JASM 并非设计为在管理员权限下运行.\n" +
-                   "尽管不太可能，但简单的漏洞有可能会对您的文件系统造成严重损害.\n\n" +
-                   "拖放功能在管理员权限下由于UIPI隔离机制无法使用.\n" +
-                   "请考虑在无管理员权限的情况下运行 JASM.\n\n" +
-                   "自行承担使用风险，已对您做出警告",
+            Text = _languageLocalizer.GetLocalizedStringOrDefault("/Startup/AdminWarning_Text",
+                   "You are running JASM as Administrator. This is NOT recommended.\n" +
+                   "JASM is not designed to be run with elevated privileges.\n" +
+                   "While unlikely, simple bugs could potentially cause serious damage to your file system.\n\n" +
+                   "Drag and Drop functionality is disabled under Administrator privileges due to UIPI isolation.\n" +
+                   "Please consider running JASM without Administrator privileges.\n\n" +
+                   "Use at your own risk, you have been warned."),
             TextWrapping = TextWrapping.WrapWholeWords
         };
         stackPanel.Children.Add(textWarning);
@@ -425,7 +426,7 @@ public class ActivationService : IActivationService
         var doNotShowAgain = new CheckBox()
         {
             IsChecked = false,
-            Content = "不再显示此警告",
+            Content = _languageLocalizer.GetLocalizedStringOrDefault("/Startup/AdminWarning_DoNotShowAgain", "Do not show this warning again"),
             Margin = new Thickness(0, 10, 0, 0)
         };
 
@@ -434,10 +435,10 @@ public class ActivationService : IActivationService
 
         var dialog = new ContentDialog
         {
-            Title = "以管理员身份运行警告",
+            Title = _languageLocalizer.GetLocalizedStringOrDefault("/Startup/AdminWarning_Title", "Run as Administrator Warning"),
             Content = stackPanel,
-            PrimaryButtonText = "我知道了",
-            SecondaryButtonText = "退出",
+            PrimaryButtonText = _languageLocalizer.GetLocalizedStringOrDefault("/Startup/AdminWarning_ConfirmButton", "I understand"),
+            SecondaryButtonText = _languageLocalizer.GetLocalizedStringOrDefault("/Startup/AdminWarning_ExitButton", "Exit"),
             DefaultButton = ContentDialogButton.Primary
         };
 
@@ -465,16 +466,17 @@ public class ActivationService : IActivationService
         var stackPanel = new StackPanel();
         var textWarning = new TextBlock()
         {
-            Text = """
-                   这个版本的 JASM 采用了新的文件夹结构.
+            Text = _languageLocalizer.GetLocalizedStringOrDefault("/Startup/NewFolderStructure_Text1",
+                   """
+                   This version of JASM adopts a new folder structure.
 
-                   现在，角色按类别进行组织，每个类别都有其自己的文件夹。因此，新的格式如下:
-                   Mods/类别/角色/<模组文件夹>
-                   所以，在您重新整理模组之前，JASM 将无法识别您的任何模组.
-                   这是一次性的操作，如果您愿意的话，可以手动进行整理.
+                   Characters are now organized by category, each with its own folder. So the new format is:
+                   Mods/Category/Character/<Mod Folder>
+                   Therefore, JASM will not recognize any of your mods until you reorganize them.
+                   This is a one-time operation, you can do it manually if you wish.
 
-                   此外，现在角色文件夹会按需创建，并且可以在设置页面清理空文件夹.
-                   """,
+                   Additionally, character folders are now created on demand and empty folders can be cleaned up in the settings page.
+                   """),
             IsTextSelectionEnabled = true,
             TextWrapping = TextWrapping.WrapWholeWords
         };
@@ -482,7 +484,7 @@ public class ActivationService : IActivationService
 
         var textWarning2 = new TextBlock()
         {
-            Text = "如果你对此不确定，那么请先备份你的模组。我已经在自己的模组上进行过测试了.",
+            Text = _languageLocalizer.GetLocalizedStringOrDefault("/Startup/NewFolderStructure_Text2", "If you are unsure about this, please backup your mods first. I have tested this on my own mods."),
             FontWeight = FontWeights.Bold,
             IsTextSelectionEnabled = true,
             TextWrapping = TextWrapping.WrapWholeWords
@@ -493,11 +495,12 @@ public class ActivationService : IActivationService
 
         var textWarning3 = new TextBlock()
         {
-            Text = """
+            Text = _languageLocalizer.GetLocalizedStringOrDefault("/Startup/NewFolderStructure_Text3",
+                   """
 
-                   在你选择以下某个选项之前，这个弹出窗口将会一直显示。你也可以使用设置页面上的 “重新整理” 按钮.
-                   如果你想了解正在发生什么情况，可以查看日志.
-                   """,
+                   This popup will persist until you choose one of the options below. You can also use the "Reorganize Mods" button on the settings page.
+                   If you want to see what is happening, check the logs.
+                   """),
             IsTextSelectionEnabled = true,
             TextWrapping = TextWrapping.WrapWholeWords
         };
@@ -507,11 +510,11 @@ public class ActivationService : IActivationService
 
         var dialog = new ContentDialog
         {
-            Title = "新文件夹结构",
+            Title = _languageLocalizer.GetLocalizedStringOrDefault("/Startup/NewFolderStructure_Title", "New Folder Structure"),
             Content = stackPanel,
-            PrimaryButtonText = "重新整理我的模组",
-            SecondaryButtonText = "我自己来做",
-            CloseButtonText = "取消",
+            PrimaryButtonText = _languageLocalizer.GetLocalizedStringOrDefault("/Startup/NewFolderStructure_ReorganizeButton", "Reorganize my mods"),
+            SecondaryButtonText = _languageLocalizer.GetLocalizedStringOrDefault("/Startup/NewFolderStructure_ManualButton", "I'll do it myself"),
+            CloseButtonText = _languageLocalizer.GetLocalizedStringOrDefault("/Startup/NewFolderStructure_CancelButton", "Cancel"),
             DefaultButton = ContentDialogButton.Primary
         };
 
@@ -529,12 +532,16 @@ public class ActivationService : IActivationService
                 await _skinManagerService.RefreshModsAsync();
 
                 if (movedModsCount == -1)
-                    _notificationManager.ShowNotification("模组重新整理失败.",
-                        "有关详细信息，请参阅日志.", TimeSpan.FromSeconds(5));
+                    _notificationManager.ShowNotification(
+                        _languageLocalizer.GetLocalizedStringOrDefault("/Startup/NewFolderStructure_ReorganizeFailedTitle", "Mod reorganization failed."),
+                        _languageLocalizer.GetLocalizedStringOrDefault("/Startup/NewFolderStructure_SeeLogs", "See logs for details."),
+                        TimeSpan.FromSeconds(5));
 
                 else
-                    _notificationManager.ShowNotification("模组已重新整理.",
-                        $"已将 {movedModsCount} 个模组移至新的角色文件夹", TimeSpan.FromSeconds(5));
+                    _notificationManager.ShowNotification(
+                        _languageLocalizer.GetLocalizedStringOrDefault("/Startup/NewFolderStructure_ReorganizeSuccessTitle", "Mods reorganized."),
+                        string.Format(_languageLocalizer.GetLocalizedStringOrDefault("/Startup/NewFolderStructure_ReorganizeSuccessMessage", "Moved {0} mods to new character folders"), movedModsCount),
+                        TimeSpan.FromSeconds(5));
             }
             finally
             {

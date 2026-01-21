@@ -15,6 +15,7 @@ public partial class ElevatorService : ObservableRecipient
 {
     private readonly ISkinManagerService _skinManagerService;
     private readonly IGameService _gameService;
+    private readonly ILanguageLocalizer _localizer;
     public const string ElevatorPipeName = "MyPipess";
     public const string ElevatorProcessName = "Elevator.exe";
     private readonly ILogger _logger;
@@ -37,10 +38,10 @@ public partial class ElevatorService : ObservableRecipient
 
     public string ElevatorStatusText => ElevatorStatus switch
     {
-        ElevatorStatus.InitializingFailed => "初始化失败",
-        ElevatorStatus.NotRunning => "未运行",
-        ElevatorStatus.Running => "运行中",
-        _ => "未知"
+        ElevatorStatus.InitializingFailed => _localizer.GetLocalizedStringOrDefault("/Settings/ElevatorStatus_InitFailed", "Initialization Failed"),
+        ElevatorStatus.NotRunning => _localizer.GetLocalizedStringOrDefault("/Settings/ElevatorStatus_NotRunning", "Not Running"),
+        ElevatorStatus.Running => _localizer.GetLocalizedStringOrDefault("/Settings/ElevatorStatus_Running", "Running"),
+        _ => _localizer.GetLocalizedStringOrDefault("/Settings/ElevatorStatus_Unknown", "Unknown")
     };
 
     [ObservableProperty] private bool _canStartElevator;
@@ -52,10 +53,11 @@ public partial class ElevatorService : ObservableRecipient
 
     private bool _IsInitialized;
 
-    public ElevatorService(ILogger logger, ISkinManagerService skinManagerService, IGameService gameService)
+    public ElevatorService(ILogger logger, ISkinManagerService skinManagerService, IGameService gameService, ILanguageLocalizer localizer)
     {
         _skinManagerService = skinManagerService;
         _gameService = gameService;
+        _localizer = localizer;
         _logger = logger.ForContext<ElevatorService>();
     }
 
@@ -80,7 +82,7 @@ public partial class ElevatorService : ObservableRecipient
         }
 
         _logger.Warning("Elevator.exe not found");
-        ErrorMessage = "Elevator.exe not found";
+        ErrorMessage = _localizer.GetLocalizedStringOrDefault("/Settings/ElevatorError_NotFound", "Elevator.exe not found");
         ElevatorStatus = ElevatorStatus.InitializingFailed;
         App.MainWindow.DispatcherQueue.TryEnqueue(() => CanStartElevator = false);
     }
@@ -118,7 +120,7 @@ public partial class ElevatorService : ObservableRecipient
         if (_elevatorProcess == null || _elevatorProcess.HasExited)
         {
             App.MainWindow.DispatcherQueue.TryEnqueue(() => ElevatorStatus = ElevatorStatus.InitializingFailed);
-            ErrorMessage = "Failed to start Elevator.exe";
+            ErrorMessage = _localizer.GetLocalizedStringOrDefault("/Settings/ElevatorError_StartFailed", "Failed to start Elevator.exe");
             _logger.Error("Failed to start Elevator.exe");
             return false;
         }

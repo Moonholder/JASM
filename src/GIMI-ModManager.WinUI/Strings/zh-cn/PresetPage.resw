@@ -1,0 +1,395 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- Page Header -->
+  <data name="AutoSyncDisabledWarning.Text" xml:space="preserve">
+    <value>未启用自动同步！记得在做更改时在游戏内用 F10 键手动重新加载 3Dmigoto (或其他加载器) 的配置文件！</value>
+  </data>
+  <data name="PageTitle.Text" xml:space="preserve">
+    <value>模组预设和模组首选项</value>
+  </data>
+
+  <!-- Create Preset Area -->
+  <data name="NewPresetNameHeader.Header" xml:space="preserve">
+    <value>新的预设名称</value>
+  </data>
+  <data name="CreatePresetButton.Content" xml:space="preserve">
+    <value>保存已启用的模组首选项并创建新的预设</value>
+  </data>
+  <data name="CreateEmptyPresetCheckBox.Content" xml:space="preserve">
+    <value>创建为空预设</value>
+  </data>
+  <data name="CreateEmptyPresetCheckBox.ToolTipService.ToolTip" xml:space="preserve">
+    <value>如果选中，新的预设将被创建而不启用任何模组。</value>
+  </data>
+
+  <!-- Control Panel (Right Side) -->
+  <data name="AutoSyncCheckBox.Content" xml:space="preserve">
+    <value>切换预设时自动同步 Mod 首选项</value>
+  </data>
+  <data name="AutoSyncCheckBox.ToolTipService.ToolTip" xml:space="preserve">
+    <value>如果选中，JASM 将在创建预设和在预设之间切换时自动同步首选项</value>
+  </data>
+  <data name="StartElevatorButton.Content" xml:space="preserve">
+    <value>启动 Elevator...</value>
+  </data>
+  
+  <!-- Manual Controls -->
+  <data name="ShowManualControlsCheckBox.Content" xml:space="preserve">
+    <value>显示手动控制</value>
+  </data>
+  <data name="ShowManualControlsCheckBox.ToolTipService.ToolTip" xml:space="preserve">
+    <value>如果您希望手动控制设置首选项，而不是让带有 Elevator 的 JASM 为您处理它</value>
+  </data>
+  <data name="SaveActivePreferencesButton.Content" xml:space="preserve">
+    <value>保存激活的 mod 偏好 (KeySwaps) 到 mod</value>
+  </data>
+  <data name="SaveActivePreferencesButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>读取 3Dmigoto 的 mod 首选项 (d3dx_user.ini)，为启用的 mod 存储设置在每个 mod 的 .JASM_Config.json 文件</value>
+  </data>
+  <data name="ApplySavedPreferencesButton.Content" xml:space="preserve">
+    <value>应用保存的 mod 偏好 (KeySwaps)</value>
+  </data>
+  <data name="ApplySavedPreferencesButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>从 .JASM_Config 中读取当前启用 mod 的首选项。并将它们写入 d3dx_user.ini 以供 3Dmigoto 读取</value>
+  </data>
+
+  <!-- Preset List Item -->
+  <data name="EnabledModsCountLabel.Text" xml:space="preserve">
+    <value>此预设启用的模组数量:</value>
+  </data>
+  <data name="CreatedAtLabel.Text" xml:space="preserve">
+    <value>创建于:</value>
+  </data>
+  <data name="PresetDetailsButton.Content" xml:space="preserve">
+    <value>进入预设详细信息</value>
+  </data>
+  <data name="ApplyPresetButton.Content" xml:space="preserve">
+    <value>应用预设</value>
+  </data>
+  <data name="ApplyPresetButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>启用这个预设中的所有 mod，并将预设的 mod 首选项写入 mod</value>
+  </data>
+  <data name="ConfirmApplyButton.Content" xml:space="preserve">
+    <value>确认</value>
+  </data>
+  
+  <!-- Dropdown Menu -->
+  <data name="ReadOnlyModeMenuItem.Text" xml:space="preserve">
+    <value>只读模式</value>
+  </data>
+  <data name="DuplicatePresetMenuItem.Text" xml:space="preserve">
+    <value>创建副本</value>
+  </data>
+  <data name="DeletePresetMenuItem.Text" xml:space="preserve">
+    <value>删除预设</value>
+  </data>
+  <data name="DeletePresetMenuItem.ToolTipService.ToolTip" xml:space="preserve">
+    <value>永久删除此预设</value>
+  </data>
+
+  <!-- Footer Actions -->
+  <data name="RandomizeModsButton.Content" xml:space="preserve">
+    <value>随机启用模组</value>
+  </data>
+  <data name="RandomizeModsButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>打开一个包含更多信息的对话框</value>
+  </data>
+  
+  <data name="ResetPreferencesButton.Content" xml:space="preserve">
+    <value>重置模组首选项</value>
+  </data>
+  <data name="ResetPreferencesButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>清除存储在 mod 中的 mod 偏好 .JASM_ModConfig.json</value>
+  </data>
+  <data name="ResetPreferencesFlyoutTitle.Text" xml:space="preserve">
+    <value>重置持久化的模组首选项</value>
+  </data>
+  <data name="ResetOnlyEnabledCheckBox.Content" xml:space="preserve">
+    <value>仅重置正启用的模组</value>
+  </data>
+  <data name="ResetLoaderConfigCheckBox.Content" xml:space="preserve">
+    <value>同时重置加载器的 d3dx_user.ini 文件</value>
+  </data>
+  <data name="ConfirmResetButton.Content" xml:space="preserve">
+    <value>确认</value>
+  </data>
+
+  <!-- How Presets Work Dialog -->
+  <data name="HowPresetsWorkTitle" xml:space="preserve">
+    <value>预设是如何工作的</value>
+  </data>
+  <data name="CloseButton" xml:space="preserve">
+    <value>关闭</value>
+  </data>
+  <data name="HowPresetsWorkText1" xml:space="preserve">
+    <value>预设是一个要启用的模组列表及其偏好设置。JASM 会在模组本身的 .JASM_ModConfig.json 文件中读取和存储模组偏好设置</value>
+  </data>
+  <data name="HowPresetsWorkText2" xml:space="preserve">
+    <value>当你创建一个新的预设时，JASM 会生成一个所有已启用模组及其存储偏好设置的列表。因此，当你稍后应用该预设时，它只会启用这些模组并应用存储在预设中的偏好设置</value>
+  </data>
+  <data name="HowPresetsWorkText3" xml:space="preserve">
+    <value>你可以通过勾选自动同步复选框来让 JASM 处理 3Dmigoto 的重新加载。你也可以选择手动处理，勾选显示手动控制复选框，手动保存/加载偏好设置，并通过 F10 键刷新 3Dmigoto。</value>
+  </data>
+  <data name="HowPresetsWorkText4" xml:space="preserve">
+    <value>可以简单地忽略本页面的预设部分，仅使用手动控制来保存模组偏好设置。</value>
+  </data>
+
+  <!-- Preset Details Page -->
+  <data name="PresetDetailsTitleFormat" xml:space="preserve">
+    <value>预设详情: {0} ({1}){2}</value>
+  </data>
+  <data name="ModCountFormat" xml:space="preserve">
+    <value>{0} 个模组</value>
+  </data>
+  <data name="ReadOnlyText" xml:space="preserve">
+    <value>只读</value>
+  </data>
+  <data name="SelectModsWindowTitle" xml:space="preserve">
+    <value>选择 Mods</value>
+  </data>
+
+  <!-- Notifications -->
+  <data name="ModRemovedTitle" xml:space="preserve">
+    <value>模组已从预设中移除</value>
+  </data>
+  <data name="ModRemovedMessage" xml:space="preserve">
+    <value>从预设 {2} 中移除了{0}模组 '{1}'</value>
+  </data>
+  <data name="MissingText" xml:space="preserve">
+    <value>缺失的</value>
+  </data>
+  <data name="ModRemoveFailedTitle" xml:space="preserve">
+    <value>从预设中移除模组失败</value>
+  </data>
+  
+  <data name="AddModFailedTitle" xml:space="preserve">
+    <value>添加模组失败</value>
+  </data>
+  <data name="AddModFailedMessage" xml:space="preserve">
+    <value>模组 {0} 添加失败: {1}</value>
+  </data>
+  <data name="BatchAddSuccessTitle" xml:space="preserve">
+    <value>模组批量添加成功</value>
+  </data>
+  <data name="BatchAddSuccessMessage" xml:space="preserve">
+    <value>成功将 {0} 个模组添加到预设 {1}</value>
+  </data>
+  <data name="BatchAddCompleteTitle" xml:space="preserve">
+    <value>模组批量添加完成</value>
+  </data>
+  <data name="BatchAddCompleteMessage" xml:space="preserve">
+    <value>成功添加 {0} 个模组，失败 {1} 个</value>
+  </data>
+  <data name="BatchAddAllFailedTitle" xml:space="preserve">
+    <value>添加模组到预设失败</value>
+  </data>
+  <data name="BatchAddAllFailedMessage" xml:space="preserve">
+    <value>所有 {0} 个模组添加均失败</value>
+  </data>
+  <data name="BatchAddErrorTitle" xml:space="preserve">
+    <value>批量添加模组到预设失败</value>
+  </data>
+  <data name="BatchAddErrorMessage" xml:space="preserve">
+    <value>操作过程中发生错误: {0}</value>
+  </data>
+
+  <data name="ModAddedToPresetTitle" xml:space="preserve">
+    <value>模组已添加到预设中</value>
+  </data>
+  <data name="ModAddedToPresetMessage" xml:space="preserve">
+    <value>已将模组 '{0}' 添加到预设 {1}</value>
+  </data>
+  <data name="AddModToPresetFailedTitle" xml:space="preserve">
+    <value>添加模组到预设失败</value>
+  </data>
+
+  <data name="PreferencesSavedTitle" xml:space="preserve">
+    <value>已保存模组首选项</value>
+  </data>
+  <data name="PreferencesSavedMessage" xml:space="preserve">
+    <value>为 mod {0} 成功保存首选项</value>
+  </data>
+  <data name="PreferencesSaveFailedTitle" xml:space="preserve">
+    <value>保存模组首选项失败</value>
+  </data>
+
+  <!-- ModSelector Page -->
+  <data name="ModSelector_Title.Text" xml:space="preserve">
+    <value>选择 Mods</value>
+  </data>
+  <data name="ModSelector_SearchBox.PlaceholderText" xml:space="preserve">
+    <value>搜索模组...</value>
+  </data>
+  <data name="ModSelector_DateAddedLabel.Text" xml:space="preserve">
+    <value>添加时间:</value>
+  </data>
+  <data name="ModSelector_ConfirmButton.Content" xml:space="preserve">
+    <value>选择 Mod</value>
+  </data>
+
+  <!-- Preset Details Page -->
+  <data name="PresetDetailsPage_AddModsButton.Label" xml:space="preserve">
+    <value>添加模组</value>
+  </data>
+  <data name="PresetDetailsPage_SearchBox.PlaceholderText" xml:space="preserve">
+    <value>搜索模组...</value>
+  </data>
+  
+  <!-- Preset Details Item -->
+  <data name="PresetDetailsPage_FindReplacementMenuItem.Text" xml:space="preserve">
+    <value>寻找替代 Mod</value>
+  </data>
+  <data name="PresetDetailsPage_SavePreferencesMenuItem.Text" xml:space="preserve">
+    <value>读取并保存首选项</value>
+  </data>
+  <data name="PresetDetailsPage_SavePreferencesMenuItem.ToolTipService.ToolTip" xml:space="preserve">
+    <value>读取当前 3Dmigoto 用户的 ini 文件 (d3dx_user.ini)，并为该预设保存偏好设置</value>
+  </data>
+  <data name="PresetDetailsPage_RemoveModMenuItem.Text" xml:space="preserve">
+    <value>从预设中移除 Mod</value>
+  </data>
+  
+  <data name="PresetDetailsPage_AddedAtLabel.Text" xml:space="preserve">
+    <value>预设添加于:</value>
+  </data>
+  <data name="PresetDetailsPage_ModNotFoundText.Text" xml:space="preserve">
+    <value>在磁盘上找不到该模组!</value>
+  </data>
+
+  <!-- Notifications -->
+  <data name="PresetCreationFailedTitle" xml:space="preserve">
+    <value>预设创建失败</value>
+  </data>
+  <data name="PresetDuplicateFailedTitle" xml:space="preserve">
+    <value>预设复制失败</value>
+  </data>
+  <data name="PresetDeleteFailedTitle" xml:space="preserve">
+    <value>删除预设失败</value>
+  </data>
+  
+  <data name="PresetAppliedTitle" xml:space="preserve">
+    <value>已应用预设</value>
+  </data>
+  <data name="PresetAppliedMessage" xml:space="preserve">
+    <value>预设: '{0}' 已应用。</value>
+  </data>
+  <data name="PresetApplyFailedTitle" xml:space="preserve">
+    <value>预设应用失败</value>
+  </data>
+  
+  <data name="PresetRenameFailedTitle" xml:space="preserve">
+    <value>预设重命名失败</value>
+  </data>
+  <data name="PresetReorderFailedTitle" xml:space="preserve">
+    <value>保存预设顺序失败</value>
+  </data>
+  <data name="PresetReadOnlyToggleFailedTitle" xml:space="preserve">
+    <value>预设切换只读失败</value>
+  </data>
+  
+  <data name="ElevatorStartFailedTitle" xml:space="preserve">
+    <value>启动 Elevator 失败</value>
+  </data>
+  <data name="ElevatorStartFailedMessage" xml:space="preserve">
+    <value>Elevator 进程启动失败</value>
+  </data>
+  
+  <data name="PreferencesResetTitle" xml:space="preserve">
+    <value>模组首选项已重置</value>
+  </data>
+  <data name="PreferencesResetMessage" xml:space="preserve">
+    <value>模组首选项已被移除</value>
+  </data>
+  <data name="AndClearedLoaderConfig" xml:space="preserve">
+    <value>并且加载器配置文件已被清除</value>
+  </data>
+  <data name="PreferencesResetFailedTitle" xml:space="preserve">
+    <value>模组首选项重置失败</value>
+  </data>
+
+  <!-- Rename Button -->
+  <data name="RenameText" xml:space="preserve">
+    <value>重命名</value>
+  </data>
+  <data name="SaveNewNameText" xml:space="preserve">
+    <value>保存新名称</value>
+  </data>
+
+  <!-- Randomize Mods Dialog -->
+  <data name="RandomizeDialog_Title" xml:space="preserve">
+    <value>随机启用模组</value>
+  </data>
+  <data name="RandomizeDialog_ConfirmButton" xml:space="preserve">
+    <value>随机</value>
+  </data>
+  <data name="RandomizeDialog_CancelButton" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  
+  <data name="RandomizeDialog_SelectCategoryLabel" xml:space="preserve">
+    <value>选择你想要对其模组进行随机化处理的类别:</value>
+  </data>
+  <data name="RandomizeDialog_WarningText" xml:space="preserve">
+    <value>注意：此操作只会随机化那些按设计仅允许一个模组处于激活状态的模组文件夹。因此，“Others _” 这类文件夹不会被随机化。并且，每个游戏角色皮肤仅会启用一个模组</value>
+  </data>
+  <data name="RandomizeDialog_AllowNoMods" xml:space="preserve">
+    <value>允许最终不使用任何模组。这意味着某个模组文件夹有可能不启用任何模组</value>
+  </data>
+  <data name="RandomizeDialog_SuggestionText" xml:space="preserve">
+    <value>如果你启用了大量模组，我建议在进行随机化操作之前，为你的模组创建一个预设（或备份）</value>
+  </data>
+
+  <!-- Notifications -->
+  <data name="RandomizeDialog_NoCategoryTitle" xml:space="preserve">
+    <value>未选择任何类别</value>
+  </data>
+  <data name="RandomizeDialog_NoCategoryMessage" xml:space="preserve">
+    <value>未选择任何要进行随机化的类别。</value>
+  </data>
+  <data name="RandomizeDialog_FailedTitle" xml:space="preserve">
+    <value>模组随机化失败</value>
+  </data>
+  <data name="RandomizeDialog_SuccessTitle" xml:space="preserve">
+    <value>已随机启用模组</value>
+  </data>
+  <data name="RandomizeDialog_SuccessMessagePrefix" xml:space="preserve">
+    <value>已针对所选类别完成模组随机化: </value>
+  </data>
+
+  <!-- Handler Service Notifications -->
+  <data name="ApplyPresetFailedTitle" xml:space="preserve">
+    <value>应用模组预设失败</value>
+  </data>
+  <data name="WriteSettingsFailedTitle" xml:space="preserve">
+    <value>无法写入模组设置到 3Dmigoto user .ini</value>
+  </data>
+  <data name="SeeLogDetails" xml:space="preserve">
+    <value>详细信息请参见日志</value>
+  </data>
+  <data name="ApplyPresetSuccessTitle" xml:space="preserve">
+    <value>应用模组预设</value>
+  </data>
+  <data name="ApplyPresetSuccessMessage" xml:space="preserve">
+    <value>模组预设 {0} 已应用</value>
+  </data>
+  
+  <data name="SavePreferencesFailedTitle" xml:space="preserve">
+    <value>保存激活的偏好设置失败</value>
+  </data>
+  <data name="SavePreferencesSuccessTitle" xml:space="preserve">
+    <value>激活的偏好设置已保存</value>
+  </data>
+  <data name="SavePreferencesSuccessMessage" xml:space="preserve">
+    <value>存储在 {0} 的偏好设置已为启用的模组保存</value>
+  </data>
+  
+  <data name="ApplyPreferencesFailedTitle" xml:space="preserve">
+    <value>应用保存的偏好设置失败</value>
+  </data>
+  <data name="ApplyPreferencesSuccessTitle" xml:space="preserve">
+    <value>已应用保存的偏好设置</value>
+  </data>
+  <data name="ApplyPreferencesSuccessMessage" xml:space="preserve">
+    <value>模组偏好设置已写入 3DMigoto {0}</value>
+  </data>
+</root>

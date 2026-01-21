@@ -24,7 +24,8 @@ public partial class ContextMenuVM(
     IGameService gameService,
     NotificationManager notificationManager,
     ILogger logger,
-    ModSettingsService modSettingsService)
+    ModSettingsService modSettingsService,
+    ILanguageLocalizer localizer)
     : ObservableRecipient
 {
     private readonly ISkinManagerService _skinManagerService = skinManagerService;
@@ -32,6 +33,7 @@ public partial class ContextMenuVM(
     private readonly NotificationManager _notificationManager = notificationManager;
     private readonly ILogger _logger = logger.ForContext<ContextMenuVM>();
     private readonly ModSettingsService _modSettingsService = modSettingsService;
+    private readonly ILanguageLocalizer _localizer = localizer;
 
     private DispatcherQueue _dispatcherQueue = null!;
     private CancellationToken _navigationCt = default;
@@ -145,8 +147,10 @@ public partial class ContextMenuVM(
         if (destinationModList is null)
         {
             _logger.Warning("Destination mod list not found");
-            _notificationManager.ShowNotification("目标模组列表未找到",
-                "目标模组列表未找到", TimeSpan.FromSeconds(5));
+            _notificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/ContextMenu_MoveDestNotFoundTitle", "Destination mod list not found"),
+                _localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/ContextMenu_MoveDestNotFoundMessage", "Could not find the destination character mod list"),
+                TimeSpan.FromSeconds(5));
             return;
         }
 
@@ -160,15 +164,26 @@ public partial class ContextMenuVM(
         catch (InvalidOperationException e)
         {
             _logger.Error(e, "Error moving mods");
-            _notificationManager
-                .ShowNotification("无效操作异常",
-                    $"无法移动模组 \n {e.Message}, 请查看日志以获取详细信息.", TimeSpan.FromSeconds(10));
+            var message = string.Format(
+                _localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/ContextMenu_MoveErrorFormat", "Unable to move mods.\n{0}\nPlease check logs for details."),
+                e.Message);
+
+            _notificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/ContextMenu_MoveErrorTitle", "Invalid Operation Exception"),
+                message, TimeSpan.FromSeconds(10));
             return;
         }
 
-        _notificationManager.ShowNotification($"{SelectedModsCount} 个模组已移动",
-            $"成功移动模组 {string.Join(",", selectedMods.Select(m => m.Mod.GetDisplayName()))} 到 {destinationModList.Character.DisplayName}",
-            TimeSpan.FromSeconds(5));
+        var successTitle = string.Format(
+            _localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/ContextMenu_MoveSuccessTitleFormat", "{0} Mods Moved"),
+            SelectedModsCount);
+
+        var successMsg = string.Format(
+            _localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/ContextMenu_MoveSuccessMessageFormat", "Successfully moved mods {0} to {1}"),
+            string.Join(",", selectedMods.Select(m => m.Mod.GetDisplayName())),
+            destinationModList.Character.DisplayName);
+
+        _notificationManager.ShowNotification(successTitle, successMsg, TimeSpan.FromSeconds(5));
 
         ModsMoved?.Invoke(this, EventArgs.Empty);
     }
@@ -251,21 +266,46 @@ public partial class ContextMenuVM(
 
         if (successCount > 0)
         {
-            var message = successCount == 1
-                ? $"成功为模组 '{selectedModEntries[0].Mod.GetDisplayName()}' 设置皮肤: {characterSkinToSet.DisplayName}"
-                : $"成功为 {successCount} 个模组设置皮肤: {characterSkinToSet.DisplayName}";
+            string message;
+            if (successCount == 1)
+            {
+                message = string.Format(
+                    _localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/ContextMenu_SkinSetSuccessSingle", "Successfully set skin for mod '{0}' to: {1}"),
+                    selectedModEntries[0].Mod.GetDisplayName(), characterSkinToSet.DisplayName);
+            }
+            else
+            {
+                message = string.Format(
+                    _localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/ContextMenu_SkinSetSuccessMulti", "Successfully set skin for {0} mods to: {1}"),
+                    successCount, characterSkinToSet.DisplayName);
+            }
 
-            _notificationManager.ShowNotification("皮肤设置完成", message, null);
+            _notificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/ContextMenu_SkinSetSuccessTitle", "Skin Setting Complete"),
+                message, null);
         }
 
         if (failCount > 0)
         {
-            var message = failCount == 1
-                ? $"未能为模组 '{failedModNames[0]}' 设置皮肤"
-                : $"未能为 {failCount} 个模组设置皮肤";
+            string messageBase;
+            if (failCount == 1)
+            {
+                messageBase = string.Format(
+                    _localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/ContextMenu_SkinSetFailSingle", "Failed to set skin for mod '{0}'"),
+                    failedModNames[0]);
+            }
+            else
+            {
+                messageBase = string.Format(
+                    _localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/ContextMenu_SkinSetFailMulti", "Failed to set skin for {0} mods"),
+                    failCount);
+            }
 
-            _notificationManager.ShowNotification("部分操作失败",
-                $"{message}\n请查看日志获取详细信息",
+            var checkLogText = _localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/ContextMenu_CheckLogSuffix", "\nPlease check logs for details");
+
+            _notificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/ContextMenu_SkinSetPartialFailTitle", "Operation Partially Failed"),
+                $"{messageBase}{checkLogText}",
                 TimeSpan.FromSeconds(5));
         }
 

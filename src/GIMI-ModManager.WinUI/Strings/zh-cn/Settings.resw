@@ -1,180 +1,110 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
-  <!-- 
-    Microsoft ResX Schema 
-    
-    Version 2.0
-    
-    The primary goals of this format is to allow a simple XML format 
-    that is mostly human readable. The generation and parsing of the 
-    various data types are done through the TypeConverter classes 
-    associated with the data types.
-    
-    Example:
-    
-    ... ado.net/XML headers & schema ...
-    <resheader name="resmimetype">text/microsoft-resx</resheader>
-    <resheader name="version">2.0</resheader>
-    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
-    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
-    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
-    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
-    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
-        <value>[base64 mime encoded serialized .NET Framework object]</value>
-    </data>
-    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
-        <comment>This is a comment</comment>
-    </data>
-                
-    There are any number of "resheader" rows that contain simple 
-    name/value pairs.
-    
-    Each data row contains a name, and value. The row also contains a 
-    type or mimetype. Type corresponds to a .NET class that support 
-    text/value conversion through the TypeConverter architecture. 
-    Classes that don't support this are serialized and stored with the 
-    mimetype set.
-    
-    The mimetype is used for serialized objects, and tells the 
-    ResXResourceReader how to depersist the object. This is currently not 
-    extensible. For a given mimetype the value must be set accordingly:
-    
-    Note - application/x-microsoft.net.object.binary.base64 is the format 
-    that the ResXResourceWriter will generate, however the reader can 
-    read any of the formats listed below.
-    
-    mimetype: application/x-microsoft.net.object.binary.base64
-    value   : The object must be serialized with 
-            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
-            : and then encoded with base64 encoding.
-    
-    mimetype: application/x-microsoft.net.object.soap.base64
-    value   : The object must be serialized with 
-            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
-            : and then encoded with base64 encoding.
-    mimetype: application/x-microsoft.net.object.bytearray.base64
-    value   : The object must be serialized into a byte array 
-            : using a System.ComponentModel.TypeConverter
-            : and then encoded with base64 encoding.
-    -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
-    <xsd:element name="root" msdata:IsDataSet="true">
-      <xsd:complexType>
-        <xsd:choice maxOccurs="unbounded">
-          <xsd:element name="metadata">
-            <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
-              </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
-            </xsd:complexType>
-          </xsd:element>
-          <xsd:element name="assembly">
-            <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
-            </xsd:complexType>
-          </xsd:element>
-          <xsd:element name="data">
-            <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
-              </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-              <xsd:attribute ref="xml:space" />
-            </xsd:complexType>
-          </xsd:element>
-          <xsd:element name="resheader">
-            <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-              </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
-            </xsd:complexType>
-          </xsd:element>
-        </xsd:choice>
-      </xsd:complexType>
-    </xsd:element>
-  </xsd:schema>
-  <resheader name="resmimetype">
-    <value>text/microsoft-resx</value>
-  </resheader>
-  <resheader name="version">
-    <value>2.0</value>
-  </resheader>
-  <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </resheader>
-  <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </resheader>
-  <data name="3dmigotoFolderSelector.Title" xml:space="preserve">
-    <value>选择Mod加载器路径</value>
+  <data name="RestartingNotificationTitle" xml:space="preserve">
+    <value>重启中...</value>
   </data>
-  <data name="ChangeLanguageDialogText" xml:space="preserve">
-    <value>更改语言需要重新启动应用程序。
-这是为了正确配置应用程序以适应所选语言。
-是否要更改语言？</value>
+  <data name="RestartingNotificationMessage" xml:space="preserve">
+    <value>应用程序现在将重新启动</value>
   </data>
-  <data name="ElevatorSectionHeader.Text" xml:space="preserve">
-    <value>同步进程</value>
+  <data name="SettingsSavedNotificationMessage" xml:space="preserve">
+    <value>重新启动应用程序...</value>
   </data>
-  <data name="ElevatorStatusTitle.Text" xml:space="preserve">
-    <value>同步状态:</value>
+  <data name="RestartRequiredTitle" xml:space="preserve">
+    <value>需要重新启动应用程序</value>
   </data>
-  <data name="FolderSectionHeader.Text" xml:space="preserve">
-    <value>文件夹</value>
+
+  <!-- Page Structure -->
+  <data name="Title.Text" xml:space="preserve">
+    <value>设置</value>
   </data>
-  <data name="GameSelectorComboBox.Header" xml:space="preserve">
-    <value>选择游戏：</value>
+  <data name="Personalization.Text" xml:space="preserve">
+    <value>个性化</value>
   </data>
-  <data name="GameSelectorSectionHeader.Text" xml:space="preserve">
-    <value>游戏</value>
+  <data name="Theme.Text" xml:space="preserve">
+    <value>主题</value>
   </data>
-  <data name="GameSelectorTitle.Text" xml:space="preserve">
-    <value>JASM 支持【原神,崩铁,鸣潮,绝区零】</value>
+  <data name="Theme_Light.Content" xml:space="preserve">
+    <value>浅色</value>
   </data>
+  <data name="Theme_Dark.Content" xml:space="preserve">
+    <value>深色</value>
+  </data>
+  <data name="Theme_Default.Content" xml:space="preserve">
+    <value>默认</value>
+  </data>
+  <data name="ThemeRestartTitle" xml:space="preserve">
+    <value>应用程序需要重启</value>
+  </data>
+  <data name="ThemeRestartMessage" xml:space="preserve">
+    <value>你需要重新启动应用程序，以使主题生效，否则应用程序将变得不稳定。很可能是因为我没有正确配置主题。推荐使用深色模式。
+
+对给您带来的不便深表歉意。</value>
+  </data>
+  <data name="WindowSectionTitle.Text" xml:space="preserve">
+    <value>窗口</value>
+  </data>
+  <data name="RememberWindowSize.Content" xml:space="preserve">
+    <value>记住窗口大小</value>
+  </data>
+  <data name="RememberWindowSize.ToolTipService.ToolTip" xml:space="preserve">
+    <value>如果选中，则在 JASM 退出时保存主窗口大小</value>
+  </data>
+  <data name="RememberWindowPosition.Content" xml:space="preserve">
+    <value>记住窗口位置</value>
+  </data>
+  <data name="RememberWindowPosition.ToolTipService.ToolTip" xml:space="preserve">
+    <value>如果选中，则在 JASM 退出时保存主窗口位置</value>
+  </data>
+
+  <!-- Language -->
   <data name="LanguageSelectionSectionHeader.Text" xml:space="preserve">
     <value>语言</value>
   </data>
   <data name="LanguageSelectorComboBox.Header" xml:space="preserve">
     <value>选择显示语言：</value>
   </data>
-  <data name="LanguageSelectorTitle.Text" xml:space="preserve">
-    <value>目前语言选项有限。我们正在继续改进。</value>
+  <data name="ChangeLanguageRestartButton" xml:space="preserve">
+    <value>更改语言并重新启动</value>
   </data>
-  <data name="ModsFolderSelector.Title" xml:space="preserve">
-    <value>选择Mod所在文件夹</value>
+  <data name="ChangeLanguageDialogText" xml:space="preserve">
+    <value>更改语言需要重新启动应用程序。
+这是为了正确配置应用程序以适应所选语言。
+是否要更改语言？</value>
   </data>
-  <data name="ModUpdateCheckerCheckBox.Content" xml:space="preserve">
-    <value>自动检查修改更新</value>
+
+  <!-- Game Selector -->
+  <data name="GameSelectorSectionHeader.Text" xml:space="preserve">
+    <value>游戏</value>
   </data>
-  <data name="ModUpdateCheckerDescription.Text" xml:space="preserve">
-    <value>修改更新检查器会在启动时和后台定期检查修改的更新。
-当启用时，每240分钟检查一次，但仅检查那些至少在60分钟内未被检查过的模组。
-手动检查总是直接检查 GameBanana。</value>
+  <data name="GameSelectorTitle.Text" xml:space="preserve">
+    <value>JASM 支持原神、崩坏：星穹铁道、鸣潮和绝区零。</value>
   </data>
-  <data name="ModUpdateCheckerNextText.Text" xml:space="preserve">
-    <value>下次检查时间：</value>
+  <data name="GameSelectorSubtitle.Text" xml:space="preserve">
+    <value>为每个选定的游戏独立保存设置。</value>
   </data>
-  <data name="ModUpdateCheckerSectionHeader.Text" xml:space="preserve">
-    <value>修改更新检查</value>
+  <data name="GameSelectorComboBox.Header" xml:space="preserve">
+    <value>选择游戏：</value>
   </data>
-  <data name="StartElevatorButton.Content" xml:space="preserve">
-    <value>启动 Elevator</value>
+    <data name="SwitchGameTitle" xml:space="preserve">
+    <value>切换游戏</value>
   </data>
-  <data name="StartElevatorDialogDontShowContent" xml:space="preserve">
-    <value>不再显示此消息</value>
+  <data name="SwitchGameMessage" xml:space="preserve">
+    <value>切换游戏将重新启动应用程序.这是为了确保应用程序为所选游戏正确配置.
+
+你想要切换游戏吗?</value>
   </data>
-  <data name="StartElevatorDialogText" xml:space="preserve">
+  <data name="SwitchToGameButton" xml:space="preserve">
+    <value>切换至 {0}</value>
+  </data>
+
+  <!-- Elevator -->
+  <data name="ElevatorSectionHeader.Text" xml:space="preserve">
+    <value>同步进程</value>
+  </data>
+  <data name="ElevatorStatusTitle.Text" xml:space="preserve">
+    <value>同步状态:</value>
+  </data>
+    <data name="StartElevatorDialogText" xml:space="preserve">
     <value>按下开始以启动 Elevator。Elevator 是一个提升权限（管理员）进程，用于与游戏进程通信。
 
 当 Elevator 处于活动状态时，你可以在本应用中按 F10 来刷新游戏中正在运行的模组。
@@ -188,5 +118,629 @@
   </data>
   <data name="StartElevatorDialogTitle" xml:space="preserve">
     <value>启动同步进程？</value>
+  </data>
+  <data name="StartElevatorButton.Content" xml:space="preserve">
+    <value>启动 Elevator</value>
+  </data>
+  <data name="StartElevatorDialogDontShowContent" xml:space="preserve">
+    <value>不再显示此消息</value>
+  </data>
+
+  <!-- Mod Update Checker -->
+  <data name="ModUpdateCheckerSectionHeader.Text" xml:space="preserve">
+    <value>模组更新检查器</value>
+  </data>
+  <data name="ModUpdateCheckerCheckBox.Content" xml:space="preserve">
+    <value>模组更新检查器：</value>
+  </data>
+  <data name="ModUpdateCheckerNextText.Text" xml:space="preserve">
+    <value>下次检查时间：</value>
+  </data>
+  <data name="ModUpdateCheckerDescription.Text" xml:space="preserve">
+    <value>Mod 更新检查器会在启动时以及在后台定期检查更新，仅支持 GameBanana。
+在启用时，每 2 小时检查一次，但仅检查那些至少在 1 小时内未被检查过的模组。
+手动检查更新时始终会直接检查 GameBanana。</value>
+  </data>
+  <data name="UpdateProcessStartError" xml:space="preserve">
+    <value>启动更新进程时出错</value>
+  </data>
+  <data name="UpdateProcessUnableToStart" xml:space="preserve">
+    <value>无法启动更新进程</value>
+  </data>
+  <!-- Mod Update Checker Notifications -->
+  <data name="UpdateChecker_FatalErrorTitle" xml:space="preserve">
+    <value>mod 更新后台检查器发生错误</value>
+  </data>
+  <data name="UpdateChecker_FatalErrorMessage" xml:space="preserve">
+    <value>在后台检查器中发生了致命错误 ({0} : {1})。这意味着 JASM 无法再在后台或手动检查模组更新。错误信息: {2}</value>
+  </data>
+  
+  <data name="UpdateChecker_CheckErrorTitle" xml:space="preserve">
+    <value>检查 mod 更新时发生错误</value>
+  </data>
+  <data name="UpdateChecker_CheckErrorMessage" xml:space="preserve">
+    <value>停止后台 mod 更新检查程序...</value>
+  </data>
+  
+  <data name="UpdateChecker_NoModsTitle" xml:space="preserve">
+    <value>没有模组需要检查更新</value>
+  </data>
+  <data name="UpdateChecker_NoModsMessage" xml:space="preserve">
+    <value>这些模组都无效，因此没有进行任何检查</value>
+  </data>
+  
+  <data name="UpdateChecker_CheckCompleteTitle" xml:space="preserve">
+    <value>完成 mod 更新检查</value>
+  </data>
+  <data name="UpdateChecker_CheckCompleteCharacterMessage" xml:space="preserve">
+    <value>已完成 {1} 的 {0} 个模组的更新检查</value>
+  </data>
+  <data name="UpdateChecker_CheckCompleteGenericMessage" xml:space="preserve">
+    <value>完成 mod 更新检查</value>
+  </data>
+  
+  <data name="UpdateChecker_NewUpdateAvailableMessage" xml:space="preserve">
+    <value>有新的或需更新的模组可供使用 {0}</value>
+  </data>
+
+  <!-- Commands -->
+  <data name="CommandsSectionHeader.Text" xml:space="preserve">
+    <value>命令</value>
+  </data>
+  <data name="CreateCustomCommandsCard.Header" xml:space="preserve">
+    <value>创建自定义命令</value>
+  </data>
+  <data name="CreateCustomCommandsCard.Description" xml:space="preserve">
+    <value>可以定义命令（脚本），然后在指定的 Mod 上运行</value>
+  </data>
+
+  <!-- Commands Page -->
+  <data name="CommandsPage_Title.Text" xml:space="preserve">
+    <value>命令设置</value>
+  </data>
+  
+  <data name="CommandsPage_CreateCommandCard.Header" xml:space="preserve">
+    <value>创建新命令</value>
+  </data>
+  <data name="CommandsPage_CreateCommandCard.Description" xml:space="preserve">
+    <value>在这里，您可以定义 JASM 可以运行的自定义命令。目前，包含 {{TargetPath}} 的命令只能在模组概览界面中执行</value>
+  </data>
+  <data name="CommandsPage_CreateCommandButton.Content" xml:space="preserve">
+    <value>创建新的命令</value>
+  </data>
+  
+  <data name="CommandsPage_DefinitionsExpander.Header" xml:space="preserve">
+    <value>命令定义</value>
+  </data>
+  <data name="CommandsPage_DefinitionsExpander.Description" xml:space="preserve">
+    <value>在这里，您可以查看和删除已创建的命令</value>
+  </data>
+
+  <!-- Create Command View -->
+  <data name="CreateCommand_Title.Text" xml:space="preserve">
+    <value>创建命令行</value>
+  </data>
+  <data name="CreateCommand_NameInput.Header" xml:space="preserve">
+    <value>* 命令名称:</value>
+  </data>
+  <data name="CreateCommand_NameInput.PlaceholderText" xml:space="preserve">
+    <value>命令显示名称（必填）</value>
+  </data>
+  
+  <data name="CreateCommand_Type_Custom.Content" xml:space="preserve">
+    <value>自定义命令</value>
+  </data>
+  <data name="CreateCommand_Type_Chained.Content" xml:space="preserve">
+    <value>自定义链式命令</value>
+  </data>
+  <data name="CreateCommand_Type_Chained.ToolTipService.ToolTip" xml:space="preserve">
+    <value>尚未实现</value>
+  </data>
+  
+  <!-- FolderSelectors (Assuming Title/PlaceHolderText properties are supported by Uid) -->
+  <data name="CreateCommand_ExecutableInput.Title" xml:space="preserve">
+    <value>* 可执行文件</value>
+  </data>
+  <data name="CreateCommand_ExecutableInput.PlaceHolderText" xml:space="preserve">
+    <value>必须在 $PATH 中或是可执行文件的绝对路径（必填）</value>
+  </data>
+  <data name="CreateCommand_WorkDirInput.Title" xml:space="preserve">
+    <value>工作目录</value>
+  </data>
+  <data name="CreateCommand_WorkDirInput.PlaceHolderText" xml:space="preserve">
+    <value>手动指定路径时，文件夹必须存在</value>
+  </data>
+  
+  <data name="CreateCommand_ArgsInput.Header" xml:space="preserve">
+    <value>参数</value>
+  </data>
+  <data name="CreateCommand_ArgsInput.PlaceholderText" xml:space="preserve">
+    <value>将传递给可执行文件的参数</value>
+  </data>
+  <data name="CreateCommand_ArgsHelp.Text" xml:space="preserve">
+    <value>当命令在文件系统对象（即皮肤/模组文件夹）上运行时，{{TargetPath}} 将被实际路径替换。</value>
+  </data>
+  
+  <!-- Checkboxes -->
+  <data name="CreateCommand_KillOnExit.Content" xml:space="preserve">
+    <value>在 JASM 退出时终止进程</value>
+  </data>
+  <data name="CreateCommand_KillOnExit.ToolTipService.ToolTip" xml:space="preserve">
+    <value>如果勾选，该进程将在 JASM 退出时被终止</value>
+  </data>
+  
+  <data name="CreateCommand_RunAsAdmin.Content" xml:space="preserve">
+    <value>管理员运行</value>
+  </data>
+  <data name="CreateCommand_RunAsAdmin.ToolTipService.ToolTip" xml:space="preserve">
+    <value>作为管理员运行</value>
+  </data>
+  
+  <data name="CreateCommand_UseShellExecute.Content" xml:space="preserve">
+    <value>使用Shell执行</value>
+  </data>
+  <data name="CreateCommand_UseShellExecute.ToolTipService.ToolTip" xml:space="preserve">
+    <value>如果勾选，将使用操作系统启动可执行文件</value>
+  </data>
+  
+  <data name="CreateCommand_NewWindow.Content" xml:space="preserve">
+    <value>创建新窗口</value>
+  </data>
+  <data name="CreateCommand_NewWindow.ToolTipService.ToolTip" xml:space="preserve">
+    <value>如果选中，它将在外部窗口中运行</value>
+  </data>
+  
+  <!-- Footer -->
+  <data name="CreateCommand_Preview.Header" xml:space="preserve">
+    <value>将要运行的命令:</value>
+  </data>
+  <data name="CreateCommand_SaveButton.Content" xml:space="preserve">
+    <value>保存命令</value>
+  </data>
+  
+  <!-- Command List Item -->
+  <data name="CommandsPage_Item_DisplayNameLabel.Text" xml:space="preserve">
+    <value>显示名称: </value>
+  </data>
+  <data name="CommandsPage_Item_ExecuteButton.Content" xml:space="preserve">
+    <value>执行</value>
+  </data>
+  <data name="CommandsPage_Item_RunConfirmText.Text" xml:space="preserve">
+    <value>您确定要运行这个命令吗?</value>
+  </data>
+  <data name="CommandsPage_Item_RunConfirmButton.Content" xml:space="preserve">
+    <value>运行</value>
+  </data>
+  <data name="CommandsPage_Item_EditButton.Content" xml:space="preserve">
+    <value>编辑</value>
+  </data>
+  <data name="CommandsPage_Item_DeleteButton.Content" xml:space="preserve">
+    <value>删除</value>
+  </data>
+  <data name="CommandsPage_Item_DeleteConfirmText.Text" xml:space="preserve">
+    <value>您确定要删除该命令吗?</value>
+  </data>
+  <data name="CommandsPage_Item_ConfirmButton.Content" xml:space="preserve">
+    <value>确定</value>
+  </data>
+  
+  <data name="CommandsPage_Item_ExecutableLabel.Text" xml:space="preserve">
+    <value>可执行文件: </value>
+  </data>
+  <data name="CommandsPage_Item_WorkingDirLabel.Text" xml:space="preserve">
+    <value>工作目录: </value>
+  </data>
+  <data name="CommandsPage_Item_ArgumentsLabel.Text" xml:space="preserve">
+    <value>运行参数: </value>
+  </data>
+  
+  <!-- Running Commands -->
+  <data name="CommandsPage_RunningExpander.Header" xml:space="preserve">
+    <value>当前运行的命令</value>
+  </data>
+  <data name="CommandsPage_RunningExpander.Description" xml:space="preserve">
+    <value>从 JASM 为当前运行的实例启动的命令</value>
+  </data>
+
+  <!-- CommandHandler Service Messages -->
+  <data name="CommandHandler_ErrorCheckingStart" xml:space="preserve">
+    <value>检查命令是否可启动时发生错误: {0}</value>
+  </data>
+  <data name="CommandHandler_CommandNotFoundId" xml:space="preserve">
+    <value>未找到 ID 为 '{0}' 的命令</value>
+  </data>
+  <data name="CommandHandler_ExecutablePathEmpty" xml:space="preserve">
+    <value>可执行文件路径为空或无效</value>
+  </data>
+  <data name="CommandHandler_ExecutableNotFound" xml:space="preserve">
+    <value>在 $PATH 中未找到可执行文件 '{0}' 或文件不存在</value>
+  </data>
+  <data name="CommandHandler_WorkingDirNotFound" xml:space="preserve">
+    <value>工作目录 '{0}' 不存在</value>
+  </data>
+  <data name="CommandHandler_SpecialVarsRequired" xml:space="preserve">
+    <value>此命令需要特殊变量</value>
+  </data>
+  <data name="CommandHandler_SpecificVarRequired" xml:space="preserve">
+    <value>此命令需要特殊变量 '{0}'</value>
+  </data>
+  <data name="CommandHandler_TargetPathNotFound" xml:space="preserve">
+    <value>目标路径 '{0}' 不存在</value>
+  </data>
+  
+  <data name="CommandHandler_ErrorStartingCommand" xml:space="preserve">
+    <value>启动命令时发生错误</value>
+  </data>
+
+  <!-- CreateCommandViewModel Strings -->
+  <data name="CreateCommand_DefaultStartGameName" xml:space="preserve">
+    <value>启动 {0}</value>
+  </data>
+  <data name="CreateCommand_EffectiveWorkDirPrefix" xml:space="preserve">
+    <value>有效工作目录: </value>
+  </data>
+  <data name="CreateCommand_InvalidWorkDir" xml:space="preserve">
+    <value>无效工作目录</value>
+  </data>
+  
+  <data name="CreateCommand_UpdateFailedTitle" xml:space="preserve">
+    <value>命令更新失败。</value>
+  </data>
+  <data name="CreateCommand_CreateFailedTitle" xml:space="preserve">
+    <value>命令创建失败。</value>
+  </data>
+  
+  <data name="CreateCommand_UpdateSuccessMessage" xml:space="preserve">
+    <value>命令 '{0}' 更新成功。</value>
+  </data>
+  <data name="CreateCommand_CreateSuccessMessage" xml:space="preserve">
+    <value>命令 '{0}' 创建成功。</value>
+  </data>
+
+  <!-- Command Warnings -->
+  <data name="CommandsPage_WarningTitle" xml:space="preserve">
+    <value>温馨提醒</value>
+  </data>
+  <data name="CommandsPage_WarningText" xml:space="preserve">
+    <value>请在创建命令时要小心。命令可以用来在你的系统上运行任何可执行文件。仅从可信来源创建命令。
+JASM 并不完美，不能保护您免受恶意脚本或 JASM 错误/故障的影响。
+
+点击 '我明白了' 即表示你已了解风险。</value>
+  </data>
+  <data name="CommandsPage_WarningConfirmButton" xml:space="preserve">
+    <value>我明白了</value>
+  </data>
+  <data name="CommandsPage_WarningCancelButton" xml:space="preserve">
+    <value>取消</value>
+  </data>
+
+  <!-- Notifications -->
+  <data name="CommandsPage_KillFailedTitle" xml:space="preserve">
+    <value>终止进程失败</value>
+  </data>
+  <data name="CommandsPage_ProcessNotRunningTitle" xml:space="preserve">
+    <value>进程未运行</value>
+  </data>
+  <data name="CommandsPage_KillSuccessTitle" xml:space="preserve">
+    <value>进程被成功终止</value>
+  </data>
+  
+  <data name="CommandsPage_CommandNotFoundTitle" xml:space="preserve">
+    <value>获取命令失败</value>
+  </data>
+  <data name="CommandsPage_CommandNotFoundMessage" xml:space="preserve">
+    <value>命令未找到</value>
+  </data>
+  
+  <data name="CommandsPage_DeleteFailedTitle" xml:space="preserve">
+    <value>删除命令失败</value>
+  </data>
+  <data name="CommandsPage_DeleteSuccessTitle" xml:space="preserve">
+    <value>命令 '{0}' 删除成功</value>
+  </data>
+
+  <!-- List Item -->
+  <data name="CommandsPage_AttributesPrefix" xml:space="preserve">
+    <value>选项: </value>
+  </data>
+  
+  <!-- Notifications -->
+  <data name="CommandHandler_CommandNotFoundTitle" xml:space="preserve">
+    <value>命令未找到</value>
+  </data>
+  <data name="CommandHandler_CommandStartFailedTitle" xml:space="preserve">
+    <value>命令无法启动</value>
+  </data>
+  <data name="CommandHandler_CommandStartFailedMessage" xml:space="preserve">
+    <value>命令 '{0}' 因以下错误无法启动: {1}</value>
+  </data>
+  <data name="CommandHandler_CommandStartedTitle" xml:space="preserve">
+    <value>命令已启动</value>
+  </data>
+  <data name="CommandHandler_CommandStartedMessage" xml:space="preserve">
+    <value>命令 '{0}' 已启动</value>
+  </data>
+
+  <!-- Process Manager Messages -->
+  <data name="Process_UnableToStartTitle" xml:space="preserve">
+    <value>无法启动进程</value>
+  </data>
+  <data name="Process_StartFailed" xml:space="preserve">
+    <value>启动 {0} 失败</value>
+  </data>
+  <data name="Process_StartFailed_UAC" xml:space="preserve">
+    <value>启动 {0} 失败, 这可能是因为用户取消了 UAC（管理员）提示</value>
+  </data>
+  <data name="Process_StartFailed_AdminProp" xml:space="preserve">
+    <value>启动 {0} 失败, 若该可执行文件（exe）的属性中启用了 “以管理员身份运行” 选项，可能会出现此问题</value>
+  </data>
+  <data name="Process_UnknownError" xml:space="preserve">
+    <value>发生未知错误</value>
+  </data>
+
+  <!-- Folders -->
+  <data name="FolderSectionHeader.Text" xml:space="preserve">
+    <value>文件夹</value>
+  </data>
+  <data name="3dmigotoFolderSelector.Title" xml:space="preserve">
+    <value>选择Mod加载器路径</value>
+  </data>
+  <data name="ModsFolderSelector.Title" xml:space="preserve">
+    <value>选择Mod所在文件夹</value>
+  </data>
+  <data name="UpdateFolderPathsTitle" xml:space="preserve">
+    <value>更新文件夹路径?</value>
+  </data>
+  <data name="SettingsSavedNotificationTitle" xml:space="preserve">
+    <value>设置保存</value>
+  </data>
+  <data name="UpdateFolderPathsMessage" xml:space="preserve">
+    <value>要保存新的文件夹路径吗？之后应用程序将重新启动.</value>
+  </data>
+  <data name="ResetLoaderPathButton.Content" xml:space="preserve">
+    <value>重置加载器 exe 路径</value>
+  </data>
+  <data name="ResetGamePathButton.Content" xml:space="preserve">
+    <value>重置游戏 exe 路径</value>
+  </data>
+  <data name="UpdatePathsButton.Content" xml:space="preserve">
+    <value>更新路径</value>
+  </data>
+  <data name="UpdatePathsButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>更新文件夹路径？</value>
+  </data>
+  <data name="ReorganizeModsButton.Content" xml:space="preserve">
+    <value>整理 Mods 文件夹</value>
+  </data>
+  <data name="ReorganizeModsTitle" xml:space="preserve">
+    <value>你想要重新整理模组文件夹？</value>
+  </data>
+  <data name="ReorganizeModsMessage" xml:space="preserve">
+    <value>你想要重新整理模组文件夹?
+这将提示应用程序对直接在模组文件夹和Others文件夹中的现有模组进行排序，并将其分配给各自的角色.
+
+任何不能合理匹配的模组都将被放在“Others”文件夹中。而已经在“其他”文件夹中的模组将保留在那里.</value>
+  </data>
+  <data name="ReorganizeModsFailedTitle" xml:space="preserve">
+    <value>整理模组时出错</value>
+  </data>
+  <data name="SeeLogsDetails" xml:space="preserve">
+    <value>查看日志以获取更多详细信息</value>
+  </data>
+  <data name="ReorganizeModsSuccessTitle" xml:space="preserve">
+    <value>已完成模组整理</value>
+  </data>
+  <data name="ReorganizeModsSuccessMessage" xml:space="preserve">
+    <value>移动 {0} 个mod到character文件夹</value>
+  </data>
+  <data name="CleanModsFolderButton.Content" xml:space="preserve">
+    <value>清理模组文件夹</value>
+  </data>
+  <data name="DisableAllModsButton.Content" xml:space="preserve">
+    <value>禁用所有模组</value>
+  </data>
+  <data name="CharacterSkinsAsCharactersCheckBox.Content" xml:space="preserve">
+    <value>将角色皮肤视为独立的角色</value>
+  </data>
+  <data name="CacheLimitDescription.Text" xml:space="preserve">
+    <value>当使用 JASM 下载 mod 时，它会自动缓存存档或 zip 文件。您可以为缓存目录指定以 GB 为单位的最大限制，JASM 将在启动时将缓存大小保持在限制之下。</value>
+  </data>
+  <data name="OpenCacheDirectoryLink.Text" xml:space="preserve">
+    <value>打开缓存目录...</value>
+  </data>
+  <data name="CurrentCacheSizeLabel" xml:space="preserve">
+    <value>当前 Mod 文件缓存的大小 </value>
+  </data>
+
+  <!-- Export/Backup -->
+  <data name="Export_Title.Text" xml:space="preserve">
+    <value>导出/备份 Mod</value>
+  </data>
+  <data name="Export_Button.Text" xml:space="preserve">
+    <value>导出 Mod</value>
+  </data>
+  <data name="ExportAllModsTitle" xml:space="preserve">
+    <value>导出所有Mod</value>
+  </data>
+  <data name="ExportSuccessTitle" xml:space="preserve">
+    <value>模组导出成功</value>
+  </data>
+  <data name="ExportSuccessMessage" xml:space="preserve">
+    <value>导出模组到 {0}</value>
+  </data>
+  <data name="ExportErrorTitle" xml:space="preserve">
+    <value>导出模组出错</value>
+  </data>
+  <data name="ExportDialogDescription.Text" xml:space="preserve">
+    <value>这将把 JASM 正在管理的所有模组导出到你所选的导出文件夹中。这些模组会被复制到导出文件夹内，且不会从原始文件夹中被移除。</value>
+  </data>
+  <data name="ExportDialogKeepStructure.ToolTipService.ToolTip" xml:space="preserve">
+    <value>保持JASM模组文件夹结构。例如：Characters/Diluc/SomeDilucSkinMod</value>
+  </data>
+  <data name="ExportDialog_KeepStructure.Text" xml:space="preserve">
+    <value>在导出文件夹中保持 CharacterName/Mods 的文件夹结构</value>
+  </data>
+  <data name="ExportDialogRemoveJasm.ToolTipService.ToolTip" xml:space="preserve">
+    <value>这是递归的，并且会删除所有以 .JASM_ 开头的文件和文件夹</value>
+  </data>
+  <data name="ExportDialog_RemoveJasm.Text" xml:space="preserve">
+    <value>从导出的模组中移除 JASM 配置文件</value>
+  </data>
+  <data name="ExportDialogChangeStatus.ToolTipService.ToolTip" xml:space="preserve">
+    <value>是否在导出的模组前添加或移除 'DISABLED_' 前缀</value>
+  </data>
+  <data name="ExportDialog_ChangeStatus.Text" xml:space="preserve">
+    <value>更改已导出模组的状态</value>
+  </data>
+
+  <!-- About -->
+  <data name="About.Text" xml:space="preserve">
+    <value>关于此应用</value>
+  </data>
+  <data name="AboutDescription.Text" xml:space="preserve">
+    <value>JASM 的目标是让整理大量的皮肤模组变得简单</value>
+  </data>
+  <data name="GithubLinkOriginal.Content" xml:space="preserve">
+    <value>Just Another Skin Manager 原版 Github</value>
+  </data>
+  <data name="GithubLinkChinese.Content" xml:space="preserve">
+    <value>Just Another Skin Manager 中文版 Github</value>
+  </data>
+  <data name="GameBananaLink.Content" xml:space="preserve">
+    <value>Just Another Skin Manager GameBanana</value>
+  </data>
+  <data name="NewVersionAvailableText.Text" xml:space="preserve">
+    <value>有新版本可用：</value>
+  </data>
+  <data name="SeeWhatsNewLink.Text" xml:space="preserve">
+    <value>看看最新版本有什么新内容</value>
+  </data>
+  <data name="UpdateConfirmationText.Text" xml:space="preserve">
+    <value>JASM 将退出，更新即将开始。你想继续吗？</value>
+  </data>
+  <data name="UpdateConfirmButton.Content" xml:space="preserve">
+    <value>是的，更新 JASM 😎</value>
+  </data>
+  <data name="UpdateJasmButtonPrefix.Text" xml:space="preserve">
+    <value>更新 JASM 版本至 </value>
+  </data>
+  <data name="IgnoreUpdateButton.Content" xml:space="preserve">
+    <value>忽略此次更新？</value>
+  </data>
+
+  <!-- KeySwap Service -->
+  <data name="KeySwap_ModNotFoundTitle" xml:space="preserve">
+    <value>模组未找到</value>
+  </data>
+  <data name="KeySwap_ModNotFoundMessage" xml:space="preserve">
+    <value>找不到 ID 为 {0} 的模组</value>
+  </data>
+  <data name="KeySwap_NotSupportedTitle" xml:space="preserve">
+    <value>键位交换不支持</value>
+  </data>
+  <data name="KeySwap_NotSupportedMessage" xml:space="preserve">
+    <value>当前模组不支持键位交换功能</value>
+  </data>
+  <data name="KeySwap_LoadFailedTitle" xml:space="preserve">
+    <value>键位交换加载失败</value>
+  </data>
+  <data name="KeySwap_LoadFailedMessage" xml:space="preserve">
+    <value>无法加载模组的键位配置: {0}</value>
+  </data>
+  <data name="KeySwap_SaveSuccessTitle" xml:space="preserve">
+    <value>保存成功</value>
+  </data>
+  <data name="KeySwap_SaveSuccessMessage" xml:space="preserve">
+    <value>键位配置已更新</value>
+  </data>
+  <data name="KeySwap_SaveFailedTitle" xml:space="preserve">
+    <value>键位交换保存失败</value>
+  </data>
+  <data name="KeySwap_SaveFailedMessage" xml:space="preserve">
+    <value>保存模组的键位配置时出错: {0}</value>
+  </data>
+
+  <!-- ModSettings Service -->
+  <data name="ModSettings_SaveFailedTitle" xml:space="preserve">
+    <value>保存模组设置失败 {0}</value>
+  </data>
+  <data name="ModSettings_SaveFailedMessage" xml:space="preserve">
+    <value>发生错误。原因: {0}</value>
+  </data>
+  <data name="ModSettings_FileNotFoundTitle" xml:space="preserve">
+    <value>找不到模组的设置文件 {0}</value>
+  </data>
+  <data name="ModSettings_ReadFailedTitle" xml:space="preserve">
+    <value>读取模组设置失败 {0}</value>
+  </data>
+  <data name="ModSettings_ReadFailedMessage" xml:space="preserve">
+    <value>发生错误。原因: {0}</value>
+  </data>
+  <data name="ModSettings_NoChangesTitle" xml:space="preserve">
+    <value>未检测到任何更改</value>
+  </data>
+  <data name="ModSettings_NoChangesMessage" xml:space="preserve">
+    <value>模组设置未更改，无需保存</value>
+  </data>
+  <data name="ModSettings_ImageNotFoundTitle" xml:space="preserve">
+    <value>未找到图片文件</value>
+  </data>
+  <data name="ModSettings_ImageNotFoundMessage" xml:space="preserve">
+    <value>保存模组设置时，未找到图片文件</value>
+  </data>
+  <data name="ModSettings_UpdatedTitle" xml:space="preserve">
+    <value>模组设置已更新</value>
+  </data>
+  <data name="ModSettings_UpdatedMessage" xml:space="preserve">
+    <value>模组 {0} 的设置已更新</value>
+  </data>
+
+    <!-- Elevator Status -->
+  <data name="ElevatorStatus_InitFailed" xml:space="preserve">
+    <value>初始化失败</value>
+  </data>
+  <data name="ElevatorStatus_NotRunning" xml:space="preserve">
+    <value>未运行</value>
+  </data>
+  <data name="ElevatorStatus_Running" xml:space="preserve">
+    <value>运行中</value>
+  </data>
+  <data name="ElevatorStatus_Unknown" xml:space="preserve">
+    <value>未知</value>
+  </data>
+
+  <!-- Elevator Errors -->
+  <data name="ElevatorError_NotFound" xml:space="preserve">
+    <value>Elevator.exe 未找到</value>
+  </data>
+  <data name="ElevatorError_StartFailed" xml:space="preserve">
+    <value>启动 Elevator.exe 失败</value>
+  </data>
+
+  <!-- Auto Updater Service -->
+  <data name="AutoUpdater_ProcessAlreadyStarted" xml:space="preserve">
+    <value>自动更新进程已启动。</value>
+  </data>
+  <data name="AutoUpdater_FolderNotFound" xml:space="preserve">
+    <value>当前的自动更新程序文件夹不存在。找不到更新文件夹: {0}</value>
+  </data>
+  <data name="AutoUpdater_ExeNotFound" xml:space="preserve">
+    <value>当前的自动更新程序文件夹中不包含自动更新程序的可执行文件。在 {1} 中找不到 {0}</value>
+  </data>
+  <data name="AutoUpdater_AlreadyRunning" xml:space="preserve">
+    <value>自动更新程序已在运行。</value>
+  </data>
+  <data name="AutoUpdater_StartFailed" xml:space="preserve">
+    <value>自动更新程序启动失败。</value>
+  </data>
+  <data name="AutoUpdater_Exception" xml:space="preserve">
+    <value>启动自动更新程序时发生了错误。错误信息: {0}</value>
+  </data>
+
+  <data name="PageTitle.Text" xml:space="preserve">
+    <value>当前应用程序运行期间显示的所有通知</value>
+  </data>
+  <data name="LogLocationSubtitle.Text" xml:space="preserve">
+    <value>通知和日志将被写入:</value>
   </data>
 </root>

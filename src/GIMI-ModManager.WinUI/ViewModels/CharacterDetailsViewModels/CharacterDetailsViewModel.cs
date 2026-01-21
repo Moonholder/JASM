@@ -37,6 +37,8 @@ public partial class CharacterDetailsViewModel : ObservableObject, INavigationAw
     private readonly IWindowManagerService _windowManagerService = App.GetService<IWindowManagerService>();
     private readonly ModPresetService _presetService = App.GetService<ModPresetService>();
     private readonly ElevatorService _elevatorService = App.GetService<ElevatorService>();
+    private readonly ILanguageLocalizer _localizer = App.GetService<ILanguageLocalizer>();
+
 
     public Func<Task>? GridLoadedAwaiter { get; set; }
 
@@ -119,7 +121,7 @@ public partial class CharacterDetailsViewModel : ObservableObject, INavigationAw
 
         // Init character card
         InitCharacterCard(parameter);
-        LoadingItemText = "模组";
+        LoadingItemText = "Mods";
 
         // Yield to UI
         await Task.Delay(100, CancellationToken);

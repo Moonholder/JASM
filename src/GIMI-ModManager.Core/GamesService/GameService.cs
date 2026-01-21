@@ -101,22 +101,20 @@ public class GameService : IGameService
 
         await InitializeGameInfoAsync().ConfigureAwait(false);
 
-        await InitializeRegionsAsync().ConfigureAwait(false);
+        var taskRegions = InitializeRegionsAsync();
+        var taskElements = InitializeElementsAsync();
+        var taskClasses = InitializeClassesAsync();
 
-        await InitializeElementsAsync().ConfigureAwait(false);
+        await Task.WhenAll(taskRegions, taskElements, taskClasses).ConfigureAwait(false);
 
-        await InitializeClassesAsync().ConfigureAwait(false);
+        var taskCharacters = InitializeCharactersAsync();
+        var taskNpcs = InitializeNpcsAsync();
+        var taskObjects = InitializeObjectsAsync();
+        var taskWeapons = InitializeWeaponsAsync();
 
-        await InitializeCharactersAsync().ConfigureAwait(false);
-
-        await InitializeNpcsAsync().ConfigureAwait(false);
-
-        await InitializeObjectsAsync().ConfigureAwait(false);
-
-        await InitializeWeaponsAsync().ConfigureAwait(false);
+        await Task.WhenAll(taskCharacters, taskNpcs, taskObjects, taskWeapons).ConfigureAwait(false);
 
         await MapCategoriesLanguageOverrideAsync().ConfigureAwait(false);
-
         await InitializeCustomCharactersAsync().ConfigureAwait(false);
 
         CheckIfDuplicateInternalNameExists();
@@ -126,24 +124,34 @@ public class GameService : IGameService
     }
 
 
-    public static async Task<GameInfo?> GetGameInfoAsync(SupportedGames game)
+    public static async Task<GameInfo?> GetGameInfoAsync(SupportedGames game, string? languageCode = null)
     {
         var gameAssetDir = Path.Combine(AppContext.BaseDirectory, "Assets", "Games", game.ToString());
-        var assetDir = Path.Combine(AppContext.BaseDirectory, "Assets", "Games", game.ToString(), "Languages", "zh-cn");
 
-        var gameFilePath = Path.Combine(assetDir, "game.json");
+        var defaultPath = Path.Combine(gameAssetDir, "game.json");
 
-        if (!File.Exists(gameFilePath))
-            return null;
+        var targetPath = defaultPath;
 
-        var jsonGameInfo =
-            JsonSerializer.Deserialize<JsonGame>(await File.ReadAllTextAsync(gameFilePath).ConfigureAwait(false),
-                Serialization.GameAssetsJsonContext.Default.JsonGame);
+        if (!string.IsNullOrEmpty(languageCode) &&
+            !languageCode.Equals("en-us", StringComparison.OrdinalIgnoreCase))
+        {
+            var langPath = Path.Combine(gameAssetDir, "Languages", languageCode, "game.json");
+            if (File.Exists(langPath))
+            {
+                targetPath = langPath;
+            }
+        }
 
-        if (jsonGameInfo is null)
-            throw new InvalidOperationException($"{gameFilePath} file is empty");
+        if (!File.Exists(targetPath)) return null;
 
-        return new GameInfo(jsonGameInfo, new DirectoryInfo(gameAssetDir));
+        try
+        {
+            var json = await File.ReadAllTextAsync(targetPath).ConfigureAwait(false);
+            var info = JsonSerializer.Deserialize<JsonGame>(json, Serialization.GameAssetsJsonContext.Default.JsonGame);
+            if (info is null) return null;
+            return new GameInfo(info, new DirectoryInfo(gameAssetDir));
+        }
+        catch { return null; }
     }
 
     public async Task<ICollection<InternalName>> PreInitializedReadModObjectsAsync(string assetsDirectory)
@@ -779,8 +787,21 @@ public class GameService : IGameService
     {
         const string gameFileName = "game.json";
 
-        var langCode = _localizer.CurrentLanguage.LanguageCode;
-        var gameFilePath = langCode.Equals("en-us", StringComparison.CurrentCultureIgnoreCase) ? Path.Combine(_assetsDirectory.FullName, gameFileName) : Path.Combine(_assetsDirectory.FullName, "Languages", langCode, gameFileName);
+        var gameFilePath = Path.Combine(_assetsDirectory.FullName, gameFileName);
+
+        if (LanguageOverrideAvailable())
+        {
+            var specificPath = Path.Combine(_languageOverrideDirectory.FullName, gameFileName);
+
+            if (File.Exists(specificPath))
+            {
+                gameFilePath = specificPath;
+            }
+            else
+            {
+                _logger.Debug($"Language specific game info not found at {specificPath}, falling back to default.");
+            }
+        }
 
         if (!File.Exists(gameFilePath))
             throw new FileNotFoundException($"{gameFileName} File not found at path: {gameFilePath}");
@@ -821,6 +842,7 @@ public class GameService : IGameService
 
         var jsonCharacters = await SerializeAsync<JsonCharacter>(characterFileName).ConfigureAwait(false);
         var customSettings = await _gameSettingsManager.ReadSettingsAsync().ConfigureAwait(false);
+        var defaultSkinName = _localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/DefaultSkinName", "Default");
 
         foreach (var jsonCharacter in jsonCharacters)
         {
@@ -831,6 +853,9 @@ public class GameService : IGameService
                 .SetClass(Classes.AllClasses)
                 .CreateCharacter(imageFolder: imageFolderName, characterSkinImageFolder: characterSkinPath);
 
+            var defaultSkin = character.Skins.FirstOrDefault(s => s.IsDefault);
+            defaultSkin?.DisplayName = defaultSkinName;
+
             _characters.Add(character);
 
             if (!_options.CharacterSkinsAsCharacters) continue;
@@ -838,6 +863,8 @@ public class GameService : IGameService
             foreach (var skin in character.ClearAndReturnSkins())
             {
                 var newCharacter = character.FromCharacterSkin(skin);
+                var newCharDefaultSkin = newCharacter.Skins.FirstOrDefault(s => s.IsDefault);
+                newCharDefaultSkin?.DisplayName = defaultSkinName;
                 _characters.Add(newCharacter);
             }
         }
@@ -957,8 +984,8 @@ public class GameService : IGameService
         const string elementsFileName = "elements.json";
 
         var elements = await SerializeAsync<JsonElement>(elementsFileName).ConfigureAwait(false);
-
-        Elements = new Elements("Elements");
+        var noneDisplayName = _localizer.GetLocalizedStringOrDefault("Common_None", "None");
+        Elements = new Elements("Elements", noneDisplayName);
 
         Elements.Initialize(elements, _assetsDirectory.FullName);
 
@@ -982,7 +1009,7 @@ public class GameService : IGameService
         var customSettings = await _gameSettingsManager.ReadSettingsAsync().ConfigureAwait(false);
 
         var customCharacters = customSettings.CustomCharacters;
-
+        var defaultSkinName = _localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/DefaultSkinName", "Default");
         foreach (var (internalName, jsonCustomCharacter) in customCharacters)
         {
             // Check against legacy predefined multi mods
@@ -1036,7 +1063,6 @@ public class GameService : IGameService
                     internalName);
             }
 
-
             var character = Character
                 .FromJson(internalName, jsonCustomCharacter)
                 .SetRegion(Regions.AllRegions)
@@ -1044,6 +1070,8 @@ public class GameService : IGameService
                 .SetClass(Classes.AllClasses)
                 .CreateCharacter(imageFolder: _gameSettingsManager.CustomCharacterImageFolder.FullName);
 
+            var defaultSkin = character.Skins.FirstOrDefault(s => s.IsDefault);
+            defaultSkin?.DisplayName = defaultSkinName;
 
             _characters.Add(character);
         }
@@ -1082,40 +1110,36 @@ public class GameService : IGameService
         return SerializeFileAsync<T>(filePath: objFilePath, throwIfNotFound: throwIfNotFound);
     }
 
+    private static readonly Dictionary<Type, System.Text.Json.Serialization.Metadata.JsonTypeInfo> _typeRegistry = new()
+    {
+        { typeof(JsonRegion), Serialization.GameAssetsJsonContext.Default.ListJsonRegion },
+        { typeof(JsonCharacter), Serialization.GameAssetsJsonContext.Default.ListJsonCharacter },
+        { typeof(JsonNpc), Serialization.GameAssetsJsonContext.Default.ListJsonNpc },
+        { typeof(JsonWeapon), Serialization.GameAssetsJsonContext.Default.ListJsonWeapon  },
+        { typeof(JsonClasses), Serialization.GameAssetsJsonContext.Default.ListJsonClasses },
+        { typeof(JsonElement), Serialization.GameAssetsJsonContext.Default.ListJsonElement },
+        { typeof(JsonBaseNameable), Serialization.GameAssetsJsonContext.Default.ListJsonBaseNameable },
+        { typeof(JsonBaseModdableObject), Serialization.GameAssetsJsonContext.Default.ListJsonBaseModdableObject },
+        { typeof(JsonCustom), Serialization.GameAssetsJsonContext.Default.ListJsonCustom }
+    };
+
     private async Task<IEnumerable<T>> SerializeFileAsync<T>(string filePath, bool throwIfNotFound = true)
     {
         if (!File.Exists(filePath))
         {
-            if (throwIfNotFound)
-                throw new FileNotFoundException($"File not found at path: {filePath}");
-            else
-                return Array.Empty<T>();
+            if (throwIfNotFound) throw new FileNotFoundException($"File not found: {filePath}");
+            return Enumerable.Empty<T>();
         }
 
-        var fileText = await File.ReadAllTextAsync(filePath).ConfigureAwait(false);
+        var json = await File.ReadAllTextAsync(filePath).ConfigureAwait(false);
 
-        // Use source-generated contexts for known game JSON types so trimming doesn't break reflection-based serialization
-        if (typeof(T) == typeof(JsonRegion))
-            return (IEnumerable<T>)(object)(JsonSerializer.Deserialize<List<JsonRegion>>(fileText, Serialization.GameAssetsJsonContext.Default.ListJsonRegion) ?? new List<JsonRegion>());
-        if (typeof(T) == typeof(JsonCharacter))
-            return (IEnumerable<T>)(object)(JsonSerializer.Deserialize<List<JsonCharacter>>(fileText, Serialization.GameAssetsJsonContext.Default.ListJsonCharacter) ?? new List<JsonCharacter>());
-        if (typeof(T) == typeof(JsonNpc))
-            return (IEnumerable<T>)(object)(JsonSerializer.Deserialize<List<JsonNpc>>(fileText, Serialization.GameAssetsJsonContext.Default.ListJsonNpc) ?? new List<JsonNpc>());
-        if (typeof(T) == typeof(JsonWeapon))
-            return (IEnumerable<T>)(object)(JsonSerializer.Deserialize<List<JsonWeapon>>(fileText, Serialization.GameAssetsJsonContext.Default.ListJsonWeapon) ?? new List<JsonWeapon>());
-        if (typeof(T) == typeof(JsonClasses))
-            return (IEnumerable<T>)(object)(JsonSerializer.Deserialize<List<JsonClasses>>(fileText, Serialization.GameAssetsJsonContext.Default.ListJsonClasses) ?? new List<JsonClasses>());
-        if (typeof(T) == typeof(JsonElement))
-            return (IEnumerable<T>)(object)(JsonSerializer.Deserialize<List<JsonElement>>(fileText, Serialization.GameAssetsJsonContext.Default.ListJsonElement) ?? new List<JsonElement>());
-        if (typeof(T) == typeof(JsonBaseNameable))
-            return (IEnumerable<T>)(object)(JsonSerializer.Deserialize<List<JsonBaseNameable>>(fileText, Serialization.GameAssetsJsonContext.Default.ListJsonBaseNameable) ?? new List<JsonBaseNameable>());
-        if (typeof(T) == typeof(JsonBaseModdableObject))
-            return (IEnumerable<T>)(object)(JsonSerializer.Deserialize<List<JsonBaseModdableObject>>(fileText, Serialization.GameAssetsJsonContext.Default.ListJsonBaseModdableObject) ?? new List<JsonBaseModdableObject>());
-        if (typeof(T) == typeof(JsonCustom))
-            return (IEnumerable<T>)(object)(JsonSerializer.Deserialize<List<JsonCustom>>(fileText, Serialization.GameAssetsJsonContext.Default.ListJsonCustom) ?? new List<JsonCustom>());
+        if (_typeRegistry.TryGetValue(typeof(T), out var typeInfo))
+        {
+            var result = JsonSerializer.Deserialize(json, typeInfo);
+            return (IEnumerable<T>)(result ?? Enumerable.Empty<T>());
+        }
 
-        // Fallback to runtime serialization for types we didn't enumerate above
-        return JsonSerializer.Deserialize<IEnumerable<T>>(fileText, _jsonSerializerOptions) ?? throw new InvalidOperationException($"{filePath} is empty");
+        return JsonSerializer.Deserialize<IEnumerable<T>>(json, _jsonSerializerOptions) ?? Enumerable.Empty<T>();
     }
 
     public string OtherCharacterInternalName => "Others";
@@ -1191,11 +1215,12 @@ public class GameService : IGameService
 
     private void AddDefaultSkin(ICharacter character)
     {
+        var defaultDisplayName = _localizer.GetLocalizedStringOrDefault("Common_Default", "Default");
         character.Skins.Add(new CharacterSkin(character)
         {
             InternalName = new InternalName("Default_" + character.InternalName),
             ModFilesName = "",
-            DisplayName = "默认",
+            DisplayName = defaultDisplayName,
             Rarity = character.Rarity,
             ReleaseDate = character.ReleaseDate,
             Character = character,
@@ -1327,26 +1352,37 @@ public class GameService : IGameService
 
     private async void LanguageChangedHandler(object? sender, EventArgs args)
     {
-        if (!_initialized)
-            return;
-
-        _logger.Debug("Language changed to {Language}", _localizer.CurrentLanguage.LanguageCode);
-
-        _languageOverrideDirectory =
-            new DirectoryInfo(Path.Combine(_assetsDirectory.FullName, "Languages",
-                _localizer.CurrentLanguage.LanguageCode));
-
-        if (_localizer.CurrentLanguage.LanguageCode == "en-us")
+        try
         {
-            _languageOverrideDirectory = new DirectoryInfo(Path.Combine(_assetsDirectory.FullName));
+            if (!_initialized)
+                return;
+
+            _logger.Debug("Language changed to {Language}", _localizer.CurrentLanguage.LanguageCode);
+
+            _languageOverrideDirectory =
+                new DirectoryInfo(Path.Combine(_assetsDirectory.FullName, "Languages",
+                    _localizer.CurrentLanguage.LanguageCode));
+
+            var langCode = _localizer.CurrentLanguage.LanguageCode;
+            if (langCode.Equals("en-us", StringComparison.CurrentCultureIgnoreCase))
+            {
+                _languageOverrideDirectory = _assetsDirectory;
+            }
+            else
+            {
+                _languageOverrideDirectory = new DirectoryInfo(Path.Combine(_assetsDirectory.FullName, "Languages", langCode));
+            }
+
+            await MapDisplayNames("characters.json", _characters.ToEnumerable()).ConfigureAwait(false);
+            await MapDisplayNames("npcs.json", _npcs.ToEnumerable()).ConfigureAwait(false);
+            await MapDisplayNames("elements.json", Elements.AllElements).ConfigureAwait(false);
+            await MapDisplayNames("weaponClasses.json", Classes.AllClasses).ConfigureAwait(false);
+            await MapDisplayNames("regions.json", Regions.AllRegions).ConfigureAwait(false);
         }
-
-
-        await MapDisplayNames("characters.json", _characters.ToEnumerable()).ConfigureAwait(false);
-        await MapDisplayNames("npcs.json", _npcs.ToEnumerable()).ConfigureAwait(false);
-        await MapDisplayNames("elements.json", Elements.AllElements).ConfigureAwait(false);
-        await MapDisplayNames("weaponClasses.json", Classes.AllClasses).ConfigureAwait(false);
-        await MapDisplayNames("regions.json", Regions.AllRegions).ConfigureAwait(false);
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "Error handling language change.");
+        }
     }
 
     private async Task<IModdableObject[]> BaseModdableObjectMapper(string jsonFileName, string imageFolder,
@@ -1448,11 +1484,11 @@ internal class Elements : BaseMapper<Element>
 {
     public IReadOnlyList<IGameElement> AllElements => Values;
 
-    public Elements(string name) : base(name)
+    public Elements(string name, string displayName) : base(name)
     {
         Values.Add(new Element()
         {
-            DisplayName = "未知",
+            DisplayName = displayName,
             InternalName = new InternalName("None")
         });
     }

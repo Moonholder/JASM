@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using GIMI_ModManager.Core.Contracts.Services;
 using GIMI_ModManager.Core.Services.GameBanana.Models;
 using GIMI_ModManager.WinUI.Helpers;
 
@@ -8,6 +9,7 @@ namespace GIMI_ModManager.WinUI.ViewModels.ModPageViewModels;
 public partial class ModFileInfoVm : ObservableObject
 {
     private readonly ModFileInfo _modFileInfo;
+    private readonly ILanguageLocalizer _localizer = App.GetService<ILanguageLocalizer>();
 
     public string ModId => _modFileInfo.ModId;
     public string FileId => _modFileInfo.FileId;
@@ -15,7 +17,9 @@ public partial class ModFileInfoVm : ObservableObject
 
     public DateTime DateAdded => _modFileInfo.DateAdded;
 
-    public string DateAddedTooltipFormat => $"Submitted: {DateAdded}";
+    public string DateAddedTooltipFormat => string.Format(
+        _localizer.GetLocalizedStringOrDefault("SubmittedDateFormat", "Submitted: {0}"),
+        DateAdded);
 
     public TimeSpan Age => DateTime.Now - DateAdded;
 

@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using ErrorOr;
+using GIMI_ModManager.Core.Contracts.Services;
 using Microsoft.UI.Xaml;
 using Serilog;
 
@@ -9,6 +10,7 @@ public class AutoUpdaterService
 {
     private readonly ILogger _logger;
     private readonly UpdateChecker _updateChecker;
+    private readonly ILanguageLocalizer _localizer;
 
     public const string AutoUpdaterFolder = "JASM - Auto Updater";
     public const string NewAutoUpdaterFolder = "JASM - Auto Updater_New";
@@ -27,10 +29,11 @@ public class AutoUpdaterService
     public bool AutoUpdaterExists =>
         _currentAutoUpdaterFolder.Exists && ContainsAutoUpdaterExe(_currentAutoUpdaterFolder);
 
-    public AutoUpdaterService(ILogger logger, UpdateChecker updateChecker)
+    public AutoUpdaterService(ILogger logger, UpdateChecker updateChecker, ILanguageLocalizer localizer)
     {
         _logger = logger;
         _updateChecker = updateChecker;
+        _localizer = localizer;
     }
 
 
@@ -87,7 +90,7 @@ public class AutoUpdaterService
         if (HasStartedSelfUpdateProcess)
         {
             _logger.Warning("Self update process already started.");
-            return new[] { Error.Conflict(description: "自动更新进程已启动.") };
+            return new[] { Error.Conflict(description: _localizer.GetLocalizedStringOrDefault("/Settings/AutoUpdater_ProcessAlreadyStarted", "Self update process already started.")) };
         }
 
         HasStartedSelfUpdateProcess = true;
@@ -112,8 +115,9 @@ public class AutoUpdaterService
             return new[]
             {
                 Error.NotFound(
-                    description:
-                    $"当前的自动更新程序文件夹不存在. 找不到更新文件夹: {_currentAutoUpdaterFolder.FullName}")
+                    description: string.Format(
+                        _localizer.GetLocalizedStringOrDefault("/Settings/AutoUpdater_FolderNotFound", "Current auto updater folder does not exist. Could not find: {0}"),
+                        _currentAutoUpdaterFolder.FullName))
             };
         }
 
@@ -126,8 +130,9 @@ public class AutoUpdaterService
             return new[]
             {
                 Error.NotFound(
-                    description:
-                    $"当前的自动更新程序文件夹中不包含自动更新程序的可执行文件. 在  {AutoUpdaterExe}  中找不到 {_currentAutoUpdaterFolder.FullName}")
+                    description: string.Format(
+                        _localizer.GetLocalizedStringOrDefault("/Settings/AutoUpdater_ExeNotFound", "Current auto updater folder does not contain the executable. Could not find {0} in {1}"),
+                        AutoUpdaterExe, _currentAutoUpdaterFolder.FullName))
             };
         }
 
@@ -136,7 +141,7 @@ public class AutoUpdaterService
         if (isAutoUpdaterRunning)
         {
             _logger.Error("Auto updater is already running.");
-            return new[] { Error.Conflict(description: "自动更新程序已在运行.") };
+            return new[] { Error.Conflict(description: _localizer.GetLocalizedStringOrDefault("/Settings/AutoUpdater_AlreadyRunning", "Auto updater is already running.")) };
         }
 
         try
@@ -153,7 +158,7 @@ public class AutoUpdaterService
             if (process is null || process.HasExited)
             {
                 _logger.Error("Failed to start Auto Updater.");
-                return new[] { Error.Unexpected(description: "自动更新程序启动失败.") };
+                return new[] { Error.Unexpected(description: _localizer.GetLocalizedStringOrDefault("/Settings/AutoUpdater_StartFailed", "Failed to start Auto Updater.")) };
             }
         }
         catch (Exception e)
@@ -161,7 +166,9 @@ public class AutoUpdaterService
             _logger.Error(e, "Failed to start Auto Updater.");
             return new[]
             {
-                Error.Unexpected(description: $"启动自动更新程序时发生了错误. 错误信息: {e.Message}")
+                Error.Unexpected(description: string.Format(
+                    _localizer.GetLocalizedStringOrDefault("/Settings/AutoUpdater_Exception", "An error occurred while starting the auto updater. Error: {0}"),
+                    e.Message))
             };
         }
 

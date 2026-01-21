@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="CustomImage_PasteItem.Text" xml:space="preserve">
+    <value>粘贴图片</value>
+  </data>
+  <data name="CustomImage_CopyItem.Text" xml:space="preserve">
+    <value>复制图片</value>
+  </data>
+  <data name="CustomImage_RemoveItem.Text" xml:space="preserve">
+    <value>移除图片</value>
+  </data>
+  <data name="CustomImage_EditButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>选择图片</value>
+  </data>
+</root>

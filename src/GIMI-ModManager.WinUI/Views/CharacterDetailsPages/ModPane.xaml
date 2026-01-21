@@ -6,6 +6,7 @@
     xmlns:controls="using:GIMI_ModManager.WinUI.Views.Controls"
     xmlns:controls1="using:CommunityToolkit.WinUI.UI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:l="using:WinUI3Localizer"
     xmlns:local="using:GIMI_ModManager.WinUI.Views.CharacterDetailsPages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:subViewModels="using:GIMI_ModManager.WinUI.ViewModels.CharacterDetailsViewModels.SubViewModels"
@@ -107,7 +108,8 @@
                         Style="{ThemeResource SubtitleTextBlockStyle}"
                         Text="{x:Bind ViewModel.ModModel.ModDisplayName, Mode=TwoWay}"
                         TextAlignment="Center"
-                        ToolTipService.ToolTip="更改模组显示名称" />
+                        ToolTipService.ToolTip="Change Mod Display Name"
+                        l:Uids.Uid="/CharacterDetailsPage/ModNameEditableBlock" />
 
                     <SplitButton
                         Grid.Column="1"
@@ -119,7 +121,8 @@
                                 <MenuFlyoutItem
                                     Command="{x:Bind ViewModel.ToggleShowDisabledIniFilesCommand}"
                                     Text="{x:Bind ViewModel.ShowDisabledIniFilesText, Mode=OneWay}"
-                                    ToolTipService.ToolTip="显示或隐藏 DISABLED 前缀的 .ini 文件" />
+                                    ToolTipService.ToolTip="Show or hide .ini files with DISABLED prefix"
+                                    l:Uids.Uid="/CharacterDetailsPage/ShowDisabledIniFilesMenuItem" />
                             </MenuFlyout>
                         </SplitButton.Flyout>
                     </SplitButton>
@@ -133,9 +136,10 @@
                     </Grid.ColumnDefinitions>
                     <TextBox
                         VerticalAlignment="Center"
-                        Header="模组链接:"
+                        Header="Mod Url:"
                         IsEnabled="{x:Bind ViewModel.IsNotReadOnly, Mode=OneWay}"
-                        Text="{x:Bind ViewModel.ModModel.ModUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        Text="{x:Bind ViewModel.ModModel.ModUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        l:Uids.Uid="/CharacterDetailsPage/ModLinkTextBox" />
 
                     <HyperlinkButton
                         Grid.Column="1"
@@ -195,7 +199,8 @@
                                         VerticalAlignment="Center"
                                         Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                         Style="{ThemeResource CaptionTextBlockStyle}"
-                                        Text="按键绑定提示" />
+                                        Text="Key Bindings Help"
+                                        l:Uids.Uid="/CharacterDetailsPage/KeyBindingsHelpTitle" />
                                     <FontIcon
                                         x:Name="ExpandIcon"
                                         Grid.Column="2"
@@ -214,7 +219,8 @@
                                 Grid.Column="1"
                                 Command="{x:Bind ViewModel.ToggleKeySwapsEditModeCommand}"
                                 IsEnabled="{x:Bind ViewModel.IsNotReadOnly, Mode=OneWay}"
-                                ToolTipService.ToolTip="切换编辑/查看">
+                                ToolTipService.ToolTip="Toggle Edit/View"
+                                l:Uids.Uid="/CharacterDetailsPage/ToggleEditViewButton">
                                 <FontIcon FontSize="12" Glyph="&#xE8ab;" />
                             </HyperlinkButton>
                         </Grid>
@@ -231,17 +237,17 @@
                                 BorderThickness="1"
                                 CornerRadius="6">
                                 <TextBlock Style="{ThemeResource CaptionTextBlockStyle}" TextWrapping="WrapWholeWords">
-                                    <Run Text="组合按键用空格分隔，如：VK_CTRL VK_UP" />
+                                    <Run Text="Separate combo keys with space, e.g.: VK_CTRL VK_UP" l:Uids.Uid="/CharacterDetailsPage/HelpText1"/>
                                     <LineBreak />
-                                    <Run Text="支持多个按键，用逗号分隔。例如：Alt UP,XB_A" />
+                                    <Run Text="Supports multiple keys, separated by comma. e.g.: Alt UP,XB_A" l:Uids.Uid="/CharacterDetailsPage/HelpText2"/>
                                     <LineBreak />
-                                    <Run Text="系统会自动解析为多个Key/Back行" />
+                                    <Run Text="System automatically parses into multiple Key/Back lines" l:Uids.Uid="/CharacterDetailsPage/HelpText3"/>
                                     <LineBreak />
-                                    <Run Text="支持NO_前缀，表示不按某键 例如：NO_VK_CTRL ALT UP" />
+                                    <Run Text="Supports NO_ prefix to exclude keys. e.g.: NO_VK_CTRL ALT UP" l:Uids.Uid="/CharacterDetailsPage/HelpText4"/>
                                     <LineBreak /><LineBreak />
-                                    <Run Text="详细内容请见：" />
-                                    <Hyperlink NavigateUri="https://leotorrez.github.io/modding/docs/key#key-bindings" ToolTipService.ToolTip="点击打开文档">
-                                        <Run Text="按键绑定帮助文档" />
+                                    <Run Text="For more details:" l:Uids.Uid="/CharacterDetailsPage/HelpTextLinkPrefix"/>
+                                    <Hyperlink NavigateUri="https://leotorrez.github.io/modding/docs/key#key-bindings" ToolTipService.ToolTip="Click to open documentation" l:Uids.Uid="/CharacterDetailsPage/HelpLink">
+                                        <Run Text="Key Bindings Documentation" l:Uids.Uid="/CharacterDetailsPage/HelpLinkText"/>
                                     </Hyperlink>
                                 </TextBlock>
                             </Border>
@@ -280,7 +286,8 @@
                                                         Margin="8,0,0,0"
                                                         Command="{x:Bind OpenIniFileCommand}"
                                                         CommandParameter="{x:Bind IniFileName}"
-                                                        ToolTipService.ToolTip="打开配置文件">
+                                                        ToolTipService.ToolTip="Open Config File"
+                                                        l:Uids.Uid="/CharacterDetailsPage/OpenConfigFileButton">
                                                         <FontIcon FontSize="14" Glyph="&#xE8A7;" />
                                                     </Button>
                                                 </Grid>
@@ -388,7 +395,8 @@
                                                         Margin="8,0,0,0"
                                                         Command="{x:Bind OpenIniFileCommand}"
                                                         CommandParameter="{x:Bind IniFileName}"
-                                                        ToolTipService.ToolTip="打开配置文件">
+                                                        ToolTipService.ToolTip="Open Config File"
+                                                        l:Uids.Uid="/CharacterDetailsPage/OpenConfigFileButton">
                                                         <FontIcon FontSize="14" Glyph="&#xE8A7;" />
                                                     </Button>
                                                 </Grid>
@@ -396,7 +404,8 @@
                                                     Margin="0,0,0,12"
                                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                     Style="{ThemeResource CaptionTextBlockStyle}"
-                                                    Text="配置文件" />
+                                                    Text="Configuration File"
+                                                    l:Uids.Uid="/CharacterDetailsPage/ConfigFileLabel" />
                                                 <ItemsRepeater ItemsSource="{x:Bind KeySwaps, Mode=OneWay}" VirtualizingStackPanel.VirtualizationMode="Recycling">
                                                     <ItemsRepeater.ItemTemplate>
                                                         <DataTemplate x:DataType="subViewModels:ModPaneFieldsKeySwapVm">
@@ -439,9 +448,10 @@
                                                                             <TextBox
                                                                                 Grid.Column="0"
                                                                                 FontWeight="SemiBold"
-                                                                                PlaceholderText="输入节名称"
+                                                                                PlaceholderText="Enter Section Name"
                                                                                 Text="{x:Bind SectionNameForEdit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                                                Visibility="{x:Bind IsEditingSectionName, Mode=OneWay}" />
+                                                                                Visibility="{x:Bind IsEditingSectionName, Mode=OneWay}"
+                                                                                l:Uids.Uid="/CharacterDetailsPage/SectionNameTextBox" />
 
 
                                                                             <Button
@@ -449,7 +459,8 @@
                                                                                 Margin="8,0,0,0"
                                                                                 VerticalAlignment="Center"
                                                                                 Command="{x:Bind ToggleEditingSectionNameCommand}"
-                                                                                ToolTipService.ToolTip="编辑节名称">
+                                                                                ToolTipService.ToolTip="Edit Section Name"
+                                                                                l:Uids.Uid="/CharacterDetailsPage/EditSectionNameButton">
                                                                                 <FontIcon FontSize="12" Glyph="&#xE70F;" />
                                                                             </Button>
                                                                         </Grid>
@@ -463,7 +474,8 @@
                                                                             <TextBlock
                                                                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                                                 Style="{ThemeResource CaptionTextBlockStyle}"
-                                                                                Text="变体数: "
+                                                                                Text="Variations: " 
+                                                                                l:Uids.Uid="/CharacterDetailsPage/VariationsLabel"
                                                                                 TextWrapping="NoWrap" />
                                                                             <TextBlock
                                                                                 Margin="2,-1,0,0"
@@ -479,7 +491,8 @@
                                                                             Margin="0,0,0,4"
                                                                             FontWeight="SemiBold"
                                                                             Style="{ThemeResource CaptionTextBlockStyle}"
-                                                                            Text="前进键" />
+                                                                            Text="Forward Hotkey"
+                                                                            l:Uids.Uid="/CharacterDetailsPage/ForwardHotkeyLabel" />
 
                                                                         <TextBox
                                                                             MinWidth="200"
@@ -502,7 +515,8 @@
                                                                             Margin="0,0,0,4"
                                                                             FontWeight="SemiBold"
                                                                             Style="{ThemeResource CaptionTextBlockStyle}"
-                                                                            Text="后退键" />
+                                                                            Text="Backward Hotkey" 
+                                                                            l:Uids.Uid="/CharacterDetailsPage/BackwardHotkeyLabel" />
 
                                                                         <TextBox
                                                                             MinWidth="200"
@@ -548,7 +562,7 @@
                 <Button.Content>
                     <StackPanel Orientation="Horizontal">
                         <FontIcon Margin="0,0,4,0" Glyph="&#xE74E;" />
-                        <TextBlock Text="保存" />
+                        <TextBlock Text="Save" l:Uids.Uid="/CharacterDetailsPage/SaveButton" />
                     </StackPanel>
                 </Button.Content>
                 <Button.KeyboardAccelerators>
@@ -571,7 +585,8 @@
                         Padding="4,0"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
-                        Text="模组已启用" />
+                        Text="Mod Enabled"
+                        l:Uids.Uid="/CharacterDetailsPage/ModEnabledLabel" />
                 </Border>
             </Grid>
 
@@ -579,8 +594,9 @@
                 Grid.Column="2"
                 HorizontalAlignment="Right"
                 Command="{x:Bind ViewModel.OpenModFolderCommand}"
-                Content="打开模组文件夹..."
-                IsEnabled="{x:Bind ViewModel.IsNotReadOnly, Mode=OneWay}" />
+                Content="Open Mod Folder..."
+                IsEnabled="{x:Bind ViewModel.IsNotReadOnly, Mode=OneWay}"
+                l:Uids.Uid="/CharacterDetailsPage/OpenModFolderButton" />
         </Grid>
     </Grid>
 </UserControl>

@@ -2,6 +2,7 @@
 using GIMI_ModManager.Core.GamesService.Interfaces;
 using GIMI_ModManager.Core.Helpers;
 using GIMI_ModManager.WinUI.Services;
+using GIMI_ModManager.Core.Contracts.Services;
 using GIMI_ModManager.WinUI.ViewModels.CharacterManagerViewModels.Validation;
 
 namespace GIMI_ModManager.WinUI.ViewModels.CharacterManagerViewModels;
@@ -26,25 +27,25 @@ public partial class CreateCharacterForm : Form
     public InputField<bool> IsMultiMod { get; } = new(false);
 
 
-    public void Initialize(ICollection<IModdableObject> allModdableObjects, ICollection<IGameElement> elements)
+    public void Initialize(ICollection<IModdableObject> allModdableObjects, ICollection<IGameElement> elements, ILanguageLocalizer localizer)
     {
-        InternalName.ValidationRules.AddInternalNameValidators(allModdableObjects);
+        InternalName.ValidationRules.AddInternalNameValidators(allModdableObjects, localizer);
 
-        ModFilesName.ValidationRules.AddModFilesNameValidators(allModdableObjects);
+        ModFilesName.ValidationRules.AddModFilesNameValidators(allModdableObjects, localizer);
 
-        DisplayName.ValidationRules.AddDisplayNameValidators(allModdableObjects);
+        DisplayName.ValidationRules.AddDisplayNameValidators(allModdableObjects, localizer);
 
         DisplayName.ValidationRules.Add(context => context.Value != string.Empty && context.Value.Trim().IsNullOrEmpty()
-            ? new ValidationResult { Message = "显示名称不能为空" }
+            ? new ValidationResult { Message = localizer.GetLocalizedStringOrDefault("/CharacterManager/Validation_DisplayNameEmpty", "Display Name cannot be empty") }
             : null);
 
-        Image.ValidationRules.AddImageValidators();
+        Image.ValidationRules.AddImageValidators(localizer);
 
-        Rarity.ValidationRules.AddRarityValidators();
+        Rarity.ValidationRules.AddRarityValidators(localizer);
 
-        Element.ValidationRules.AddElementValidators(elements);
+        Element.ValidationRules.AddElementValidators(elements, localizer);
 
-        Keys.ValidationRules.AddKeysValidators(allModdableObjects.OfType<ICharacter>().ToList());
+        Keys.ValidationRules.AddKeysValidators(allModdableObjects.OfType<ICharacter>().ToList(), localizer);
 
         IsInitialized = true;
     }

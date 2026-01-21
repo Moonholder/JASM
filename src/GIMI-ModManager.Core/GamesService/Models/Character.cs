@@ -182,7 +182,7 @@ public class Character : ICharacter, IEquatable<Character>
             InternalName = new InternalName("Default_" + character.InternalName),
             ModFilesName = character.ModFilesName,
             ImageUri = character.ImageUri,
-            DisplayName = "默认",
+            DisplayName = "Default",
             Rarity = character.Rarity,
             ReleaseDate = character.ReleaseDate,
             Character = character,

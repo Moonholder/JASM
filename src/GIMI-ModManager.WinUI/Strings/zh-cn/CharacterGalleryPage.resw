@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- Header / Controls -->
+  <data name="SelectSkinButton.Content" xml:space="preserve">
+    <value>选择皮肤</value>
+  </data>
+  <data name="SortByLabel.Text" xml:space="preserve">
+    <value>排序方式:</value>
+  </data>
+  <data name="SortComboBox.PlaceholderText" xml:space="preserve">
+    <value>模组排序...</value>
+  </data>
+  <data name="SortByDateAdded.Content" xml:space="preserve">
+    <value>添加时间</value>
+  </data>
+  <data name="SortByFolderName.Content" xml:space="preserve">
+    <value>文件夹名</value>
+  </data>
+  <data name="SortByName.Content" xml:space="preserve">
+    <value>模组名称</value>
+  </data>
+  
+  <!-- Settings Flyout -->
+  <data name="SettingsButtonText.Text" xml:space="preserve">
+    <value>设置</value>
+  </data>
+  <data name="GridItemHeightLabel.Text" xml:space="preserve">
+    <value>调整网格高度:</value>
+  </data>
+  <data name="GridItemWidthLabel.Text" xml:space="preserve">
+    <value>调整网格宽度:</value>
+  </data>
+  <data name="SingleSelectionCheckBox.Content" xml:space="preserve">
+    <value>单选模式</value>
+  </data>
+  <data name="SingleSelectionCheckBox.ToolTipService.ToolTip" xml:space="preserve">
+    <value>选择此选项将只允许一次启用一个模组。</value>
+  </data>
+  <data name="AutoSyncCheckBox.Content" xml:space="preserve">
+    <value>自动同步</value>
+  </data>
+  <data name="AutoSyncCheckBox.ToolTipService.ToolTip" xml:space="preserve">
+    <value>启用此项后，切换时将自动刷新模组到游戏，并从d3dx_user.ini文件中同步模组切换项到ini文件。</value>
+  </data>
+
+  <!-- Search & View Toggle -->
+  <data name="SearchBox.PlaceholderText" xml:space="preserve">
+    <value>搜索模组...</value>
+  </data>
+  <data name="ViewToggleSwitch.OffContent" xml:space="preserve">
+    <value>详细视图</value>
+  </data>
+  <data name="ViewToggleSwitch.OnContent" xml:space="preserve">
+    <value>画廊视图</value>
+  </data>
+
+  <!-- Context Menu -->
+  <data name="SaveImageMenuItem.Text" xml:space="preserve">
+    <value>保存图片</value>
+  </data>
+  <data name="OpenModFolderMenuItem.Text" xml:space="preserve">
+    <value>打开模组文件夹...</value>
+  </data>
+  <data name="OpenModUrlMenuItem.Text" xml:space="preserve">
+    <value>打开模组网址...</value>
+  </data>
+  <data name="DeleteModMenuItem.Text" xml:space="preserve">
+    <value>删除此模组</value>
+  </data>
+
+  <!-- Mod Item Details -->
+  <data name="AuthorLabel.Text" xml:space="preserve">
+    <value>作者:</value>
+  </data>
+  <data name="DateAddedLabel.Text" xml:space="preserve">
+    <value>添加时间:</value>
+  </data>
+
+  <!-- Loading State -->
+  <data name="LoadingModsText.Text" xml:space="preserve">
+    <value>正在加载模组...</value>
+  </data>
+
+  <!-- Delete Dialog -->
+  <data name="DeleteDialog_DoNotAskAgain.Content" xml:space="preserve">
+    <value>下次不再询问</value>
+  </data>
+  <data name="DeleteDialog_ConfirmMessage.Text" xml:space="preserve">
+    <value>您确定要删除 {0} 吗?</value>
+  </data>
+  <data name="DeleteDialog_Title.Title" xml:space="preserve">
+    <value>删除模组</value>
+  </data>
+  <data name="DeleteDialog_DeleteButton.Content" xml:space="preserve">
+    <value>删除</value>
+  </data>
+  <data name="DeleteDialog_CancelButton.Content" xml:space="preserve">
+    <value>取消</value>
+  </data>
+
+  <!-- Delete Notifications -->
+  <data name="DeleteNotification_FailureTitle" xml:space="preserve">
+    <value>删除模组失败</value>
+  </data>
+  <data name="DeleteNotification_SuccessTitle" xml:space="preserve">
+    <value>模组删除成功</value>
+  </data>
+  <data name="DeleteNotification_SuccessMessage" xml:space="preserve">
+    <value>{0} 已从列表中删除。</value>
+  </data>
+</root>

@@ -36,7 +36,8 @@ public partial class PresetViewModel(
     BusyService busyService,
     ModPresetHandlerService modPresetHandlerService,
     ILocalSettingsService localSettingsService,
-    ModRandomizationService modRandomizationService)
+    ModRandomizationService modRandomizationService,
+    ILanguageLocalizer localizer)
     : ObservableRecipient, INavigationAware
 {
     public readonly ElevatorService ElevatorService = elevatorService;
@@ -53,6 +54,7 @@ public partial class PresetViewModel(
     private readonly ILocalSettingsService _localSettingsService = localSettingsService;
     private readonly ModPresetHandlerService _modPresetHandlerService = modPresetHandlerService;
     private readonly ModRandomizationService _modRandomizationService = modRandomizationService;
+    private readonly ILanguageLocalizer _localizer = localizer;
     private static readonly Random Random = new();
 
 
@@ -116,7 +118,9 @@ public partial class PresetViewModel(
         }
         catch (Exception e)
         {
-            _notificationManager.ShowNotification("预设创建失败", e.Message, TimeSpan.FromSeconds(5));
+            _notificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/PresetPage/PresetCreationFailedTitle", "Failed to create preset"),
+                e.Message, TimeSpan.FromSeconds(5));
         }
 
         ReloadPresets();
@@ -138,7 +142,9 @@ public partial class PresetViewModel(
         }
         catch (Exception e)
         {
-            _notificationManager.ShowNotification("预设复制失败", e.Message, TimeSpan.FromSeconds(5));
+            _notificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/PresetPage/PresetDuplicateFailedTitle", "Failed to duplicate preset"),
+                e.Message, TimeSpan.FromSeconds(5));
         }
 
         ReloadPresets();
@@ -158,7 +164,9 @@ public partial class PresetViewModel(
         }
         catch (Exception e)
         {
-            _notificationManager.ShowNotification("删除预设失败", e.Message, TimeSpan.FromSeconds(5));
+            _notificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/PresetPage/PresetDeleteFailedTitle", "Failed to delete preset"),
+                e.Message, TimeSpan.FromSeconds(5));
         }
 
         ReloadPresets();
@@ -210,12 +218,16 @@ public partial class PresetViewModel(
                 }
             });
 
-            _notificationManager.ShowNotification("已应用预设", $"预设: '{preset.Name}' 已应用。",
+            notificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/PresetPage/PresetAppliedTitle", "Preset applied"),
+                string.Format(_localizer.GetLocalizedStringOrDefault("/PresetPage/PresetAppliedMessage", "Preset: '{0}' applied."), preset.Name),
                 TimeSpan.FromSeconds(5));
         }
         catch (Exception e)
         {
-            _notificationManager.ShowNotification("预设应用失败", e.Message, TimeSpan.FromSeconds(5));
+            _notificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/PresetPage/PresetApplyFailedTitle", "Failed to apply preset"),
+                e.Message, TimeSpan.FromSeconds(5));
         }
         finally
         {
@@ -240,7 +252,9 @@ public partial class PresetViewModel(
         }
         catch (Exception e)
         {
-            _notificationManager.ShowNotification("预设重命名失败", e.Message, TimeSpan.FromSeconds(5));
+            _notificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/PresetPage/PresetRenameFailedTitle", "Failed to rename preset"),
+                e.Message, TimeSpan.FromSeconds(5));
         }
 
         ReloadPresets();
@@ -258,7 +272,9 @@ public partial class PresetViewModel(
         }
         catch (Exception e)
         {
-            _notificationManager.ShowNotification("保存预设顺序失败", e.Message, TimeSpan.FromSeconds(5));
+            _notificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/PresetPage/PresetReorderFailedTitle", "Failed to save preset order"),
+                e.Message, TimeSpan.FromSeconds(5));
         }
 
         ReloadPresets();
@@ -301,7 +317,9 @@ public partial class PresetViewModel(
         }
         catch (Exception e)
         {
-            _notificationManager.ShowNotification("预设切换只读失败", e.Message, TimeSpan.FromSeconds(5));
+            _notificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/PresetPage/PresetReadOnlyToggleFailedTitle", "Failed to toggle read-only mode"),
+                e.Message, TimeSpan.FromSeconds(5));
         }
 
         ReloadPresets();
@@ -321,8 +339,9 @@ public partial class PresetViewModel(
             var isStarted = await Task.Run(() => ElevatorService.StartElevator());
 
             if (!isStarted)
-                _notificationManager.ShowNotification("启动Elevator失败",
-                    "Elevator进程启动失败",
+                _notificationManager.ShowNotification(
+                    _localizer.GetLocalizedStringOrDefault("/PresetPage/ElevatorStartFailedTitle", "Failed to start Elevator"),
+                    _localizer.GetLocalizedStringOrDefault("/PresetPage/ElevatorStartFailedMessage", "Elevator process failed to start"),
                     TimeSpan.FromSeconds(5));
 
             AutoSync3DMigotoConfig = ElevatorService.ElevatorStatus == ElevatorStatus.Running &&
@@ -331,7 +350,9 @@ public partial class PresetViewModel(
         }
         catch (Exception e)
         {
-            _notificationManager.ShowNotification("启动Elevator失败", e.Message, TimeSpan.FromSeconds(5));
+            _notificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/PresetPage/ElevatorStartFailedTitle", "Failed to start Elevator"),
+                e.Message, TimeSpan.FromSeconds(5));
         }
 
         IsBusy = false;
@@ -352,15 +373,21 @@ public partial class PresetViewModel(
                     await _userPreferencesService.Clear3DMigotoModPreferencesAsync(ResetOnlyEnabledMods)
                         .ConfigureAwait(false);
 
-                _notificationManager.ShowNotification("模组首选项已重置",
-                    $"模组首选项已被移除{(AlsoReset3DmigotoConfig ? $" 并且 {Constants.UserIniFileName} 已被清除" : "")}",
+                var messagePart2 = AlsoReset3DmigotoConfig
+                    ? $" {_localizer.GetLocalizedStringOrDefault("/PresetPage/AndClearedLoaderConfig", "and loader config cleared")}"
+                    : "";
+
+                _notificationManager.ShowNotification(
+                    _localizer.GetLocalizedStringOrDefault("/PresetPage/PreferencesResetTitle", "Mod preferences reset"),
+                    $"{_localizer.GetLocalizedStringOrDefault("/PresetPage/PreferencesResetMessage", "Mod preferences removed")}{messagePart2}",
                     TimeSpan.FromSeconds(5));
             });
         }
         catch (Exception e)
         {
-            _notificationManager.ShowNotification("模组首选项重置失败", e.Message,
-                TimeSpan.FromSeconds(5));
+            _notificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/PresetPage/PreferencesResetFailedTitle", "Failed to reset mod preferences"),
+                e.Message, TimeSpan.FromSeconds(5));
         }
     }
 
@@ -420,7 +447,7 @@ public partial class PresetViewModel(
         Presets.Clear();
         foreach (var preset in presets)
         {
-            Presets.Add(new ModPresetVm(preset)
+            Presets.Add(new ModPresetVm(preset, _localizer)
             {
                 ToggleReadOnlyCommand = ToggleReadOnlyCommand,
                 RenamePresetCommand = RenamePresetCommand,
@@ -454,8 +481,10 @@ public partial class PresetViewModel(
 
 public partial class ModPresetVm : ObservableObject
 {
-    public ModPresetVm(ModPreset preset)
+    private readonly ILanguageLocalizer _localizer;
+    public ModPresetVm(ModPreset preset, ILanguageLocalizer localizer)
     {
+        _localizer = localizer;
         Name = preset.Name;
         NameInput = Name;
         EnabledModsCount = preset.Mods.Count;
@@ -466,6 +495,7 @@ public partial class ModPresetVm : ObservableObject
 
         CreatedAt = preset.Created;
         IsReadOnly = preset.IsReadOnly;
+        _renameButtonText = RenameText;
     }
 
     public string Name { get; }
@@ -479,7 +509,7 @@ public partial class ModPresetVm : ObservableObject
 
     [ObservableProperty] private bool _isEditingName;
 
-    [ObservableProperty] private string _renameButtonText = RenameText;
+    [ObservableProperty] private string _renameButtonText;
     [ObservableProperty] private bool _isReadOnly;
 
     [RelayCommand]
@@ -524,8 +554,8 @@ public partial class ModPresetVm : ObservableObject
     public required IAsyncRelayCommand ApplyPresetCommand { get; init; }
     public required IRelayCommand NavigateToPresetDetailsCommand { get; init; }
 
-    private const string RenameText = "重命名";
-    private const string ConfirmText = "保存新名称";
+    private string RenameText => _localizer.GetLocalizedStringOrDefault("/PresetPage/RenameText", "Rename");
+    private string ConfirmText => _localizer.GetLocalizedStringOrDefault("/PresetPage/SaveNewNameText", "Save New Name");
 }
 
 public partial class ModPresetEntryVm : ObservableObject

@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkitWrapper;
 using GIMI_ModManager.Core.Contracts.Entities;
@@ -47,6 +47,7 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
     private readonly ModPresetService _modPresetService;
     private readonly ElevatorService _elevatorService;
     private readonly UserPreferencesService _userPreferencesService;
+    private readonly ILanguageLocalizer _localizer;
 
     private ICharacterModList _characterModList = null!;
     private ICharacterSkin? _inGameSkin = null;
@@ -98,9 +99,9 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
 
     [ObservableProperty] private ObservableCollection<RootFolder> _rootFolder = new();
 
-    private const string AddRenameText = "重命名和添加模组";
-    private const string AddReplaceText = "覆盖旧模组";
-    [ObservableProperty] private string _primaryButtonText = AddRenameText;
+    private string AddRenameText => _localizer.GetLocalizedStringOrDefault("/ModInstallerPage/AddRenameText", "Rename and Add Mod");
+    private string AddReplaceText => _localizer.GetLocalizedStringOrDefault("/ModInstallerPage/AddReplaceText", "Overwrite Old Mod");
+    [ObservableProperty] private string _primaryButtonText = string.Empty;
 
     [ObservableProperty] private bool _overwriteExistingMod;
 
@@ -125,14 +126,15 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
 
     [ObservableProperty] private FileSystemItem? _lastSelectedImageFile;
 
-    [ObservableProperty] private string _imageSource = "自动";
+    [ObservableProperty] private string _imageSource = string.Empty;
 
     public ModInstallerVM(ILogger logger, ImageHandlerService imageHandlerService,
         NotificationManager notificationManager, IWindowManagerService windowManagerService,
         ModNotificationManager modNotificationManager, ILocalSettingsService localSettingsService,
         CharacterSkinService characterSkinService, ModSettingsService modSettingsService,
         ElevatorService elevatorService, UserPreferencesService userPreferencesService,
-        GameBananaService gameBananaService, ModPresetService modPresetService, ISkinManagerService skinManagerService)
+        GameBananaService gameBananaService, ModPresetService modPresetService, ISkinManagerService skinManagerService,
+        ILanguageLocalizer localizer)
     {
         _logger = logger;
         _imageHandlerService = imageHandlerService;
@@ -148,6 +150,9 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
         _gameBananaService = gameBananaService;
         _modPresetService = modPresetService;
         _skinManagerService = skinManagerService;
+        _localizer = localizer;
+        _imageSource = _localizer.GetLocalizedStringOrDefault("/ModInstallerPage/ImageSourceAuto", "Auto");
+        _primaryButtonText = AddRenameText;
         PropertyChanged += OnPropertyChanged;
     }
 
@@ -231,7 +236,7 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
                         {
                             ClearModPreviewImage();
                             ModPreviewImagePath = new Uri(imageFile.Path);
-                            ImageSource = "现有模组中的图片";
+                            ImageSource = _localizer.GetLocalizedStringOrDefault("/ModInstallerPage/ImageSourceExistingMod", "Image from existing mod");
                         }
 
                         CustomName = oldModSettings.CustomName ?? string.Empty;
@@ -244,20 +249,32 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
             }
 
 
-            var autoFoundImages = SkinModHelpers.DetectModPreviewImages(_modInstallation.ModFolder.FullName);
-
-            if (autoFoundImages.Any())
-                dispatcherQueue.TryEnqueue(() =>
-                {
-                    ModPreviewImagePath = autoFoundImages.First();
-                    var fileSystemItem = RootFolder.FirstOrDefault()
-                        ?.GetByPath(autoFoundImages.FirstOrDefault()?.LocalPath ?? "");
-                    SetModPreviewImage(fileSystemItem);
-                    ImageSource = "在新模组中找到本地图像";
-                });
-
             if (options?.ModUrl is not null)
-                dispatcherQueue.TryEnqueue(() => { ModUrl = options.ModUrl.ToString(); });
+            {
+                await dispatcherQueue.EnqueueAsync(async () =>
+                {
+                    ModUrl = options.ModUrl.ToString();
+                    await GetModInfo(ModUrl, skipLocalImageFallback: true);
+                });
+            }
+
+            if (ModPreviewImagePath == _placeholderImageUri)
+            {
+                var autoFoundImages = SkinModHelpers.DetectModPreviewImages(_modInstallation.ModFolder.FullName);
+
+                if (autoFoundImages.Any())
+                    dispatcherQueue.TryEnqueue(() =>
+                    {
+                        if (ModPreviewImagePath == _placeholderImageUri)
+                        {
+                            ModPreviewImagePath = autoFoundImages.First();
+                            var fileSystemItem = RootFolder.FirstOrDefault()
+                                ?.GetByPath(autoFoundImages.FirstOrDefault()?.LocalPath ?? "");
+                            SetModPreviewImage(fileSystemItem);
+                            ImageSource = _localizer.GetLocalizedStringOrDefault("/ModInstallerPage/ImageSourceLocalFound", "Local image found in new mod");
+                        }
+                    });
+            }
         }).ConfigureAwait(false);
     }
 
@@ -267,7 +284,7 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
         {
             if (!CustomName.IsNullOrEmpty() && !Author.IsNullOrEmpty() && ModPreviewImagePath != _placeholderImageUri)
                 return;
-            await GetModInfo(ModUrl);
+            await GetModInfo(ModUrl, skipLocalImageFallback: true);
         }
         else if (e.PropertyName == nameof(OverwriteExistingMod))
         {
@@ -302,8 +319,9 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
         InstallerFinished?.Invoke(this, EventArgs.Empty);
         _logger.Debug("Mod {newModPath} was added to {modListPath}", newMod.FullPath,
             _characterModList.AbsModsFolderPath);
-        _notificationManager.ShowNotification($"模组 '{modName}' 已安装",
-            $"Mod '{modName}' ({newMod.Name}), 已成功添加到 {_characterModList.Character.DisplayName} mod列表",
+        _notificationManager.ShowNotification(
+            string.Format(_localizer.GetLocalizedStringOrDefault("/ModInstallerPage/ModInstalledTitle", "Mod '{0}' installed"), modName),
+            string.Format(_localizer.GetLocalizedStringOrDefault("/ModInstallerPage/ModInstalledMessage", "Mod '{0}' ({1}), was successfully added to {2} mod list"), modName, newMod.Name, _characterModList.Character.DisplayName),
             TimeSpan.FromSeconds(5));
 
         if (EnableThisMod)
@@ -340,7 +358,7 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
                 ModFolderName = newMod.Name,
                 ShowOnOverview = true,
                 AttentionType = AttentionType.Added,
-                Message = "模组添加成功"
+                Message = _localizer.GetLocalizedStringOrDefault("/ModInstallerPage/ModAddedSuccess", "Mod added successfully")
             }));
     }
 
@@ -462,7 +480,7 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
         }
 
         LastSelectedImageFile = fileSystemItem;
-        ImageSource = "从新模组中选择的本地图像";
+        ImageSource = _localizer.GetLocalizedStringOrDefault("/ModInstallerPage/ImageSourceLocalSelected", "Local image selected from new mod");
     }
 
     [RelayCommand]
@@ -475,7 +493,7 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
             LastSelectedImageFile = null;
         }
 
-        ImageSource = "手动";
+        ImageSource = _localizer.GetLocalizedStringOrDefault("/ModInstallerPage/ImageSourceManual", "Manual");
     }
 
     private bool _canCopyImage()
@@ -516,7 +534,7 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
         try
         {
             imageUri = await _imageHandlerService.GetImageFromClipboardAsync();
-            ImageSource = "手动";
+            ImageSource = _localizer.GetLocalizedStringOrDefault("/ModInstallerPage/ImageSourceManual", "Manual");
         }
         catch (Exception e)
         {
@@ -547,7 +565,7 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
 
 
         ModPreviewImagePath = new Uri(imageUri.Path);
-        ImageSource = "手动";
+        ImageSource = _localizer.GetLocalizedStringOrDefault("/ModInstallerPage/ImageSourceManual", "Manual");
         if (LastSelectedImageFile is not null)
         {
             LastSelectedImageFile.RightIcon = null;
@@ -697,7 +715,7 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
             _logger.Error(e, "Failed to get presets");
 
             _notificationManager.ShowNotification(
-                "获取预设失败，无法自动更新预设中的模组条目", e.Message,
+                _localizer.GetLocalizedStringOrDefault("/ModInstallerPage/GetPresetFailedTitle", "Failed to get presets"), e.Message,
                 TimeSpan.FromSeconds(5));
 
             return;
@@ -724,7 +742,7 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
                 _logger.Error(e, "Failed to update preset {presetName}", modPreset.Name);
 
                 _notificationManager.ShowNotification(
-                    $"更新预设 {modPreset.Name} 失败，无法自动更新预设中的模组条目。请手动检查你的预设",
+                    string.Format(_localizer.GetLocalizedStringOrDefault("/ModInstallerPage/UpdatePresetFailedTitle", "Failed to update preset {0}"), modPreset.Name),
                     e.Message, TimeSpan.FromSeconds(5));
                 return;
             }
@@ -740,19 +758,21 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
 
         var readOnlyPresetsMessage = readOnlyPresetsWithMod.Length == 0
             ? ""
-            : "以下预设由于为只读而未更新: " +
+            : _localizer.GetLocalizedStringOrDefault("/ModInstallerPage/PresetsReadOnlyNotUpdated", "The following presets were not updated because they are read-only: ") +
               string.Join(", ", readOnlyPresets.Select(p => p.Name));
 
         TimeSpan? notificationDuration = readOnlyPresetsMessage.Any() ? null : TimeSpan.FromSeconds(6);
 
         var presetsUpdatedMessage = presetsUpdated.Count == 0
             ? ""
-            : "模组在以下预设中已更新: " +
+            : _localizer.GetLocalizedStringOrDefault("/ModInstallerPage/ModUpdatedInPresets", "Mod has been updated in the following presets: ") +
               string.Join(", ", presets.Select(p => p.Name)) + "\n" +
               readOnlyPresetsMessage;
 
         var notification = new SimpleNotification(
-            title: presetsUpdated.Count == 0 ? "模组没有更新任何预设" : "模组已更新至预设",
+            title: presetsUpdated.Count == 0
+                ? _localizer.GetLocalizedStringOrDefault("/ModInstallerPage/ModNotUpdatedAnyPreset", "Mod did not update any presets")
+                : _localizer.GetLocalizedStringOrDefault("/ModInstallerPage/ModUpdatedToPresets", "Mod updated to presets"),
             message: presetsUpdatedMessage,
             notificationDuration);
 
@@ -835,7 +855,7 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
 
     private readonly Dictionary<Uri, ModPageInfo> _modPageDataCache = new();
 
-    private async Task GetModInfo(string url, bool overrideCurrent = false)
+    private async Task GetModInfo(string url, bool overrideCurrent = false, bool skipLocalImageFallback = false)
     {
         if (url.IsNullOrEmpty() || IsRetrievingModInfo)
             return;
@@ -864,7 +884,7 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
             if ((overrideCurrent || Author.IsNullOrEmpty()) && !modInfo.AuthorName.IsNullOrEmpty())
                 Author = modInfo.AuthorName;
 
-            if (ModPreviewImagePath == _placeholderImageUri || overrideCurrent)
+            if (ModPreviewImagePath == _placeholderImageUri || overrideCurrent || skipLocalImageFallback)
             {
                 var newImageUrl = modInfo.PreviewImages?.FirstOrDefault();
 
@@ -875,7 +895,7 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
                         var newImage = await Task.Run(() => _imageHandlerService.DownloadImageAsync(newImageUrl, ct),
                             ct);
                         ModPreviewImagePath = new Uri(newImage.Path);
-                        ImageSource = "GB模组缩略图";
+                        ImageSource = _localizer.GetLocalizedStringOrDefault("/ModInstallerPage/ImageSourceGB", "GB mod thumbnail");
                         if (LastSelectedImageFile is not null)
                         {
                             LastSelectedImageFile.RightIcon = null;
@@ -947,8 +967,9 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
         PInvoke.PlaySound("SystemAsterisk", null,
             SND_FLAGS.SND_ASYNC | SND_FLAGS.SND_ALIAS | SND_FLAGS.SND_NODEFAULT);
 
-        _notificationManager.ShowNotification("出现了一个错误",
-            "添加模组时出现错误. 如需了解更多详细信息，请查看日志",
+        _notificationManager.ShowNotification(
+            _localizer.GetLocalizedStringOrDefault("/ModInstallerPage/ErrorOccurredTitle", "An error occurred"),
+            _localizer.GetLocalizedStringOrDefault("/ModInstallerPage/ErrorOccurredMessage", "An error occurred while adding the mod. Please check the logs for more details."),
             TimeSpan.FromSeconds(10));
 
         CloseRequested?.Invoke(this, new CloseRequestedArgs(CloseReasons.Error, e));
@@ -1018,8 +1039,9 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
                 }
                 else
                 {
-                    _notificationManager.QueueNotification("无法确定新模组的皮肤",
-                        "JASM 无法确定该模组对应的游戏内皮肤，因此无法确定需要禁用哪些模组.");
+                    _notificationManager.QueueNotification(
+                        _localizer.GetLocalizedStringOrDefault("/ModInstallerPage/CannotDetermineSkinTitle", "Cannot determine skin for new mod"),
+                        _localizer.GetLocalizedStringOrDefault("/ModInstallerPage/CannotDetermineSkinMessage", "JASM cannot determine the in-game skin for this mod, therefore cannot determine which mods need to be disabled."));
                     return;
                 }
             }

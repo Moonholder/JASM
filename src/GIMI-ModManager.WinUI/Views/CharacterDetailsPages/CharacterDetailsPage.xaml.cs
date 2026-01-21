@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.WinUI.UI.Animations;
+using GIMI_ModManager.Core.Contracts.Services;
 using GIMI_ModManager.WinUI.Contracts.Services;
 using GIMI_ModManager.WinUI.Helpers.Xaml;
 using GIMI_ModManager.WinUI.ViewModels.CharacterDetailsViewModels;
@@ -21,6 +22,8 @@ namespace GIMI_ModManager.WinUI.Views.CharacterDetailsPages;
 public sealed partial class CharacterDetailsPage : Page
 {
     public CharacterDetailsViewModel ViewModel { get; } = App.GetService<CharacterDetailsViewModel>();
+
+    private readonly ILanguageLocalizer _localizer = App.GetService<ILanguageLocalizer>();
 
     public CharacterDetailsPage()
     {
@@ -50,7 +53,7 @@ public sealed partial class CharacterDetailsPage : Page
         if (tooltip is ToolTip) return;
         var toolTip = new ToolTip
         {
-            Content = "这个角色只有一个默认的游戏内皮肤，所以你不能更改它。",
+            Content = _localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/SingleSkinTooltip", "This character only has one default in-game skin, so you can't change it."),
             Placement = PlacementMode.Bottom
         };
 
@@ -120,7 +123,10 @@ public sealed partial class CharacterDetailsPage : Page
         var noModsElement = EnsureNoModsUIElementAdded();
         noModsElement.Visibility = Visibility.Visible;
         ModGrid.Visibility = Visibility.Collapsed;
-        ModPane.Visibility = Visibility.Collapsed;
+        ModPane.Opacity = 0;
+        ModPane.IsHitTestVisible = false;
+        ModPane.MaxWidth = 0;
+        ModPane.MaxHeight = 0;
         ModPaneSplitter.Visibility = Visibility.Collapsed;
         SearchModsTextBox.Visibility = Visibility.Collapsed;
 
@@ -136,7 +142,10 @@ public sealed partial class CharacterDetailsPage : Page
 
 
         ModGrid.Visibility = Visibility.Visible;
-        ModPane.Visibility = Visibility.Visible;
+        ModPane.Opacity = 1;
+        ModPane.IsHitTestVisible = true;
+        ModPane.MaxWidth = double.PositiveInfinity;
+        ModPane.MaxHeight = double.PositiveInfinity;
         ModPaneSplitter.Visibility = Visibility.Visible;
         SearchModsTextBox.Visibility = Visibility.Visible;
 
@@ -170,7 +179,7 @@ public sealed partial class CharacterDetailsPage : Page
 
         var title = new TextBlock()
         {
-            Text = "没有找到这个角色的模组 😖",
+            Text = _localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/NoModsFoundText", "No mods found for this character 😖"),
             FontSize = 28,
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center,
@@ -207,7 +216,7 @@ public sealed partial class CharacterDetailsPage : Page
         // Create the TextBlock for "Drop Mods Here"
         var dropText = new TextBlock
         {
-            Text = "拖放模组文件夹/压缩包到这里",
+            Text = _localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/DropModsHereText", "Drop Mods Here"),
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center,
             FontSize = 20,

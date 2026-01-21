@@ -1,4 +1,5 @@
-﻿using GIMI_ModManager.Core.Services;
+﻿using GIMI_ModManager.Core.Contracts.Services;
+using GIMI_ModManager.Core.Services;
 using GIMI_ModManager.WinUI.Contracts.Services;
 using GIMI_ModManager.WinUI.Models;
 using GIMI_ModManager.WinUI.Models.Settings;
@@ -15,12 +16,16 @@ namespace GIMI_ModManager.WinUI.Views.PasswordInputPages
         private readonly string FilePath;
 
         private readonly Services.Notifications.NotificationManager _notificationManager;
-        public PasswordInputDialog(TaskCompletionSource<DragAndDropScanResult> tsc, DragAndDropScanner scanner, string filePath, Services.Notifications.NotificationManager notificationManager)
+
+        private readonly ILanguageLocalizer _localizer;
+        public PasswordInputDialog(TaskCompletionSource<DragAndDropScanResult> tsc, DragAndDropScanner scanner, string filePath,
+            Services.Notifications.NotificationManager notificationManager, ILanguageLocalizer localizer)
         {
             Tcs = tsc;
             Scanner = scanner;
             FilePath = filePath;
             _notificationManager = notificationManager;
+            _localizer = localizer;
             InitializeComponent();
             XamlRoot = App.MainWindow.Content.XamlRoot;
             PasswordBox.SelectionChanged += PasswordComboBox_SelectionChanged;
@@ -56,8 +61,8 @@ namespace GIMI_ModManager.WinUI.Views.PasswordInputPages
             {
                 args.Cancel = true;
                 _notificationManager.ShowNotification(
-                        "解压失败",
-                        "密码错误，请尝试其他密码",
+                        _localizer.GetLocalizedStringOrDefault("/CharactersPage/PasswordDialog_ExtractFailedTitle", "Extraction Failed"),
+                        _localizer.GetLocalizedStringOrDefault("/CharactersPage/PasswordDialog_ExtractFailedMessage", "Incorrect password, please try another one"),
                         TimeSpan.FromSeconds(5));
                 return;
             }

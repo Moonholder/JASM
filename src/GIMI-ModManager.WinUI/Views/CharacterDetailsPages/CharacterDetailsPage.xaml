@@ -8,6 +8,7 @@
     xmlns:controls1="using:GIMI_ModManager.WinUI.Views.Controls"
     xmlns:converters="using:CommunityToolkit.WinUI.UI.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:l="using:WinUI3Localizer"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="using:GIMI_ModManager.WinUI.Models"
     xmlns:notifications="using:GIMI_ModManager.WinUI.Services.Notifications"
@@ -40,7 +41,8 @@
                                 <TextBlock
                                     Margin="0,0,4,0"
                                     HorizontalAlignment="Left"
-                                    Text="已选模组:" />
+                                    Text="Selected Mods:"
+                                    l:Uids.Uid="/CharacterDetailsPage/SelectedModsLabel" />
                                 <TextBlock HorizontalAlignment="Left" Text="{x:Bind ViewModel.ContextMenuVM.SelectedModsCount, Mode=OneWay}" />
                             </StackPanel>
                             <Button
@@ -48,7 +50,9 @@
                                 HorizontalAlignment="Right"
                                 Background="Transparent"
                                 BorderThickness="0"
-                                Command="{x:Bind ViewModel.DeleteModsCommand}">
+                                Command="{x:Bind ViewModel.DeleteModsCommand}"
+                                ToolTipService.ToolTip="Delete selected mods"
+                                l:Uids.Uid="/CharacterDetailsPage/DeleteModsButton">
                                 <FontIcon FontSize="16" Glyph="&#xE74D;" />
                             </Button>
                         </Grid>
@@ -62,17 +66,19 @@
                             x:Name="MoveModsButton"
                             Margin="0,8,16,0"
                             Command="{x:Bind ViewModel.ContextMenuVM.MoveModsCommand}"
-                            Content="移动" />
+                            Content="Move"
+                            l:Uids.Uid="/CharacterDetailsPage/MoveModsButton" />
                         <StackPanel>
-                            <TextBlock Text="移动模组到另一个角色: " />
+                            <TextBlock Text="Move mods to another character: " l:Uids.Uid="/CharacterDetailsPage/MoveModsToCharacterLabel" />
                             <AutoSuggestBox
                                 x:Name="MoveModSearchBox"
                                 IsEnabled="{x:Bind ViewModel.IsNotHardBusy, Mode=OneWay}"
                                 ItemsSource="{x:Bind ViewModel.ContextMenuVM.SuggestedModdableObjects, Mode=OneWay}"
-                                PlaceholderText="搜索..."
+                                PlaceholderText="Search..."
                                 QuerySubmitted="MoveModSearch_OnQuerySubmitted"
                                 Text="{x:Bind ViewModel.ContextMenuVM.MoveModsSearchText, Mode=TwoWay}"
-                                TextChanged="MoveModSearch_OnTextChanged">
+                                TextChanged="MoveModSearch_OnTextChanged"
+                                l:Uids.Uid="/CharacterDetailsPage/MoveModsSearchBox">
                                 <AutoSuggestBox.ItemTemplate>
                                     <DataTemplate x:DataType="subViewModels:SuggestedModObject">
                                         <TextBlock FontFamily="{StaticResource GenshinFont}" Text="{x:Bind DisplayName}" />
@@ -93,9 +99,10 @@
                             HorizontalAlignment="Stretch"
                             VerticalAlignment="Top"
                             ExpandDirection="Down"
-                            Header="移动模组到另一个皮肤"
+                            Header="Move mods to another skin"
                             IsEnabled="{x:Bind ViewModel.ContextMenuVM.MultipleSkins, Mode=OneWay}"
-                            IsExpanded="False">
+                            IsExpanded="False"
+                            l:Uids.Uid="/CharacterDetailsPage/MoveModsToSkinExpander">
                             <Expander.Content>
                                 <StackPanel>
                                     <controls1:SelectCharacterFromGrid GridSource="{x:Bind ViewModel.ContextMenuVM.SelectableCharacterSkins, Mode=OneWay}" ItemClickedCommand="{x:Bind ViewModel.ContextMenuVM.SelectNewCharacterSkinCommand}" />
@@ -105,13 +112,13 @@
                                             <Button.Content>
                                                 <StackPanel Orientation="Horizontal">
                                                     <FontIcon Margin="0,0,4,0" Glyph="&#xE74E;" />
-                                                    <TextBlock Text="移动" />
+                                                    <TextBlock Text="Move" l:Uids.Uid="/CharacterDetailsPage/MoveButtonText" />
                                                 </StackPanel>
                                             </Button.Content>
                                         </Button>
 
                                         <StackPanel Margin="4,0,0,0" Visibility="{x:Bind ViewModel.ContextMenuVM.ModHasCharacterSkinOverride, Mode=OneWay}">
-                                            <TextBlock Text="当前皮肤设置: " />
+                                            <TextBlock Text="Current Skin Setting: " l:Uids.Uid="/CharacterDetailsPage/CurrentSkinSettingLabel" />
                                             <TextBlock HorizontalAlignment="Center" Text="{x:Bind ViewModel.ContextMenuVM.ModCharacterSkinOverride.DisplayName, FallbackValue='', Mode=OneWay}" />
                                         </StackPanel>
                                     </StackPanel>
@@ -141,7 +148,7 @@
                     Visibility="Visible">
                     <ProgressRing />
                     <TextBlock>
-                        <Run Text="加载" />
+                        <Run Text="Loading" l:Uids.Uid="/CharacterDetailsPage/LoadingPrefix" />
                         <Run Text="{x:Bind ViewModel.LoadingItemText, Mode=OneWay}" />
                         <Run Text="..." />
 
@@ -174,25 +181,28 @@
 
                         <StackPanel Orientation="Horizontal">
                             <MenuBar IsEnabled="{x:Bind ViewModel.IsNotHardBusy, Mode=OneWay}">
-                                <MenuBarItem Title="模组">
+                                <MenuBarItem Title="Mods" l:Uids.Uid="/CharacterDetailsPage/ModsMenuTitle">
                                     <MenuBarItem.Items>
                                         <MenuFlyoutItem
                                             Command="{x:Bind ViewModel.AddModFolderCommand}"
-                                            Text="添加模组..."
-                                            ToolTipService.ToolTip="添加一个模组文件夹" />
+                                            Text="Add Mod..."
+                                            ToolTipService.ToolTip="Add a mod folder"
+                                            l:Uids.Uid="/CharacterDetailsPage/AddModMenuItem" />
 
                                         <MenuFlyoutItem
                                             Command="{x:Bind ViewModel.AddModArchiveCommand}"
-                                            Text="添加模组(压缩包)..."
-                                            ToolTipService.ToolTip="在压缩包中添加模组">
+                                            Text="Add Mod (Archive)..."
+                                            ToolTipService.ToolTip="Add mod from archive"
+                                            l:Uids.Uid="/CharacterDetailsPage/AddModArchiveMenuItem">
                                             <MenuFlyoutItem.KeyboardAccelerators>
                                                 <KeyboardAccelerator Key="O" Modifiers="Control" />
                                             </MenuFlyoutItem.KeyboardAccelerators>
                                         </MenuFlyoutItem>
                                         <MenuFlyoutItem
                                             Command="{x:Bind ViewModel.AddModFromClipboardCommand}"
-                                            Text="添加模组(剪贴板)..."
-                                            ToolTipService.ToolTip="从剪贴板中的GB链接/文件夹/压缩包添加模组">
+                                            Text="Add Mod (Clipboard)..."
+                                            ToolTipService.ToolTip="Add mod from clipboard GB Link/Folder/Archive"
+                                            l:Uids.Uid="/CharacterDetailsPage/AddModClipboardMenuItem">
                                             <MenuFlyoutItem.KeyboardAccelerators>
                                                 <KeyboardAccelerator
                                                     Key="V"
@@ -201,7 +211,10 @@
                                             </MenuFlyoutItem.KeyboardAccelerators>
                                         </MenuFlyoutItem>
                                         <MenuFlyoutSeparator />
-                                        <MenuFlyoutItem Command="{x:Bind ViewModel.RefreshAllModsCommand}" Text="刷新模组">
+                                        <MenuFlyoutItem
+                                            Command="{x:Bind ViewModel.RefreshAllModsCommand}"
+                                            Text="Refresh Mods"
+                                            l:Uids.Uid="/CharacterDetailsPage/RefreshModsMenuItem">
                                             <MenuFlyoutItem.KeyboardAccelerators>
                                                 <KeyboardAccelerator Key="F5" />
                                             </MenuFlyoutItem.KeyboardAccelerators>
@@ -209,35 +222,45 @@
                                     </MenuBarItem.Items>
                                 </MenuBarItem>
 
-                                <MenuBarItem Title="文件夹">
-                                    <MenuFlyoutItem Command="{x:Bind ViewModel.OpenGIMIRootFolderCommand}" Text="打开加载器根目录..." />
+                                <MenuBarItem Title="Folders" l:Uids.Uid="/CharacterDetailsPage/FoldersMenuTitle">
+                                    <MenuFlyoutItem
+                                        Command="{x:Bind ViewModel.OpenGIMIRootFolderCommand}"
+                                        Text="Open Loader Root Folder..."
+                                        l:Uids.Uid="/CharacterDetailsPage/OpenLoaderRootMenuItem" />
                                     <MenuFlyoutSeparator />
-                                    <MenuFlyoutItem Command="{x:Bind ViewModel.OpenCharacterFolderCommand}" Text="打开角色文件夹..." />
+                                    <MenuFlyoutItem
+                                        Command="{x:Bind ViewModel.OpenCharacterFolderCommand}"
+                                        Text="Open Character Folder..."
+                                        l:Uids.Uid="/CharacterDetailsPage/OpenCharacterFolderMenuItem" />
                                     <MenuFlyoutSeparator />
                                     <MenuFlyoutItem
                                         Command="{x:Bind ViewModel.OpenModFolderCommand}"
                                         IsEnabled="{x:Bind ViewModel.ModGridVM.IsSingleModSelected, Mode=OneWay}"
-                                        Text="打开模组文件夹..." />
+                                        Text="Open Mod Folder..."
+                                        l:Uids.Uid="/CharacterDetailsPage/OpenModFolderMenuItem" />
                                 </MenuBarItem>
 
-                                <MenuBarItem Title="显示">
+                                <MenuBarItem Title="View" l:Uids.Uid="/CharacterDetailsPage/ViewMenuTitle">
                                     <ToggleMenuFlyoutItem
                                         Command="{x:Bind ViewModel.ToggleSingleSelectCommand}"
                                         IsChecked="{x:Bind ViewModel.IsSingleSelectEnabled, Mode=OneWay}"
-                                        Text="单选模式"
-                                        ToolTipService.ToolTip="选择此项后，只允许同时启用一个模组，同时禁用多选模式" />
+                                        Text="Single Select Mode"
+                                        ToolTipService.ToolTip="When selected, only one mod can be enabled at a time, also disables multi-select mode"
+                                        l:Uids.Uid="/CharacterDetailsPage/SingleSelectModeMenuItem" />
                                     <ToggleMenuFlyoutItem
                                         Command="{x:Bind ViewModel.ToggleHideModFolderColumnCommand}"
                                         IsChecked="{x:Bind ViewModel.IsModFolderNameColumnVisible, Mode=OneWay}"
-                                        Text="显示 '模组文件夹名' 列" />
+                                        Text="Show 'Mod Folder Name' Column"
+                                        l:Uids.Uid="/CharacterDetailsPage/ShowModFolderColumnMenuItem" />
                                 </MenuBarItem>
                             </MenuBar>
                             <ToggleButton
                                 VerticalAlignment="Center"
                                 Command="{x:Bind ViewModel.ToggleAutoSyncCommand}"
-                                Content="自动同步"
+                                Content="Auto Sync"
                                 IsChecked="{x:Bind ViewModel.AutoSync3DMigotoConfig, Mode=OneWay}"
-                                ToolTipService.ToolTip="启用此项后，切换时将自动刷新模组到游戏，并从d3dx_user.ini文件中同步模组切换项到ini文件"/>
+                                ToolTipService.ToolTip="When enabled, mods will automatically refresh in-game when toggled, and sync mod toggles from d3dx_user.ini file"
+                                l:Uids.Uid="/CharacterDetailsPage/AutoSyncButton" />
                         </StackPanel>
 
 
@@ -248,9 +271,10 @@
                             VerticalAlignment="Center"
                             IsClosable="False"
                             IsOpen="{x:Bind ViewModel.ModGridVM.ShowMultipleModsActiveWarning, Mode=OneWay}"
-                            Message="已启用多个模组"
+                            Message="Multiple Mods Enabled"
                             Severity="Warning"
-                            Visibility="Visible" />
+                            Visibility="Visible"
+                            l:Uids.Uid="/CharacterDetailsPage/MultipleModsWarning" />
 
                     </Grid>
 
@@ -275,9 +299,10 @@
                                 MinWidth="200"
                                 MaxWidth="500"
                                 IsEnabled="{x:Bind ViewModel.IsNotHardBusy, Mode=OneWay}"
-                                PlaceholderText="搜索模组..."
+                                PlaceholderText="Search mods..."
                                 Text="{x:Bind ViewModel.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                TextChanged="SearchModsTextBox_OnTextChanged">
+                                TextChanged="SearchModsTextBox_OnTextChanged"
+                                l:Uids.Uid="/CharacterDetailsPage/SearchModsTextBox">
 
                                 <TextBox.KeyboardAccelerators>
                                     <KeyboardAccelerator
@@ -293,9 +318,10 @@
                         <ToggleSwitch
                             x:Name="ViewToggleSwitch"
                             IsOn="False"
-                            OffContent="详细视图"
-                            OnContent="画廊视图"
-                            Toggled="ViewToggleSwitch_OnToggled" />
+                            OffContent="Detail View"
+                            OnContent="Gallery View"
+                            Toggled="ViewToggleSwitch_OnToggled"
+                            l:Uids.Uid="/CharacterDetailsPage/ViewToggleSwitch" />
 
                         <Grid MinWidth="32">
                             <ProgressRing IsActive="{x:Bind ViewModel.IsWorking, Mode=OneWay}" />
@@ -353,7 +379,39 @@
                     </Grid>
                 </Grid>
             </Grid>
+            <StackPanel
+                x:Name="NoModsPanel"
+                Grid.Column="1"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Orientation="Vertical"
+                Visibility="Collapsed">
 
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    FontSize="28"
+                    Text="No mods found for this character 😖"
+                    l:Uids.Uid="/CharacterDetailsPage/NoModsFoundText" />
+
+                <Grid Margin="10">
+                    <Border
+                        Width="300"
+                        Height="250"
+                        Padding="5"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        BorderBrush="{ThemeResource SystemControlForegroundBaseMediumHighBrush}"
+                        BorderThickness="1"
+                        CornerRadius="5">
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontSize="20"
+                            Text="Drop mod folders/archives here"
+                            l:Uids.Uid="/CharacterDetailsPage/DropModsHereText" />
+                    </Border>
+                </Grid>
+            </StackPanel>
 
         </Grid>
     </Grid>

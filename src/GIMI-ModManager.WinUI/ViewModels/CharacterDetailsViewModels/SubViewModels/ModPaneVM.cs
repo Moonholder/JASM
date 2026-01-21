@@ -32,7 +32,8 @@ public sealed partial class ModPaneVM(
     NotificationManager notificationService,
     ModSettingsService modSettingsService,
     ImageHandlerService imageHandlerService,
-    IKeySwapService keySwapService)
+    IKeySwapService keySwapService,
+    ILanguageLocalizer localizer)
     : ObservableRecipient, IRecipient<ModChangedMessage>
 {
     private readonly ILogger _logger = Log.ForContext<ModPaneVM>();
@@ -40,6 +41,7 @@ public sealed partial class ModPaneVM(
     private readonly NotificationManager _notificationService = notificationService;
     private readonly ModSettingsService _modSettingsService = modSettingsService;
     private readonly ImageHandlerService _imageHandlerService = imageHandlerService;
+    private readonly ILanguageLocalizer _localizer = localizer;
 
     private readonly AsyncLock _loadModLock = new();
     private CancellationToken _cancellationToken = CancellationToken.None;
@@ -55,7 +57,6 @@ public sealed partial class ModPaneVM(
 
     // 紧凑显示/编辑切换
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(KeySwapsModeText))]
     private bool _isKeySwapsEditMode;
 
     public bool IsNotReadOnly => !IsReadOnly;
@@ -76,7 +77,9 @@ public sealed partial class ModPaneVM(
     [NotifyPropertyChangedFor(nameof(ShowDisabledIniFilesText))]
     private bool _showDisabledIniFiles = false;
 
-    public string ShowDisabledIniFilesText => ShowDisabledIniFiles ? "隐藏 DISABLED 文件" : "显示 DISABLED 文件";
+    public string ShowDisabledIniFilesText => ShowDisabledIniFiles
+        ? _localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/HideDisabledIniFiles", "Hide DISABLED files")
+        : _localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/ShowDisabledIniFiles", "Show DISABLED files");
 
     public bool QueueLoadMod(Guid? modId, bool force = false) => _channel.Writer.TryWrite(new LoadModMessage { ModId = modId, Force = force });
 
@@ -607,8 +610,6 @@ public sealed partial class ModPaneVM(
     {
         IsEditingModName = !IsEditingModName;
     }
-
-    public string KeySwapsModeText => IsKeySwapsEditMode ? "完成编辑" : "编辑键位";
 
     private bool CanToggleKeySwapsEditMode() => IsNotReadOnly;
 

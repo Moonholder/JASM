@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:GIMI_ModManager.WinUI.Views.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:l="using:WinUI3Localizer"
     xmlns:services="using:GIMI_ModManager.WinUI.Services"
     xmlns:subVms="using:GIMI_ModManager.WinUI.ViewModels.SubVms"
     mc:Ignorable="d">
@@ -44,7 +45,8 @@
                 Margin="5,0,0,0"
                 VerticalAlignment="Center"
                 Command="{x:Bind BrowseCommand}"
-                Content="浏览" />
+                Content="Browse" 
+                l:Uids.Uid="Common_Browse" />
         </Grid>
 
         <Grid

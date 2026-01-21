@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using GIMI_ModManager.Core.Contracts.Services;
 using GIMI_ModManager.Core.GamesService;
 using GIMI_ModManager.Core.Services.CommandService;
 using GIMI_ModManager.Core.Services.CommandService.Models;
@@ -21,6 +22,8 @@ public partial class SimpleSelectProcessDialogVM : ObservableObject
     private readonly CommandService _commandService = App.GetService<CommandService>();
 
     private readonly IGameService _gameService = App.GetService<IGameService>();
+
+    private readonly ILanguageLocalizer _localizer = App.GetService<ILanguageLocalizer>();
 
 
     public PathPicker PathPicker { get; }
@@ -48,8 +51,8 @@ public partial class SimpleSelectProcessDialogVM : ObservableObject
         await processManager.CheckStatus();
         PlaceHolderText = type switch
         {
-            StartType.Game => "选择游戏可执行文件",
-            StartType.ModelImporter => "选择可执行的Mod加载器exe程序",
+            StartType.Game => _localizer.GetLocalizedStringOrDefault("/CharactersPage/SelectGameExecutablePlaceholder", "Select Game Executable"),
+            StartType.ModelImporter => _localizer.GetLocalizedStringOrDefault("/CharactersPage/SelectModLoaderExecutablePlaceholder", "Select Mod Loader Executable"),
             _ => throw new ArgumentOutOfRangeException()
         };
 

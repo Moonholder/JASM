@@ -6,4 +6,5 @@
 		<type fullname="GIMI_ModManager.WinUI.ViewModels.CharacterDetailsViewModels.SubViewModels.ModRowVM" />
 		<type fullname="GIMI_ModManager.WinUI.ViewModels.ModPageViewModels.ModFileInfoVm" />
 	</assembly>
+	<assembly fullname="Microsoft.WinUI" preserve="all" />
 </linker>

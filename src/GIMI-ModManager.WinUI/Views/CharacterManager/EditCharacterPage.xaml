@@ -7,6 +7,7 @@
     xmlns:controls="using:GIMI_ModManager.WinUI.Views.Controls"
     xmlns:controls1="using:CommunityToolkit.WinUI.UI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:l="using:WinUI3Localizer"
     xmlns:local="using:GIMI_ModManager.WinUI.Views.CharacterManager"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewModels="using:GIMI_ModManager.WinUI.ViewModels"
@@ -30,13 +31,14 @@
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
             <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal">
-                <TextBlock VerticalAlignment="Center" Text="角色模组文件夹:" />
+                <TextBlock VerticalAlignment="Center" Text="Character Mods Folder:" l:Uids.Uid="/CharacterManager/EditPage_ModFolderLabel" />
                 <controls:LinkButton
                     Link="{x:Bind ViewModel.ModFolderUri, Mode=TwoWay}"
                     Text="{x:Bind ViewModel.ModFolderString, Mode=TwoWay}"
-                    ToolTipService.ToolTip="打开角色的模组文件夹" />
+                    ToolTipService.ToolTip="Open character mods folder" 
+                    l:Uids.Uid="/CharacterManager/EditPage_OpenFolderTooltip"/>
 
-                <Button Command="{x:Bind ViewModel.GoToCharacterCommand}">转到角色</Button>
+                <Button Command="{x:Bind ViewModel.GoToCharacterCommand}" Content="Go to Character" l:Uids.Uid="/CharacterManager/EditPage_GoToCharacterButton" />
             </StackPanel>
 
 
@@ -44,28 +46,32 @@
                 Grid.Column="1"
                 HorizontalAlignment="Right"
                 Command="{x:Bind ViewModel.DisableCharacterCommand, Mode=OneWay}"
-                Content="禁用角色"
+                Content="Disable Character"
                 IsEnabled="{x:Bind ViewModel.CharacterStatus.IsEnabledAndNotCustomCharacter, Mode=OneWay}"
-                ToolTipService.ToolTip="首先打开一个弹出窗口，其中包含更多信息"
-                Visibility="{x:Bind ViewModel.CharacterStatus.IsEnabledAndNotCustomCharacter, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                ToolTipService.ToolTip="Opens a popup with more info first"
+                Visibility="{x:Bind ViewModel.CharacterStatus.IsEnabledAndNotCustomCharacter, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                l:Uids.Uid="/CharacterManager/EditPage_DisableCharacterButton" />
 
             <Button
                 Grid.Column="1"
                 HorizontalAlignment="Right"
                 Command="{x:Bind ViewModel.EnableCharacterCommand, Mode=OneWay}"
-                Content="启用角色"
+                Content="Enable Character"
                 IsEnabled="{x:Bind ViewModel.CharacterStatus.IsDisabledAndNotCustomCharacter, Mode=OneWay}"
-                ToolTipService.ToolTip="首先打开一个弹出窗口，其中包含更多信息"
-                Visibility="{x:Bind ViewModel.CharacterStatus.IsDisabledAndNotCustomCharacter, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                ToolTipService.ToolTip="Opens a popup with more info first"
+                Visibility="{x:Bind ViewModel.CharacterStatus.IsDisabledAndNotCustomCharacter, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                l:Uids.Uid="/CharacterManager/EditPage_EnableCharacterButton" />
 
             <Button
                 Grid.Column="1"
                 HorizontalAlignment="Right"
                 Command="{x:Bind ViewModel.DeleteCustomCharacterCommand, Mode=OneWay}"
-                Content="删除自定义角色"
+                Content="Delete Custom Character"
                 IsEnabled="{x:Bind ViewModel.CharacterStatus.IsCustomCharacter, Mode=OneWay}"
-                ToolTipService.ToolTip="首先打开一个弹出窗口，其中包含更多信息"
-                Visibility="{x:Bind ViewModel.CharacterStatus.IsCustomCharacter, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                ToolTipService.ToolTip="Opens a popup with more info first"
+                Visibility="{x:Bind ViewModel.CharacterStatus.IsCustomCharacter, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                l:Uids.Uid="/CharacterManager/EditPage_DeleteCustomCharacterButton" />
+
 
 
 
@@ -111,7 +117,7 @@
                             Background="{ThemeResource ControlFillColorSecondaryBrush}"
                             Orientation="Horizontal"
                             Spacing="8">
-                            <TextBlock Text="内部名称 (Id): " />
+                            <TextBlock Text="Internal Name (Id): " l:Uids.Uid="/CharacterManager/EditPage_InternalNameLabel" />
                             <TextBlock
                                 IsTextSelectionEnabled="True"
                                 Style="{ThemeResource BodyStrongTextBlockStyle}"
@@ -124,10 +130,9 @@
                                     <TextBlock
                                         MaxWidth="300"
                                         IsTextSelectionEnabled="True"
-                                        TextWrapping="WrapWholeWords">
-                                        内部名称由 JASM 用来识别角色 / 模组对象。它也被用作模组文件夹的名称。必须是独一无二的。
-                                        在角色创建之后更改此名称意味着 JASM 会将其识别为一个新角色。
-                                    </TextBlock>
+                                        TextWrapping="WrapWholeWords"
+                                        Text="The internal name is used by JASM to identify the Character / Moddable Object. It is also used as the name of the folder for mods. Must be unique. Changing this after creation means JASM will identify it as a new character."
+                                        l:Uids.Uid="/CharacterManager/InternalNameHelp" />
                                 </Flyout>
                             </Button.Flyout>
                         </Button>
@@ -141,16 +146,20 @@
                             <local:InputWrapper.Input>
                                 <TextBox
                                     MinWidth="200"
-                                    Header="显示名称"
+                                    Header="Display Name"
                                     PlaceholderText="{x:Bind ViewModel.Form.DisplayName.PlaceHolderText, Mode=OneWay}"
-                                    Text="{x:Bind ViewModel.Form.DisplayName.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    Text="{x:Bind ViewModel.Form.DisplayName.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                    l:Uids.Uid="/CharacterManager/DisplayNameInput" />
                             </local:InputWrapper.Input>
                         </local:InputWrapper>
 
                         <local:InputWrapper InputField="{x:Bind ViewModel.Form.ReleaseDate}" Visibility="{x:Bind ViewModel.CharacterStatus.IsCustomCharacter, Mode=OneWay}">
                             <local:InputWrapper.Input>
 
-                                <CalendarDatePicker Date="{x:Bind ViewModel.Form.ReleaseDate.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Header="发布日期" />
+                                <CalendarDatePicker 
+                                    Date="{x:Bind ViewModel.Form.ReleaseDate.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                    Header="Release Date" 
+                                    l:Uids.Uid="/CharacterManager/ReleaseDateInput" />
                             </local:InputWrapper.Input>
                         </local:InputWrapper>
 
@@ -161,13 +170,14 @@
                                     <Slider
                                         Width="200"
                                         AutomationProperties.Name="Slider with ticks"
-                                        Header="稀有度"
+                                        Header="Rarity"
                                         Maximum="6"
                                         Minimum="0"
                                         SnapsTo="Ticks"
                                         TickFrequency="1"
                                         TickPlacement="Outside"
-                                        Value="{x:Bind ViewModel.Form.Rarity.Value, Mode=TwoWay}" />
+                                        Value="{x:Bind ViewModel.Form.Rarity.Value, Mode=TwoWay}"
+                                        l:Uids.Uid="/CharacterManager/RaritySlider" />
                                     <TextBlock VerticalAlignment="Center" Text="{x:Bind ViewModel.Form.Rarity.Value, Mode=OneWay}" />
                                 </StackPanel>
                             </local:InputWrapper.Input>
@@ -176,21 +186,22 @@
                         <local:InputWrapper InputField="{x:Bind ViewModel.Form.Element}" Visibility="{x:Bind ViewModel.CharacterStatus.IsCustomCharacter, Mode=OneWay}">
                             <local:InputWrapper.Input>
                                 <ComboBox
-                                    Header="属性"
+                                    Header="Element"
                                     ItemsSource="{x:Bind ViewModel.Elements}"
-                                    SelectedItem="{x:Bind ViewModel.SelectedElement, Mode=TwoWay}" />
+                                    SelectedItem="{x:Bind ViewModel.SelectedElement, Mode=TwoWay}"
+                                    l:Uids.Uid="/CharacterManager/ElementComboBox" />
                             </local:InputWrapper.Input>
                         </local:InputWrapper>
 
                         <local:InputWrapper InputField="{x:Bind ViewModel.Form.IsMultiMod}">
                             <local:InputWrapper.Input>
-                                <CheckBox Content="允许启用多个模组" IsChecked="{x:Bind ViewModel.Form.IsMultiMod.Value, Mode=TwoWay}" />
+                                <CheckBox Content="Allow Multiple Mods Enabled" IsChecked="{x:Bind ViewModel.Form.IsMultiMod.Value, Mode=TwoWay}" l:Uids.Uid="/CharacterManager/IsMultiModCheckBox" />
                             </local:InputWrapper.Input>
 
                             <local:InputWrapper.HelpInfo>
-                                <TextBlock IsTextSelectionEnabled="True" TextWrapping="WrapWholeWords">
-                                    如果勾选此项，当为此模组对象启用多个模组时，JASM 将不会显示警告信息。
-                                </TextBlock>
+                                <TextBlock IsTextSelectionEnabled="True" TextWrapping="WrapWholeWords"
+                                           Text="If checked, JASM will not show a warning when multiple mods are enabled for this moddable object."
+                                           l:Uids.Uid="/CharacterManager/IsMultiModHelp" />
                             </local:InputWrapper.HelpInfo>
                         </local:InputWrapper>
                     </StackPanel>
@@ -205,7 +216,7 @@
                     Margin="8,0"
                     HorizontalAlignment="Right"
                     Orientation="Horizontal">
-                    <TextBlock Text="模组数量:" />
+                    <TextBlock Text="Mod Count:" l:Uids.Uid="/CharacterManager/EditPage_ModCountLabel" />
                     <TextBlock
                         Margin="8,0,0,0"
                         FontSize="20"
@@ -228,7 +239,8 @@
                                         HorizontalAlignment="Right"
                                         IsTextSelectionEnabled="True"
                                         Text="{x:Bind DateAdded}"
-                                        ToolTipService.ToolTip="添加至 JASM 的日期" />
+                                        ToolTipService.ToolTip="Date Added to JASM"
+                                        l:Uids.Uid="/CharacterManager/EditPage_DateAddedTooltip" />
 
                                     <TextBlock
                                         Grid.Column="0"
@@ -269,17 +281,19 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock FontSize="16" Text="搜索关键词:" />
+                    <TextBlock FontSize="16" Text="Search Keywords:" l:Uids.Uid="/CharacterManager/SearchKeywordsLabel" />
                     <TextBox
                         Grid.Column="1"
-                        PlaceholderText="搜索关键词..."
-                        Text="{x:Bind ViewModel.KeyToAddInput, Mode=TwoWay}" />
+                        PlaceholderText="Keyword..."
+                        Text="{x:Bind ViewModel.KeyToAddInput, Mode=TwoWay}"
+                        l:Uids.Uid="/CharacterManager/KeywordInput" />
                     <Button
                         Grid.Column="2"
                         Margin="0,0,10,0"
                         HorizontalAlignment="Right"
                         Command="{x:Bind ViewModel.AddKeyCommand}"
-                        Content="添加关键词" />
+                        Content="Add Keyword"
+                        l:Uids.Uid="/CharacterManager/AddKeywordButton" />
 
                     <Button
                         Grid.Column="3"
@@ -290,8 +304,9 @@
                                 <Grid MaxWidth="200">
                                     <TextBlock
                                         IsTextSelectionEnabled="True"
-                                        Text="JASM 利用关键词来助力提升搜索功能。有些角色可能拥有多个名称，因此你可以添加额外的名称或搜索词条作为关键词。"
-                                        TextWrapping="WrapWholeWords" />
+                                        Text="JASM uses keywords to help with the search functionality. Some characters might have multiple names, so you can add extra names or search terms as keywords."
+                                        TextWrapping="WrapWholeWords"
+                                        l:Uids.Uid="/CharacterManager/KeywordHelpText" />
                                 </Grid>
                             </Flyout>
                         </Button.Flyout>
@@ -322,7 +337,8 @@
                                         HorizontalAlignment="Right"
                                         Command="{Binding ElementName=EditCharacterPageRoot, Path=ViewModel.RemoveKeyCommand, Mode=OneTime}"
                                         CommandParameter="{Binding Mode=OneTime}"
-                                        Content="移除" />
+                                        Content="Remove"
+                                        l:Uids.Uid="/CharacterManager/RemoveKeywordButton" />
                                 </Grid>
                             </DataTemplate>
                         </ListView.ItemTemplate>
@@ -346,24 +362,26 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <Button
+                 <Button
                     Grid.Row="0"
                     Margin="0,16"
                     HorizontalAlignment="Center"
                     Command="{x:Bind ViewModel.RevertChangesCommand}"
-                    Content="撤销更改"
-                    ToolTipService.ToolTip="Reverts changes not saved" />
+                    Content="Revert Changes"
+                    ToolTipService.ToolTip="Reverts changes not saved"
+                    l:Uids.Uid="/CharacterManager/EditPage_RevertChangesButton" />
                 <Button
                     Grid.Row="1"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Bottom"
                     Background="{ThemeResource AccentFillColorDefaultBrush}"
                     Command="{x:Bind ViewModel.DummySaveCommand}"
-                    Content="保存更改"
-                    ToolTipService.ToolTip="将更改保存到磁盘">
+                    Content="Save Changes"
+                    ToolTipService.ToolTip="Save changes to disk"
+                    l:Uids.Uid="/CharacterManager/EditPage_SaveChangesButton">
                     <Button.Flyout>
                         <Flyout Placement="Bottom">
-                            <Button Command="{x:Bind ViewModel.SaveChangesCommand}" Content="保存" />
+                            <Button Command="{x:Bind ViewModel.SaveChangesCommand}" Content="Save" l:Uids.Uid="/CharacterManager/EditPage_ConfirmSaveButton" />
                         </Flyout>
                     </Button.Flyout>
                 </Button>
@@ -374,7 +392,7 @@
                     HorizontalAlignment="Stretch"
                     Command="{x:Bind ViewModel.ShowCharacterModelCommand}">
                     <Button.Content>
-                        <TextBlock Text="显示角色数据模型..." TextWrapping="WrapWholeWords" />
+                        <TextBlock Text="Show Character Data Model..." TextWrapping="WrapWholeWords" l:Uids.Uid="/CharacterManager/EditPage_ShowModelButton" />
                     </Button.Content>
                 </Button>
 
@@ -387,12 +405,13 @@
                 Width="200"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Bottom"
-                Content="重置角色"
-                ToolTipService.ToolTip="将角色的各项数值重置为默认值"
-                Visibility="{x:Bind ViewModel.IsNotCustomCharacter, Converter={StaticResource BoolToVisibilityConverter}}">
+                Content="Reset Character"
+                ToolTipService.ToolTip="Reset character values to default"
+                Visibility="{x:Bind ViewModel.IsNotCustomCharacter, Converter={StaticResource BoolToVisibilityConverter}}"
+                l:Uids.Uid="/CharacterManager/EditPage_ResetCharacterButton">
                 <Button.Flyout>
                     <Flyout>
-                        <Button Command="{x:Bind ViewModel.ResetCharacterToDefaultCommand}" Content="重置角色设置" />
+                        <Button Command="{x:Bind ViewModel.ResetCharacterToDefaultCommand}" Content="Reset Character Settings" l:Uids.Uid="/CharacterManager/EditPage_ConfirmResetButton" />
                     </Flyout>
                 </Button.Flyout>
             </Button>

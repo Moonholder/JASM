@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="CharacterManagerItem.Content" xml:space="preserve">
+    <value>角色管理</value>
+  </data>
+  <data name="ModsOverviewItem.Content" xml:space="preserve">
+    <value>模组概览</value>
+  </data>
+  <data name="PresetsItem.Content" xml:space="preserve">
+    <value>模组预设</value>
+  </data>
+  <data name="NotificationsItem.Content" xml:space="preserve">
+    <value>通知</value>
+  </data>
+  <!-- Code Behind Strings -->
+  <data name="CharacterOverview" xml:space="preserve">
+    <value>角色概览</value>
+  </data>
+  <data name="SwitchGameTooltip" xml:space="preserve">
+    <value>双击可切换到 {0}</value>
+  </data>
+</root>

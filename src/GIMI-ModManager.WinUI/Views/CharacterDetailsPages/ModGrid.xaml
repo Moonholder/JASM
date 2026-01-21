@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:l="using:WinUI3Localizer"
     xmlns:local="using:GIMI_ModManager.WinUI.Views.CharacterDetailsPages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="using:GIMI_ModManager.WinUI.Models"
@@ -84,7 +85,7 @@
                     CanUserResize="False"
                     CanUserSort="True"
                     ClipboardContentBinding="{Binding IsEnabled, Mode=OneWay}"
-                    Header="是否启用"
+                    Header="{x:Bind ViewModel.GetLocalized('/CharacterDetailsPage/EnabledColumnHeader', 'Enabled'), Mode=OneWay}"
                     Tag="IsEnabled">
 
                     <controls:DataGridTemplateColumn.CellTemplate>
@@ -124,13 +125,13 @@
                                                 <Button
                                                     Margin="0"
                                                     Padding="0"
+                                                    l:Uids.Uid="/CharacterDetailsPage/NewVersionAvailableToolTip"
                                                     BorderThickness="0"
                                                     Click="Notification_OnClick"
                                                     CornerRadius="0"
                                                     DataContext="{x:Bind}"
                                                     PointerEntered="NotificationButton_OnPointerEntered"
-                                                    PointerExited="NotificationButton_OnPointerExited"
-                                                    ToolTipService.ToolTip="有新版本可用">
+                                                    PointerExited="NotificationButton_OnPointerExited">
                                                     <Button.Content>
                                                         <FontIcon
                                                             VerticalAlignment="Bottom"
@@ -153,7 +154,7 @@
                     MinWidth="94"
                     Binding="{Binding DisplayName, Mode=OneWay}"
                     CanUserSort="True"
-                    Header="模组名称"
+                    Header="{x:Bind ViewModel.GetLocalized('/CharacterDetailsPage/ModNameColumnHeader', 'Mod Name'), Mode=OneWay}"
                     IsReadOnly="True"
                     Tag="DisplayName" />
 
@@ -161,24 +162,24 @@
                     Width="SizeToCells"
                     Binding="{Binding FolderName, Mode=OneWay}"
                     CanUserSort="True"
-                    Header="模组文件夹名"
+                    Header="{x:Bind ViewModel.GetLocalized('/CharacterDetailsPage/FolderNameColumnHeader', 'Folder Name'), Mode=OneWay}"
                     IsReadOnly="True"
                     Tag="FolderName"
                     Visibility="{x:Bind ViewModel.IsModFolderNameColumnVisible, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
 
                 <controls:DataGridTextColumn
                     Width="SizeToCells"
-                    MinWidth="70"
+                    MinWidth="85"
                     Binding="{Binding Author, Mode=OneWay}"
                     CanUserSort="True"
-                    Header="作者"
+                    Header="{x:Bind ViewModel.GetLocalized('/CharacterDetailsPage/AuthorColumnHeader', 'Author'), Mode=OneWay}"
                     Tag="Author" />
 
                 <controls:DataGridTemplateColumn
                     Width="SizeToHeader"
                     CanUserSort="True"
                     ClipboardContentBinding="{Binding DateAddedFormated, Mode=OneTime}"
-                    Header="添加时间"
+                    Header="{x:Bind ViewModel.GetLocalized('/CharacterDetailsPage/DateAddedColumnHeader', 'Date Added'), Mode=OneWay}"
                     IsReadOnly="True"
                     Tag="DateAdded">
                     <controls:DataGridTemplateColumn.CellTemplate>
@@ -198,10 +199,10 @@
 
                 <controls:DataGridTextColumn
                     Width="SizeToCells"
-                    MinWidth="70"
+                    MinWidth="85"
                     Binding="{Binding InPresets, Mode=OneWay}"
                     CanUserSort="True"
-                    Header="预设"
+                    Header="{x:Bind ViewModel.GetLocalized('/CharacterDetailsPage/PresetsColumnHeader', 'Presets'), Mode=OneWay}"
                     IsReadOnly="True"
                     Tag="Presets" />
 
@@ -211,7 +212,7 @@
                     MinWidth="70"
                     Binding="{Binding Description, Mode=OneWay}"
                     CanUserSort="False"
-                    Header="备注"
+                    Header="{x:Bind ViewModel.GetLocalized('/CharacterDetailsPage/DescriptionColumnHeader', 'Notes'), Mode=OneWay}"
                     IsReadOnly="False"
                     Tag="Description" />
 

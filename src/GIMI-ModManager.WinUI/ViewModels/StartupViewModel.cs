@@ -34,6 +34,7 @@ public partial class StartupViewModel : ObservableRecipient, INavigationAware
     private readonly SelectedGameService _selectedGameService;
     private readonly ModArchiveRepository _modArchiveRepository;
     private readonly CommandService _commandService;
+    private readonly ILanguageLocalizer _localizer;
 
 
     public PathPicker PathToGIMIFolderPicker { get; }
@@ -62,7 +63,7 @@ public partial class StartupViewModel : ObservableRecipient, INavigationAware
         IWindowManagerService windowManagerService, ISkinManagerService skinManagerService,
         SelectedGameService selectedGameService, IGameService gameService, ModPresetService modPresetService,
         UserPreferencesService userPreferencesService, ModArchiveRepository modArchiveRepository,
-        CommandService commandService)
+        CommandService commandService, ILanguageLocalizer localizer)
     {
         _navigationService = navigationService;
         _localSettingsService = localSettingsService;
@@ -74,6 +75,7 @@ public partial class StartupViewModel : ObservableRecipient, INavigationAware
         _userPreferencesService = userPreferencesService;
         _modArchiveRepository = modArchiveRepository;
         _commandService = commandService;
+        _localizer = localizer;
 
         PathToGIMIFolderPicker = new PathPicker([]);
 
@@ -83,6 +85,7 @@ public partial class StartupViewModel : ObservableRecipient, INavigationAware
         PathToGIMIFolderPicker.IsValidChanged += (sender, args) => SaveStartupSettingsCommand.NotifyCanExecuteChanged();
         PathToModsFolderPicker.IsValidChanged +=
             (sender, args) => SaveStartupSettingsCommand.NotifyCanExecuteChanged();
+        _localizer = localizer;
     }
 
 
@@ -138,16 +141,24 @@ public partial class StartupViewModel : ObservableRecipient, INavigationAware
         _navigationService.NavigateTo(typeof(CharactersViewModel).FullName!, null, true);
         _windowManagerService.ResizeWindowPercent(_windowManagerService.MainWindow, 80, 80);
         _windowManagerService.MainWindow.CenterOnScreen();
-        App.GetService<NotificationManager>().ShowNotification("保存启动设置",
-            $"启动设置已保存到 '{_localSettingsService.GameScopedSettingsLocation}'",
+
+        var notificationManager = App.GetService<NotificationManager>();
+        notificationManager.ShowNotification(
+            _localizer.GetLocalizedStringOrDefault("/Startup/SettingsSavedTitle", "Startup settings saved"),
+            string.Format(
+                _localizer.GetLocalizedStringOrDefault("/Startup/SettingsSavedMessage", "Startup settings saved to '{0}'"),
+                _localSettingsService.GameScopedSettingsLocation),
             TimeSpan.FromSeconds(7));
+
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
         Task.Run(async () =>
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
         {
             await Task.Delay(TimeSpan.FromSeconds(7));
-            App.GetService<NotificationManager>().ShowNotification("JASM仍处于alpha阶段",
-                "会有bug，有可能会出现问题。无论如何，希望你喜欢使用JASM!",
+
+            notificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/Startup/AlphaWarningTitle", "JASM is still in alpha"),
+                _localizer.GetLocalizedStringOrDefault("/Startup/AlphaWarningMessage", "There will be bugs and things might break. Regardless, I hope you enjoy using JASM!"),
                 TimeSpan.FromSeconds(20));
         });
     }
@@ -180,7 +191,7 @@ public partial class StartupViewModel : ObservableRecipient, INavigationAware
         SetSelectedGame(await _selectedGameService.GetSelectedGameAsync());
         await SetGameInfo(SelectedGame.Value.ToString());
         SetPaths(settings);
-        ReorganizeModsOnStartup = true;
+        //ReorganizeModsOnStartup = true;
     }
 
     [RelayCommand]
@@ -202,7 +213,8 @@ public partial class StartupViewModel : ObservableRecipient, INavigationAware
 
     private async Task SetGameInfo(string game)
     {
-        var gameInfo = await GameService.GetGameInfoAsync(Enum.Parse<SupportedGames>(game));
+        var currentLang = _localizer.CurrentLanguage.LanguageCode;
+        var gameInfo = await GameService.GetGameInfoAsync(Enum.Parse<SupportedGames>(game), currentLang);
 
         if (gameInfo is null)
         {
@@ -221,7 +233,8 @@ public partial class StartupViewModel : ObservableRecipient, INavigationAware
     {
         foreach (var supportedGame in Enum.GetValues<SupportedGames>())
         {
-            var gameInfo = await GameService.GetGameInfoAsync(supportedGame);
+            var currentLang = _localizer.CurrentLanguage.LanguageCode;
+            var gameInfo = await GameService.GetGameInfoAsync(supportedGame, currentLang);
             if (gameInfo is null)
                 continue;
 

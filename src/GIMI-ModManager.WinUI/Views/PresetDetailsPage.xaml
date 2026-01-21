@@ -8,6 +8,7 @@
     xmlns:controls1="using:GIMI_ModManager.WinUI.Views.Controls"
     xmlns:converters="using:CommunityToolkit.WinUI.UI.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:l="using:WinUI3Localizer"
     xmlns:local="using:GIMI_ModManager.WinUI.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewModels="using:GIMI_ModManager.WinUI.ViewModels"
@@ -59,7 +60,8 @@
                 <AppBarButton
                     Command="{x:Bind ViewModel.AddModsToPresetCommand}"
                     Icon="Add"
-                    Label="添加模组" />
+                    Label="Add Mods"
+                    l:Uids.Uid="/PresetPage/PresetDetailsPage_AddModsButton" />
             </CommandBar>
 
             <TextBox
@@ -69,8 +71,9 @@
                 MaxHeight="32"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Center"
-                PlaceholderText="搜索模组..."
-                TextChanged="SearchBox_OnTextChanged" />
+                PlaceholderText="Search mods..."
+                TextChanged="SearchBox_OnTextChanged"
+                l:Uids.Uid="/PresetPage/PresetDetailsPage_SearchBox" />
         </Grid>
 
 
@@ -151,8 +154,9 @@
                                         <MenuFlyoutItem
                                             Command="{x:Bind ReplaceMissingModCommand}"
                                             CommandParameter="{Binding Mode=OneWay}"
-                                            Text="寻找替代Mod"
-                                            Visibility="{x:Bind IsMissing, Converter={StaticResource BoolToVisibilityConverter}}">
+                                            Text="Find Replacement Mod"
+                                            Visibility="{x:Bind IsMissing, Converter={StaticResource BoolToVisibilityConverter}}"
+                                            l:Uids.Uid="/PresetPage/PresetDetailsPage_FindReplacementMenuItem">
                                             <MenuFlyoutItem.Icon>
                                                 <FontIcon Glyph="&#xE8DA;" />
                                             </MenuFlyoutItem.Icon>
@@ -160,9 +164,10 @@
                                         <MenuFlyoutItem
                                             Command="{x:Bind ReadAndSavePreferencesCommand}"
                                             CommandParameter="{Binding Mode=OneWay}"
-                                            Text="读取并保存首选项"
-                                            ToolTipService.ToolTip="读取当前 3Dmigoto 用户的 ini 文件(d3dxUser.ini)，并为该预设保存偏好设置"
-                                            Visibility="{x:Bind IsNotMissing, Converter={StaticResource BoolToVisibilityConverter}}">
+                                            Text="Read and Save Preferences"
+                                            ToolTipService.ToolTip="Read current 3Dmigoto user ini file (d3dx_user.ini) and save preferences for this preset"
+                                            Visibility="{x:Bind IsNotMissing, Converter={StaticResource BoolToVisibilityConverter}}"
+                                            l:Uids.Uid="/PresetPage/PresetDetailsPage_SavePreferencesMenuItem">
                                             <MenuFlyoutItem.Icon>
                                                 <FontIcon Glyph="&#xE74E;" />
                                             </MenuFlyoutItem.Icon>
@@ -171,7 +176,8 @@
                                         <MenuFlyoutItem
                                             Command="{x:Bind RemoveModFromPresetCommand}"
                                             CommandParameter="{Binding Mode=OneTime}"
-                                            Text="从预设中移除Mod">
+                                            Text="Remove Mod from Preset"
+                                            l:Uids.Uid="/PresetPage/PresetDetailsPage_RemoveModMenuItem">
                                             <MenuFlyoutItem.Icon>
                                                 <FontIcon Glyph="&#xE894;" />
                                             </MenuFlyoutItem.Icon>
@@ -216,7 +222,7 @@
                                     Visibility="{x:Bind HasSourceUrl, Converter={StaticResource BoolToVisibilityConverter}}" />
 
                                 <StackPanel>
-                                    <TextBlock HorizontalAlignment="Center" Text="预设添加于:" />
+                                    <TextBlock HorizontalAlignment="Center" Text="Added at:" l:Uids.Uid="/PresetPage/PresetDetailsPage_AddedAtLabel" />
                                     <TextBlock HorizontalAlignment="Center" Text="{x:Bind AddedAt}" />
                                 </StackPanel>
 
@@ -229,7 +235,8 @@
                                 <TextBlock
                                     HorizontalAlignment="Center"
                                     Foreground="Red"
-                                    Text="在磁盘上找不到该模组!" />
+                                    Text="Mod not found on disk!"
+                                    l:Uids.Uid="/PresetPage/PresetDetailsPage_ModNotFoundText" />
 
                                 <StackPanel>
                                     <TextBlock HorizontalAlignment="Center" Text="Original Path:" />

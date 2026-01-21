@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8" ?>
 <Page
     x:Class="GIMI_ModManager.WinUI.Views.CharactersPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -8,6 +7,7 @@
     xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
     xmlns:controls1="using:GIMI_ModManager.WinUI.Views.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:l="using:WinUI3Localizer"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="using:GIMI_ModManager.WinUI.Models"
     xmlns:subVms="using:GIMI_ModManager.WinUI.ViewModels.SubVms"
@@ -19,9 +19,8 @@
         <xaml:BoolToVisibleConverter x:Name="BoolToVisibleConverter" />
         <xaml:BoolInverterConverter x:Name="BoolInverterConverter" />
         <xaml:AttentionTypeToSymbolConverter x:Name="AttentionTypeToSymbolConverter" />
-
-
     </Page.Resources>
+
     <Grid Margin="0,-24,0,0" Background="Transparent">
         <Grid.Resources>
             <MenuFlyout x:Name="ImageCommandsFlyout" Opening="ImageCommandsFlyout_OnOpening">
@@ -37,7 +36,8 @@
                     Command="{x:Bind ViewModel.CheckForUpdatesForCharacterCommand}"
                     CommandParameter="{Binding}"
                     IsEnabled="{x:Bind ViewModel.CanCheckForUpdates, Mode=OneWay}"
-                    Text="检查更新">
+                    Text="Check for updates"
+                    l:Uids.Uid="/CharactersPage/CheckForUpdatesMenuItem">
                     <MenuFlyoutItem.Icon>
                         <FontIcon Glyph="&#xE777;" />
                     </MenuFlyoutItem.Icon>
@@ -46,17 +46,19 @@
                 <MenuFlyoutItem
                     Command="{x:Bind ViewModel.OpenCharacterFolderCommand}"
                     CommandParameter="{Binding}"
-                    Text="打开文件夹...">
+                    Text="Open Folder..."
+                    l:Uids.Uid="/CharactersPage/OpenFolderMenuItem">
                     <MenuFlyoutItem.Icon>
                         <FontIcon Glyph="&#xE8DA;" />
                     </MenuFlyoutItem.Icon>
                 </MenuFlyoutItem>
                 <MenuFlyoutSeparator />
-                <MenuFlyoutSubItem Text="Mods">
+                <MenuFlyoutSubItem Text="Mods" l:Uids.Uid="/CharactersPage/ModsSubMenu">
                     <MenuFlyoutItem
                         Command="{x:Bind ViewModel.ClearNotificationsCommand}"
                         CommandParameter="{Binding}"
-                        Text="清除通知">
+                        Text="Clear Notifications"
+                        l:Uids.Uid="/CharactersPage/ClearNotificationsMenuItem">
                         <MenuFlyoutItem.Icon>
                             <FontIcon Glyph="&#xE894;" />
                         </MenuFlyoutItem.Icon>
@@ -65,7 +67,8 @@
                     <MenuFlyoutItem
                         Command="{x:Bind ViewModel.DisableCharacterModsCommand}"
                         CommandParameter="{Binding}"
-                        Text="禁用所有模组" />
+                        Text="Disable All Mods"
+                        l:Uids.Uid="/CharactersPage/DisableAllModsMenuItem" />
                 </MenuFlyoutSubItem>
             </MenuFlyout>
         </Grid.Resources>
@@ -78,11 +81,12 @@
 
         <ContentDialog
             x:Name="SelectProcessDialog"
-            Title="选择启动进程路径"
+            Title="Select Launch Process Path"
             DefaultButton="Primary"
             IsPrimaryButtonEnabled="{x:Bind ViewModel.SimpleSelectProcessDialogVM.PathPicker.IsValid, Mode=OneWay}"
-            PrimaryButtonText="保存"
-            SecondaryButtonText="取消">
+            PrimaryButtonText="Save"
+            SecondaryButtonText="Cancel"
+            l:Uids.Uid="/CharactersPage/SelectProcessDialog">
             <Grid MinWidth="500" MinHeight="200">
 
                 <Grid.RowDefinitions>
@@ -95,8 +99,9 @@
                     <TextBlock
                         Margin="0,0,0,8"
                         IsTextSelectionEnabled="True"
-                        Text="选择您想要启动的进程的路径。保存后，按下启动按钮时将启动此进程。这可以在设置页面重置."
-                        TextWrapping="WrapWholeWords" />
+                        Text="Select the path of the process you want to launch. This process will be launched when you press the Launch button. This can be reset in the Settings page."
+                        TextWrapping="WrapWholeWords"
+                        l:Uids.Uid="/CharactersPage/SelectProcessDescription" />
 
                     <controls1:FolderSelector
                         Title=""
@@ -106,14 +111,12 @@
                         ValidationErrorText="{x:Bind ViewModel.SimpleSelectProcessDialogVM.PathPicker.ValidationMessages, Mode=OneWay}" />
                 </StackPanel>
 
-
-
-
                 <Button
                     Grid.Row="1"
                     HorizontalAlignment="Right"
                     Command="{x:Bind ViewModel.SimpleSelectProcessDialogVM.ShowAdvancedDialogCommand}"
-                    Content="创建高级命令" />
+                    Content="Create Advanced Command"
+                    l:Uids.Uid="/CharactersPage/CreateAdvancedCommandButton" />
 
 
             </Grid>
@@ -159,8 +162,9 @@
                 <TextBlock
                     Margin="0,0,8,0"
                     VerticalAlignment="Center"
-                    Text="排序方式:"
-                    TextWrapping="WrapWholeWords" />
+                    Text="Sort by:"
+                    TextWrapping="WrapWholeWords"
+                    l:Uids.Uid="/CharactersPage/SortByLabel" />
 
                 <ComboBox
                     x:Name="SortingComboBox"
@@ -170,7 +174,8 @@
                     PlaceholderText="Sort Characters..."
                     SelectedItem="{x:Bind ViewModel.SelectedSortingMethod, Mode=TwoWay}"
                     SelectionChanged="SortingComboBox_OnSelectionChanged"
-                    SelectionChangedTrigger="Committed" />
+                    SelectionChangedTrigger="Committed"
+                    l:Uids.Uid="/CharactersPage/SortingComboBox" />
 
                 <ToggleButton
                     Margin="0,0,16,0"
@@ -183,12 +188,14 @@
 
                 <Button
                     Command="{x:Bind ViewModel.RefreshModsInGameCommand}"
-                    Content="刷新 Mods"
-                    IsHitTestVisible="True" />
+                    Content="Refresh Mods"
+                    IsHitTestVisible="True"
+                    l:Uids.Uid="/CharactersPage/RefreshModsButton" />
                 <Button
                     Margin="32,0,32,0"
                     Command="{x:Bind ViewModel.Start3DmigotoCommand}"
-                    Content="启动Mod加载器">
+                    Content="Start Mod Loader"
+                    l:Uids.Uid="/CharactersPage/StartModLoaderButton">
                     <ToolTipService.ToolTip>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="{x:Bind ViewModel.ThreeDMigtoProcessManager.ProcessPath, Mode=OneWay}" TextWrapping="WrapWholeWords" />
@@ -234,7 +241,7 @@
                 CornerRadius="8"
                 Orientation="Horizontal">
                 <CommandBar DefaultLabelPosition="Right" IsOpen="False">
-                    <AppBarButton Label="模组预设">
+                    <AppBarButton Label="Mod Presets" l:Uids.Uid="/CharactersPage/ModPresetsAppBarButton">
                         <AppBarButton.Icon>
                             <FontIcon Glyph="&#xEA41;" />
                         </AppBarButton.Icon>
@@ -242,7 +249,7 @@
                             <Flyout Placement="Bottom">
                                 <ScrollViewer Margin="-4">
                                     <StackPanel Spacing="8">
-                                        <TextBlock Text="应用预设:" />
+                                        <TextBlock Text="Apply Preset:" l:Uids.Uid="/CharactersPage/ApplyPresetLabel" />
                                         <ItemsRepeater ItemsSource="{x:Bind ViewModel.ModPresets}">
                                             <ItemsRepeater.Layout>
                                                 <StackLayout Orientation="Vertical" Spacing="8" />
@@ -254,7 +261,7 @@
                                                         <Button.Flyout>
                                                             <Flyout Placement="Right">
                                                                 <Button Command="{x:Bind ApplyPresetCommand}" CommandParameter="{x:Bind}">
-                                                                    <TextBlock Text="确认" />
+                                                                    <TextBlock Text="Confirm" l:Uids.Uid="/CharactersPage/ConfirmButton" />
                                                                 </Button>
                                                             </Flyout>
                                                         </Button.Flyout>
@@ -268,10 +275,11 @@
                                         <Button 
                                             HorizontalAlignment="Stretch"
                                             Command="{x:Bind ViewModel.RandomizeModsCommand}"
-                                            ToolTipService.ToolTip="打开一个包含更多信息的对话框">
+                                            ToolTipService.ToolTip="Opens a dialog with more info"
+                                            l:Uids.Uid="/CharactersPage/RandomizeModsButton">
                                             <StackPanel Orientation="Horizontal" Spacing="8">
                                                 <FontIcon Glyph="&#xE8B1;" />
-                                                <TextBlock Text="随机启用模组" />
+                                                <TextBlock Text="Randomize Mods" l:Uids.Uid="/CharactersPage/RandomizeModsText" />
                                             </StackPanel>
                                         </Button>
                                     </StackPanel>
@@ -279,7 +287,7 @@
                             </Flyout>
                         </AppBarButton.Flyout>
                     </AppBarButton>
-                    <AppBarButton Icon="Filter" Label="筛选">
+                    <AppBarButton Icon="Filter" Label="Filter" l:Uids.Uid="/CharactersPage/FilterAppBarButton">
 
                         <AppBarButton.Flyout>
                             <Flyout>
@@ -293,7 +301,8 @@
                                             Command="{x:Bind ViewModel.ShowOnlyCharactersWithEnabledModsCommand}"
                                             Content="{x:Bind ViewModel.ModEnabledToggleText, Mode=OneWay}"
                                             IsChecked="{x:Bind ViewModel.ShowOnlyWithEnabledMods, Mode=OneWay}"
-                                            ToolTipService.ToolTip="展示至少存在一个启用的模组" />
+                                            ToolTipService.ToolTip="Shows only characters with at least one enabled mod"
+                                            l:Uids.Uid="/CharactersPage/ShowOnlyWithEnabledModsToggle" />
                                         <ToggleButton
                                             Command="{x:Bind ViewModel.ShowOnlyCharactersWithModNotificationsCommand}"
                                             Content="{x:Bind ViewModel.ModNotificationsToggleText, Mode=OneWay}"
@@ -348,8 +357,9 @@
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Style="{ThemeResource SubtitleTextBlockStyle}"
-                    Text="拖到这里自动检测Mod..."
-                    TextWrapping="NoWrap" />
+                    Text="Drag and Drop to Detect Mods..."
+                    TextWrapping="NoWrap"
+                    l:Uids.Uid="/CharactersPage/DragAndDropText" />
 
             </Grid>
 

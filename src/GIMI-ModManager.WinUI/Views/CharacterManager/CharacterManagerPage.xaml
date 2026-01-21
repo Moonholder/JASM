@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="utf-8" ?>
 <Page
     x:Class="GIMI_ModManager.WinUI.Views.CharacterManagerPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:l="using:WinUI3Localizer"
     xmlns:local="using:GIMI_ModManager.WinUI.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewModels="using:GIMI_ModManager.WinUI.ViewModels"
@@ -27,7 +27,8 @@
             HorizontalAlignment="Left"
             FontSize="28"
             Style="{StaticResource TitleTextBlockStyle}"
-            Text="角色管理器" />
+            Text="Character Manager"
+            l:Uids.Uid="/CharacterManager/PageTitle" />
 
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
@@ -40,13 +41,14 @@
                 x:Name="CharacterSearchBox"
                 Width="300"
                 HorizontalAlignment="Left"
-                Header="搜索要编辑的角色"
+                Header="Search for a character to edit"
                 ItemsSource="{x:Bind ViewModel.Suggestions}"
-                PlaceholderText="开始输入搜索..."
+                PlaceholderText="Start typing to search..."
                 QuerySubmitted="CharacterSearchBox_OnQuerySubmitted"
                 SuggestionChosen="CharacterSearchBox_OnSuggestionChosen"
                 TextChanged="CharacterSearchBox_OnTextChanged"
-                Text="{x:Bind ViewModel.SearchBoxText, Mode=TwoWay}">
+                Text="{x:Bind ViewModel.SearchBoxText, Mode=TwoWay}"
+                l:Uids.Uid="/CharacterManager/SearchBox">
                 <AutoSuggestBox.KeyboardAccelerators>
                     <KeyboardAccelerator
                         Key="F"
@@ -79,7 +81,8 @@
                 Margin="16,0,0,0"
                 VerticalAlignment="Bottom"
                 Command="{x:Bind ViewModel.OpenCreateCharacterFormCommand}"
-                ToolTipService.ToolTip="创建新角色">
+                ToolTipService.ToolTip="Create new character"
+                l:Uids.Uid="/CharacterManager/CreateButton">
                 <FontIcon Glyph="&#xE710;" />
             </Button>
 

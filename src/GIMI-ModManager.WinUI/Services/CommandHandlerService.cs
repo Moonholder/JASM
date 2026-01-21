@@ -7,13 +7,15 @@ using GIMI_ModManager.Core.Services.CommandService.Models;
 using GIMI_ModManager.WinUI.Services.ModHandling;
 using GIMI_ModManager.WinUI.Services.Notifications;
 using Serilog;
+using GIMI_ModManager.Core.Contracts.Services;
 
 namespace GIMI_ModManager.WinUI.Services;
 
-public class CommandHandlerService(CommandService commandService, ILogger logger)
+public class CommandHandlerService(CommandService commandService, ILogger logger, ILanguageLocalizer localizer)
 {
     private readonly ILogger _logger = logger.ForContext<CommandHandlerService>();
     private readonly CommandService _commandService = commandService;
+    private readonly ILanguageLocalizer _localizer = localizer;
 
 
     public async Task<ICollection<string>> CanRunCommandAsync(Guid commandId, SpecialVariablesInput? variablesInput,
@@ -30,7 +32,9 @@ public class CommandHandlerService(CommandService commandService, ILogger logger
 #endif
 
             _logger.Error(e, "An error occured when checking if command can be started");
-            return new List<string> { $"An error occured when checking if command can be started: {e.Message}" };
+            return [
+                string.Format(_localizer.GetLocalizedStringOrDefault("/Settings/CommandHandler_ErrorCheckingStart", "An error occurred when checking if command can be started: {0}"), e.Message)
+            ];
         }
     }
 
@@ -42,7 +46,7 @@ public class CommandHandlerService(CommandService commandService, ILogger logger
 
         if (command is null)
         {
-            return [$"Command with id '{commandId}' not found"];
+            return [string.Format(_localizer.GetLocalizedStringOrDefault("/Settings/CommandHandler_CommandNotFoundId", "Command with ID '{0}' not found"), commandId)];
         }
 
 
@@ -50,14 +54,15 @@ public class CommandHandlerService(CommandService commandService, ILogger logger
 
         if (command.ExecutionOptions.Command.IsNullOrEmpty())
         {
-            errors.Add("Executable path value is empty null or empty");
+            errors.Add(_localizer.GetLocalizedStringOrDefault("/Settings/CommandHandler_ExecutablePathEmpty", "Executable path value is null or empty"));
         }
 
 
         if (!File.Exists(command.ExecutionOptions.Command) && !IsExeFoundInPath(command))
         {
-            errors.Add(
-                $"Executable '{command.ExecutionOptions.Command}' not found in $PATH or Executable file does not exist");
+            errors.Add(string.Format(
+                _localizer.GetLocalizedStringOrDefault("/Settings/CommandHandler_ExecutableNotFound", "Executable '{0}' not found in $PATH or file does not exist"),
+                command.ExecutionOptions.Command));
         }
 
 
@@ -65,8 +70,9 @@ public class CommandHandlerService(CommandService commandService, ILogger logger
             command.ExecutionOptions.WorkingDirectory is not null &&
             !Directory.Exists(command.ExecutionOptions.WorkingDirectory))
         {
-            errors.Add(
-                $"Working directory '{command.ExecutionOptions.WorkingDirectory}' does not exist");
+            errors.Add(string.Format(
+                _localizer.GetLocalizedStringOrDefault("/Settings/CommandHandler_WorkingDirNotFound", "Working directory '{0}' does not exist"),
+                command.ExecutionOptions.WorkingDirectory));
         }
 
 
@@ -75,7 +81,7 @@ public class CommandHandlerService(CommandService commandService, ILogger logger
         {
             if (variablesInput is null)
             {
-                errors.Add($"Special variables are required for this command");
+                errors.Add(_localizer.GetLocalizedStringOrDefault("/Settings/CommandHandler_SpecialVarsRequired", "Special variables are required for this command"));
             }
             else
             {
@@ -88,7 +94,9 @@ public class CommandHandlerService(CommandService commandService, ILogger logger
                 if (strings.Any(x => x is not null && x.Contains(SpecialVariables.TargetPath)) &&
                     !variablesInput.HasSpecialVariable(SpecialVariables.TargetPath))
                 {
-                    errors.Add($"Special variable '{SpecialVariables.TargetPath}' is required for this command");
+                    errors.Add(string.Format(
+                        _localizer.GetLocalizedStringOrDefault("/Settings/CommandHandler_SpecificVarRequired", "Special variable '{0}' is required for this command"),
+                        SpecialVariables.TargetPath));
                 }
             }
         }
@@ -98,7 +106,9 @@ public class CommandHandlerService(CommandService commandService, ILogger logger
         if (usesTargetPath &&
             (variablesInput is null || !variablesInput.HasSpecialVariable(SpecialVariables.TargetPath)))
         {
-            errors.Add($"Special variable '{SpecialVariables.TargetPath}' is required for this command");
+            errors.Add(string.Format(
+                _localizer.GetLocalizedStringOrDefault("/Settings/CommandHandler_SpecificVarRequired", "Special variable '{0}' is required for this command"),
+                SpecialVariables.TargetPath));
         }
 
         if (usesTargetPath)
@@ -107,7 +117,9 @@ public class CommandHandlerService(CommandService commandService, ILogger logger
 
             if (targetPath is not null && !Directory.Exists(targetPath))
             {
-                errors.Add($"Target path '{targetPath}' does not exist");
+                errors.Add(string.Format(
+                    _localizer.GetLocalizedStringOrDefault("/Settings/CommandHandler_TargetPathNotFound", "Target path '{0}' does not exist"),
+                    targetPath));
             }
         }
 
@@ -129,8 +141,8 @@ public class CommandHandlerService(CommandService commandService, ILogger logger
 #endif
 
             _logger.Error(e, "An error occured when starting command");
-            return Result<ProcessCommand>.Error(e, new SimpleNotification("An error occured when starting command",
-                e.Message, null));
+            var title = _localizer.GetLocalizedStringOrDefault("/Settings/CommandHandler_ErrorStartingCommand", "An error occurred when starting command");
+            return Result<ProcessCommand>.Error(e, new SimpleNotification(title, e.Message, null));
         }
     }
 
@@ -143,16 +155,21 @@ public class CommandHandlerService(CommandService commandService, ILogger logger
 
         if (command is null)
         {
-            return Result<ProcessCommand>.Error(new SimpleNotification("命令未找到",
-                $"ID为 '{commandId}' 的命令未找到"));
+            var title = _localizer.GetLocalizedStringOrDefault("/Settings/CommandHandler_CommandNotFoundTitle", "Command not found");
+            var msg = string.Format(_localizer.GetLocalizedStringOrDefault("/Settings/CommandHandler_CommandNotFoundId", "Command with ID '{0}' not found"), commandId);
+            return Result<ProcessCommand>.Error(new SimpleNotification(title, msg));
         }
 
         var errors = await InternalCanRunCommandAsync(commandId, variablesInput, cancellationToken);
 
         if (errors.Count > 0)
         {
-            return Result<ProcessCommand>.Error(new SimpleNotification("命令无法启动",
-                $"命令 '{command.CommandDisplayName}' 因以下错误无法启动： {string.Join(", ", errors)}"));
+            var title = _localizer.GetLocalizedStringOrDefault("/Settings/CommandHandler_CommandStartFailedTitle", "Command cannot start");
+            var msg = string.Format(
+                _localizer.GetLocalizedStringOrDefault("/Settings/CommandHandler_CommandStartFailedMessage", "Command '{0}' failed to start due to: {1}"),
+                command.CommandDisplayName, string.Join(", ", errors));
+
+            return Result<ProcessCommand>.Error(new SimpleNotification(title, msg));
         }
 
         var processCommand = _commandService.CreateCommand(command, variablesInput);
@@ -160,8 +177,12 @@ public class CommandHandlerService(CommandService commandService, ILogger logger
         processCommand.Start();
 
 
-        return Result<ProcessCommand>.Success(processCommand, new SimpleNotification("命令已启动",
-            $"命令  '{command.CommandDisplayName}' 已启动"));
+        var successTitle = _localizer.GetLocalizedStringOrDefault("/Settings/CommandHandler_CommandStartedTitle", "Command started");
+        var successMsg = string.Format(
+            _localizer.GetLocalizedStringOrDefault("/Settings/CommandHandler_CommandStartedMessage", "Command '{0}' started"),
+            command.CommandDisplayName);
+
+        return Result<ProcessCommand>.Success(processCommand, new SimpleNotification(successTitle, successMsg));
     }
 
     public async Task<List<CommandDefinition>> GetCommandsThatContainSpecialVariablesAsync(

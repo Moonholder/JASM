@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="GoToDetailsButton.Content" xml:space="preserve">
+    <value>跳转详情页</value>
+  </data>
+  
+  <data name="PageTitle.Text" xml:space="preserve">
+    <value>模组概览</value>
+  </data>
+  
+  <data name="OpenAllButton.Content" xml:space="preserve">
+    <value>展开全部</value>
+  </data>
+  
+  <data name="CloseAllButton.Content" xml:space="preserve">
+    <value>关闭全部</value>
+  </data>
+  
+  <data name="SearchBox.PlaceholderText" xml:space="preserve">
+    <value>按回车键搜索...</value>
+  </data>
+</root>

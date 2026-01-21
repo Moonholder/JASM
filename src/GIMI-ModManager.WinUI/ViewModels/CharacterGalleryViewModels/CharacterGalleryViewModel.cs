@@ -31,6 +31,7 @@ public partial class CharacterGalleryViewModel : ObservableRecipient, INavigatio
     private readonly INavigationService _navigationService;
     private readonly IGameService _gameService;
     private readonly ILogger _logger;
+    private readonly ILanguageLocalizer _localizer;
 
 
     private ICategory? _category;
@@ -113,7 +114,7 @@ public partial class CharacterGalleryViewModel : ObservableRecipient, INavigatio
         ILocalSettingsService localSettingsService,
         CharacterSkinService characterSkinService,
         UserPreferencesService userPreferencesService,
-        ElevatorService elevatorService, ILogger logger)
+        ElevatorService elevatorService, ILanguageLocalizer localizer, ILogger logger)
     {
         _skinManagerService = skinManagerService;
         _localSettingsService = localSettingsService;
@@ -123,6 +124,7 @@ public partial class CharacterGalleryViewModel : ObservableRecipient, INavigatio
         _logger = logger.ForContext<CharacterGalleryViewModel>();
         _navigationService = navigationService;
         _gameService = gameService;
+        _localizer = localizer;
 
         var settings = _localSettingsService.ReadSetting<CharacterGallerySettings>(CharacterGallerySettings.Key) ??
                        new CharacterGallerySettings();

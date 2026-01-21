@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- Context Menu -->
+  <data name="CheckForUpdatesMenuItem.Text" xml:space="preserve">
+    <value>检查更新</value>
+  </data>
+  <data name="OpenFolderMenuItem.Text" xml:space="preserve">
+    <value>打开文件夹...</value>
+  </data>
+  <data name="ModsSubMenu.Text" xml:space="preserve">
+    <value>模组</value>
+  </data>
+  <data name="ClearNotificationsMenuItem.Text" xml:space="preserve">
+    <value>清除通知</value>
+  </data>
+  <data name="DisableAllModsMenuItem.Text" xml:space="preserve">
+    <value>禁用所有模组</value>
+  </data>
+
+  <!-- Process Selection Dialog -->
+  <data name="SelectProcessDialog.Title" xml:space="preserve">
+    <value>选择启动进程路径</value>
+  </data>
+  <data name="SelectProcessDialog.PrimaryButtonText" xml:space="preserve">
+    <value>保存</value>
+  </data>
+  <data name="SelectProcessDialog.SecondaryButtonText" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  <data name="SelectProcessDescription.Text" xml:space="preserve">
+    <value>选择您想要启动的进程的路径。保存后，按下启动按钮时将启动此进程。这可以在设置页面重置。</value>
+  </data>
+  <data name="CreateAdvancedCommandButton.Content" xml:space="preserve">
+    <value>创建高级命令</value>
+  </data>
+
+  <!-- Header Section -->
+  <data name="SortByLabel.Text" xml:space="preserve">
+    <value>排序方式:</value>
+  </data>
+  <data name="SortingComboBox.PlaceholderText" xml:space="preserve">
+    <value>角色排序...</value>
+  </data>
+  <data name="RefreshModsButton.Content" xml:space="preserve">
+    <value>刷新 Mods</value>
+  </data>
+  <data name="StartModLoaderButton.Content" xml:space="preserve">
+    <value>启动 Mod 加载器</value>
+  </data>
+
+  <!-- Command Bar -->
+  <data name="ModPresetsAppBarButton.Label" xml:space="preserve">
+    <value>模组预设</value>
+  </data>
+  <data name="ApplyPresetLabel.Text" xml:space="preserve">
+    <value>应用预设:</value>
+  </data>
+  <data name="ConfirmButton.Text" xml:space="preserve">
+    <value>确认</value>
+  </data>
+  <data name="RandomizeModsButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>打开一个包含更多信息的对话框</value>
+  </data>
+  <data name="RandomizeModsText.Text" xml:space="preserve">
+    <value>随机启用模组</value>
+  </data>
+  <data name="FilterAppBarButton.Label" xml:space="preserve">
+    <value>筛选</value>
+  </data>
+  <data name="ShowOnlyWithEnabledModsToggle.ToolTipService.ToolTip" xml:space="preserve">
+    <value>展示至少存在一个启用的模组</value>
+  </data>
+
+  <!-- Drag and Drop -->
+  <data name="DragAndDropText.Text" xml:space="preserve">
+    <value>拖到这里自动检测 Mod...</value>
+  </data>
+
+  <!-- ViewModel Strings -->
+  <data name="StartGameButtonFormat" xml:space="preserve">
+    <value>启动 {0}</value>
+  </data>
+  <data name="NoCharacterFoundFormat" xml:space="preserve">
+    <value>没有找到 {0}...</value>
+  </data>
+  <data name="OverviewTitleSuffix" xml:space="preserve">
+    <value>概览</value>
+  </data>
+  <data name="Overview" xml:space="preserve">
+    <value>概览</value>
+  </data>
+
+  <!-- Filter Toggles -->
+  <data name="ShowOnlyWithModsToggleFormat" xml:space="preserve">
+    <value>只显示有模组的 {0}</value>
+  </data>
+  <data name="ShowOnlyWithEnabledModsToggleFormat" xml:space="preserve">
+    <value>只显示有启用模组的 {0}</value>
+  </data>
+  <data name="ShowOnlyWithNotificationsToggleFormat" xml:space="preserve">
+    <value>只显示有更新通知的 {0}</value>
+  </data>
+  <data name="SearchBoxPlaceholderFormat" xml:space="preserve">
+    <value>搜索 {0}...</value>
+  </data>
+
+  <!-- Pin/Unpin -->
+  <data name="PinCharacter" xml:space="preserve">
+    <value>置顶角色</value>
+  </data>
+  <data name="UnpinCharacter" xml:space="preserve">
+    <value>取消置顶</value>
+  </data>
+
+  <!-- Notifications -->
+  <data name="DisableModsErrorTitle" xml:space="preserve">
+    <value>禁用模组时出错</value>
+  </data>
+  <data name="ModsDisabledTitle" xml:space="preserve">
+    <value>模组已禁用</value>
+  </data>
+  <data name="ModsDisabledMessageFormat" xml:space="preserve">
+    <value>{0} 的所有模组均已禁用</value>
+  </data>
+  <data name="AddModErrorTitle" xml:space="preserve">
+    <value>添加模组时出错</value>
+  </data>
+  <data name="InvalidGameBananaUrlTitle" xml:space="preserve">
+    <value>无效的 GameBanana 模组页面链接</value>
+  </data>
+  <data name="OpenModPageErrorTitle" xml:space="preserve">
+    <value>打开模组页面时出错</value>
+  </data>
+
+  <!-- Sorters -->
+  <data name="Sorter_Alphabetical" xml:space="preserve">
+    <value>按字母顺序</value>
+  </data>
+  <data name="Sorter_ModCount" xml:space="preserve">
+    <value>模组数量</value>
+  </data>
+  <data name="Sorter_RecentlyAdded" xml:space="preserve">
+    <value>最近添加的</value>
+  </data>
+  <data name="Sorter_ReleaseDate" xml:space="preserve">
+    <value>发布时间</value>
+  </data>
+  <data name="Sorter_Rarity" xml:space="preserve">
+    <value>稀有度</value>
+  </data>
+
+  <data name="SelectGameExecutablePlaceholder" xml:space="preserve">
+    <value>选择游戏可执行文件</value>
+  </data>
+  <data name="SelectModLoaderExecutablePlaceholder" xml:space="preserve">
+    <value>选择可执行的 Mod 加载器 exe 程序</value>
+  </data>
+
+  <!-- Drag & Drop Service -->
+  <data name="DragDrop_MultiFilesWarningTitle" xml:space="preserve">
+    <value>使用多个存储条目进行了拖放操作</value>
+  </data>
+  <data name="DragDrop_MultiFilesWarningMessage" xml:space="preserve">
+    <value>目前不支持这种情况</value>
+  </data>
+  <data name="DragDrop_AlreadyInstallingTitle" xml:space="preserve">
+    <value>请先完成为 '{0}' 添加模组的操作</value>
+  </data>
+  <data name="DragDrop_AlreadyInstallingMessage" xml:space="preserve">
+    <value>JASM 不支持为同一个角色安装多个模组</value>
+  </data>
+
+  <!-- Password Input Dialog -->
+  <data name="PasswordDialog.Title" xml:space="preserve">
+    <value>输入加密文件的密码</value>
+  </data>
+  <data name="PasswordDialog.CloseButtonText" xml:space="preserve">
+    <value>密码管理器</value>
+  </data>
+  <data name="PasswordDialog.PrimaryButtonText" xml:space="preserve">
+    <value>确认</value>
+  </data>
+  <data name="PasswordDialog.SecondaryButtonText" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  <data name="PasswordDialog_Input.PlaceholderText" xml:space="preserve">
+    <value>输入密码</value>
+  </data>
+  
+  <data name="PasswordDialog_ExtractFailedTitle" xml:space="preserve">
+    <value>解压失败</value>
+  </data>
+  <data name="PasswordDialog_ExtractFailedMessage" xml:space="preserve">
+    <value>密码错误，请尝试其他密码</value>
+  </data>
+
+  <!-- Password Entry Dialog -->
+  <data name="PasswordEntryDialog.Title" xml:space="preserve">
+    <value>输入密码信息</value>
+  </data>
+  <data name="PasswordEntryDialog.PrimaryButtonText" xml:space="preserve">
+    <value>确定</value>
+  </data>
+  <data name="PasswordEntryDialog.SecondaryButtonText" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  <data name="PasswordEntryDialog_DisplayNameLabel.Text" xml:space="preserve">
+    <value>显示名称 (可选)</value>
+  </data>
+  <data name="PasswordEntryDialog_PasswordLabel.Text" xml:space="preserve">
+    <value>密码</value>
+  </data>
+
+  <!-- Password Manager Dialog -->
+  <data name="PasswordManagerDialog.Title" xml:space="preserve">
+    <value>密码管理器</value>
+  </data>
+  <data name="PasswordManagerDialog.PrimaryButtonText" xml:space="preserve">
+    <value>确定</value>
+  </data>
+  <data name="PasswordManagerDialog.SecondaryButtonText" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  <data name="PasswordManager_DisplayNameHeader.Text" xml:space="preserve">
+    <value>显示名称</value>
+  </data>
+  <data name="PasswordManager_PasswordHeader.Text" xml:space="preserve">
+    <value>密码</value>
+  </data>
+  <data name="PasswordManager_AddButton.Content" xml:space="preserve">
+    <value>添加</value>
+  </data>
+  <data name="PasswordManager_EditButton.Content" xml:space="preserve">
+    <value>编辑</value>
+  </data>
+  <data name="PasswordManager_RemoveButton.Content" xml:space="preserve">
+    <value>删除</value>
+  </data>
+</root>

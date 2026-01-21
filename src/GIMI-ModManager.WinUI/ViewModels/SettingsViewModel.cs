@@ -236,17 +236,17 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
         {
             var result = await _windowManagerService.ShowDialogAsync(new ContentDialog()
             {
-                Title = "应用程序需要重启",
+                Title = _localizer.GetLocalizedStringOrDefault("/Settings/ThemeRestartTitle", "App needs restart"),
                 Content = new TextBlock()
                 {
-                    Text =
-                        "你需要重新启动应用程序，以使主题生效，否则应用程序将变得不稳定. " +
-                        "很可能是因为我没有正确配置主题。推荐使用深色模式.\n\n" +
-                        "对给您带来的不便深表歉意.",
+                    Text = _localizer.GetLocalizedStringOrDefault("/Settings/ThemeRestartMessage",
+                        "You need to restart the application for the theme to take effect, otherwise the application will become unstable. " +
+                        "This is likely because I didn't configure the theme correctly. Dark mode is recommended.\n\n" +
+                        "Sorry for the inconvenience."),
                     TextWrapping = TextWrapping.Wrap
                 },
-                PrimaryButtonText = "重启",
-                CloseButtonText = "取消",
+                PrimaryButtonText = _localizer.GetLocalizedStringOrDefault("Common_Restart", "Restart"),
+                CloseButtonText = _localizer.GetLocalizedStringOrDefault("Common_Cancel", "Cancel"),
                 DefaultButton = ContentDialogButton.Primary
             });
 
@@ -254,7 +254,10 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
 
             ElementTheme = param;
             await _themeSelectorService.SetThemeAsync(param);
-            _notificationManager.ShowNotification("重启中...", "应用程序现在将重新启动.",
+
+            _notificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/Settings/RestartingNotificationTitle", "Restarting..."),
+                _localizer.GetLocalizedStringOrDefault("/Settings/RestartingNotificationMessage", "The application will restart now."),
                 null);
             await RestartAppAsync();
         }
@@ -307,12 +310,12 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
         {
             XamlRoot = App.MainWindow.Content.XamlRoot,
             Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
-            Title = "更新文件夹路径?",
-            CloseButtonText = "取消",
-            PrimaryButtonText = "保存",
+            Title = _localizer.GetLocalizedStringOrDefault("/Settings/UpdateFolderPathsTitle", "Update folder paths?"),
+            CloseButtonText = _localizer.GetLocalizedStringOrDefault("Common_Cancel", "Cancel"),
+            PrimaryButtonText = _localizer.GetLocalizedStringOrDefault("Common_Save", "Save"),
             DefaultButton = ContentDialogButton.Primary,
             RequestedTheme = ElementTheme,
-            Content = "要保存新的文件夹路径吗？之后应用程序将重新启动."
+            Content = _localizer.GetLocalizedStringOrDefault("/Settings/UpdateFolderPathsMessage", "Do you want to save the new folder paths? The application will restart afterwards.")
         };
 
         var result = await dialog.ShowAsync();
@@ -328,8 +331,11 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
             await _localSettingsService.SaveSettingAsync(ModManagerOptions.Section,
                 modManagerOptions);
             _logger.Information("Saved startup settings: {@ModManagerOptions}", modManagerOptions);
-            _notificationManager.ShowNotification("设置保存. 重新启动应用程序...", "", TimeSpan.FromSeconds(2));
 
+            _notificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/Settings/SettingsSavedNotificationTitle", "Settings saved"),
+                _localizer.GetLocalizedStringOrDefault("/Settings/SettingsSavedNotificationMessage", "Restarting application..."),
+                TimeSpan.FromSeconds(2));
 
             await RestartAppAsync();
         }
@@ -356,19 +362,19 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
     {
         var result = await _windowManagerService.ShowDialogAsync(new ContentDialog()
         {
-            Title = "重新整理模组?",
+            Title = _localizer.GetLocalizedStringOrDefault("/Settings/ReorganizeModsTitle", "Reorganize Mods?"),
             Content = new TextBlock()
             {
-                Text =
-                    "你想要重新整理模组文件夹?\n" +
-                    "这将提示应用程序对直接在模组文件夹和Others文件夹中的现有模组进行排序，并将其分配给各自的角色.\n\n" +
-                    "任何不能合理匹配的模组都将被放在“Others”文件夹中。而已经在“其他”文件夹中的模组将保留在那里.",
+                Text = _localizer.GetLocalizedStringOrDefault("/Settings/ReorganizeModsMessage",
+                    "Do you want to reorganize the mod folders?\n" +
+                    "This will prompt the application to sort existing mods directly in the mods folder and Others folder and assign them to their respective characters.\n\n" +
+                    "Any mods that cannot be reasonably matched will be placed in the 'Others' folder. Mods already in the 'Others' folder will remain there."),
                 TextWrapping = TextWrapping.WrapWholeWords,
                 IsTextSelectionEnabled = true
             },
-            PrimaryButtonText = "是的",
+            PrimaryButtonText = _localizer.GetLocalizedStringOrDefault("Common_Yes", "Yes"),
             DefaultButton = ContentDialogButton.Primary,
-            CloseButtonText = "取消",
+            CloseButtonText = _localizer.GetLocalizedStringOrDefault("Common_Cancel", "Cancel"),
             Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style
         });
 
@@ -389,12 +395,15 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
                 await _skinManagerService.RefreshModsAsync();
 
                 if (movedModsCount == -1)
-                    _notificationManager.ShowNotification("Mods reorganization failed.",
-                        "See logs for more details.", TimeSpan.FromSeconds(5));
-
+                    _notificationManager.ShowNotification(
+                        _localizer.GetLocalizedStringOrDefault("/Settings/ReorganizeModsFailedTitle", "Mods reorganization failed."),
+                        _localizer.GetLocalizedStringOrDefault("/Settings/SeeLogsDetails", "See logs for more details."),
+                        TimeSpan.FromSeconds(5));
                 else
-                    _notificationManager.ShowNotification("Mods reorganized.",
-                        $"Moved {movedModsCount} mods to character folders", TimeSpan.FromSeconds(5));
+                    _notificationManager.ShowNotification(
+                        _localizer.GetLocalizedStringOrDefault("/Settings/ReorganizeModsSuccessTitle", "Mods reorganized."),
+                        string.Format(_localizer.GetLocalizedStringOrDefault("/Settings/ReorganizeModsSuccessMessage", "Moved {0} mods to character folders"), movedModsCount),
+                        TimeSpan.FromSeconds(5));
             }
             finally
             {
@@ -424,23 +433,22 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
         var text = new TextBlock
         {
             TextWrapping = TextWrapping.WrapWholeWords,
-            Text = _localizer.GetLocalizedStringOrDefault("/Settings/StartElevatorDialogText") ??
+            Text = _localizer.GetLocalizedStringOrDefault("/Settings/StartElevatorDialogText",
                    "Press Start to launch the Elevator. The Elevator is an elevated (admin) process that is used for communication with the Genshin game process.\n\n" +
                    "While the Elevator is active, you can press F10 within this App to refresh active mods in Genshin.\n\n" +
                    "Enabling and disabling mods will also automatically refresh active mods in Genshin " +
                    "The Elevator process should automatically close when this program is closed.\n\n" +
                    "After pressing Start, a User Account Control (UAC) prompt will appear to confirm the elevation.\n\n" +
                    "(This requires that Genshin and that 3Dmigoto is running, when pressing F10\n\n" +
-                   "Check the FAQ on the JASM github to download it separately as it gets flagged as malware.",
+                   "Check the FAQ on the JASM github to download it separately as it gets flagged as malware."),
             Margin = new Thickness(0, 0, 0, 12),
             IsTextSelectionEnabled = true
         };
 
-
         var doNotShowAgainCheckBox = new CheckBox
         {
-            Content = _localizer.GetLocalizedStringOrDefault("/Settings/StartElevatorDialogDontShowContent") ??
-                      "Don't Show this Again",
+            Content = _localizer.GetLocalizedStringOrDefault("/Settings/StartElevatorDialogDontShowContent",
+                      "Don't Show this Again"),
             IsChecked = false
         };
 
@@ -453,15 +461,14 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
             }
         };
 
-
         var dialog = new ContentDialog
         {
-            Title = _localizer.GetLocalizedStringOrDefault("/Settings/StartElevatorDialogTitle") ??
-                    "启动 Elevator 进程?",
+            Title = _localizer.GetLocalizedStringOrDefault("/Settings/StartElevatorDialogTitle",
+                    "Start Elevator Process?"),
             Content = stackPanel,
             DefaultButton = ContentDialogButton.Primary,
-            CloseButtonText = "取消",
-            PrimaryButtonText = "启动",
+            CloseButtonText = _localizer.GetLocalizedStringOrDefault("Common_Cancel", "Cancel"),
+            PrimaryButtonText = _localizer.GetLocalizedStringOrDefault("Common_Start", "Start"),
             XamlRoot = App.MainWindow.Content.XamlRoot
         };
 
@@ -482,7 +489,10 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
             }
             catch (Win32Exception e)
             {
-                _notificationManager.ShowNotification("无法启动Elevator进程", e.Message, TimeSpan.FromSeconds(10));
+                _notificationManager.ShowNotification(
+                    _localizer.GetLocalizedStringOrDefault("/Settings/ElevatorStartFailed", "Unable to start Elevator process"),
+                    e.Message,
+                    TimeSpan.FromSeconds(10));
                 _showElevatorStartDialog = true;
             }
     }
@@ -544,13 +554,13 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
     {
         var dialog = new ContentDialog()
         {
-            PrimaryButtonText = "导出",
+            PrimaryButtonText = _localizer.GetLocalizedStringOrDefault("Common_Export", "Export"),
             IsPrimaryButtonEnabled = true,
-            CloseButtonText = "取消",
+            CloseButtonText = _localizer.GetLocalizedStringOrDefault("Common_Cancel", "Cancel"),
             DefaultButton = ContentDialogButton.Primary
         };
 
-        dialog.Title = "导出所有Mod";
+        dialog.Title = _localizer.GetLocalizedStringOrDefault("/Settings/ExportAllModsTitle", "Export all Mods");
 
         dialog.ContentTemplate = contentDialog.ContentTemplate;
 
@@ -585,13 +595,18 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
                     removeLocalJasmSettings: model.RemoveJasmSettings, zip: false,
                     keepCharacterFolderStructure: model.KeepFolderStructure, setModStatus: model.SetModStatus);
             });
-            _notificationManager.ShowNotification("模组导出成功", $"导出模组到 {folder.Path}",
+            _notificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/Settings/ExportSuccessTitle", "Mods exported successfully"),
+                string.Format(_localizer.GetLocalizedStringOrDefault("/Settings/ExportSuccessMessage", "Exported mods to {0}"), folder.Path),
                 TimeSpan.FromSeconds(5));
         }
         catch (Exception e)
         {
             _logger.Error(e, "Error exporting mods");
-            _notificationManager.ShowNotification("导出模组出错", e.Message, TimeSpan.FromSeconds(10));
+            _notificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/Settings/ExportErrorTitle", "Error exporting mods"),
+                e.Message,
+                TimeSpan.FromSeconds(10));
         }
         finally
         {
@@ -622,19 +637,19 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
 
             var restartDialog = new ContentDialog()
             {
-                Title = "需要重新启动应用程序",
+                Title = _localizer.GetLocalizedStringOrDefault("/Settings/RestartRequiredTitle", "App needs restart"),
                 Content = new TextBlock()
                 {
                     Text = _localizer.GetLocalizedStringOrDefault("/Settings/ChangeLanguageDialogText",
                         defaultValue:
-                        "更改语言需要重新启动应用程序.\n" +
-                        "这是为了确保应用程序为所选语言正确配置.\n\n" +
-                        "你想要更改语言吗?"),
+                        "Changing language requires an application restart.\n" +
+                        "This is to ensure the application is correctly configured for the selected language.\n\n" +
+                        "Do you want to change the language?"),
                     TextWrapping = TextWrapping.WrapWholeWords,
                     IsTextSelectionEnabled = true
                 },
-                PrimaryButtonText = "更改语言并重新启动",
-                CloseButtonText = "取消",
+                PrimaryButtonText = _localizer.GetLocalizedStringOrDefault("/Settings/ChangeLanguageRestartButton", "Change language and restart"),
+                CloseButtonText = _localizer.GetLocalizedStringOrDefault("Common_Cancel", "Cancel"),
                 DefaultButton = ContentDialogButton.Primary
             };
 
@@ -670,13 +685,18 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
         catch (Exception e)
         {
             _logger.Error(e, "Error starting update process");
-            _notificationManager.ShowNotification("启动更新过程出错", e.Message, TimeSpan.FromSeconds(10));
+            _notificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/Settings/UpdateProcessStartError", "Error starting update process"),
+                e.Message,
+                TimeSpan.FromSeconds(10));
         }
 
         if (errors is not null && errors.Any())
         {
             var errorMessages = errors.Select(e => e.Description).ToArray();
-            _notificationManager.ShowNotification("无法启动更新进程", string.Join('\n', errorMessages),
+            _notificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/Settings/UpdateProcessUnableToStart", "Unable to start update process"),
+                string.Join('\n', errorMessages),
                 TimeSpan.FromSeconds(10));
         }
     }
@@ -692,18 +712,18 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
 
         var switchGameDialog = new ContentDialog()
         {
-            Title = "切换游戏",
+            Title = _localizer.GetLocalizedStringOrDefault("/Settings/SwitchGameTitle", "Switch Game"),
             Content = new TextBlock()
             {
-                Text =
-                    "切换游戏将重新启动应用程序. " +
-                    "这是为了确保应用程序为所选游戏正确配置.\n\n" +
-                    "你想要切换游戏吗?",
+                Text = _localizer.GetLocalizedStringOrDefault("/Settings/SwitchGameMessage",
+                    "Switching games will restart the application. " +
+                    "This is to ensure the application is correctly configured for the selected game.\n\n" +
+                    "Do you want to switch the game?"),
                 TextWrapping = TextWrapping.WrapWholeWords
             },
 
-            PrimaryButtonText = $"切换至 {game}",
-            CloseButtonText = "取消",
+            PrimaryButtonText = string.Format(_localizer.GetLocalizedStringOrDefault("/Settings/SwitchToGameButton", "Switch to {0}"), game),
+            CloseButtonText = _localizer.GetLocalizedStringOrDefault("Common_Cancel", "Cancel"),
             DefaultButton = ContentDialogButton.Primary
         };
 
@@ -782,7 +802,8 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
                 BackGroundModCheckerSettings.Key);
 
         IsModUpdateCheckerEnabled = modUpdateCheckerOptions.Enabled;
-        var gameInfo = await GameService.GetGameInfoAsync(Enum.Parse<SupportedGames>(SelectedGame));
+        var currentLangCode = _localizer.CurrentLanguage.LanguageCode;
+        var gameInfo = await GameService.GetGameInfoAsync(Enum.Parse<SupportedGames>(SelectedGame), currentLangCode);
 
         if (gameInfo is not null)
         {

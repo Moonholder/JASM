@@ -11,6 +11,7 @@ using System.IO;
 using Windows.Storage;
 using GIMI_ModManager.WinUI.Services.ModHandling;
 using GIMI_ModManager.WinUI.Services.Notifications;
+using GIMI_ModManager.Core.Contracts.Services;
 
 namespace GIMI_ModManager.WinUI.ViewModels.CharacterGalleryViewModels
 {
@@ -18,20 +19,28 @@ namespace GIMI_ModManager.WinUI.ViewModels.CharacterGalleryViewModels
     {
         private readonly ModModel _modModel;
         private Uri? _originalImagePath;
+        private readonly ILanguageLocalizer _localizer = App.GetService<ILanguageLocalizer>();
 
         public Guid Id => _modModel.Id;
         public IModdableObject Character => _modModel.Character;
         public string Name => _modModel.Name;
         public string Author => _modModel.Author;
         public DateTime DateAdded => _modModel.DateAdded;
-        public string DateAddedView => $"于 {DateAdded} 添加到 JASM 中";
+        public string DateAddedView => string.Format(
+            _localizer.GetLocalizedStringOrDefault("DateAddedFormat", "Added to JASM on {0}"),
+            DateAdded);
         public TimeSpan TimeSinceAdded => DateTime.Now - DateAdded;
         public string TimeSinceFormated => FormaterHelpers.FormatTimeSinceAdded(TimeSinceAdded);
         public Uri ImagePath => _modModel.ImagePath;
         public Uri? ModUrl => string.IsNullOrWhiteSpace(_modModel.ModUrl) ? null : new Uri(_modModel.ModUrl);
         public bool HasModUrl => ModUrl is not null;
-        public string NameTooltip => $"模组名称: {Name}\n文件夹名: {FolderName}";
-        public string ButtonText => _modModel.IsEnabled ? "禁用" : "启用";
+        public string NameTooltip => string.Format(
+            _localizer.GetLocalizedStringOrDefault("ModNameTooltipFormat", "Mod Name: {0}\nFolder Name: {1}"),
+            Name, FolderName);
+
+        public string ButtonText => _modModel.IsEnabled
+            ? _localizer.GetLocalizedStringOrDefault("DisableButton", "Disable")
+            : _localizer.GetLocalizedStringOrDefault("EnableButton", "Enable");
 
         public string FolderName
         {
@@ -148,7 +157,8 @@ namespace GIMI_ModManager.WinUI.ViewModels.CharacterGalleryViewModels
             }
             catch (Exception e)
             {
-                notificationService.ShowNotification("保存图片失败", e.Message, null);
+                var title = _localizer.GetLocalizedStringOrDefault("SaveImageFailedTitle", "Failed to save image");
+                notificationService.ShowNotification(title, e.Message, null);
             }
         },
         () => CanSaveImage);

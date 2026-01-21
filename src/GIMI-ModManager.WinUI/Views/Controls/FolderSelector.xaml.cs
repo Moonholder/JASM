@@ -93,7 +93,7 @@ public sealed partial class FolderSelector : UserControl
 
     #region PlaceHolderText
 
-    private static readonly DependencyProperty PlaceHolderTextProperty = DependencyProperty.Register(
+    public static readonly DependencyProperty PlaceHolderTextProperty = DependencyProperty.Register(
         nameof(PlaceHolderText), typeof(string), typeof(FolderSelector), new PropertyMetadata(default(string)));
 
     public string PlaceHolderText

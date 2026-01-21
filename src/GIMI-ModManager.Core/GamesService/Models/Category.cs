@@ -41,7 +41,7 @@ public class Category : ICategory
     {
         var internalName = new InternalName("Character");
 
-        return new Category(internalName, ModCategory.Character, "角色", "角色", typeof(ICharacter));
+        return new Category(internalName, ModCategory.Character, "Character", "Characters", typeof(ICharacter));
     }
 
     internal static ICategory CreateForNpc()

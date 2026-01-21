@@ -2,17 +2,16 @@
 <Page
     x:Class="GIMI_ModManager.WinUI.Views.CharacterGalleryPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations"
-    xmlns:characterGalleryViewModels="using:GIMI_ModManager.WinUI.ViewModels.CharacterGalleryViewModels"
-    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
-    xmlns:controls1="using:GIMI_ModManager.WinUI.Views.Controls"
-    xmlns:converters="using:CommunityToolkit.WinUI.UI.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="using:GIMI_ModManager.WinUI.Views"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:models="using:GIMI_ModManager.WinUI.Models"
+    xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations"
+    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+    xmlns:converters="using:CommunityToolkit.WinUI.UI.Converters"
     xmlns:xaml="using:GIMI_ModManager.WinUI.Helpers.Xaml"
+    xmlns:characterGalleryViewModels="using:GIMI_ModManager.WinUI.ViewModels.CharacterGalleryViewModels"
+    xmlns:controls1="using:GIMI_ModManager.WinUI.Views.Controls"
+    xmlns:l="using:WinUI3Localizer"
     x:Name="RootPageName"
     mc:Ignorable="d">
 
@@ -100,9 +99,10 @@
                         TextTrimming="CharacterEllipsis" />
 
                     <Button
-                        Content="选择皮肤"
+                        Content="Select Skin"
                         Flyout="{StaticResource SelectInGameSkin}"
-                        IsEnabled="{x:Bind ViewModel.MultipleCharacterSkins, Mode=OneWay}">
+                        IsEnabled="{x:Bind ViewModel.MultipleCharacterSkins, Mode=OneWay}"
+                        l:Uids.Uid="/CharacterGalleryPage/SelectSkinButton">
                         <Button.KeyboardAccelerators>
                             <KeyboardAccelerator Key="F1" />
                         </Button.KeyboardAccelerators>
@@ -110,7 +110,7 @@
                 </StackPanel>
             </StackPanel>
 
-           <StackPanel
+            <StackPanel
                 Grid.Column="1"
                 HorizontalAlignment="Right"
                 Orientation="Horizontal">
@@ -118,8 +118,9 @@
                 <TextBlock
                     Margin="0,0,8,0"
                     VerticalAlignment="Center"
-                    Text="排序方式:"
-                    TextWrapping="WrapWholeWords" />
+                    Text="Sort by:"
+                    TextWrapping="WrapWholeWords"
+                    l:Uids.Uid="/CharacterGalleryPage/SortByLabel" />
 
                 <ComboBox
                     x:Name="SortingComboBox"
@@ -127,10 +128,11 @@
                     VerticalAlignment="Center"
                     PlaceholderText="Sort Mods..."
                     SelectionChanged="SortingComboBox_OnSelectionChanged"
-                    SelectionChangedTrigger="Committed">
-                    <ComboBoxItem Content="添加时间" Tag="DateAdded" />
-                    <ComboBoxItem Content="文件夹名" Tag="FolderName" />
-                    <ComboBoxItem Content="模组名称" Tag="Name" />
+                    SelectionChangedTrigger="Committed"
+                    l:Uids.Uid="/CharacterGalleryPage/SortComboBox">
+                    <ComboBoxItem Content="Date Added" Tag="DateAdded" l:Uids.Uid="/CharacterGalleryPage/SortByDateAdded" />
+                    <ComboBoxItem Content="Folder Name" Tag="FolderName" l:Uids.Uid="/CharacterGalleryPage/SortByFolderName" />
+                    <ComboBoxItem Content="Mod Name" Tag="Name" l:Uids.Uid="/CharacterGalleryPage/SortByName" />
                 </ComboBox>
 
                 <ToggleButton
@@ -152,11 +154,11 @@
 
 
                 <Button>
-                    <TextBlock Text="设置" />
+                    <TextBlock Text="Settings" l:Uids.Uid="/CharacterGalleryPage/SettingsButtonText" />
                     <Button.Flyout>
                         <Flyout>
                             <StackPanel MinWidth="200" Spacing="8">
-                                <TextBlock Text="调整网格高度:" />
+                                <TextBlock Text="Adjust Height:" l:Uids.Uid="/CharacterGalleryPage/GridItemHeightLabel" />
                                 <Slider
                                     x:Name="GridItemHeightSlider"
                                     Maximum="500"
@@ -164,7 +166,7 @@
                                     SnapsTo="Ticks"
                                     TickFrequency="50"
                                     Value="{x:Bind ViewModel.GridItemHeight, Mode=TwoWay}" />
-                                <TextBlock Text="调整网格宽度:" />
+                                <TextBlock Text="Adjust Desired Width:" l:Uids.Uid="/CharacterGalleryPage/GridItemWidthLabel" />
                                 <Slider
                                     x:Name="GridItemWithSlider"
                                     Maximum="800"
@@ -178,16 +180,17 @@
                                         HorizontalAlignment="Left"
                                         Command="{x:Bind ViewModel.ToggleSingleSelectionCommand}"
                                         IsChecked="{x:Bind ViewModel.IsSingleSelection, Mode=OneWay}"
-                                        ToolTipService.ToolTip="选择此选项将只允许一次启用一个模组.">
-                                        单选模式
-                                    </CheckBox>
+                                        ToolTipService.ToolTip="Selecting this will only allow one mod to be enabled at a time."
+                                        Content="Single Select Mode"
+                                        l:Uids.Uid="/CharacterGalleryPage/SingleSelectionCheckBox"/>
+
                                     <CheckBox
                                         HorizontalAlignment="Right"
                                         Command="{x:Bind ViewModel.ToggleAutoSyncCommand}"
                                         IsChecked="{x:Bind ViewModel.AutoSync3DMigotoConfig, Mode=OneWay}"
-                                        ToolTipService.ToolTip="启用此项后，切换时将自动刷新模组到游戏，并从d3dx_user.ini文件中同步模组切换项到ini文件.">
-                                        自动同步
-                                    </CheckBox>
+                                        ToolTipService.ToolTip="When enabled, mods will automatically refresh in-game when toggled, and sync mod toggles from d3dx_user.ini file."
+                                        Content="Auto Sync"
+                                        l:Uids.Uid="/CharacterGalleryPage/AutoSyncCheckBox"/>
                                 </StackPanel>
                             </StackPanel>
                         </Flyout>
@@ -199,16 +202,17 @@
                     Height="32"
                     MinWidth="200"
                     MaxWidth="320"
-                    PlaceholderText="搜索模组..."
-                    TextChanged="ModSearchBox_OnTextChanged" />
-
+                    PlaceholderText="Search mods..."
+                    TextChanged="ModSearchBox_OnTextChanged"
+                    l:Uids.Uid="/CharacterGalleryPage/SearchBox" />
 
                 <ToggleSwitch
                     x:Name="ViewToggleSwitch"
                     IsOn="True"
-                    OffContent="详细视图"
-                    OnContent="画廊视图"
-                    Toggled="ViewToggleSwitch_OnToggled" />
+                    OffContent="Detail View"
+                    OnContent="Gallery View"
+                    Toggled="ViewToggleSwitch_OnToggled"
+                    l:Uids.Uid="/CharacterGalleryPage/ViewToggleSwitch" />
 
                 <Grid MinWidth="32">
                     <ProgressRing IsActive="{x:Bind ViewModel.IsBusy, Mode=OneWay}" />
@@ -316,8 +320,9 @@
                                                         <MenuFlyoutItem
                                                             Command="{x:Bind SaveImageCommand}"
                                                             CommandParameter="{x:Bind Mode=OneWay}"
-                                                            Text="保存图片"
-                                                            IsEnabled="{x:Bind CanSaveImage, Mode=OneWay}">
+                                                            Text="Save Image"
+                                                            IsEnabled="{x:Bind CanSaveImage, Mode=OneWay}"
+                                                            l:Uids.Uid="/CharacterGalleryPage/SaveImageMenuItem">
                                                             <MenuFlyoutItem.Icon>
                                                                 <FontIcon Glyph="&#xE74E;" />
                                                             </MenuFlyoutItem.Icon>
@@ -325,7 +330,8 @@
                                                         <MenuFlyoutItem
                                                             Command="{x:Bind OpenModFolderCommand}"
                                                             CommandParameter="{x:Bind Mode=OneWay}"
-                                                            Text="打开模组文件夹...">
+                                                            Text="Open Mod Folder..."
+                                                            l:Uids.Uid="/CharacterGalleryPage/OpenModFolderMenuItem">
                                                             <MenuFlyoutItem.Icon>
                                                                 <FontIcon Glyph="&#xE838;" />
                                                             </MenuFlyoutItem.Icon>
@@ -333,7 +339,8 @@
                                                         <MenuFlyoutItem
                                                             Command="{x:Bind OpenModUrlCommand}"
                                                             CommandParameter="{x:Bind Mode=OneWay}"
-                                                            Text="打开模组网址...">
+                                                            Text="Open Mod Page..."
+                                                            l:Uids.Uid="/CharacterGalleryPage/OpenModUrlMenuItem">
                                                             <MenuFlyoutItem.Icon>
                                                                 <FontIcon Glyph="&#xE8A7;" />
                                                             </MenuFlyoutItem.Icon>
@@ -341,7 +348,8 @@
                                                         <MenuFlyoutItem
                                                             Command="{x:Bind DeleteModCommand}"
                                                             CommandParameter="{x:Bind Mode=OneWay}"
-                                                            Text="删除此模组">
+                                                            Text="Delete Mod"
+                                                            l:Uids.Uid="/CharacterGalleryPage/DeleteModMenuItem">
                                                             <MenuFlyoutItem.Icon>
                                                                 <FontIcon Glyph="&#xE74D;" />
                                                             </MenuFlyoutItem.Icon>
@@ -382,7 +390,7 @@
                                                 VerticalAlignment="Center"
                                                 Orientation="Horizontal"
                                                 Spacing="8">
-                                                <TextBlock Text="作者:" />
+                                                <TextBlock Text="Author:" l:Uids.Uid="/CharacterGalleryPage/AuthorLabel" />
                                                 <TextBlock
                                                     IsTextSelectionEnabled="True"
                                                     Text="{x:Bind Author, Mode=OneWay}"
@@ -398,7 +406,7 @@
                                                 VerticalAlignment="Center"
                                                 Orientation="Horizontal"
                                                 Spacing="4">
-                                                <TextBlock Text="添加时间:" />
+                                                <TextBlock Text="Added:" l:Uids.Uid="/CharacterGalleryPage/DateAddedLabel" />
                                                 <TextBlock Text="{x:Bind TimeSinceFormated, Mode=OneWay}" ToolTipService.ToolTip="{x:Bind DateAddedView, Mode=OneWay}" />
                                             </StackPanel>
 
@@ -428,7 +436,7 @@
                     <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
                         <StackPanel Spacing="16">
                             <ProgressRing IsActive="True" />
-                            <TextBlock Text="正在加载模组..." />
+                            <TextBlock Text="Loading mods..." l:Uids.Uid="/CharacterGalleryPage/LoadingModsText" />
                         </StackPanel>
                     </Grid>
 

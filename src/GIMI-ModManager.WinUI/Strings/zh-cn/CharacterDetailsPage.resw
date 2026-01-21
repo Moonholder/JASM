@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- Flyout / Context Menu -->
+  <data name="SelectedModsLabel.Text" xml:space="preserve">
+    <value>已选模组:</value>
+  </data>
+  <data name="DeleteModsButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>删除选中的模组</value>
+  </data>
+  <data name="MoveModsButton.Content" xml:space="preserve">
+    <value>移动</value>
+  </data>
+  <data name="MoveModsToCharacterLabel.Text" xml:space="preserve">
+    <value>移动模组到另一个角色: </value>
+  </data>
+  <data name="MoveModsSearchBox.PlaceholderText" xml:space="preserve">
+    <value>搜索...</value>
+  </data>
+  <data name="MoveModsToSkinExpander.Header" xml:space="preserve">
+    <value>移动模组到另一个皮肤</value>
+  </data>
+  <data name="MoveButtonText.Text" xml:space="preserve">
+    <value>移动</value>
+  </data>
+  <data name="CurrentSkinSettingLabel.Text" xml:space="preserve">
+    <value>当前皮肤设置: </value>
+  </data>
+
+  <!-- Loading -->
+  <data name="LoadingPrefix.Text" xml:space="preserve">
+    <value>加载</value>
+  </data>
+
+  <!-- Menu Bar -->
+  <data name="ModsMenuTitle.Title" xml:space="preserve">
+    <value>模组</value>
+  </data>
+  <data name="AddModMenuItem.Text" xml:space="preserve">
+    <value>添加模组...</value>
+  </data>
+  <data name="AddModMenuItem.ToolTipService.ToolTip" xml:space="preserve">
+    <value>添加一个模组文件夹</value>
+  </data>
+  <data name="AddModArchiveMenuItem.Text" xml:space="preserve">
+    <value>添加模组(压缩包)...</value>
+  </data>
+  <data name="AddModArchiveMenuItem.ToolTipService.ToolTip" xml:space="preserve">
+    <value>在压缩包中添加模组</value>
+  </data>
+  <data name="AddModClipboardMenuItem.Text" xml:space="preserve">
+    <value>添加模组(剪贴板)...</value>
+  </data>
+  <data name="AddModClipboardMenuItem.ToolTipService.ToolTip" xml:space="preserve">
+    <value>从剪贴板中的GB链接/文件夹/压缩包添加模组</value>
+  </data>
+  <data name="RefreshModsMenuItem.Text" xml:space="preserve">
+    <value>刷新模组</value>
+  </data>
+
+  <data name="FoldersMenuTitle.Title" xml:space="preserve">
+    <value>文件夹</value>
+  </data>
+  <data name="OpenLoaderRootMenuItem.Text" xml:space="preserve">
+    <value>打开加载器根目录...</value>
+  </data>
+  <data name="OpenCharacterFolderMenuItem.Text" xml:space="preserve">
+    <value>打开角色文件夹...</value>
+  </data>
+  <data name="OpenModFolderMenuItem.Text" xml:space="preserve">
+    <value>打开模组文件夹...</value>
+  </data>
+
+  <data name="ViewMenuTitle.Title" xml:space="preserve">
+    <value>显示</value>
+  </data>
+  <data name="SingleSelectModeMenuItem.Text" xml:space="preserve">
+    <value>单选模式</value>
+  </data>
+  <data name="SingleSelectModeMenuItem.ToolTipService.ToolTip" xml:space="preserve">
+    <value>选择此项后，只允许同时启用一个模组，同时禁用多选模式</value>
+  </data>
+  <data name="ShowModFolderColumnMenuItem.Text" xml:space="preserve">
+    <value>显示 '模组文件夹名' 列</value>
+  </data>
+
+  <!-- Toolbar -->
+  <data name="AutoSyncButton.Content" xml:space="preserve">
+    <value>自动同步</value>
+  </data>
+  <data name="AutoSyncButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>启用此项后，切换时将自动刷新模组到游戏，并从d3dx_user.ini文件中同步模组切换项到ini文件</value>
+  </data>
+  <data name="MultipleModsWarning.Message" xml:space="preserve">
+    <value>已启用多个模组</value>
+  </data>
+  <data name="SearchModsTextBox.PlaceholderText" xml:space="preserve">
+    <value>搜索模组...</value>
+  </data>
+  <data name="ViewToggleSwitch.OffContent" xml:space="preserve">
+    <value>详细视图</value>
+  </data>
+  <data name="ViewToggleSwitch.OnContent" xml:space="preserve">
+    <value>画廊视图</value>
+  </data>
+
+  <!-- DataGrid Columns -->
+  <data name="EnabledColumnHeader" xml:space="preserve">
+    <value>是否启用</value>
+  </data>
+  <data name="NewVersionAvailableToolTip" xml:space="preserve">
+    <value>有新版本可用</value>
+  </data>
+  <data name="ModNameColumnHeader" xml:space="preserve">
+    <value>模组名称</value>
+  </data>
+  <data name="FolderNameColumnHeader" xml:space="preserve">
+    <value>模组文件夹名</value>
+  </data>
+  <data name="AuthorColumnHeader" xml:space="preserve">
+    <value>作者</value>
+  </data>
+  <data name="DateAddedColumnHeader" xml:space="preserve">
+    <value>添加时间</value>
+  </data>
+  <data name="PresetsColumnHeader" xml:space="preserve">
+    <value>预设</value>
+  </data>
+  <data name="DescriptionColumnHeader" xml:space="preserve">
+    <value>备注</value>
+  </data>
+  <!-- CharacterCard -->
+  <data name="GoToModsOverviewButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>跳转到模组管理页面</value>
+  </data>
+  <data name="EditCharacterButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>编辑角色</value>
+  </data>
+  <data name="ModCountLabel.Text" xml:space="preserve">
+    <value>模组数量:</value>
+  </data>
+  <data name="CurrentSkinLabel.Text" xml:space="preserve">
+    <value>当前角色皮肤:</value>
+  </data>
+  <data name="DefaultSkinName" xml:space="preserve">
+    <value>默认</value>
+  </data>
+  <data name="SelectSkinButton.Content" xml:space="preserve">
+    <value>选择皮肤</value>
+  </data>
+  <data name="DisableAllModsButton.Content" xml:space="preserve">
+    <value>禁用所有模组</value>
+  </data>
+
+  <!-- ModPane: Header & Link -->
+  <data name="ModNameEditableBlock.ToolTipService.ToolTip" xml:space="preserve">
+    <value>更改模组显示名称</value>
+  </data>
+  <data name="ShowDisabledIniFilesMenuItem.ToolTipService.ToolTip" xml:space="preserve">
+    <value>显示或隐藏 DISABLED 前缀的 .ini 文件</value>
+  </data>
+  <data name="ModLinkTextBox.Header" xml:space="preserve">
+    <value>模组链接:</value>
+  </data>
+
+  <!-- ModPane: Keyswap Help -->
+  <data name="KeyBindingsHelpTitle.Text" xml:space="preserve">
+    <value>按键绑定提示</value>
+  </data>
+  <data name="ToggleEditViewButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>切换编辑/查看</value>
+  </data>
+  <data name="HelpText1.Text" xml:space="preserve">
+    <value>组合按键用空格分隔，如：VK_CTRL VK_UP</value>
+  </data>
+  <data name="HelpText2.Text" xml:space="preserve">
+    <value>支持多个按键，用逗号分隔。例如：Alt UP,XB_A</value>
+  </data>
+  <data name="HelpText3.Text" xml:space="preserve">
+    <value>系统会自动解析为多个 Key/Back 行</value>
+  </data>
+  <data name="HelpText4.Text" xml:space="preserve">
+    <value>支持 NO_ 前缀，表示不按某键 例如：NO_VK_CTRL ALT UP</value>
+  </data>
+  <data name="HelpTextLinkPrefix.Text" xml:space="preserve">
+    <value>详细内容请见：</value>
+  </data>
+  <data name="HelpLink.ToolTipService.ToolTip" xml:space="preserve">
+    <value>点击打开文档</value>
+  </data>
+  <data name="HelpLinkText.Text" xml:space="preserve">
+    <value>按键绑定帮助文档</value>
+  </data>
+
+  <!-- ModPane: Keyswap Edit -->
+  <data name="HideDisabledIniFiles" xml:space="preserve">
+    <value>隐藏 DISABLED 文件</value>
+  </data>
+  <data name="ShowDisabledIniFiles" xml:space="preserve">
+    <value>显示 DISABLED 文件</value>
+  </data>
+  <data name="ConfigFileLabel.Text" xml:space="preserve">
+    <value>配置文件</value>
+  </data>
+  <data name="OpenConfigFileButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>打开配置文件</value>
+  </data>
+  <data name="SectionNameTextBox.PlaceholderText" xml:space="preserve">
+    <value>输入节名称</value>
+  </data>
+  <data name="EditSectionNameButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>编辑节名称</value>
+  </data>
+  <data name="VariationsLabel.Text" xml:space="preserve">
+    <value>变体数: </value>
+  </data>
+  <data name="ForwardHotkeyLabel.Text" xml:space="preserve">
+    <value>前进键</value>
+  </data>
+  <data name="BackwardHotkeyLabel.Text" xml:space="preserve">
+    <value>后退键</value>
+  </data>
+
+  <!-- ModPane: Footer -->
+  <data name="SaveButton.Text" xml:space="preserve">
+    <value>保存</value>
+  </data>
+  <data name="ModEnabledLabel.Text" xml:space="preserve">
+    <value>模组已启用</value>
+  </data>
+  <data name="OpenModFolderButton.Content" xml:space="preserve">
+    <value>打开模组文件夹...</value>
+  </data>
+
+
+  <data name="SingleSkinTooltip" xml:space="preserve">
+    <value>这个角色只有一个默认的游戏内皮肤，所以你不能更改它。</value>
+  </data>
+  <data name="NoModsFoundText" xml:space="preserve">
+    <value>没有找到这个角色的模组 😖</value>
+  </data>
+  <data name="DropModsHereText" xml:space="preserve">
+    <value>拖放模组文件夹/压缩包到这里</value>
+  </data>
+
+  <!-- ContextMenu - Move Mods -->
+<data name="ContextMenu_MoveMods_TargetNotFoundTitle" xml:space="preserve">
+  <value>目标模组列表未找到</value>
+</data>
+<data name="ContextMenu_MoveMods_TargetNotFoundBody" xml:space="preserve">
+  <value>无法找到所选角色的模组列表。</value>
+</data>
+<data name="ContextMenu_MoveMods_InvalidOperationTitle" xml:space="preserve">
+  <value>移动失败</value>
+</data>
+<data name="ContextMenu_MoveMods_ErrorBody" xml:space="preserve">
+  <value>无法移动模组
+{0}
+请查看日志以获取详细信息。</value>
+  <comment>{0} is the exception message</comment>
+</data>
+<data name="ContextMenu_MoveMods_SuccessTitle" xml:space="preserve">
+  <value>已移动 {0} 个模组</value>
+  <comment>{0} is the count of mods</comment>
+</data>
+<data name="ContextMenu_MoveMods_SuccessBody" xml:space="preserve">
+  <value>成功将模组 {0} 移动到 {1}</value>
+  <comment>{0} is mod names, {1} is destination character name</comment>
+</data>
+
+<!-- ContextMenu - Skin Override -->
+<data name="ContextMenu_SkinOverride_SuccessTitle" xml:space="preserve">
+  <value>皮肤设置完成</value>
+</data>
+<data name="ContextMenu_SkinOverride_SuccessSingleBody" xml:space="preserve">
+  <value>成功为模组 '{0}' 设置皮肤: {1}</value>
+  <comment>{0} is mod name, {1} is skin name</comment>
+</data>
+<data name="ContextMenu_SkinOverride_SuccessMultipleBody" xml:space="preserve">
+  <value>成功为 {0} 个模组设置皮肤: {1}</value>
+  <comment>{0} is count, {1} is skin name</comment>
+</data>
+<data name="ContextMenu_SkinOverride_PartialFailTitle" xml:space="preserve">
+  <value>部分操作失败</value>
+</data>
+<data name="ContextMenu_SkinOverride_FailSingleBody" xml:space="preserve">
+  <value>未能为模组 '{0}' 设置皮肤</value>
+  <comment>{0} is mod name</comment>
+</data>
+<data name="ContextMenu_SkinOverride_FailMultipleBody" xml:space="preserve">
+  <value>未能为 {0} 个模组设置皮肤</value>
+  <comment>{0} is count</comment>
+</data>
+<data name="ContextMenu_SkinOverride_CheckLogsSuffix" xml:space="preserve">
+  <value>{0}
+请查看日志获取详细信息</value>
+  <comment>{0} is the previous failure message</comment>
+</data>
+
+<!-- Delete Dialog -->
+  <data name="DeleteDialog_MoveToRecycleBin.Content" xml:space="preserve">
+    <value>移动到回收站?</value>
+  </data>
+  <data name="DeleteDialog_RemoveFromPresets.Content" xml:space="preserve">
+    <value>从预设中移除?</value>
+  </data>
+  <data name="DeleteDialog_Title" xml:space="preserve">
+    <value>删除这 {0} 个模组?</value>
+  </data>
+  <data name="DeleteDialog_DeleteButton" xml:space="preserve">
+    <value>删除</value>
+  </data>
+  <data name="DeleteDialog_CancelButton" xml:space="preserve">
+    <value>取消</value>
+  </data>
+
+  <!-- Delete Notifications -->
+  <data name="DeleteNotification_FailureTitle" xml:space="preserve">
+    <value>删除模组失败</value>
+  </data>
+  <data name="DeleteNotification_SuccessTitle" xml:space="preserve">
+    <value>{0} 个模组已删除</value>
+  </data>
+  <data name="DeleteNotification_SuccessMessage" xml:space="preserve">
+    <value>成功删除 {0} 的 {1} 模组</value>
+  </data>
+
+  <!-- Error Builder Headers -->
+  <data name="DeleteError_Header" xml:space="preserve">
+    <value>删除模组时发生错误:</value>
+  </data>
+  <data name="DeleteError_PresetHeader" xml:space="preserve">
+    <value>预设错误模组:</value>
+  </data>
+  <data name="DeleteError_DeleteHeader" xml:space="preserve">
+    <value>删除错误模组:</value>
+  </data>
+</root>

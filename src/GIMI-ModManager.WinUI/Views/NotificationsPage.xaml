@@ -4,6 +4,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:l="using:WinUI3Localizer"
     xmlns:local="using:GIMI_ModManager.WinUI.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="using:GIMI_ModManager.WinUI.Models"
@@ -20,10 +21,15 @@
         <TextBlock
             Margin="0,4,0,8"
             Style="{ThemeResource TitleTextBlockStyle}"
-            Text="当前应用程序运行期间显示的所有通知" />
+            Text="All notifications shown during current application run"
+            l:Uids.Uid="/Settings/PageTitle" />
 
         <StackPanel Grid.Row="1" Margin="0,4,0,16">
-            <TextBlock Style="{ThemeResource SubtitleTextBlockStyle}" Text="通知和日志将被写入:" />
+            <TextBlock 
+                Style="{ThemeResource SubtitleTextBlockStyle}" 
+                Text="Notifications and logs are written to:" 
+                l:Uids.Uid="/Settings/LogLocationSubtitle" />
+            
             <Grid VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -35,11 +41,13 @@
                     IsTextSelectionEnabled="True"
                     Text="{x:Bind ViewModel.LogFilePath}"
                     TextWrapping="Wrap" />
+                
                 <Button
                     Grid.Column="1"
                     VerticalAlignment="Center"
-                    Command="{x:Bind ViewModel.CopyLogFilePathCommand}">
-                    <FontIcon FontSize="12" Glyph="&#xE8A7;" />
+                    Command="{x:Bind ViewModel.OpenLogFolderCommand}"
+                    ToolTipService.ToolTip="Open logs folder"> 
+                    <FontIcon FontSize="12" Glyph="&#xE8B7;" />
                 </Button>
             </Grid>
         </StackPanel>

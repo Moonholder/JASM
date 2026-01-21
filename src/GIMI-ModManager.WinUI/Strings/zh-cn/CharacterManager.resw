@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="PageTitle.Text" xml:space="preserve">
+    <value>角色管理器</value>
+  </data>
+  
+  <data name="SearchBox.Header" xml:space="preserve">
+    <value>搜索要编辑的角色</value>
+  </data>
+  
+  <data name="SearchBox.PlaceholderText" xml:space="preserve">
+    <value>开始输入搜索...</value>
+  </data>
+  
+  <data name="CreateButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>创建新角色</value>
+  </data>
+
+  <!-- Create Character Page -->
+  <data name="CreatePageTitle.Text" xml:space="preserve">
+    <value>创建角色</value>
+  </data>
+  <data name="CharacterImageLabel.Text" xml:space="preserve">
+    <value>角色图片</value>
+  </data>
+  
+  <data name="InternalNameInput.Header" xml:space="preserve">
+    <value>内部名称 (必填)</value>
+  </data>
+  <data name="InternalNameHelp.Text" xml:space="preserve">
+    <value>内部名称由 JASM 用来识别角色 / 模组对象。它也被用作模组文件夹的名称。必须是独一无二的。
+在角色创建之后更改这个名称，意味着 JASM 将会把它当作一个新角色来识别。</value>
+  </data>
+  
+  <data name="DisplayNameInput.Header" xml:space="preserve">
+    <value>显示名称</value>
+  </data>
+  
+  <data name="ModFilesNameInput.Header" xml:space="preserve">
+    <value>模组文件名称</value>
+  </data>
+  <data name="ModFilesNameHelp.Text" xml:space="preserve">
+    <value>在某些情况下，JASM 能够尝试确定某个模组适用于哪个角色。在进行此项操作时，它会使用 “模组文件名（ModFilesName）” 文本尝试查找同名的模组文件。例如，假设 “模组文件名（ModFilesName）” 是 “paimon”，那么它将会匹配名为 “PaimonHeadLightMap.dds” 这样的文件。
+如果您不希望 JASM 尝试匹配模组文件，可将其留空。</value>
+  </data>
+  
+  <data name="ReleaseDateInput.Header" xml:space="preserve">
+    <value>发布日期</value>
+  </data>
+  
+  <data name="RaritySlider.Header" xml:space="preserve">
+    <value>稀有度</value>
+  </data>
+  
+  <data name="ElementComboBox.Header" xml:space="preserve">
+    <value>属性</value>
+  </data>
+  
+  <data name="IsMultiModCheckBox.Content" xml:space="preserve">
+    <value>允许启用多个模组</value>
+  </data>
+  <data name="IsMultiModHelp.Text" xml:space="preserve">
+    <value>如果勾选此项，当针对该模组对象启用多个模组时，JASM 将不会显示警告信息。</value>
+  </data>
+  
+  <data name="SearchKeywordsLabel.Text" xml:space="preserve">
+    <value>搜索关键词</value>
+  </data>
+  <data name="KeywordInput.PlaceholderText" xml:space="preserve">
+    <value>搜索关键词...</value>
+  </data>
+  <data name="AddKeywordButton.Content" xml:space="preserve">
+    <value>添加关键词</value>
+  </data>
+  <data name="KeywordHelpText.Text" xml:space="preserve">
+    <value>JASM 使用关键词来帮助提升搜索功能。有些角色可能有多个名称，所以你可以添加额外的名称或搜索词条作为关键词。</value>
+  </data>
+  <data name="RemoveKeywordButton.Content" xml:space="preserve">
+    <value>移除</value>
+  </data>
+  
+  <data name="ExportJsonButton.Content" xml:space="preserve">
+    <value>导出角色的 JSON 文件</value>
+  </data>
+  <data name="OpenJsonFileButton.Content" xml:space="preserve">
+    <value>打开自定义角色的 JSON 文件</value>
+  </data>
+  <data name="SaveCharacterButton.Content" xml:space="preserve">
+    <value>创建角色</value>
+  </data>
+
+  <!-- Notifications -->
+  <data name="CreatePage_CreateFailedTitle" xml:space="preserve">
+    <value>创建角色失败</value>
+  </data>
+  <data name="CreatePage_EnableModListFailed" xml:space="preserve">
+    <value>角色已创建，但未能为该角色启用模组列表。</value>
+  </data>
+  <data name="CreatePage_CreateSuccessTitle" xml:space="preserve">
+    <value>角色已创建</value>
+  </data>
+  <data name="CreatePage_CreateSuccessMessage" xml:space="preserve">
+    <value>角色 '{0}' 已成功创建</value>
+  </data>
+  
+  <data name="CreatePage_PasteImageFailedTitle" xml:space="preserve">
+    <value>粘贴图片失败</value>
+  </data>
+  <data name="CreatePage_NoImageInClipboard" xml:space="preserve">
+    <value>在剪贴板中未找到图片</value>
+  </data>
+  
+  <data name="CreatePage_ExportFailedTitle" xml:space="preserve">
+    <value>未能创建 JSON 导出文件</value>
+  </data>
+  <data name="CreatePage_JsonCopiedTitle" xml:space="preserve">
+    <value>角色的 JSON（数据）已复制到剪贴板</value>
+  </data>
+
+  <!-- Export Dialog -->
+  <data name="CreatePage_ExportDialogTitle" xml:space="preserve">
+    <value>角色模型 JSON（格式）导出</value>
+  </data>
+  <data name="CreatePage_ExportDialogCopyButton" xml:space="preserve">
+    <value>复制到剪贴板并关闭</value>
+  </data>
+  <data name="CreatePage_ExportDialogCloseButton" xml:space="preserve">
+    <value>关闭</value>
+  </data>
+
+  <!-- Edit Page Header -->
+  <data name="EditPage_ModFolderLabel.Text" xml:space="preserve">
+    <value>角色模组文件夹:</value>
+  </data>
+  <data name="EditPage_OpenFolderTooltip.ToolTipService.ToolTip" xml:space="preserve">
+    <value>打开角色的模组文件夹</value>
+  </data>
+  <data name="EditPage_GoToCharacterButton.Content" xml:space="preserve">
+    <value>转到角色</value>
+  </data>
+  
+  <data name="EditPage_DisableCharacterButton.Content" xml:space="preserve">
+    <value>禁用角色</value>
+  </data>
+  <data name="EditPage_DisableCharacterButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>首先打开一个弹出窗口，其中包含更多信息</value>
+  </data>
+  <data name="EditPage_EnableCharacterButton.Content" xml:space="preserve">
+    <value>启用角色</value>
+  </data>
+  <data name="EditPage_EnableCharacterButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>首先打开一个弹出窗口，其中包含更多信息</value>
+  </data>
+  <data name="EditPage_DeleteCustomCharacterButton.Content" xml:space="preserve">
+    <value>删除自定义角色</value>
+  </data>
+  <data name="EditPage_DeleteCustomCharacterButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>首先打开一个弹出窗口，其中包含更多信息</value>
+  </data>
+
+  <!-- Edit Page Details -->
+  <data name="EditPage_InternalNameLabel.Text" xml:space="preserve">
+    <value>内部名称 (Id): </value>
+  </data>
+  <data name="EditPage_ModCountLabel.Text" xml:space="preserve">
+    <value>模组数量:</value>
+  </data>
+  <data name="EditPage_DateAddedTooltip.ToolTipService.ToolTip" xml:space="preserve">
+    <value>添加至 JASM 的日期</value>
+  </data>
+
+  <!-- Edit Page Actions -->
+  <data name="EditPage_RevertChangesButton.Content" xml:space="preserve">
+    <value>撤销更改</value>
+  </data>
+  <data name="EditPage_RevertChangesButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>撤销未保存的更改</value>
+  </data>
+  <data name="EditPage_SaveChangesButton.Content" xml:space="preserve">
+    <value>保存更改</value>
+  </data>
+  <data name="EditPage_SaveChangesButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>将更改保存到磁盘</value>
+  </data>
+  <data name="EditPage_ConfirmSaveButton.Content" xml:space="preserve">
+    <value>保存</value>
+  </data>
+  <data name="EditPage_ShowModelButton.Text" xml:space="preserve">
+    <value>显示角色数据模型...</value>
+  </data>
+  <data name="EditPage_ResetCharacterButton.Content" xml:space="preserve">
+    <value>重置角色</value>
+  </data>
+  <data name="EditPage_ResetCharacterButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>将角色的各项数值重置为默认值</value>
+  </data>
+  <data name="EditPage_ConfirmResetButton.Content" xml:space="preserve">
+    <value>重置角色设置</value>
+  </data>
+
+  <!-- Edit Page Dialogs -->
+  <data name="EditPage_DeleteFolderCheckBox.Content" xml:space="preserve">
+    <value>删除角色文件夹及其内容 / 模组？
+文件将被永久删除！</value>
+  </data>
+  <data name="EditPage_DisableCharacterDialogText.Text" xml:space="preserve">
+    <value>你确定要禁用这个角色吗？这不会移除该角色，但 JASM 将不再识别这个角色。该角色稍后可以重新激活。按下 “是” 后，这将立即执行。</value>
+  </data>
+  <data name="EditPage_DisableCharacterDialogTitle.Title" xml:space="preserve">
+    <value>禁用角色</value>
+  </data>
+  <data name="EditPage_DisableCharacterConfirmButton" xml:space="preserve">
+    <value>是, 禁用这个角色</value>
+  </data>
+  <data name="EditPage_CancelButton" xml:space="preserve">
+    <value>不, 取消</value>
+  </data>
+  <data name="EditPage_CloseButton" xml:space="preserve">
+    <value>关闭</value>
+  </data>
+
+  <data name="EditPage_DeleteCustomFolderCheckBox.Content" xml:space="preserve">
+    <value>是否删除自定义角色文件夹及其内容 / 模组？
+文件将会被永久删除！</value>
+  </data>
+  <data name="EditPage_DeleteCustomDialogText.Text" xml:space="preserve">
+    <value>你确定要删除这个自定义角色吗？这将会移除该角色，而且 JASM 将不再识别这个角色。按下 “是” 后，这将立即执行。</value>
+  </data>
+  <data name="EditPage_DeleteCustomDialogTitle.Title" xml:space="preserve">
+    <value>删除自定义角色</value>
+  </data>
+  <data name="EditPage_DeleteCustomConfirmButton" xml:space="preserve">
+    <value>是, 删除这个角色</value>
+  </data>
+  
+  <data name="EditPage_EnableCharacterDialogText.Text" xml:space="preserve">
+    <value>你确定要启用这个角色吗？按下 “是” 后，这将立即执行。</value>
+  </data>
+  <data name="EditPage_EnableCharacterDialogTitle.Title" xml:space="preserve">
+    <value>启用角色</value>
+  </data>
+  <data name="EditPage_EnableCharacterConfirmButton" xml:space="preserve">
+    <value>是, 启用这个角色</value>
+  </data>
+  
+  <data name="EditPage_ModelDialogTitle.Title" xml:space="preserve">
+    <value>角色模型</value>
+  </data>
+
+  <!-- Edit Page Notifications -->
+  <data name="EditPage_CustomDeletedTitle" xml:space="preserve">
+    <value>自定义角色已删除</value>
+  </data>
+  <data name="EditPage_CustomDeletedMessage" xml:space="preserve">
+    <value>自定义角色 '{0}' 已成功删除</value>
+  </data>
+  <data name="EditPage_SaveFailedTitle" xml:space="preserve">
+    <value>未能保存对角色所做的更改</value>
+  </data>
+
+  <!-- Validation Messages -->
+  <data name="Validation_InternalNameEmpty" xml:space="preserve">
+    <value>内部名称不能为空</value>
+  </data>
+  <data name="Validation_InternalNameTaken" xml:space="preserve">
+    <value>内部名称 '{0}' 已被 {1} 占用</value>
+  </data>
+  <data name="Validation_InternalNameInvalidChar" xml:space="preserve">
+    <value>内部名称包含无效的文件系统字符 '{0}'</value>
+  </data>
+  
+  <data name="Validation_ModFilesNameTaken" xml:space="preserve">
+    <value>模组文件名已被 {0} 占用</value>
+  </data>
+  
+  <data name="Validation_DisplayNameTakenWarning" xml:space="preserve">
+    <value>另一个模组对象 ({0}) 已经使用了这个显示名称，这可能会导致搜索出现异常情况</value>
+  </data>
+  <data name="Validation_DisplayNameEmpty" xml:space="preserve">
+    <value>显示名称不能为空</value>
+  </data>
+  
+  <data name="Validation_ImageEmpty" xml:space="preserve">
+    <value>图像不能为空</value>
+  </data>
+  <data name="Validation_ImageInvalid" xml:space="preserve">
+    <value>图像必须是有效的现有图像</value>
+  </data>
+  <data name="Validation_ImageExtensionNotSupported" xml:space="preserve">
+    <value>图像必须属于以下类型之一: {0}. 扩展名 {1} 不受支持.</value>
+  </data>
+  
+  <data name="Validation_RarityTooLow" xml:space="preserve">
+    <value>稀有度必须大于 -1</value>
+  </data>
+  <data name="Validation_RarityTooHigh" xml:space="preserve">
+    <value>稀有度必须小于 11</value>
+  </data>
+  
+  <data name="Validation_ElementInvalid" xml:space="preserve">
+    <value>属性 {0} 不存在。有效值 {1}</value>
+  </data>
+  
+  <data name="Validation_KeyTaken" xml:space="preserve">
+    <value>键 '{0}' 已被 {1} 占用</value>
+  </data>
+</root>

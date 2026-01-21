@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="using:GIMI_ModManager.WinUI.Views.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:l="using:WinUI3Localizer"
     xmlns:local="using:GIMI_ModManager.WinUI.Views.CharacterDetailsPages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     IsEnabled="{x:Bind ViewModel.IsModObjectLoaded, Mode=OneWay}"
@@ -49,7 +50,8 @@
                     <Button
                         HorizontalAlignment="Center"
                         Command="{x:Bind ViewModel.GoToModsOverviewCommand}"
-                        ToolTipService.ToolTip="跳转到模组管理页面">
+                        ToolTipService.ToolTip="Go to Mods Management Page"
+                        l:Uids.Uid="/CharacterDetailsPage/GoToModsOverviewButton">
                         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xEA37;" />
                     </Button>
 
@@ -57,7 +59,8 @@
                     <Button
                         HorizontalAlignment="Right"
                         Command="{x:Bind ViewModel.GoToCharacterEditScreenCommand}"
-                        ToolTipService.ToolTip="编辑角色">
+                        ToolTipService.ToolTip="Edit Character"
+                        l:Uids.Uid="/CharacterDetailsPage/EditCharacterButton">
                         <FontIcon Glyph="&#xE70F;" />
                     </Button>
                 </StackPanel>
@@ -102,7 +105,8 @@
                     Margin="0,0,4,0"
                     VerticalAlignment="Center"
                     Style="{ThemeResource BodyTextStyle}"
-                    Text="模组数量:" />
+                    Text="Mod Count:"
+                    l:Uids.Uid="/CharacterDetailsPage/ModCountLabel" />
                 <TextBlock Style="{ThemeResource BodyTextStyle}" Text="{x:Bind ViewModel.TrackedModsCount, Mode=OneWay}" />
             </StackPanel>
 
@@ -115,7 +119,8 @@
                 <TextBlock
                     Padding="0,0,0,16"
                     HorizontalAlignment="Center"
-                    Text="当前游戏内角色皮肤:" />
+                    Text="Selected In-Game Skin:"
+                    l:Uids.Uid="/CharacterDetailsPage/CurrentSkinLabel" />
                 <TextBlock
                     HorizontalAlignment="Center"
                     FontFamily="{StaticResource GenshinFont}"
@@ -125,9 +130,10 @@
                 <Button
                     Margin="0,16,0,0"
                     HorizontalAlignment="Center"
-                    Content="选择皮肤"
+                    Content="Select Skin"
                     Flyout="{StaticResource SelectInGameSkin}"
-                    IsEnabled="{x:Bind ViewModel.CanChangeInGameSkins, Mode=OneWay}">
+                    IsEnabled="{x:Bind ViewModel.CanChangeInGameSkins, Mode=OneWay}"
+                    l:Uids.Uid="/CharacterDetailsPage/SelectSkinButton">
 
                     <Button.KeyboardAccelerators>
                         <KeyboardAccelerator Key="F1" />
@@ -140,7 +146,11 @@
         </StackPanel>
 
         <StackPanel Grid.Row="2" Margin="0,0,0,8">
-            <Button HorizontalAlignment="Center" Command="{x:Bind ViewModel.DisableAllModsCommand}">禁用所有模组</Button>
+            <Button 
+                HorizontalAlignment="Center" 
+                Command="{x:Bind ViewModel.DisableAllModsCommand}"
+                Content="Disable All Mods"
+                l:Uids.Uid="/CharacterDetailsPage/DisableAllModsButton" />
         </StackPanel>
     </Grid>
 </UserControl>

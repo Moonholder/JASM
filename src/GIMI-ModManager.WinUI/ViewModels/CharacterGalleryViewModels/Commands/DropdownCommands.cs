@@ -1,13 +1,14 @@
-﻿using Windows.System;
-using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
 using GIMI_ModManager.Core.Helpers;
-using Microsoft.UI.Xaml.Controls;
-using GIMI_ModManager.WinUI.Services.Notifications;
-using Windows.Storage;
-using GIMI_ModManager.WinUI.Services;
 using GIMI_ModManager.WinUI.Contracts.Services;
-using GIMI_ModManager.WinUI.Services.AppManagement;
 using GIMI_ModManager.WinUI.Models.Settings;
+using GIMI_ModManager.WinUI.Services;
+using GIMI_ModManager.WinUI.Services.AppManagement;
+using GIMI_ModManager.WinUI.Services.Notifications;
+using Microsoft.UI.Xaml.Controls;
+using Windows.Storage;
+using Windows.System;
+using WinUI3Localizer;
 
 namespace GIMI_ModManager.WinUI.ViewModels.CharacterGalleryViewModels;
 
@@ -40,7 +41,7 @@ public partial class CharacterGalleryViewModel
 
         var doNotAskAgainCheckBox = new CheckBox()
         {
-            Content = "下次不再询问",
+            Content = _localizer.GetLocalizedStringOrDefault("/CharacterGalleryPage/DeleteDialog_DoNotAskAgain", "Do not ask again"),
             IsChecked = false,
         };
         var stackPanel = new StackPanel()
@@ -49,7 +50,7 @@ public partial class CharacterGalleryViewModel
             {
                 new TextBlock()
                 {
-                    Text = $"您确定要删除 {vm.Name}吗?",
+                    Text = string.Format(_localizer.GetLocalizedStringOrDefault("/CharacterGalleryPage/DeleteDialog_ConfirmMessage", "Are you sure you want to delete {0}?"), vm.Name),
                     TextWrapping = Microsoft.UI.Xaml.TextWrapping.WrapWholeWords,
                 },
                 doNotAskAgainCheckBox
@@ -58,10 +59,10 @@ public partial class CharacterGalleryViewModel
 
         var dialog = new ContentDialog()
         {
-            Title = "删除模组",
+            Title = _localizer.GetLocalizedStringOrDefault("/CharacterGalleryPage/DeleteDialog_Title", "Delete Mod"),
             Content = stackPanel,
-            PrimaryButtonText = "删除",
-            CloseButtonText = "取消",
+            PrimaryButtonText = _localizer.GetLocalizedStringOrDefault("/CharacterGalleryPage/DeleteDialog_DeleteButton", "Delete"),
+            CloseButtonText = _localizer.GetLocalizedStringOrDefault("/CharacterGalleryPage/DeleteDialog_CancelButton", "Cancel"),
             DefaultButton = ContentDialogButton.Primary,
         };
 
@@ -118,10 +119,15 @@ public partial class CharacterGalleryViewModel
         catch (Exception e)
         {
             _logger.Error(e, "Failed to delete mod");
-            notificationManager.ShowNotification("删除模组失败", e.Message, TimeSpan.FromSeconds(10));
+            notificationManager.ShowNotification(
+               _localizer.GetLocalizedStringOrDefault("/CharacterGalleryPage/DeleteNotification_FailureTitle", "Failed to delete mod"),
+               e.Message, TimeSpan.FromSeconds(5));
             return;
         }
 
-        notificationManager.ShowNotification("模组删除成功", $"{vm.Name} 已从列表中删除。", TimeSpan.FromSeconds(5));
+        notificationManager.ShowNotification(
+           _localizer.GetLocalizedStringOrDefault("/CharacterGalleryPage/DeleteNotification_SuccessTitle", "Mod deleted successfully"),
+           string.Format(_localizer.GetLocalizedStringOrDefault("/CharacterGalleryPage/DeleteNotification_SuccessMessage", "{0} has been removed from the list."), vm.Name),
+           TimeSpan.FromSeconds(5));
     }
 }

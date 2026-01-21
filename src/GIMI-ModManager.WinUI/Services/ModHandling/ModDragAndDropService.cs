@@ -9,6 +9,7 @@ using Serilog;
 using Windows.Storage;
 using Windows.Win32;
 using Windows.Win32.Media.Audio;
+using GIMI_ModManager.Core.Contracts.Services;
 using static GIMI_ModManager.WinUI.Services.ModHandling.ModDragAndDropService.DragAndDropFinishedArgs;
 
 namespace GIMI_ModManager.WinUI.Services.ModHandling;
@@ -21,16 +22,18 @@ public class ModDragAndDropService
     private readonly ILocalSettingsService _localSettingsService = App.GetService<ILocalSettingsService>();
     private readonly IThemeSelectorService _themeSelectorService;
     private readonly Notifications.NotificationManager _notificationManager;
+    private readonly ILanguageLocalizer _localizer;
 
     public event EventHandler<DragAndDropFinishedArgs>? DragAndDropFinished;
 
     public ModDragAndDropService(ILogger logger, Notifications.NotificationManager notificationManager,
-        ModInstallerService modInstallerService, IWindowManagerService windowManagerService, IThemeSelectorService themeSelectorService)
+        ModInstallerService modInstallerService, IWindowManagerService windowManagerService, IThemeSelectorService themeSelectorService, ILanguageLocalizer localizer)
     {
         _notificationManager = notificationManager;
         _modInstallerService = modInstallerService;
         _windowManagerService = windowManagerService;
         _themeSelectorService = themeSelectorService;
+        _localizer = localizer;
         _logger = logger.ForContext<ModDragAndDropService>();
     }
 
@@ -50,7 +53,8 @@ public class ModDragAndDropService
         if (storageItems.Count > 1)
         {
             _notificationManager.ShowNotification(
-                "使用多个存储条目进行了拖放操作，目前不支持这种情况", "",
+                _localizer.GetLocalizedStringOrDefault("/CharactersPage/DragDrop_MultiFilesWarningTitle", "Multiple items dropped"),
+                _localizer.GetLocalizedStringOrDefault("/CharactersPage/DragDrop_MultiFilesWarningMessage", "Dropping multiple items is currently not supported"),
                 TimeSpan.FromSeconds(5));
             return null;
         }
@@ -58,8 +62,8 @@ public class ModDragAndDropService
         if (_windowManagerService.GetWindow(modList) is { } window)
         {
             _notificationManager.ShowNotification(
-                $"请先完成为 '{modList.Character.DisplayName}' 添加模组的操作",
-                $"JASM 不支持为同一个角色安装多个模组",
+                string.Format(_localizer.GetLocalizedStringOrDefault("/CharactersPage/DragDrop_AlreadyInstallingTitle", "Please finish adding mod for '{0}' first"), modList.Character.DisplayName),
+                _localizer.GetLocalizedStringOrDefault("/CharactersPage/DragDrop_AlreadyInstallingMessage", "JASM does not support installing multiple mods for the same character simultaneously"),
                 TimeSpan.FromSeconds(8));
 
             PInvoke.PlaySound("SystemAsterisk", null,
@@ -152,13 +156,13 @@ public class ModDragAndDropService
     {
         var tcs = new TaskCompletionSource<DragAndDropScanResult>();
 
-        App.MainWindow.DispatcherQueue.TryEnqueue(() =>
+        App.MainWindow.DispatcherQueue.TryEnqueue(async () =>
         {
-            var passwordDialog = new PasswordInputDialog(tcs, scanner, filePath, _notificationManager)
+            var passwordDialog = new PasswordInputDialog(tcs, scanner, filePath, _notificationManager, _localizer)
             {
                 RequestedTheme = _themeSelectorService.Theme
             };
-            passwordDialog.ShowAsync();
+            await passwordDialog.ShowAsync();
         });
 
         return await tcs.Task;

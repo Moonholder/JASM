@@ -36,7 +36,8 @@ public partial class ModGridVM(
     ModSettingsService modSettingsService,
     ElevatorService elevatorService,
     UserPreferencesService userPreferencesService,
-    IWindowManagerService windowManagerService)
+    IWindowManagerService windowManagerService,
+    ILanguageLocalizer localizer)
     : ObservableRecipient, IRecipient<ModChangedMessage>
 {
     private readonly ISkinManagerService _skinManagerService = skinManagerService;
@@ -50,6 +51,7 @@ public partial class ModGridVM(
     private readonly UserPreferencesService _userPreferencesService = userPreferencesService;
     private readonly IWindowManagerService _windowManagerService = windowManagerService;
     private readonly ILogger _logger = Log.ForContext<ModGridVM>();
+    private readonly ILanguageLocalizer _localizer = localizer;
 
     private DispatcherQueue? _dispatcherQueue; // 设为可空
     private CancellationToken _navigationCt = default;
@@ -107,6 +109,10 @@ public partial class ModGridVM(
         public TimeSpan? MinWaitTime { get; } = minWaitTime;
     };
 
+    public string GetLocalized(string key, string defaultValue)
+    {
+        return _localizer.GetLocalizedStringOrDefault(key, defaultValue);
+    }
     private async Task ModRefreshLoopAsync()
     {
         try

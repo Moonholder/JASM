@@ -42,13 +42,13 @@ public partial class CharacterDetailsViewModel
 
         var moveToRecycleBinCheckBox = new CheckBox()
         {
-            Content = "移动到回收站?",
+            Content = _localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/DeleteDialog_MoveToRecycleBin", "Move to Recycle Bin?"),
             IsChecked = _moveToRecycleBinCheckBox
         };
 
         var removeFromPresetsCheckBox = new CheckBox()
         {
-            Content = "从预设中移除?",
+            Content = _localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/DeleteDialog_RemoveFromPresets", "Remove from presets?"),
             IsChecked = _removeFromPresetCheckBox
         };
 
@@ -87,10 +87,10 @@ public partial class CharacterDetailsViewModel
 
         var dialog = new ContentDialog()
         {
-            Title = $"删除这 {selectedModsCount} 个模组?",
+            Title = string.Format(_localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/DeleteDialog_Title", "Delete these {0} mods?"), selectedModsCount),
             Content = contentWrapper,
-            PrimaryButtonText = "删除",
-            SecondaryButtonText = "取消",
+            PrimaryButtonText = _localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/DeleteDialog_DeleteButton", "Delete"),
+            SecondaryButtonText = _localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/DeleteDialog_CancelButton", "Cancel"),
             DefaultButton = ContentDialogButton.Primary
         };
 
@@ -172,12 +172,12 @@ public partial class CharacterDetailsViewModel
             {
                 var content = new StringBuilder();
 
-                content.AppendLine("Error deleting mods:");
+                content.AppendLine(_localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/DeleteError_Header", "Error deleting mods:"));
 
 
                 if (modsToDeletePresetError.Count > 0)
                 {
-                    content.AppendLine("Preset error Mods:");
+                    content.AppendLine(_localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/DeleteError_PresetHeader", "Preset error Mods:"));
                     foreach (var mod in modsToDeletePresetError)
                     {
                         content.AppendLine($"- {mod.DisplayName}");
@@ -188,7 +188,7 @@ public partial class CharacterDetailsViewModel
 
                 if (modsToDeleteErrored.Count > 0)
                 {
-                    content.AppendLine("Delete error Mods:");
+                    content.AppendLine(_localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/DeleteError_DeleteHeader", "Delete error Mods:"));
                     foreach (var mod in modsToDeleteErrored)
                     {
                         content.AppendLine($"- {mod.DisplayName}");
@@ -196,13 +196,17 @@ public partial class CharacterDetailsViewModel
                     }
                 }
 
-                _notificationService.ShowNotification("删除模组失败", content.ToString(), TimeSpan.FromSeconds(10));
+                _notificationService.ShowNotification(
+                    _localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/DeleteNotification_FailureTitle", "Failed to delete mods"),
+                    content.ToString(), TimeSpan.FromSeconds(10));
                 return;
             }
 
-
-            _notificationService.ShowNotification($"{modsDeleted.Count} 个模组已删除",
-                $"成功删除 {shownCharacterName} 的 {string.Join(", ", selectedMods.Select(m => m.DisplayName))} 模组",
+            _notificationService.ShowNotification(
+                string.Format(_localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/DeleteNotification_SuccessTitle", "{0} mods deleted"), modsDeleted.Count),
+                string.Format(_localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/DeleteNotification_SuccessMessage", "Successfully deleted mods for {0}: {1}"),
+                    shownCharacterName,
+                    string.Join(", ", selectedMods.Select(m => m.DisplayName))),
                 TimeSpan.FromSeconds(5));
         }).ConfigureAwait(false);
     }

@@ -2,6 +2,7 @@
 using GIMI_ModManager.Core.GamesService.Interfaces;
 using GIMI_ModManager.Core.Helpers;
 using GIMI_ModManager.WinUI.Services;
+using GIMI_ModManager.Core.Contracts.Services;
 using GIMI_ModManager.WinUI.ViewModels.CharacterManagerViewModels.Validation;
 using System.Xml.Linq;
 
@@ -13,21 +14,23 @@ public sealed partial class EditCharacterForm : Form
     {
     }
 
-    public void Initialize(ICharacter character, ICollection<IModdableObject> allModdableObjects, ICollection<IGameElement> elements)
+    public void Initialize(ICharacter character, ICollection<IModdableObject> allModdableObjects, ICollection<IGameElement> elements, ILanguageLocalizer localizer)
     {
         allModdableObjects = allModdableObjects.Contains(character)
             ? allModdableObjects.Where(mo => !mo.Equals(character)).ToArray()
             : allModdableObjects;
 
-        InternalName.ValidationRules.AddInternalNameValidators(allModdableObjects);
+        InternalName.ValidationRules.AddInternalNameValidators(allModdableObjects, localizer);
         InternalName.ReInitializeInput(character.InternalName);
 
-        DisplayName.ValidationRules.AddDisplayNameValidators(allModdableObjects);
+        DisplayName.ValidationRules.AddDisplayNameValidators(allModdableObjects, localizer);
         DisplayName.ValidationRules.Add(context =>
-            context.Value.Trim().IsNullOrEmpty() ? new ValidationResult { Message = "显示名称不能为空" } : null);
+            context.Value.Trim().IsNullOrEmpty()
+            ? new ValidationResult { Message = localizer.GetLocalizedStringOrDefault("/CharacterManager/Validation_DisplayNameEmpty", "Display Name cannot be empty") }
+            : null);
         DisplayName.ReInitializeInput(character.DisplayName);
 
-        Image.ValidationRules.AddImageValidators();
+        Image.ValidationRules.AddImageValidators(localizer);
         Image.ReInitializeInput(character.ImageUri ?? ImageHandlerService.StaticPlaceholderImageUri);
 
         Rarity.ReInitializeInput(character.Rarity);
@@ -40,7 +43,7 @@ public sealed partial class EditCharacterForm : Form
             ReleaseDate.ReInitializeInput(safeDate);
         }
 
-        Keys.ValidationRules.AddKeysValidators([.. allModdableObjects.OfType<ICharacter>()]);
+        Keys.ValidationRules.AddKeysValidators([.. allModdableObjects.OfType<ICharacter>()], localizer);
         Keys.ReInitializeInput(character.Keys);
 
         IsMultiMod.ReInitializeInput(character.IsMultiMod);

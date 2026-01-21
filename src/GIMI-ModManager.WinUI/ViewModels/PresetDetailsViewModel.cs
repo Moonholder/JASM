@@ -29,7 +29,8 @@ public sealed partial class PresetDetailsViewModel(
     BusyService busyService,
     ElevatorService elevatorService,
     UserPreferencesService userPreferencesService,
-    IThemeSelectorService themeSelectorService)
+    IThemeSelectorService themeSelectorService,
+    ILanguageLocalizer localizer)
     : ObservableRecipient, INavigationAware
 {
     private readonly ImageHandlerService _imageHandlerService = imageHandlerService;
@@ -42,6 +43,7 @@ public sealed partial class PresetDetailsViewModel(
     private readonly ElevatorService _elevatorService = elevatorService;
     private readonly UserPreferencesService _userPreferencesService = userPreferencesService;
     private readonly IThemeSelectorService _themeSelectorService = themeSelectorService;
+    private readonly ILanguageLocalizer _localizer = localizer;
     private const string SelectModsWindowKey = "SelectModsWindow";
 
     private CancellationTokenSource? _cancellationTokenSource;
@@ -70,13 +72,19 @@ public sealed partial class PresetDetailsViewModel(
     {
         var preset = _modPresetService.GetPresets().FirstOrDefault(p => p.Name == PresetName);
 
-        var modCountText = $"{preset?.Mods.Count ?? 0}个模组";
+        var modCountText = string.Format(
+            _localizer.GetLocalizedStringOrDefault("/PresetPage/ModCountFormat", "{0} mods"),
+            preset?.Mods.Count ?? 0);
 
         var isReadOnly = preset?.IsReadOnly ?? false;
 
-        var readOnlyText = isReadOnly ? " (只读)" : string.Empty;
+        var readOnlyText = isReadOnly
+            ? $" ({_localizer.GetLocalizedStringOrDefault("/PresetPage/ReadOnlyText", "Read-Only")})"
+            : string.Empty;
 
-        return $"预设详情: {PresetName} ({modCountText}){readOnlyText}";
+        return string.Format(
+            _localizer.GetLocalizedStringOrDefault("/PresetPage/PresetDetailsTitleFormat", "Preset Details: {0} ({1}){2}"),
+            PresetName, modCountText, readOnlyText);
     }
 
     public async void OnNavigatedTo(object parameter)
@@ -178,9 +186,7 @@ public sealed partial class PresetDetailsViewModel(
     [RelayCommand(CanExecute = nameof(IsNotBusy))]
     private async Task RemoveModFromPreset(ModPresetEntryDetailedVm? modPresetEntryVm)
     {
-        if (modPresetEntryVm is null)
-            return;
-
+        if (modPresetEntryVm is null) return;
 
         IsBusy = true;
         try
@@ -189,13 +195,20 @@ public sealed partial class PresetDetailsViewModel(
 
             ModEntries.Remove(modPresetEntryVm);
             OnPropertyChanged(nameof(GetPageTitle));
-            _notificationManager.ShowNotification("模组已从预设中移除",
-                $"从预设 {PresetName} 中移除了{(modPresetEntryVm.IsMissing ? "缺失的" : "")}模组 '{modPresetEntryVm.Name}'",
+
+            _notificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/PresetPage/ModRemovedTitle", "Mod removed from preset"),
+                string.Format(_localizer.GetLocalizedStringOrDefault("/PresetPage/ModRemovedMessage", "Removed {0} mod '{1}' from preset {2}"),
+                    (modPresetEntryVm.IsMissing ? _localizer.GetLocalizedStringOrDefault("/PresetPage/MissingText", "missing") : ""),
+                    modPresetEntryVm.Name,
+                    PresetName),
                 null);
         }
         catch (Exception e)
         {
-            _notificationManager.ShowNotification("从预设中移除模组失败", e.Message, null);
+            _notificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/PresetPage/ModRemoveFailedTitle", "Failed to remove mod from preset"),
+                e.Message, null);
         }
         finally
         {
@@ -255,8 +268,10 @@ public sealed partial class PresetDetailsViewModel(
                 catch (Exception ex)
                 {
                     failedMods.Add((modId.ToString(), ex));
-                    _notificationManager.ShowNotification($"添加模组失败",
-                        $"模组 {modId} 添加失败: {ex.Message}", null);
+                    _notificationManager.ShowNotification(
+                        _localizer.GetLocalizedStringOrDefault("/PresetPage/AddModFailedTitle", "Failed to add mod"),
+                        string.Format(_localizer.GetLocalizedStringOrDefault("/PresetPage/AddModFailedMessage", "Mod {0} failed to add: {1}"), modId, ex.Message),
+                        null);
                 }
             }
 
@@ -287,28 +302,34 @@ public sealed partial class PresetDetailsViewModel(
 
                 if (failedMods.Count == 0)
                 {
-                    _notificationManager.ShowNotification("模组批量添加成功",
-                        $"成功将 {addedModEntries.Count} 个模组添加到预设 {PresetName}",
+                    _notificationManager.ShowNotification(
+                        _localizer.GetLocalizedStringOrDefault("/PresetPage/BatchAddSuccessTitle", "Mods added successfully"),
+                        string.Format(_localizer.GetLocalizedStringOrDefault("/PresetPage/BatchAddSuccessMessage", "Successfully added {0} mods to preset {1}"), addedModEntries.Count, PresetName),
                         null);
                 }
                 else
                 {
-                    _notificationManager.ShowNotification("模组批量添加完成",
-                        $"成功添加 {addedModEntries.Count} 个模组，失败 {failedMods.Count} 个",
-                        null);
+                    _notificationManager.ShowNotification(
+                       _localizer.GetLocalizedStringOrDefault("/PresetPage/BatchAddCompleteTitle", "Mods batch add complete"),
+                       string.Format(_localizer.GetLocalizedStringOrDefault("/PresetPage/BatchAddCompleteMessage", "Successfully added {0} mods, failed {1}"), addedModEntries.Count, failedMods.Count),
+                       null);
                 }
                 OnPropertyChanged(nameof(GetPageTitle));
             }
             else if (failedMods.Count > 0)
             {
-                _notificationManager.ShowNotification("添加模组到预设失败",
-                    $"所有 {failedMods.Count} 个模组添加均失败", null);
+                _notificationManager.ShowNotification(
+                    _localizer.GetLocalizedStringOrDefault("/PresetPage/BatchAddAllFailedTitle", "Failed to add mods to preset"),
+                    string.Format(_localizer.GetLocalizedStringOrDefault("/PresetPage/BatchAddAllFailedMessage", "All {0} mods failed to add"), failedMods.Count),
+                    null);
             }
         }
         catch (Exception e)
         {
-            _notificationManager.ShowNotification("批量添加模组到预设失败",
-                $"操作过程中发生错误: {e.Message}", null);
+            _notificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/PresetPage/BatchAddErrorTitle", "Error adding mods to preset"),
+                string.Format(_localizer.GetLocalizedStringOrDefault("/PresetPage/BatchAddErrorMessage", "An error occurred during the operation: {0}"), e.Message),
+                null);
         }
         finally
         {
@@ -366,13 +387,16 @@ public sealed partial class PresetDetailsViewModel(
 
             await Task.Run(() => _modPresetService.DeleteModEntryAsync(PresetName, vm.ModId));
 
-            _notificationManager.ShowNotification("模组已添加到预设中",
-                $"已将模组 '{modEntryVm.Name}' 添加到预设 {PresetName}",
+            _notificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/PresetPage/ModAddedToPresetTitle", "Mod added to preset"),
+                string.Format(_localizer.GetLocalizedStringOrDefault("/PresetPage/ModAddedToPresetMessage", "Added mod '{0}' to preset {1}"), modEntryVm.Name, PresetName),
                 null);
         }
         catch (Exception e)
         {
-            _notificationManager.ShowNotification("添加模组到预设失败", e.Message, null);
+            _notificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/PresetPage/AddModToPresetFailedTitle", "Failed to add mod to preset"),
+                e.Message, null);
         }
         finally
         {
@@ -415,12 +439,16 @@ public sealed partial class PresetDetailsViewModel(
             _backendModEntries[backendIndex] = updatedModEntry;
 
 
-            _notificationManager.ShowNotification("已保存模组首选项",
-                $"为mod {presetEntryDetailedVm.Name} 成功保存首选项 ", null);
+            _notificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/PresetPage/PreferencesSavedTitle", "Mod preferences saved"),
+                string.Format(_localizer.GetLocalizedStringOrDefault("/PresetPage/PreferencesSavedMessage", "Successfully saved preferences for mod {0}"), presetEntryDetailedVm.Name),
+                null);
         }
         catch (Exception e)
         {
-            _notificationManager.ShowNotification("保存模组首选项失败", e.Message, null);
+            _notificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/PresetPage/PreferencesSaveFailedTitle", "Failed to save mod preferences"),
+                e.Message, null);
         }
         finally
         {
@@ -470,7 +498,7 @@ public sealed partial class PresetDetailsViewModel(
         var window = new WindowEx()
         {
             SystemBackdrop = new MicaBackdrop(),
-            Title = "选择 Mods",
+            Title = _localizer.GetLocalizedStringOrDefault("/PresetPage/SelectModsWindowTitle", "Select Mods"),
             Content = modSelector,
             Width = 1200,
             Height = 750,

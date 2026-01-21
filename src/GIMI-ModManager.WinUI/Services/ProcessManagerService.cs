@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using GIMI_ModManager.Core.Contracts.Services;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -17,6 +18,7 @@ public abstract partial class BaseProcessManager<TProcessOptions> : ObservableOb
     private readonly CommandService _commandService;
     private readonly CommandHandlerService _commandHandler;
     private readonly NotificationManager _notificationManager;
+    private readonly ILanguageLocalizer _localizer;
     private CommandDefinition? _commandDefinition;
     private ProcessCommand? _process;
 
@@ -39,6 +41,7 @@ public abstract partial class BaseProcessManager<TProcessOptions> : ObservableOb
         _commandService = App.GetService<CommandService>();
         _commandHandler = App.GetService<CommandHandlerService>();
         _notificationManager = App.GetService<NotificationManager>();
+        _localizer = App.GetService<ILanguageLocalizer>();
     }
 
 
@@ -109,22 +112,28 @@ public abstract partial class BaseProcessManager<TProcessOptions> : ObservableOb
 
         if (!result.IsSuccess)
         {
+            var errorTitle = _localizer.GetLocalizedStringOrDefault("/Settings/Process_UnableToStartTitle", "Unable to start process");
+
             if (result.Exception is Win32Exception e)
             {
-                var message = $"启动 {ProcessName} 失败";
+                var message = string.Format(
+                    _localizer.GetLocalizedStringOrDefault("/Settings/Process_StartFailed", "Failed to start {0}"),
+                    ProcessName);
 
                 if (e.NativeErrorCode == 1223)
                 {
-                    message =
-                        $"启动 {ProcessName} 失败, 这可能是因为用户取消了 UAC（管理员）提示";
+                    message = string.Format(
+                        _localizer.GetLocalizedStringOrDefault("/Settings/Process_StartFailed_UAC", "Failed to start {0}. This might be because the User Account Control (UAC) prompt was cancelled."),
+                        ProcessName);
                 }
                 else if (e.NativeErrorCode == 740)
                 {
-                    message =
-                        $"启动 {ProcessName} 失败, 若该可执行文件（exe）的属性中启用了 “以管理员身份运行” 选项，可能会出现此问题";
+                    message = string.Format(
+                        _localizer.GetLocalizedStringOrDefault("/Settings/Process_StartFailed_AdminProp", "Failed to start {0}. This can happen if the 'Run as Administrator' option is enabled in the executable's properties."),
+                        ProcessName);
                 }
 
-                _notificationManager.ShowNotification("无法启动进程", message, null);
+                _notificationManager.ShowNotification(errorTitle, message, null);
                 return;
             }
 
@@ -135,7 +144,8 @@ public abstract partial class BaseProcessManager<TProcessOptions> : ObservableOb
                 return;
             }
 
-            _notificationManager.ShowNotification("无法启动进程", "发生未知错误", null);
+            var unknownError = _localizer.GetLocalizedStringOrDefault("/Settings/Process_UnknownError", "An unknown error occurred");
+            _notificationManager.ShowNotification(errorTitle, unknownError, null);
             return;
         }
 

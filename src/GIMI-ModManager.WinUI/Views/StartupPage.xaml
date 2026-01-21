@@ -66,8 +66,8 @@
                         <TextBlock
                             IsTextSelectionEnabled="True"
                             Style="{ThemeResource BodyTextBlockStyle}"
-                            TextWrapping="WrapWholeWords"
                             Text="As part of the first time setup you will need to select a Model-Importer folder (3dmigoto) and its connected Mods folder. The 3dmigoto folder usually contains 3DMigoto Loader.exe/3DMigotoLoader.exe and a Mods folder. If you have not set up the model importer yet, please do so now, see link below. I find most mods on Gamebanana but Nexusmods also has some."
+                            TextWrapping="WrapWholeWords"
                             l:Uids.Uid="/Startup/Body1" />
                         <StackPanel Orientation="Horizontal">
 
@@ -88,8 +88,8 @@
                         Margin="0,8,0,0"
                         IsTextSelectionEnabled="True"
                         Style="{ThemeResource BodyTextBlockStyle}"
-                        TextWrapping="WrapWholeWords"
                         Text="Once the settings are saved the application will create a folder for each character within the 'Mods' folder. Mod folders outside of these character folders are ignored. This application enables and disables mods by prefixing mod folders with 'DISABLED_'.  JASM also supports exporting Mods managed by it if you wish to use them with other applications."
+                        TextWrapping="WrapWholeWords"
                         l:Uids.Uid="/Startup/Body2" />
 
                     <TextBlock
@@ -97,8 +97,8 @@
                         Margin="0,4,0,0"
                         IsTextSelectionEnabled="True"
                         Style="{ThemeResource BodyStrongTextBlockStyle}"
-                        TextWrapping="WrapWholeWords"
                         Text="It is always a good idea to backup your files/mods before using applications that interact with your files"
+                        TextWrapping="WrapWholeWords"
                         l:Uids.Uid="/Startup/BackupWarning" />
 
                 </Grid>
@@ -125,8 +125,8 @@
                     <TextBlock
                         Margin="0,8,0,0"
                         Style="{ThemeResource BodyTextBlockStyle}"
-                        TextWrapping="WrapWholeWords"
-                        Text="Unloading of Mods is currently not implemented. However, once implemented it will be possible to unload select mods to an unloaded mods folder." />
+                        Text="Unloading of Mods is currently not implemented. However, once implemented it will be possible to unload select mods to an unloaded mods folder."
+                        TextWrapping="WrapWholeWords" />
                 </Grid>
                 <controls:FolderSelector
                     Title="Unloaded Mods Folder (Optional)"
@@ -138,8 +138,9 @@
                 <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                     <CheckBox
                         Margin="12,0,12,0"
-                        Content="整理模组文件夹"
-                        IsChecked="{x:Bind ViewModel.ReorganizeModsOnStartup, Mode=TwoWay}" />
+                        Content="Reorganize Mods Folder"
+                        IsChecked="{x:Bind ViewModel.ReorganizeModsOnStartup, Mode=TwoWay}"
+                        l:Uids.Uid="/Startup/ReorganizeModsCheckBox" />
 
                     <Button Background="Transparent" CornerRadius="8">
                         <Button.Flyout>
@@ -155,21 +156,21 @@
                                     <TextBlock
                                         Margin="0,8,0,4"
                                         Style="{ThemeResource BodyTextBlockStyle}"
-                                        TextWrapping="WrapWholeWords"
                                         Text="Enabling this option will prompt the application to sort existing mods into folders assigned to their respective characters. Any mods that can't be reasonably matched will be placed in an 'Others' folder."
+                                        TextWrapping="WrapWholeWords"
                                         l:Uids.Uid="/Startup/ReorganizeTooltip1" />
 
                                     <TextBlock
                                         Style="{ThemeResource BodyTextBlockStyle}"
-                                        TextWrapping="WrapWholeWords"
                                         Text="A mod folder containing multiple character names may be wrongly moved to a character's directory. This assumes a flat mod structure, where skin folders are loosely stored in the mods folder. If you have a custom folder structure, there is a high chance that JASM will incorrectly identify your skins. This also the case if you have nested folders with skins inside of them."
+                                        TextWrapping="WrapWholeWords"
                                         l:Uids.Uid="/Startup/ReorganizeTooltip2" />
 
                                     <TextBlock
                                         Margin="0,8,0,4"
                                         Style="{ThemeResource BaseTextBlockStyle}"
-                                        TextWrapping="WrapWholeWords"
                                         Text="This can be activated later in the settings page."
+                                        TextWrapping="WrapWholeWords"
                                         l:Uids.Uid="/Startup/ReorganizeTooltip3" />
                                 </StackPanel>
                             </Flyout>
@@ -181,9 +182,10 @@
 
                     <CheckBox
                         Margin="40,0,12,0"
-                        Content="同时禁用所有模组"
+                        Content="Disable all mods at once"
                         IsChecked="{x:Bind ViewModel.DisableMods, Mode=TwoWay}"
-                        IsEnabled="{x:Bind ViewModel.ReorganizeModsOnStartup, Mode=OneWay}" />
+                        IsEnabled="{x:Bind ViewModel.ReorganizeModsOnStartup, Mode=OneWay}"
+                        l:Uids.Uid="/Startup/DisableModsCheckBox" />
 
                     <Button Background="Transparent" CornerRadius="8">
                         <Button.Flyout>
@@ -199,8 +201,8 @@
                                     <TextBlock
                                         Margin="0,8,0,4"
                                         Style="{ThemeResource BodyTextBlockStyle}"
-                                        TextWrapping="WrapWholeWords"
                                         Text="Prepend DISABLED_ to all mods so that they are disabled"
+                                        TextWrapping="WrapWholeWords"
                                         l:Uids.Uid="/Startup/DisableModsTooltip" />
 
                                 </StackPanel>
@@ -220,7 +222,8 @@
                     Margin="0,16,0,0"
                     HorizontalAlignment="Center"
                     Command="{x:Bind ViewModel.SaveStartupSettingsCommand}"
-                    Content="保存" />
+                    Content="Save"
+                    l:Uids.Uid="/Startup/SaveButton" />
 
             </StackPanel>
         </ScrollViewer>

@@ -9,6 +9,7 @@ using GIMI_ModManager.WinUI.Services;
 using GIMI_ModManager.WinUI.Services.AppManagement;
 using GIMI_ModManager.WinUI.Services.Notifications;
 using GIMI_ModManager.WinUI.Views.Settings;
+using GIMI_ModManager.Core.Contracts.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
@@ -19,7 +20,8 @@ public sealed partial class CommandsSettingsViewModel(
     IWindowManagerService windowManagerService,
     NotificationManager notificationManager,
     ILocalSettingsService localSettingsService,
-    CommandHandlerService commandHandlerService)
+    CommandHandlerService commandHandlerService,
+    ILanguageLocalizer localizer)
     : ObservableRecipient, INavigationAware
 {
     private readonly CommandService _commandService = commandService;
@@ -27,6 +29,7 @@ public sealed partial class CommandsSettingsViewModel(
     private readonly NotificationManager _notificationManager = notificationManager;
     private readonly ILocalSettingsService _localSettingsService = localSettingsService;
     private readonly CommandHandlerService _commandHandlerService = commandHandlerService;
+    private readonly ILanguageLocalizer _localizer = localizer;
 
     public ObservableCollection<CommandDefinitionVM> CommandDefinitions { get; } = new();
 
@@ -44,20 +47,17 @@ public sealed partial class CommandsSettingsViewModel(
         {
             var commandWarningDialog = new ContentDialog
             {
-                Title = "温馨提醒",
+                Title = _localizer.GetLocalizedStringOrDefault("/Settings/CommandsPage_WarningTitle", "Friendly Warning"),
 
                 Content = new TextBlock()
                 {
-                    Text = "请在创建命令时要小心. " +
-                           "命令可以用来在你的系统上运行任何可执行文件. " +
-                           "仅从可信来源创建命令.\n" +
-                           "JASM并不完美，不能保护您免受恶意脚本或JASM错误/故障的影响.\n\n" +
-                           "点击 '我明白了' 即表示你已了解风险.",
+                    Text = _localizer.GetLocalizedStringOrDefault("/Settings/CommandsPage_WarningText",
+                        "Please be careful when creating commands. Commands can be used to run any executable on your system. Only create commands from trusted sources.\nJASM is not perfect and cannot protect you from malicious scripts or JASM bugs/glitches.\n\nClicking 'I understand' means you acknowledge the risks."),
                     IsTextSelectionEnabled = true,
                     TextWrapping = TextWrapping.WrapWholeWords
                 },
-                PrimaryButtonText = "我明白了",
-                CloseButtonText = "取消"
+                PrimaryButtonText = _localizer.GetLocalizedStringOrDefault("/Settings/CommandsPage_WarningConfirmButton", "I understand"),
+                CloseButtonText = _localizer.GetLocalizedStringOrDefault("/Settings/CommandsPage_WarningCancelButton", "Cancel")
             };
 
             var result = await _windowManagerService.ShowDialogAsync(commandWarningDialog);
@@ -97,18 +97,24 @@ public sealed partial class CommandsSettingsViewModel(
             }
             catch (Exception e)
             {
-                _notificationManager.ShowNotification("终止进程失败", e.Message, TimeSpan.FromSeconds(5));
+                _notificationManager.ShowNotification(
+                    _localizer.GetLocalizedStringOrDefault("/Settings/CommandsPage_KillFailedTitle", "Failed to kill process"),
+                    e.Message, TimeSpan.FromSeconds(5));
                 return;
             }
         }
         else
         {
-            _notificationManager.ShowNotification("进程未运行", string.Empty, TimeSpan.FromSeconds(2));
+            _notificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/Settings/CommandsPage_ProcessNotRunningTitle", "Process not running"),
+                string.Empty, TimeSpan.FromSeconds(2));
             await RefreshRunningCommandsAsync();
             return;
         }
 
-        _notificationManager.ShowNotification("进程被成功终止", string.Empty, TimeSpan.FromSeconds(2));
+        _notificationManager.ShowNotification(
+            _localizer.GetLocalizedStringOrDefault("/Settings/CommandsPage_KillSuccessTitle", "Process successfully killed"),
+            string.Empty, TimeSpan.FromSeconds(2));
     }
 
     private bool CanEditCommand(CommandDefinitionVM? commandVM)
@@ -129,7 +135,9 @@ public sealed partial class CommandsSettingsViewModel(
 
         if (existingCommand is null)
         {
-            _notificationManager.ShowNotification("Failed to get command", "Command not found",
+            _notificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/Settings/CommandsPage_CommandNotFoundTitle", "Failed to get command"),
+                _localizer.GetLocalizedStringOrDefault("/Settings/CommandsPage_CommandNotFoundMessage", "Command not found"),
                 TimeSpan.FromSeconds(5));
             return;
         }
@@ -154,7 +162,9 @@ public sealed partial class CommandsSettingsViewModel(
         }
         catch (Exception e)
         {
-            _notificationManager.ShowNotification("删除命令失败", e.Message, TimeSpan.FromSeconds(5));
+            _notificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/Settings/CommandsPage_DeleteFailedTitle", "Failed to delete command"),
+                e.Message, TimeSpan.FromSeconds(5));
             return;
         }
         finally
@@ -162,8 +172,8 @@ public sealed partial class CommandsSettingsViewModel(
             await RefreshCommandDefinitionsAsync();
         }
 
-        _notificationManager.ShowNotification($"命令 '{commandDefinition.CommandDisplayName}' 删除成功",
-            string.Empty, TimeSpan.FromSeconds(2));
+        var msg = string.Format(_localizer.GetLocalizedStringOrDefault("/Settings/CommandsPage_DeleteSuccessTitle", "Command '{0}' deleted successfully"), commandDefinition.CommandDisplayName);
+        _notificationManager.ShowNotification(msg, string.Empty, TimeSpan.FromSeconds(2));
     }
 
     private bool CanRunCommand(CommandDefinitionVM? commandVM)
@@ -205,7 +215,7 @@ public sealed partial class CommandsSettingsViewModel(
 
         foreach (var commandDefinition in commandDefinitions.Reverse())
         {
-            var commandDefinitionVM = new CommandDefinitionVM(commandDefinition)
+            var commandDefinitionVM = new CommandDefinitionVM(commandDefinition, _localizer)
             {
                 DeleteCommand = DeleteCommandCommand,
                 RunCommand = RunCommand,
@@ -288,7 +298,7 @@ public partial class CommandVM : ObservableObject
 
 public partial class CommandDefinitionVM : ObservableObject
 {
-    public CommandDefinitionVM(CommandDefinition commandDefinition)
+    public CommandDefinitionVM(CommandDefinition commandDefinition, ILanguageLocalizer localizer)
     {
         Id = commandDefinition.Id;
         CommandDisplayName = commandDefinition.CommandDisplayName;
@@ -314,7 +324,7 @@ public partial class CommandDefinitionVM : ObservableObject
 
         if (attributes.Count != 0)
         {
-            attributes.Insert(0, "选项: ");
+            attributes.Insert(0, localizer.GetLocalizedStringOrDefault("/Settings/CommandsPage_AttributesPrefix", "Options: "));
             var lastItem = attributes.Last().TrimEnd('|', ' ');
             attributes[^1] = lastItem;
         }

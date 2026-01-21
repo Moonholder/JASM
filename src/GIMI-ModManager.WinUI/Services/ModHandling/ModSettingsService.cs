@@ -19,13 +19,16 @@ public class ModSettingsService
     private readonly ISkinManagerService _skinManagerService;
     private readonly ILogger _logger;
     private readonly Notifications.NotificationManager _notificationManager;
+    private readonly ILanguageLocalizer _localizer;
 
     public ModSettingsService(ISkinManagerService skinManagerService,
         Notifications.NotificationManager notificationManager,
+        ILanguageLocalizer localizer,
         ILogger logger)
     {
         _skinManagerService = skinManagerService;
         _notificationManager = notificationManager;
+        _localizer = localizer;
         _logger = logger.ForContext<ModSettingsService>();
     }
 
@@ -52,8 +55,9 @@ public class ModSettingsService
             {
                 _logger.Error(e, "Failed to save settings for mod {modName}", mod.Name);
 
-                _notificationManager.ShowNotification($"保存模组设置失败 {mod.Name}",
-                    $"发生错误。原因: {e.Message}",
+                _notificationManager.ShowNotification(
+                    string.Format(_localizer.GetLocalizedStringOrDefault("/Settings/ModSettings_SaveFailedTitle", "Failed to save settings for mod {0}"), mod.Name),
+                    string.Format(_localizer.GetLocalizedStringOrDefault("/Settings/ModSettings_SaveFailedMessage", "An error occurred. Reason: {0}"), e.Message),
                     TimeSpan.FromSeconds(5));
 
                 return new Error<Exception>(e);
@@ -88,7 +92,9 @@ public class ModSettingsService
         catch (ModSettingsNotFoundException e)
         {
             _logger.Error(e, "Could not find settings file for mod {ModName}", mod.Name);
-            _notificationManager.ShowNotification($"找不到模组的设置文件 {mod.Name}", "",
+            _notificationManager.ShowNotification(
+                string.Format(_localizer.GetLocalizedStringOrDefault("/Settings/ModSettings_FileNotFoundTitle", "Could not find settings file for mod {0}"), mod.Name),
+                "",
                 TimeSpan.FromSeconds(5));
             return new NotFound();
         }
@@ -96,8 +102,9 @@ public class ModSettingsService
         {
             _logger.Error(e, "Failed to read settings for mod {modName}", mod.Name);
 
-            _notificationManager.ShowNotification($"读取模组设置失败 {mod.Name}",
-                $"发生错误。原因: {e.Message}",
+            _notificationManager.ShowNotification(
+                string.Format(_localizer.GetLocalizedStringOrDefault("/Settings/ModSettings_ReadFailedTitle", "Failed to read settings for mod {0}"), mod.Name),
+                string.Format(_localizer.GetLocalizedStringOrDefault("/Settings/ModSettings_ReadFailedMessage", "An error occurred. Reason: {0}"), e.Message),
                 TimeSpan.FromSeconds(5));
 
             return new Error<Exception>(e);
@@ -110,7 +117,9 @@ public class ModSettingsService
         return await CommandWrapperAsync(async () =>
         {
             if (!change.AnyUpdates)
-                return Result<ModSettings>.Error(new SimpleNotification("未检测到任何更改", "模组设置未更改，无需保存"));
+                return Result<ModSettings>.Error(new SimpleNotification(
+                    _localizer.GetLocalizedStringOrDefault("/Settings/ModSettings_NoChangesTitle", "No changes detected"),
+                    _localizer.GetLocalizedStringOrDefault("/Settings/ModSettings_NoChangesMessage", "Mod settings have not changed, no need to save")));
 
             var mod = _skinManagerService.GetModById(modId);
 
@@ -129,8 +138,9 @@ public class ModSettingsService
                )
             {
                 change.ImagePath = null;
-                _notificationManager.ShowNotification("未找到图片文件",
-                    "保存模组设置时，未找到图片文件",
+                _notificationManager.ShowNotification(
+                    _localizer.GetLocalizedStringOrDefault("/Settings/ModSettings_ImageNotFoundTitle", "Image file not found"),
+                    _localizer.GetLocalizedStringOrDefault("/Settings/ModSettings_ImageNotFoundMessage", "Image file not found when saving mod settings"),
                     TimeSpan.FromSeconds(5));
             }
 
@@ -159,8 +169,8 @@ public class ModSettingsService
 
 
             return Result<ModSettings>.Success(newModSettings, new SimpleNotification(
-                title: "模组设置已更新",
-                message: $"模组 {mod.GetDisplayName()} 的设置已更新",
+                title: _localizer.GetLocalizedStringOrDefault("/Settings/ModSettings_UpdatedTitle", "Mod settings updated"),
+                message: string.Format(_localizer.GetLocalizedStringOrDefault("/Settings/ModSettings_UpdatedMessage", "Settings for mod {0} have been updated"), mod.GetDisplayName()),
                 null
             ));
         }).ConfigureAwait(false);

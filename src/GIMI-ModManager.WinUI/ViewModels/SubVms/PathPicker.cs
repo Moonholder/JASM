@@ -94,7 +94,7 @@ public partial class PathPicker : ObservableRecipient
         var folderPicker = new FolderPicker(windowId)
         {
             SuggestedStartLocation = SuggestedStartLocation,
-            CommitButtonText = CommitButtonText
+            // CommitButtonText = CommitButtonText
         };
 
         var folder = await folderPicker.PickSingleFolderAsync();
@@ -108,7 +108,7 @@ public partial class PathPicker : ObservableRecipient
         var filePicker = new FileOpenPicker(windowId)
         {
             SuggestedStartLocation = SuggestedStartLocation,
-            CommitButtonText = CommitButtonText
+            // CommitButtonText = CommitButtonText
         };
         foreach (var filter in FileTypeFilter)
         {
@@ -126,7 +126,7 @@ public partial class PathPicker : ObservableRecipient
         var filePicker = new FileSavePicker(windowId)
         {
             SuggestedStartLocation = SuggestedStartLocation,
-            CommitButtonText = CommitButtonText
+            // CommitButtonText = CommitButtonText
         };
 
         filePicker.FileTypeChoices.Add("Files", FileTypeFilter);

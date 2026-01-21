@@ -206,7 +206,7 @@ public partial class App : Application
                             UseJitter = true,
                             MaxRetryAttempts = 5,
                             Delay = TimeSpan.FromMilliseconds(500),
-                            ShouldHandle = new PredicateBuilder().Handle<HttpRequestException>().Handle<TimeoutException>() // 明确处理哪些异常
+                            ShouldHandle = new PredicateBuilder().Handle<HttpRequestException>().Handle<TimeoutException>()
                         });
 
                 });

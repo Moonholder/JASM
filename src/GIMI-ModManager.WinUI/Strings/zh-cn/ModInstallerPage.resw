@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+<!-- Context Menu -->
+  <data name="SetPreviewImageItem.Text" xml:space="preserve">
+    <value>设置模组预览图</value>
+  </data>
+  <data name="SetRootFolderItem.Text" xml:space="preserve">
+    <value>设置模组根目录</value>
+  </data>
+  <data name="SetShaderFixesFolderItem.Text" xml:space="preserve">
+    <value>设置 ShaderFixes 文件夹</value>
+  </data>
+
+  <!-- Duplicate Mod Dialog -->
+  <data name="DuplicateModDialog.Title" xml:space="preserve">
+    <value>存在同名的文件夹</value>
+  </data>
+  <data name="DuplicateModDialog.CloseButtonText" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  <data name="DuplicateModWarning.Message" xml:space="preserve">
+    <value>1. 你可以选择覆盖旧模组, 从而删除它。
+或者
+2. 你可以重命名新模组或旧模组中的任意一个</value>
+  </data>
+  <data name="NewModLabel.Text" xml:space="preserve">
+    <value>新模组:</value>
+  </data>
+  <data name="ExistingModLabel.Text" xml:space="preserve">
+    <value>其他模组:</value>
+  </data>
+  
+  <data name="RenameNewModInput.Header" xml:space="preserve">
+    <value>重命名</value>
+  </data>
+  <data name="RenameNewModInput.PlaceholderText" xml:space="preserve">
+    <value>自定义名称</value>
+  </data>
+  <data name="RenameNewFolderInput.Header" xml:space="preserve">
+    <value>重命名文件夹</value>
+  </data>
+  <data name="RenameNewFolderInput.PlaceholderText" xml:space="preserve">
+    <value>文件夹名称</value>
+  </data>
+  
+  <data name="RenameExistingModInput.Header" xml:space="preserve">
+    <value>重命名</value>
+  </data>
+  <data name="RenameExistingModInput.PlaceholderText" xml:space="preserve">
+    <value>自定义名称</value>
+  </data>
+  <data name="RenameExistingFolderInput.Header" xml:space="preserve">
+    <value>重命名文件夹</value>
+  </data>
+  <data name="RenameExistingFolderInput.PlaceholderText" xml:space="preserve">
+    <value>文件夹名称</value>
+  </data>
+  
+  <data name="OpenExistingFolderLink.Text" xml:space="preserve">
+    <value>打开已经存在的模组文件夹...</value>
+  </data>
+  <data name="OverwriteCheckBox.Content" xml:space="preserve">
+    <value>覆盖现有模组</value>
+  </data>
+  <data name="ReplaceDuplicateInPresetCheckBox.ToolTipService.ToolTip" xml:space="preserve">
+    <value>重复的模组将在预设中被新安装的模组替换。该选项与'在预设中替换旧模组'复选框是互斥的。</value>
+  </data>
+  <data name="ReplaceDuplicateInPresetText.Text" xml:space="preserve">
+    <value>用新的模组替换预设中重复的模组</value>
+  </data>
+
+  <!-- Left Column -->
+  <data name="AlwaysOnTopButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>保持窗口始终置顶</value>
+  </data>
+  <data name="RetrieveInfoButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>从模组页面检索详细信息</value>
+  </data>
+  <data name="ModUrlInput.Header" xml:space="preserve">
+    <value>模组页面 URL</value>
+  </data>
+  <data name="ModUrlInput.PlaceholderText" xml:space="preserve">
+    <value>粘贴 URL 自动填充模组预览图等信息 (仅支持 GameBanana)</value>
+  </data>
+  <data name="CustomNameInput.Header" xml:space="preserve">
+    <value>模组自定义名称</value>
+  </data>
+  <data name="CustomNameInput.PlaceholderText" xml:space="preserve">
+    <value>在整个 JASM 中显示的自定义名称</value>
+  </data>
+  <data name="AuthorInput.Header" xml:space="preserve">
+    <value>作者</value>
+  </data>
+  <data name="DescriptionInput.Header" xml:space="preserve">
+    <value>备注</value>
+  </data>
+  <data name="DescriptionInput.PlaceholderText" xml:space="preserve">
+    <value>自定义自由文本备注，显示在角色详情页的表格中</value>
+  </data>
+
+  <!-- Right Column -->
+  <data name="ExtractDirLabel.Text" xml:space="preserve">
+    <value>解压目录:</value>
+  </data>
+  <data name="ImageSourceLabel.Text" xml:space="preserve">
+    <value>预览图片来源:</value>
+  </data>
+  
+  <data name="RightClickRootHint.Text" xml:space="preserve">
+    <value>你可以通过鼠标右键设置 mod 文件夹的根目录</value>
+  </data>
+  <data name="PasteImageHint.Text" xml:space="preserve">
+    <value>你可以通过复制粘贴图像文件来设置预览图片</value>
+  </data>
+  <data name="SelectImageHint.Text" xml:space="preserve">
+    <value>你也可以手动选择右侧模组文件夹中的预览图像文件</value>
+  </data>
+  <data name="AddModHint.Text" xml:space="preserve">
+    <value>通常只需按下 '添加模组' 就可以了</value>
+  </data>
+
+  <!-- Footer -->
+  <data name="EnableOnlyCheckBox.ToolTipService.ToolTip" xml:space="preserve">
+    <value>这将启用此模组并禁用该角色的其他模组。</value>
+  </data>
+  <data name="EnableOnlyText.Text" xml:space="preserve">
+    <value>启用此模组并禁用其他模组?</value>
+  </data>
+  <data name="ReplaceInPresetCheckBox.Content" xml:space="preserve">
+    <value>在预设中使用新模组替换要更新的模组</value>
+  </data>
+  <data name="ReplaceInPresetCheckBox.ToolTipService.ToolTip" xml:space="preserve">
+    <value>这将用新安装的模组更新所有预设中的旧模组。该复选框与检测到重复模组时的复选框是分开的</value>
+  </data>
+  <data name="AddModButton.Content" xml:space="preserve">
+    <value>添加模组</value>
+  </data>
+
+  <!-- ViewModel Strings -->
+  <data name="AddRenameText" xml:space="preserve">
+    <value>重命名和添加模组</value>
+  </data>
+  <data name="AddReplaceText" xml:space="preserve">
+    <value>覆盖旧模组</value>
+  </data>
+  <data name="ImageSourceAuto" xml:space="preserve">
+    <value>自动</value>
+  </data>
+  <data name="ImageSourceManual" xml:space="preserve">
+    <value>手动</value>
+  </data>
+  <data name="ImageSourceExistingMod" xml:space="preserve">
+    <value>现有模组中的图片</value>
+  </data>
+  <data name="ImageSourceLocalFound" xml:space="preserve">
+    <value>在新模组中找到本地图像</value>
+  </data>
+  <data name="ImageSourceLocalSelected" xml:space="preserve">
+    <value>从新模组中选择的本地图像</value>
+  </data>
+  <data name="ImageSourceGB" xml:space="preserve">
+    <value>GB模组缩略图</value>
+  </data>
+  <data name="ModInstalledTitle" xml:space="preserve">
+    <value>模组 '{0}' 已安装</value>
+  </data>
+  <data name="ModInstalledMessage" xml:space="preserve">
+    <value>Mod '{0}' ({1}), 已成功添加到 {2} mod列表</value>
+  </data>
+  <data name="ModAddedSuccess" xml:space="preserve">
+    <value>模组添加成功</value>
+  </data>
+  <data name="GetPresetFailedTitle" xml:space="preserve">
+    <value>获取预设失败，无法自动更新预设中的模组条目</value>
+  </data>
+  <data name="UpdatePresetFailedTitle" xml:space="preserve">
+    <value>更新预设 {0} 失败，无法自动更新预设中的模组条目。请手动检查你的预设</value>
+  </data>
+  <data name="PresetsReadOnlyNotUpdated" xml:space="preserve">
+    <value>以下预设由于为只读而未更新: </value>
+  </data>
+  <data name="ModUpdatedInPresets" xml:space="preserve">
+    <value>模组在以下预设中已更新: </value>
+  </data>
+  <data name="ModNotUpdatedAnyPreset" xml:space="preserve">
+    <value>模组没有更新任何预设</value>
+  </data>
+  <data name="ModUpdatedToPresets" xml:space="preserve">
+    <value>模组已更新至预设</value>
+  </data>
+  <data name="ErrorOccurredTitle" xml:space="preserve">
+    <value>出现了一个错误</value>
+  </data>
+  <data name="ErrorOccurredMessage" xml:space="preserve">
+    <value>添加模组时出现错误. 如需了解更多详细信息，请查看日志</value>
+  </data>
+  <data name="CannotDetermineSkinTitle" xml:space="preserve">
+    <value>无法确定新模组的皮肤</value>
+  </data>
+  <data name="CannotDetermineSkinMessage" xml:space="preserve">
+    <value>JASM 无法确定该模组对应的游戏内皮肤，因此无法确定需要禁用哪些模组.</value>
+  </data>
+</root>

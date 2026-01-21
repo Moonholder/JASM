@@ -133,7 +133,7 @@ public partial class CharactersViewModel : ObservableRecipient, INavigationAware
 
         DockPanelVM = new OverviewDockPanelVM();
         StartGameIcon = _gameService.GameIcon;
-        ShortGameName = "启动 " + _gameService.GameShortName;
+        ShortGameName = string.Format(_localizer.GetLocalizedStringOrDefault("/CharactersPage/StartGameButtonFormat", "Launch {0}"), _gameService.GameShortName);
         GameBananaLink = _gameService.GameBananaUrl;
 
         CanCheckForUpdates = _modUpdateAvailableChecker.IsReady;
@@ -169,7 +169,7 @@ public partial class CharactersViewModel : ObservableRecipient, INavigationAware
     }
 
     private CharacterGridItemModel NoCharacterFound =>
-        new(new Character("None", $"没有找到{_category.DisplayNamePlural}..."));
+        new(new Character("None", string.Format(_localizer.GetLocalizedStringOrDefault("/CharactersPage/NoCharacterFoundFormat", "No {0} found..."), _category.DisplayNamePlural)));
 
     public void AutoSuggestBox_TextChanged(string text)
     {
@@ -317,12 +317,23 @@ public partial class CharactersViewModel : ObservableRecipient, INavigationAware
         _busyService.BusyChanged += OnBusyChangedHandler;
 
         _category = category;
-        CategoryPageTitle =
-            $"{category.DisplayName} {_localizer.GetLocalizedStringOrDefault("Overview", useUidAsDefaultValue: true)}";
-        ModToggleText = $"只显示有模组的{category.DisplayNamePlural}";
-        ModEnabledToggleText = $"只显示有启用模组的{category.DisplayNamePlural}";
-        ModNotificationsToggleText = $"只显示有更新通知的{category.DisplayNamePlural}";
-        SearchBoxPlaceHolder = $"搜索{category.DisplayNamePlural}...";
+        CategoryPageTitle = $"{category.DisplayName} {_localizer.GetLocalizedStringOrDefault("/CharactersPage/OverviewTitleSuffix", "Overview")}";
+
+        ModToggleText = string.Format(
+            _localizer.GetLocalizedStringOrDefault("/CharactersPage/ShowOnlyWithModsToggleFormat", "Show only {0} with mods"),
+            category.DisplayNamePlural);
+
+        ModEnabledToggleText = string.Format(
+            _localizer.GetLocalizedStringOrDefault("/CharactersPage/ShowOnlyWithEnabledModsToggleFormat", "Show only {0} with enabled mods"),
+            category.DisplayNamePlural);
+
+        ModNotificationsToggleText = string.Format(
+            _localizer.GetLocalizedStringOrDefault("/CharactersPage/ShowOnlyWithNotificationsToggleFormat", "Show only {0} with update notifications"),
+            category.DisplayNamePlural);
+
+        SearchBoxPlaceHolder = string.Format(
+            _localizer.GetLocalizedStringOrDefault("/CharactersPage/SearchBoxPlaceholderFormat", "Search {0}..."),
+            category.DisplayNamePlural);
 
 
         var characters = _gameService.GetModdableObjects(_category);
@@ -419,7 +430,7 @@ public partial class CharactersViewModel : ObservableRecipient, INavigationAware
                 .Count();
 
             if (distinctReleaseDates == 1 &&
-                SortingMethods.FirstOrDefault(x => x.SortingMethodType == GridItemSorter.ReleaseDateSortName) is
+                SortingMethods.FirstOrDefault(x => x.SortingMethodType == GridItemSorter.ReleaseDateSortKey) is
                 { } releaseDateSortingMethod)
             {
                 SortingMethods.Remove(releaseDateSortingMethod);
@@ -466,7 +477,9 @@ public partial class CharactersViewModel : ObservableRecipient, INavigationAware
 
         SortByDescending = settings.SortByDescending;
 
-        var sorter = SortingMethods.FirstOrDefault(x => x.SortingMethodType == settings.SortingMethod);
+        var sorter = SortingMethods.FirstOrDefault(x =>
+        (x.Sorter is GridItemSorter gs && gs.InternalKey == settings.SortingMethod) ||
+        x.SortingMethodType == settings.SortingMethod);
 
         SelectedSortingMethod = sorter ?? SortingMethods.First();
 
@@ -742,14 +755,14 @@ public partial class CharactersViewModel : ObservableRecipient, INavigationAware
     }
 
 
-    [ObservableProperty] private string _pinText = DefaultPinText;
+    [ObservableProperty] private string _pinText;
 
-    [ObservableProperty] private string _pinGlyph = DefaultPinGlyph;
+    [ObservableProperty] private string _pinGlyph;
 
     const string DefaultPinGlyph = "\uE718";
-    const string DefaultPinText = "置顶角色";
     const string DefaultUnpinGlyph = "\uE77A";
-    const string DefaultUnpinText = "取消置顶";
+    private string GetPinText() => _localizer.GetLocalizedStringOrDefault("/CharactersPage/PinCharacter", "Pin Character");
+    private string GetUnpinText() => _localizer.GetLocalizedStringOrDefault("/CharactersPage/UnpinCharacter", "Unpin Character");
 
     public void OnRightClickContext(CharacterGridItemModel clickedCharacter)
     {
@@ -758,12 +771,12 @@ public partial class CharactersViewModel : ObservableRecipient, INavigationAware
 
         if (clickedCharacter.IsPinned)
         {
-            PinText = DefaultUnpinText;
+            PinText = GetUnpinText();
             PinGlyph = DefaultUnpinGlyph;
         }
         else
         {
-            PinText = DefaultPinText;
+            PinText = GetPinText();
             PinGlyph = DefaultPinGlyph;
         }
     }
@@ -846,13 +859,19 @@ public partial class CharactersViewModel : ObservableRecipient, INavigationAware
         catch (Exception e)
         {
             _logger.Error(e, "Error disabling mods for character {Character}", character.Character.InternalName);
-            NotificationManager.ShowNotification("禁用模组时出错", e.Message, TimeSpan.FromSeconds(6));
+            NotificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/CharactersPage/DisableModsErrorTitle", "Error disabling mods"),
+                e.Message,
+                TimeSpan.FromSeconds(6));
             return;
         }
 
         character.SetMods(updatedMods);
         await RefreshMultipleModsWarningAsync();
-        NotificationManager.ShowNotification("模组已禁用", $"{character.Character.DisplayName} 的所有模组均已禁用", null);
+        NotificationManager.ShowNotification(
+            _localizer.GetLocalizedStringOrDefault("/CharactersPage/ModsDisabledTitle", "Mods disabled"),
+            string.Format(_localizer.GetLocalizedStringOrDefault("/CharactersPage/ModsDisabledMessageFormat", "All mods for {0} have been disabled"), character.Character.DisplayName),
+            null);
     }
 
     [RelayCommand]
@@ -952,7 +971,10 @@ public partial class CharactersViewModel : ObservableRecipient, INavigationAware
         catch (Exception e)
         {
             _logger.Error(e, "Error adding mod");
-            NotificationManager.ShowNotification("添加模组时出错", e.Message, TimeSpan.FromSeconds(10));
+            NotificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/CharactersPage/AddModErrorTitle", "Error adding mod"),
+                e.Message,
+                TimeSpan.FromSeconds(6));
         }
         finally
         {
@@ -978,7 +1000,9 @@ public partial class CharactersViewModel : ObservableRecipient, INavigationAware
 
         if (!GameBananaUrlHelper.TryGetModIdFromUrl(uri, out _))
         {
-            NotificationManager.ShowNotification("无效的GameBanana 模组页面链接", "", null);
+            NotificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/CharactersPage/InvalidGameBananaUrlTitle", "Invalid GameBanana Mod Page URL"),
+                "", null);
             return;
         }
 
@@ -990,7 +1014,10 @@ public partial class CharactersViewModel : ObservableRecipient, INavigationAware
         catch (Exception e)
         {
             _logger.Error(e, "Error opening mod page window");
-            NotificationManager.ShowNotification("打开模组页面时出错", e.Message, TimeSpan.FromSeconds(10));
+            NotificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/CharactersPage/OpenModPageErrorTitle", "Error opening mod page"),
+                e.Message,
+                TimeSpan.FromSeconds(6));
         }
         finally
         {
@@ -1010,12 +1037,15 @@ public partial class CharactersViewModel : ObservableRecipient, INavigationAware
     private async Task SortBy(IEnumerable<GridItemSortingMethod> methodTypes)
     {
         if (_isNavigating) return;
-        var sortingMethodType = methodTypes.First();
+        var sortingMethodWrapper = methodTypes.First();
+
+        if (sortingMethodWrapper.Sorter is not GridItemSorter sorter)
+            return;
 
         ResetContent();
 
         var settings = await ReadCharacterSettings();
-        settings.SortingMethod = sortingMethodType.SortingMethodType;
+        settings.SortingMethod = sorter.InternalKey;
         await SaveCharacterSettings(settings).ConfigureAwait(false);
     }
 
@@ -1060,25 +1090,36 @@ public partial class CharactersViewModel : ObservableRecipient, INavigationAware
         var othersCharacter = _backendCharacters.FirstOrDefault(ch =>
             ch.Character.InternalName.Id.Contains("Others", StringComparison.OrdinalIgnoreCase));
 
-        var alphabetical = new GridItemSortingMethod(GridItemSorter.Alphabetical, othersCharacter, lastCharacters);
+        var alphabetical = new GridItemSortingMethod(
+            GridItemSorter.CreateAlphabetical(_localizer.GetLocalizedStringOrDefault("/CharactersPage/Sorter_Alphabetical", "Alphabetical")),
+            othersCharacter, lastCharacters);
         SortingMethods.Add(alphabetical);
 
-        var byModCount = new GridItemSortingMethod(GridItemSorter.ModCount, othersCharacter, lastCharacters);
+        var byModCount = new GridItemSortingMethod(
+            GridItemSorter.CreateModCount(_localizer.GetLocalizedStringOrDefault("/CharactersPage/Sorter_ModCount", "Mod Count")),
+            othersCharacter, lastCharacters);
         SortingMethods.Add(byModCount);
 
-
-        var byModRecentlyAdded = new GridItemSortingMethod(GridItemSorter.ModRecentlyAdded, othersCharacter, lastCharacters);
+        var byModRecentlyAdded = new GridItemSortingMethod(
+            GridItemSorter.CreateModRecentlyAdded(_localizer.GetLocalizedStringOrDefault("/CharactersPage/Sorter_RecentlyAdded", "Recently Added")),
+            othersCharacter, lastCharacters);
         SortingMethods.Add(byModRecentlyAdded);
 
         if (_category.ModCategory == ModCategory.Character)
         {
-            SortingMethods.Add(new GridItemSortingMethod(GridItemSorter.ReleaseDate, othersCharacter, lastCharacters));
-            SortingMethods.Add(new GridItemSortingMethod(GridItemSorter.Rarity, othersCharacter, lastCharacters));
+            SortingMethods.Add(new GridItemSortingMethod(
+                GridItemSorter.CreateReleaseDate(_localizer.GetLocalizedStringOrDefault("/CharactersPage/Sorter_ReleaseDate", "Release Date")),
+                othersCharacter, lastCharacters));
+            SortingMethods.Add(new GridItemSortingMethod(
+                GridItemSorter.CreateRarity(_localizer.GetLocalizedStringOrDefault("/CharactersPage/Sorter_Rarity", "Rarity")),
+                othersCharacter, lastCharacters));
         }
 
         if (_category.ModCategory == ModCategory.Weapons)
         {
-            SortingMethods.Add(new GridItemSortingMethod(GridItemSorter.Rarity, othersCharacter, lastCharacters));
+            SortingMethods.Add(new GridItemSortingMethod(
+                GridItemSorter.CreateRarity(_localizer.GetLocalizedStringOrDefault("/CharactersPage/Sorter_Rarity", "Rarity")),
+                othersCharacter, lastCharacters));
         }
     }
 
@@ -1115,97 +1156,68 @@ public partial class CharactersViewModel : ObservableRecipient, INavigationAware
         Sorter<CharacterGridItemModel> sortingMethodType,
         CharacterGridItemModel? firstItem = null,
         ICollection<CharacterGridItemModel>? lastItems = null)
-        : SortingMethod(sortingMethodType, firstItem, lastItems);
+        : SortingMethod(sortingMethodType, firstItem, lastItems)
+    {
+        public Sorter<CharacterGridItemModel> Sorter { get; } = sortingMethodType;
+    }
 
     public sealed class GridItemSorter : Sorter<CharacterGridItemModel>
     {
+        public string InternalKey { get; init; }
+
         private GridItemSorter(string sortingMethodType, SortFunc firstSortFunc, AdditionalSortFunc? secondSortFunc = null,
             AdditionalSortFunc? thirdSortFunc = null) : base(sortingMethodType, firstSortFunc, secondSortFunc, thirdSortFunc)
         {
+            InternalKey = sortingMethodType;
         }
 
-        public const string AlphabeticalSortName = "按字母顺序";
+        public const string AlphabeticalSortKey = "Alphabetical";
+        public const string ReleaseDateSortKey = "ReleaseDate";
+        public const string RaritySortKey = "Rarity";
+        public const string ModCountSortKey = "ModCount";
+        public const string ModRecentlyAddedKey = "ModRecentlyAdded";
 
-        public static GridItemSorter Alphabetical { get; } =
+        public static GridItemSorter CreateAlphabetical(string displayName) =>
             new(
-                AlphabeticalSortName,
-                (characters, isDescending) =>
-                    isDescending
-                        ? characters.OrderByDescending(x => x.Character.DisplayName)
-                        : characters.OrderBy(x => x.Character.DisplayName
-                        ));
+                displayName,
+                (characters, isDescending) => isDescending ? characters.OrderByDescending(x => x.Character.DisplayName) : characters.OrderBy(x => x.Character.DisplayName))
+            { InternalKey = AlphabeticalSortKey };
 
-
-        public const string ReleaseDateSortName = "发布时间";
-
-        public static GridItemSorter ReleaseDate { get; } =
+        public static GridItemSorter CreateReleaseDate(string displayName) =>
             new(
-                ReleaseDateSortName,
-                (characters, isDescending) =>
-                    !isDescending
-                        ? characters.OrderByDescending(x => ((ICharacter)x.Character).ReleaseDate)
-                        : characters.OrderBy(x => ((ICharacter)x.Character).ReleaseDate),
-                (characters, _) =>
-                    characters.ThenBy(x => x.Character.DisplayName
-                    ));
+                displayName,
+                (characters, isDescending) => !isDescending ? characters.OrderByDescending(x => ((ICharacter)x.Character).ReleaseDate) : characters.OrderBy(x => ((ICharacter)x.Character).ReleaseDate),
+                (characters, _) => characters.ThenBy(x => x.Character.DisplayName))
+            { InternalKey = ReleaseDateSortKey };
 
-
-        public const string RaritySortName = "稀有度";
-
-        public static GridItemSorter Rarity { get; } =
+        public static GridItemSorter CreateRarity(string displayName) =>
             new(
-                RaritySortName,
-                (characters, isDescending) =>
-                    !isDescending
-                        ? characters.OrderByDescending(x => ((IRarity)x.Character).Rarity)
-                        : characters.OrderBy(x => ((IRarity)x.Character).Rarity),
-                (characters, _) =>
-                    characters.ThenBy(x => x.Character.DisplayName
-                    ));
+                displayName,
+                (characters, isDescending) => !isDescending ? characters.OrderByDescending(x => ((IRarity)x.Character).Rarity) : characters.OrderBy(x => ((IRarity)x.Character).Rarity),
+                (characters, _) => characters.ThenBy(x => x.Character.DisplayName))
+            { InternalKey = RaritySortKey };
 
-
-        public const string ModCountSortName = "模组数量";
-
-        public static GridItemSorter ModCount { get; } =
+        public static GridItemSorter CreateModCount(string displayName) =>
             new(
-                ModCountSortName,
-                (characters, isDescending) =>
-                    !isDescending
-                        ? characters.OrderByDescending(x => x.ModCount)
-                        : characters.OrderBy(x => x.ModCount),
-                (characters, _) =>
-                    characters.ThenBy(x => x.Character.DisplayName
-                    ));
+                displayName,
+                (characters, isDescending) => !isDescending ? characters.OrderByDescending(x => x.ModCount) : characters.OrderBy(x => x.ModCount),
+                (characters, _) => characters.ThenBy(x => x.Character.DisplayName))
+            { InternalKey = ModCountSortKey };
 
-
-        public const string ModRecentlyAddedName = "最近添加的";
-
-        public static GridItemSorter ModRecentlyAdded { get; } =
+        public static GridItemSorter CreateModRecentlyAdded(string displayName) =>
             new(
-                ModRecentlyAddedName,
-                (characters, isDescending) =>
-                    !isDescending
-                        ? characters.OrderByDescending(x =>
-                        {
-                            var validDates = x.Mods.Where(mod => mod.DateAdded != default).Select(mod => mod.DateAdded)
-                                .ToArray();
-                            if (validDates.Any())
-                                return validDates.Max();
-                            else
-                                return DateTime.MinValue;
-                        })
-                        : characters.OrderBy(x =>
-                        {
-                            var validDates = x.Mods.Where(mod => mod.DateAdded != default).Select(mod => mod.DateAdded)
-                                .ToArray();
-                            if (validDates.Any())
-                                return validDates.Min();
-                            else
-                                return DateTime.MaxValue;
-                        }),
-                (characters, _) =>
-                    characters.ThenBy(x => x.Character.DisplayName
-                    ));
+                displayName,
+                (characters, isDescending) => !isDescending ? characters.OrderByDescending(x =>
+                {
+                    var validDates = x.Mods.Where(mod => mod.DateAdded != default).Select(mod => mod.DateAdded).ToArray();
+                    return validDates.Any() ? validDates.Max() : DateTime.MinValue;
+                }) : characters.OrderBy(x =>
+                {
+                    var validDates = x.Mods.Where(mod => mod.DateAdded != default).Select(mod => mod.DateAdded).ToArray();
+                    return validDates.Any() ? validDates.Min() : DateTime.MaxValue;
+                }),
+                (characters, _) => characters.ThenBy(x => x.Character.DisplayName))
+            { InternalKey = ModRecentlyAddedKey };
     }
 
     [RelayCommand]

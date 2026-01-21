@@ -31,6 +31,7 @@ public partial class EditCharacterViewModel : ObservableRecipient, INavigationAw
     private readonly NotificationManager _notificationManager;
     private readonly ImageHandlerService _imageHandlerService;
     private readonly INavigationService _navigationService;
+    private readonly ILanguageLocalizer _localizer;
 
     private ICharacter _character = null!;
 
@@ -57,7 +58,7 @@ public partial class EditCharacterViewModel : ObservableRecipient, INavigationAw
 
     public ElementTheme CurrentTheme { get; set; }
     public EditCharacterViewModel(IGameService gameService, ILogger logger, ISkinManagerService skinManagerService,
-        ImageHandlerService imageHandlerService, NotificationManager notificationManager, INavigationService navigationService, IThemeSelectorService themeSelectorService)
+        ImageHandlerService imageHandlerService, NotificationManager notificationManager, INavigationService navigationService, IThemeSelectorService themeSelectorService, ILanguageLocalizer localizer)
     {
         _gameService = gameService;
         _logger = logger.ForContext<EditCharacterViewModel>();
@@ -65,6 +66,7 @@ public partial class EditCharacterViewModel : ObservableRecipient, INavigationAw
         _imageHandlerService = imageHandlerService;
         _notificationManager = notificationManager;
         _navigationService = navigationService;
+        _localizer = localizer;
 
         CurrentTheme = themeSelectorService.Theme;
         PropertyChanged += (_, args) =>
@@ -125,7 +127,7 @@ public partial class EditCharacterViewModel : ObservableRecipient, INavigationAw
         SelectedElement = Elements.FirstOrDefault(e => e.InternalName.Equals(character.Element.InternalName, StringComparison.OrdinalIgnoreCase), Elements.First(e => e.InternalName.Equals("None", StringComparison.OrdinalIgnoreCase)));
         Form.Element.Value = SelectedElement.InternalName;
 
-        Form.Initialize(character, allModObjects, elements);
+        Form.Initialize(character, allModObjects, elements, _localizer);
         NotifyAllCommands();
     }
 
@@ -181,12 +183,17 @@ public partial class EditCharacterViewModel : ObservableRecipient, INavigationAw
             if (image is not null)
                 Form.Image.Value = image;
             else
-                _notificationManager.ShowNotification("粘贴图片失败", "在剪贴板中未找到图片", null);
+                _notificationManager.ShowNotification(
+                    _localizer.GetLocalizedStringOrDefault("/CharacterManager/CreatePage_PasteImageFailedTitle", "Failed to paste image"),
+                    _localizer.GetLocalizedStringOrDefault("/CharacterManager/CreatePage_NoImageInClipboard", "No image found in clipboard"),
+                    null);
         }
         catch (Exception ex)
         {
             _logger.Error(ex, "Failed to paste image");
-            _notificationManager.ShowNotification("F粘贴图片失败", ex.Message, null);
+            _notificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/CharacterManager/CreatePage_PasteImageFailedTitle", "Failed to paste image"),
+                ex.Message, null);
         }
     }
 
@@ -210,8 +217,7 @@ public partial class EditCharacterViewModel : ObservableRecipient, INavigationAw
     {
         var deleteFolderCheckBox = new CheckBox()
         {
-            Content = "删除角色文件夹及其内容 / 模组?\n" +
-                      "文件将被永久删除!",
+            Content = _localizer.GetLocalizedStringOrDefault("/CharacterManager/EditPage_DeleteFolderCheckBox", "Delete character folder and its contents/mods?\nFiles will be permanently deleted!"),
             IsChecked = false
         };
 
@@ -221,11 +227,8 @@ public partial class EditCharacterViewModel : ObservableRecipient, INavigationAw
             {
                 new TextBlock()
                 {
-                    Text =
-                        "你确定要禁用这个角色吗？ " +
-                        "这不会移除该角色，但 JASM将不再识别这个角色。 " +
-                        "该角色稍后可以重新激活。 " +
-                        "按下 “是” 后，这将立即执行。",
+                    Text = _localizer.GetLocalizedStringOrDefault("/CharacterManager/EditPage_DisableCharacterDialogText",
+                        "Are you sure you want to disable this character? This will not remove the character, but JASM will no longer recognize it. The character can be reactivated later. This will be executed immediately after pressing 'Yes'."),
                     TextWrapping = TextWrapping.WrapWholeWords,
                     Margin = new Thickness(0, 0, 0, 8)
                 },
@@ -236,10 +239,10 @@ public partial class EditCharacterViewModel : ObservableRecipient, INavigationAw
 
         var disableDialog = new ContentDialog
         {
-            Title = "禁用角色",
+            Title = _localizer.GetLocalizedStringOrDefault("/CharacterManager/EditPage_DisableCharacterDialogTitle", "Disable Character"),
             Content = dialogContent,
-            PrimaryButtonText = "是,禁用这个角色",
-            CloseButtonText = "不,取消",
+            PrimaryButtonText = _localizer.GetLocalizedStringOrDefault("/CharacterManager/EditPage_DisableCharacterConfirmButton", "Yes, disable this character"),
+            CloseButtonText = _localizer.GetLocalizedStringOrDefault("/CharacterManager/EditPage_CancelButton", "No, cancel"),
             DefaultButton = ContentDialogButton.Primary,
             XamlRoot = App.MainWindow.Content.XamlRoot,
             RequestedTheme = CurrentTheme
@@ -269,8 +272,7 @@ public partial class EditCharacterViewModel : ObservableRecipient, INavigationAw
     {
         var deleteFolderCheckBox = new CheckBox()
         {
-            Content = "是否删除自定义角色文件夹及其内容 / 模组？" +
-                      "文件将会被永久删除！",
+            Content = _localizer.GetLocalizedStringOrDefault("/CharacterManager/EditPage_DeleteCustomFolderCheckBox", "Delete custom character folder and its contents/mods?\nFiles will be permanently deleted!"),
             IsChecked = false
         };
 
@@ -280,10 +282,8 @@ public partial class EditCharacterViewModel : ObservableRecipient, INavigationAw
             {
                 new TextBlock()
                 {
-                    Text =
-                        "你确定要删除这个自定义角色吗？" +
-                        "这将会移除该角色，而且 JASM将不再识别这个角色。" +
-                        "“按下‘是’后，这将立即执行。",
+                    Text = _localizer.GetLocalizedStringOrDefault("/CharacterManager/EditPage_DeleteCustomDialogText",
+                        "Are you sure you want to delete this custom character? This will remove the character, and JASM will no longer recognize it. This will be executed immediately after pressing 'Yes'."),
                     TextWrapping = TextWrapping.WrapWholeWords,
                     Margin = new Thickness(0, 0, 0, 8)
                 },
@@ -294,10 +294,10 @@ public partial class EditCharacterViewModel : ObservableRecipient, INavigationAw
 
         var disableDialog = new ContentDialog
         {
-            Title = "删除自定义角色",
+            Title = _localizer.GetLocalizedStringOrDefault("/CharacterManager/EditPage_DeleteCustomDialogTitle", "Delete Custom Character"),
             Content = dialogContent,
-            PrimaryButtonText = "是,删除这个角色",
-            CloseButtonText = "不，取消",
+            PrimaryButtonText = _localizer.GetLocalizedStringOrDefault("/CharacterManager/EditPage_DeleteCustomConfirmButton", "Yes, delete this character"),
+            CloseButtonText = _localizer.GetLocalizedStringOrDefault("/CharacterManager/EditPage_CancelButton", "No, cancel"),
             DefaultButton = ContentDialogButton.Primary,
             XamlRoot = App.MainWindow.Content.XamlRoot,
             RequestedTheme = CurrentTheme
@@ -318,7 +318,10 @@ public partial class EditCharacterViewModel : ObservableRecipient, INavigationAw
         });
 
         _navigationService.NavigateTo(typeof(CharacterManagerViewModel).FullName!, new object(), clearNavigation: true);
-        _notificationManager.ShowNotification("自定义角色已删除", $"自定义角色 '{_character.DisplayName}' 已成功删除", null);
+        _notificationManager.ShowNotification(
+            _localizer.GetLocalizedStringOrDefault("/CharacterManager/EditPage_CustomDeletedTitle", "Custom character deleted"),
+            string.Format(_localizer.GetLocalizedStringOrDefault("/CharacterManager/EditPage_CustomDeletedMessage", "Custom character '{0}' has been successfully deleted"), _character.DisplayName),
+            null);
     }
 
     private bool CanEnableCharacter() => !_character.IsCustomModObject && CharacterStatus.IsDisabled && !AnyChanges();
@@ -328,19 +331,18 @@ public partial class EditCharacterViewModel : ObservableRecipient, INavigationAw
     {
         var dialogContent = new TextBlock()
         {
-            Text =
-                "你确定要启用这个角色吗？" +
-                "按下‘是’后，这将立即执行。",
+            Text = _localizer.GetLocalizedStringOrDefault("/CharacterManager/EditPage_EnableCharacterDialogText",
+                "Are you sure you want to enable this character? This will be executed immediately after pressing 'Yes'."),
             TextWrapping = TextWrapping.WrapWholeWords,
             Margin = new Thickness(0, 0, 0, 8)
         };
 
         var enableDialog = new ContentDialog
         {
-            Title = "启用角色",
+            Title = _localizer.GetLocalizedStringOrDefault("/CharacterManager/EditPage_EnableCharacterDialogTitle", "Enable Character"),
             Content = dialogContent,
-            PrimaryButtonText = "是,启用这个角色",
-            CloseButtonText = "不,取消",
+            PrimaryButtonText = _localizer.GetLocalizedStringOrDefault("/CharacterManager/EditPage_EnableCharacterConfirmButton", "Yes, enable this character"),
+            CloseButtonText = _localizer.GetLocalizedStringOrDefault("/CharacterManager/EditPage_CancelButton", "No, cancel"),
             DefaultButton = ContentDialogButton.Primary,
             XamlRoot = App.MainWindow.Content.XamlRoot,
             RequestedTheme = CurrentTheme
@@ -387,7 +389,9 @@ public partial class EditCharacterViewModel : ObservableRecipient, INavigationAw
         catch (Exception e)
         {
             _logger.Error(e, "Failed to save changes to character");
-            _notificationManager.ShowNotification("未能保存对角色所做的更改", e.Message, null);
+            _notificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/CharacterManager/EditPage_SaveFailedTitle", "Failed to save changes to character"),
+                e.Message, null);
             return;
         }
 
@@ -559,9 +563,9 @@ public partial class EditCharacterViewModel : ObservableRecipient, INavigationAw
 
         var characterModelDialog = new ContentDialog
         {
-            Title = "Character Model",
+            Title = _localizer.GetLocalizedStringOrDefault("/CharacterManager/EditPage_ModelDialogTitle", "Character Model"),
             Content = contentWrapper,
-            CloseButtonText = "关闭",
+            CloseButtonText = _localizer.GetLocalizedStringOrDefault("/CharacterManager/EditPage_CloseButton", "Close"),
             DefaultButton = ContentDialogButton.Close,
             XamlRoot = App.MainWindow.Content.XamlRoot,
             RequestedTheme = CurrentTheme,
