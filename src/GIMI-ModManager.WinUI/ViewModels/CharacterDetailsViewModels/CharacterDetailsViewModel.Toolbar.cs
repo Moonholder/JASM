@@ -1,14 +1,14 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.UI.Controls;
+using GIMI_ModManager.Core.GamesService.Interfaces;
+using GIMI_ModManager.Core.GamesService.Requests;
+using GIMI_ModManager.Core.Helpers;
 using GIMI_ModManager.WinUI.Models.Options;
 using GIMI_ModManager.WinUI.Models.Settings;
 using GIMI_ModManager.WinUI.ViewModels.CharacterDetailsViewModels.SubViewModels;
 using GIMI_ModManager.WinUI.ViewModels.SubVms;
 using GIMI_ModManager.WinUI.Views;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Input;
 using System.Collections.ObjectModel;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
@@ -35,7 +35,7 @@ public partial class CharacterDetailsViewModel
     private async Task InitToolbarAsync()
     {
         var settings = await ReadSettingsAsync();
-        IsSingleSelectEnabled = settings.SingleSelect;
+        IsSingleSelectEnabled = !_modList.Character.IsMultiMod;
         ModGridVM.GridSelectionMode = IsSingleSelectEnabled ? DataGridSelectionMode.Single : DataGridSelectionMode.Extended;
         IsModFolderNameColumnVisible = settings.ModFolderNameColumnVisible;
         var modPresetSettings = await _localSettingsService.ReadOrCreateSettingAsync<ModPresetSettings>(ModPresetSettings.Key);
@@ -110,16 +110,31 @@ public partial class CharacterDetailsViewModel
     {
         await CommandWrapperAsync(false, async () =>
         {
-            var settings = await ReadSettingsAsync();
-            settings.SingleSelect = !IsSingleSelectEnabled;
-            await SaveSettingsAsync(settings);
+            var newSingleSelectState = !IsSingleSelectEnabled;
 
-            IsSingleSelectEnabled = settings.SingleSelect;
+            var request = new OverrideCharacterRequest
+            {
+                IsMultiMod = NewValue<bool>.Set(!newSingleSelectState)
+            };
 
-            var firstModSelected = ModGridVM.SelectedMods.FirstOrDefault();
+            if (_modList.Character is ICharacter character)
+            {
+                await _gameService.SetCharacterOverrideAsync(character, request);
+            }
+            else
+            {
+                _logger.Warning("Attempted to set character override on a non-character object: {InternalName}", _modList.Character.InternalName);
+            }
+
+            IsSingleSelectEnabled = newSingleSelectState;
             ModGridVM.GridSelectionMode = IsSingleSelectEnabled ? DataGridSelectionMode.Single : DataGridSelectionMode.Extended;
-            if (firstModSelected is not null)
-                ModGridVM.SetSelectedMod(firstModSelected.Id);
+
+            if (IsSingleSelectEnabled && ModGridVM.SelectedMods.Count > 1)
+            {
+                var firstModSelected = ModGridVM.SelectedMods.FirstOrDefault();
+                if (firstModSelected is not null)
+                    ModGridVM.SetSelectedMod(firstModSelected.Id);
+            }
         }).ConfigureAwait(false);
     }
 

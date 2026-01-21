@@ -173,6 +173,7 @@ public partial class CharacterGalleryViewModel : ObservableRecipient, INavigatio
 
         _category = moddableObject.ModCategory;
         _moddableObject = moddableObject;
+        IsSingleSelection = !_moddableObject.IsMultiMod;
         if (_moddableObject is ICharacter character)
         {
             _selectedSkin = character.Skins.First();

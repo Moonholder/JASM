@@ -1,4 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using GIMI_ModManager.Core.GamesService.Interfaces;
+using GIMI_ModManager.Core.GamesService.Requests;
+using GIMI_ModManager.Core.Helpers;
 using GIMI_ModManager.WinUI.Models.Settings;
 
 namespace GIMI_ModManager.WinUI.ViewModels.CharacterGalleryViewModels;
@@ -13,14 +16,23 @@ public partial class CharacterGalleryViewModel
     [RelayCommand(CanExecute = nameof(CanToggleSingleSelection))]
     private async Task ToggleSingleSelection()
     {
-        var settings = await _localSettingsService
-            .ReadOrCreateSettingAsync<CharacterGallerySettings>(CharacterGallerySettings.Key);
+        var newSingleSelectState = !IsSingleSelection;
 
-        settings.IsSingleSelection = !settings.IsSingleSelection;
+        var request = new OverrideCharacterRequest
+        {
+            IsMultiMod = NewValue<bool>.Set(!newSingleSelectState)
+        };
 
-        await _localSettingsService.SaveSettingAsync(CharacterGallerySettings.Key, settings);
+        if (_moddableObject is ICharacter character)
+        {
+            await _gameService.SetCharacterOverrideAsync(character, request);
+        }
+        else
+        {
+            _logger.Warning("Attempted to set character override on a non-character object: {InternalName}", _moddableObject?.InternalName);
+        }
 
-        IsSingleSelection = settings.IsSingleSelection;
+        IsSingleSelection = newSingleSelectState;
     }
 
     [RelayCommand(CanExecute = nameof(CanToggleAutoSync))]
