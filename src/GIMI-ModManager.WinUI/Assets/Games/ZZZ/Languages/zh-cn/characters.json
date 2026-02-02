@@ -664,5 +664,25 @@
   {
     "InternalName": "Zhao",
     "DisplayName": "照"
+  },
+  {
+    "InternalName": "Aria",
+    "DisplayName": "爱芮",
+    "InGameSkins": [
+      {
+        "InternalName": "Aria Discordant Note",
+        "DisplayName": "不协和音"
+      }
+    ]
+  },
+  {
+    "InternalName": "Sunna",
+    "DisplayName": "千夏",
+    "InGameSkins": [
+      {
+        "InternalName": "Sunna Afternoon Tea Break",
+        "DisplayName": "午后茶歇"
+      }
+    ]
   }
 ]

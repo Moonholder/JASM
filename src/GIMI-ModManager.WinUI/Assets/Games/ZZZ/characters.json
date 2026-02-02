@@ -928,7 +928,7 @@
     "InternalName": "YeShunguang",
     "DisplayName": "Ye Shunguang"
   },
-    {
+  {
     "Keys": [
       "Zhao"
     ],
@@ -944,5 +944,53 @@
     "InGameSkins": [],
     "InternalName": "Zhao",
     "DisplayName": "Zhao"
+  },
+  {
+    "Keys": [
+      "Aria"
+    ],
+    "ReleaseDate": "2026-01-30T00:00:00",
+    "Image": "Aria.webp",
+    "Rarity": 5,
+    "Element": "Ether",
+    "Class": "Anomaly",
+    "Region": [
+      "Angels of Delusion"
+    ],
+    "ModFilesName": "Aria",
+    "InGameSkins": [
+      {
+        "ModFilesName": "AriaDiscordantNote",
+        "Image": "AriaDiscordantNote.webp",
+        "InternalName": "Aria Discordant Note",
+        "DisplayName": "Discordant Note"
+      }
+    ],
+    "InternalName": "Aria",
+    "DisplayName": "Aria"
+  },
+  {
+    "Keys": [
+      "Sunna"
+    ],
+    "ReleaseDate": "2026-01-30T00:00:00",
+    "Image": "Sunna.webp",
+    "Rarity": 5,
+    "Element": "Physical",
+    "Class": "Support",
+    "Region": [
+      "Angels of Delusion"
+    ],
+    "ModFilesName": "Sunna",
+    "InGameSkins": [
+      {
+        "ModFilesName": "SunnaAfternoonTeaBreak",
+        "Image": "SunnaAfternoonTeaBreak.webp",
+        "InternalName": "Sunna Afternoon Tea Break",
+        "DisplayName": "Afternoon Tea Break"
+      }
+    ],
+    "InternalName": "Sunna",
+    "DisplayName": "Sunna"
   }
 ]

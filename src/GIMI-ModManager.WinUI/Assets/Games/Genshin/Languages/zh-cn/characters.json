@@ -287,7 +287,13 @@
   },
   {
     "InternalName": "Neuvillette",
-    "DisplayName": "那维莱特"
+    "DisplayName": "那维莱特",
+    "InGameSkins": [
+      {
+        "InternalName": "MelusentGift",
+        "DisplayName": "莘露的赠礼"
+      }
+    ]
   },
   {
     "InternalName": "Nilou",
@@ -379,11 +385,23 @@
   },
   {
     "InternalName": "Traveler (Female)",
-    "DisplayName": "旅行者（女）"
+    "DisplayName": "旅行者（女）",
+    "InGameSkins": [
+      {
+        "InternalName": "Lumine As Heaven and Earth Are Made Anew",
+        "DisplayName": "复地重天"
+      }
+    ]
   },
   {
     "InternalName": "Traveler (Male)",
-    "DisplayName": "旅行者（男）"
+    "DisplayName": "旅行者（男）",
+        "InGameSkins": [
+      {
+        "InternalName": "Aether As Heaven and Earth Are Made Anew",
+        "DisplayName": "复地重天"
+      }
+    ]
   },
   {
     "InternalName": "Venti",
@@ -431,7 +449,13 @@
   },
   {
     "InternalName": "Yaoyao",
-    "DisplayName": "瑶瑶"
+    "DisplayName": "瑶瑶",
+    "InGameSkins": [
+      {
+        "InternalName": "Rainlit Bamboo Reverie",
+        "DisplayName": "聆雨听竹"
+      }
+    ]
   },
   {
     "InternalName": "Yelan",
@@ -719,5 +743,17 @@
   {
     "InternalName": "Jahoda",
     "DisplayName": "雅珂达"
+  },
+  {
+    "InternalName": "Columbina",
+    "DisplayName": "哥伦比娅"
+  },
+  {
+    "InternalName": "Zibai",
+    "DisplayName": "兹白"
+  },
+  {
+    "InternalName": "Illuga",
+    "DisplayName": "叶洛亚"
   }
 ]
