@@ -1311,5 +1311,39 @@
     "InGameSkins": [],
     "InternalName": "Dahlia",
     "DisplayName": "The Dahlia"
+  },
+  {
+    "Keys": [
+      "Sparxie"
+    ],
+    "ReleaseDate": "2026-01-14T00:00:00",
+    "Image": "sparxie.webp",
+    "Rarity": 5,
+    "Element": "Fire",
+    "Class": "Elation",
+    "Region": [
+      "Cosmic"
+    ],
+    "ModFilesName": "Sparxie",
+    "InGameSkins": [],
+    "InternalName": "Sparxie",
+    "DisplayName": "Sparxie"
+  },
+  {
+    "Keys": [
+      "Yao Guang"
+    ],
+    "ReleaseDate": "2026-02-01T00:00:00",
+    "Image": "yaoguang.webp",
+    "Rarity": 5,
+    "Element": "Physical",
+    "Class": "Elation",
+    "Region": [
+      "The Xianzhou Yuque"
+    ],
+    "ModFilesName": "YaoGuang",
+    "InGameSkins": [],
+    "InternalName": "YaoGuang",
+    "DisplayName": "YaoGuang"
   }
 ]

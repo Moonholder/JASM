@@ -752,7 +752,7 @@
     "Keys": [
       "Mornye"
     ],
-    "ReleaseDate": "2025-12-25T00:00:00",
+    "ReleaseDate": "2026-01-15T00:00:00",
     "Image": "Mornye.webp",
     "Rarity": 5,
     "Element": "Fusion",
@@ -767,10 +767,27 @@
   },
   {
     "Keys": [
+      "Aemeath"
+    ],
+    "ReleaseDate": "2026-02-06T00:00:00",
+    "Image": "Aemeath.webp",
+    "Rarity": 5,
+    "Element": "Fusion",
+    "Class": "Sword",
+    "Region": [
+      "Lahai-Roi"
+    ],
+    "ModFilesName": "Aemeath",
+    "InGameSkins": [],
+    "InternalName": "Aemeath",
+    "DisplayName": "Aemeath"
+  },
+  {
+    "Keys": [
       "Luuk",
       "Herssen"
     ],
-    "ReleaseDate": "2026-01-01T00:00:00",
+    "ReleaseDate": "2026-02-07T00:00:00",
     "Image": "Luuk.webp",
     "Rarity": 5,
     "Element": "Unknown",
@@ -787,7 +804,7 @@
     "Keys": [
       "Lucilla"
     ],
-    "ReleaseDate": "2026-01-01T00:00:00",
+    "ReleaseDate": "2026-03-01T00:00:00",
     "Image": "Lucilla.webp",
     "Rarity": 5,
     "Element": "Unknown",
@@ -804,7 +821,7 @@
     "Keys": [
       "Sigrika"
     ],
-    "ReleaseDate": "2026-01-01T00:00:00",
+    "ReleaseDate": "2026-03-01T00:00:00",
     "Image": "Sigrika.webp",
     "Rarity": 5,
     "Element": "Unknown",
