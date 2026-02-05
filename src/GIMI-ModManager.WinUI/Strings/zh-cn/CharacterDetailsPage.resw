@@ -107,7 +107,7 @@
   <data name="EnabledColumnHeader" xml:space="preserve">
     <value>是否启用</value>
   </data>
-  <data name="NewVersionAvailableToolTip" xml:space="preserve">
+  <data name="NewVersionAvailableToolTip.ToolTipService.ToolTip" xml:space="preserve">
     <value>有新版本可用</value>
   </data>
   <data name="ModNameColumnHeader" xml:space="preserve">

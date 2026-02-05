@@ -870,8 +870,14 @@ public class GameService : IGameService
         }
 
 
+
         _characters.Insert(0, getOthersCharacter());
-        _characters.Add(getGlidersCharacter());
+        // Only add Gliders for games that support it (Genshin and WuWa)
+        if (GameShortName.Equals("Genshin", StringComparison.OrdinalIgnoreCase) ||
+            GameShortName.Equals("WuWa", StringComparison.OrdinalIgnoreCase))
+        {
+            _characters.Add(getGlidersCharacter());
+        }
         _characters.Add(getWeaponsCharacter());
 
         if (LanguageOverrideAvailable())

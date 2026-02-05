@@ -178,7 +178,7 @@
                     <TextBlock
                         IsTextSelectionEnabled="True"
                         TextWrapping="WrapWholeWords"
-                        Text="JASM supports Genshin Impact, Honkai Star Rail, Wuthering Waves and Zenless Zone Zero."
+                        Text="JASM supports Genshin Impact, Honkai Star Rail, Wuthering Waves, Zenless Zone Zero and Arknights: Endfield."
                         l:Uids.Uid="/Settings/GameSelectorTitle" />
                     <TextBlock
                         Margin="0,0,0,8"

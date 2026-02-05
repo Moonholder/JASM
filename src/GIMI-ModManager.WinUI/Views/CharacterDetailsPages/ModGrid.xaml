@@ -125,13 +125,14 @@
                                                 <Button
                                                     Margin="0"
                                                     Padding="0"
-                                                    l:Uids.Uid="/CharacterDetailsPage/NewVersionAvailableToolTip"
                                                     BorderThickness="0"
                                                     Click="Notification_OnClick"
                                                     CornerRadius="0"
                                                     DataContext="{x:Bind}"
                                                     PointerEntered="NotificationButton_OnPointerEntered"
-                                                    PointerExited="NotificationButton_OnPointerExited">
+                                                    PointerExited="NotificationButton_OnPointerExited"
+                                                    ToolTipService.ToolTip="new version available"
+                                                    l:Uids.Uid="/CharacterDetailsPage/NewVersionAvailableToolTip">
                                                     <Button.Content>
                                                         <FontIcon
                                                             VerticalAlignment="Bottom"

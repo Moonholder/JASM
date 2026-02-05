@@ -77,7 +77,7 @@
     <value>游戏</value>
   </data>
   <data name="GameSelectorTitle.Text" xml:space="preserve">
-    <value>JASM 支持原神、崩坏：星穹铁道、鸣潮和绝区零。</value>
+    <value>JASM 支持原神、崩坏：星穹铁道、鸣潮、绝区零和终末地。</value>
   </data>
   <data name="GameSelectorSubtitle.Text" xml:space="preserve">
     <value>为每个选定的游戏独立保存设置。</value>

@@ -152,7 +152,8 @@ internal class Program
             { "Genshin", new[] { "GenshinImpact", "YuanShen" } },
             { "Honkai", new[] { "StarRail" } },
             { "WuWa", new[] { "Client-Win64-Shipping" } },
-            { "ZZZ", new[] { "ZenlessZoneZero" } }
+            { "ZZZ", new[] { "ZenlessZoneZero" } },
+            { "Endfield", new[] { "Endfield" } }
         };
 
         if (!gameProcessMap.TryGetValue(game, out var processNames))

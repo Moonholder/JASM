@@ -23,6 +23,7 @@ public class SelectedGameService
     private const string Honkai = "Honkai";
     private const string WuWa = "WuWa";
     private const string ZZZ = "ZZZ";
+    private const string Endfield = "Endfield";
 
 
     public SelectedGameService(ILocalSettingsService localSettingsService, ILogger logger)
@@ -84,10 +85,11 @@ public class SelectedGameService
 
         return selectedGame switch
         {
-            Genshin => [SupportedGames.Honkai, SupportedGames.WuWa, SupportedGames.ZZZ],
-            Honkai => [SupportedGames.Genshin, SupportedGames.WuWa, SupportedGames.ZZZ],
-            WuWa => [SupportedGames.Genshin, SupportedGames.Honkai, SupportedGames.ZZZ],
-            ZZZ => [SupportedGames.Genshin, SupportedGames.Honkai, SupportedGames.WuWa],
+            Genshin => [SupportedGames.Honkai, SupportedGames.WuWa, SupportedGames.ZZZ, SupportedGames.Endfield],
+            Honkai => [SupportedGames.Genshin, SupportedGames.WuWa, SupportedGames.ZZZ, SupportedGames.Endfield],
+            WuWa => [SupportedGames.Genshin, SupportedGames.Honkai, SupportedGames.ZZZ, SupportedGames.Endfield],
+            ZZZ => [SupportedGames.Genshin, SupportedGames.Honkai, SupportedGames.WuWa, SupportedGames.Endfield],
+            Endfield => [SupportedGames.Genshin, SupportedGames.Honkai, SupportedGames.WuWa, SupportedGames.ZZZ],
             _ => throw new ArgumentOutOfRangeException()
         };
     }
@@ -137,7 +139,7 @@ public class SelectedGameService
         if (Enum.TryParse<SupportedGames>(game, out _))
             return true;
 
-        return game is Genshin or Honkai or WuWa;
+        return game is Genshin or Honkai or WuWa or Endfield;
     }
 
 

@@ -10,4 +10,5 @@ public static class Constants
     public static readonly string[] ScriptIniNames = ["Script.ini", "merged.ini", "mod.ini"];
     public static readonly string[] MergedIniPrefixes = ["Master", "merged"];
     public static readonly string UserIniFileName = "d3dx_user.ini";
+    public static readonly string D3DXIniFileName = "d3dx.ini";
 }

@@ -84,7 +84,8 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
         SupportedGames.Genshin.ToString(),
         SupportedGames.Honkai.ToString(),
         SupportedGames.WuWa.ToString(),
-        SupportedGames.ZZZ.ToString()
+        SupportedGames.ZZZ.ToString(),
+        SupportedGames.Endfield.ToString()
     };
 
     [ObservableProperty] private string _selectedGame = string.Empty;
@@ -807,7 +808,7 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
 
         if (gameInfo is not null)
         {
-            PathToGIMIFolderPicker.SetValidators(GimiFolderRootValidators.Validators(gameInfo.GameModelImporterExeNames));
+            PathToGIMIFolderPicker.SetValidators(GimiFolderRootValidators.Validators([Core.Helpers.Constants.D3DXIniFileName]));
         }
 
         var windowSettings =

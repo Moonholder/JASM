@@ -1,0 +1,27 @@
+[
+    {
+        "InternalName": "Heat",
+        "DisplayName": "灼热",
+        "Image": "Heat.svg"
+    },
+    {
+        "InternalName": "Cryo",
+        "DisplayName": "寒冷",
+        "Image": "Cryo.svg"
+    },
+    {
+        "InternalName": "Electric",
+        "DisplayName": "电磁",
+        "Image": "Electric.svg"
+    },
+    {
+        "InternalName": "Natura",
+        "DisplayName": "自然",
+        "Image": "Natura.svg"
+    },
+    {
+        "InternalName": "Physical",
+        "DisplayName": "物理",
+        "Image": "Physical.svg"
+    }
+]
