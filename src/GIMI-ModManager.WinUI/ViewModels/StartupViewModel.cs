@@ -226,7 +226,7 @@ public partial class StartupViewModel : ObservableRecipient, INavigationAware
         ModelImporterShortName = gameInfo.GameModelImporterShortName;
         GameBananaUrl = gameInfo.GameBananaUrl;
         ModelImporterUrl = gameInfo.GameModelImporterUrl;
-        PathToGIMIFolderPicker.SetValidators(GimiFolderRootValidators.Validators([Constants.D3DXIniFileName])); 
+        PathToGIMIFolderPicker.SetValidators(GimiFolderRootValidators.Validators([Constants.D3DXIniFileName]));
     }
 
     private async Task SetGameComboBoxValues()
