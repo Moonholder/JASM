@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.26.0](https://github.com/Moonholder/JASM/compare/v2.25.0...v2.26.0) (2026-02-05)
+
+
+### Features
+
+* 为明日方舟: 终末地添加支持 ([5554882](https://github.com/Moonholder/JASM/commit/55548827604aca98ce49d8e3ac437d59ce1cf53b))
+
+
+### Miscellaneous
+
+* 为 Genshin, HSR, WuWa 和 ZZZ 添加角色及皮肤 ([5e9fa18](https://github.com/Moonholder/JASM/commit/5e9fa1849fc8fde303213f1ba33e4941569d8097))
+* 为每个角色分类独立保存是否启用单选模式 ([bc74fdd](https://github.com/Moonholder/JASM/commit/bc74fddbb1ab467373890e9f38c4ef2fd1f6baf0))
+
 ## [2.25.0](https://github.com/Moonholder/JASM/compare/v2.24.2...v2.25.0) (2025-12-30)
 
 
