@@ -1,0 +1,13 @@
+{
+  "GameName": "Arknights: Endfield",
+  "GameShortName": "Endfield",
+  "RarityName": "Rarity",
+  "GameIcon": "Start_Game.png",
+  "GameBananaUrl": "https://gamebanana.com/games/21842",
+  "GameModelImporterUrl": "",
+  "GameModelImporterName": "Endfield-Model-Importer",
+  "GameModelImporterShortName": "ENDMI",
+  "GameModelImporterExeName": [
+    "3DMigotoLoader.exe"
+  ]
+}

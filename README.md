@@ -2,7 +2,7 @@
 
 > 原项目地址：[https://github.com/Jorixon/JASM](https://github.com/Jorixon/JASM)
 
-未处理的异常会写入 JASM 应用程序目录中的 Logs 文件。
+未处理的异常会写入 JASM 应用程序目录中的 Logs 文件夹中。
 
 ## 功能
 - 精美的用户界面 👀
@@ -65,7 +65,7 @@ JASM会识别Mod文件夹中的ini文件，并提取其中的按键切换信息�
 #### Tips
 * 应用程序设置存储在这里```C:\Users\<username>\AppData\Local\JASM\ApplicationData```
 * Mod 特定设置存储在 mod 文件夹中，并以```.JASM_``` 为前缀。导出 mod 时，可以忽略这些文件。  
-* JASM能自动识别【```cover```, ```.jasm_cover```, ```preview```】为前缀的图片作为模组的预览图。
+* JASM会优先识别【```cover```, ```.jasm_cover```, ```preview```】为前缀的图片作为模组的预览图。
 
 ---
 ### JASM 不能启动
@@ -73,10 +73,9 @@ JASM会识别Mod文件夹中的ini文件，并提取其中的按键切换信息�
 
 如果 JASM 之前能正常工作，一个可能的修复方法是删除 JASM 的用户设置文件夹。这会清除你的设置，比如预设、文件夹路径等。不过，你的模组以及模组设置（如自定义显示名称和图片）不会受到影响。JASM 设置存储在以下位置：`%localappdata%\JASM` / `C:\Users\<username>\AppData\Local\JASM`。你可以先尝试删除每个游戏的设置文件夹，看看是否有帮助，或者也可以直接删除整个文件夹。预设存储在预设文件夹内。最好先备份一下。
 
-### XXMI 兼容性
-截至目前，JASM 尚未完全兼容。在那之前，在你为 XXMI 中的 MI 设置的文件夹中创建一个名为 “3dmigoto loader.exe” 的空白文件。
+### XXMI 兼容
 
-或者，如果你清楚自己在做什么，并且希望能够通过 JASM 在 XXMI 中启动游戏，在点击```启动游戏```弹出的窗口中点击```创建高级命令```，具体如下:
+如果你清楚自己在做什么，并且希望能够通过 JASM 在 XXMI 中启动游戏，在点击```启动游戏```弹出的窗口中点击```创建高级命令```，具体如下:
 ![image](https://github.com/user-attachments/assets/2b0d48a7-25d9-46c9-9102-313632445181)
 
 ### 更多参数参考

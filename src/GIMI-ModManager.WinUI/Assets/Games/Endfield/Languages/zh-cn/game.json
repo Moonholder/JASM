@@ -1,0 +1,13 @@
+{
+    "GameName": "明日方舟: 终末地",
+    "GameShortName": "Endfield",
+    "RarityName": "Rarity",
+    "GameIcon": "Start_Game.png",
+    "GameBananaUrl": "https://gamebanana.com/games/21842",
+    "GameModelImporterUrl": "https://github.com/SilentNightSound/SR-Model-Importer",
+    "GameModelImporterName": "Endfield-Model-Importer",
+    "GameModelImporterShortName": "EFMI",
+    "GameModelImporterExeName": [
+        "3DMigotoLoader.exe"
+    ]
+}

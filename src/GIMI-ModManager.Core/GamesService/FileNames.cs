@@ -22,5 +22,6 @@ public enum SupportedGames
     Genshin,
     Honkai,
     WuWa,
-    ZZZ
+    ZZZ,
+    Endfield
 }

@@ -1,0 +1,22 @@
+[
+    {
+        "InternalName": "Sword",
+        "DisplayName": "Sword"
+    },
+    {
+        "InternalName": "Greatsword",
+        "DisplayName": "Greatsword"
+    },
+    {
+        "InternalName": "Polearm",
+        "DisplayName": "Polearm"
+    },
+    {
+        "InternalName": "Handcannon",
+        "DisplayName": "Handcannon"
+    },
+    {
+        "InternalName": "ArtsUnit",
+        "DisplayName": "Arts Unit"
+    }
+]

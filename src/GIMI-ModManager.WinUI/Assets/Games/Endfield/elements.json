@@ -1,0 +1,27 @@
+[
+    {
+        "InternalName": "Heat",
+        "DisplayName": "Heat",
+        "Image": "heat.svg"
+    },
+    {
+        "InternalName": "Cryo",
+        "DisplayName": "Cryo",
+        "Image": "cryo.svg"
+    },
+    {
+        "InternalName": "Electric",
+        "DisplayName": "Electric",
+        "Image": "Electric.svg"
+    },
+    {
+        "InternalName": "Natura",
+        "DisplayName": "Natura",
+        "Image": "natura.svg"
+    },
+    {
+        "InternalName": "Physical",
+        "DisplayName": "Physical",
+        "Image": "Physical.svg"
+    }
+]

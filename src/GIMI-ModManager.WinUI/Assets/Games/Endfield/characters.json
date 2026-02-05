@@ -1,0 +1,410 @@
+[
+    {
+        "Keys": [
+            "endministratormale"
+        ],
+        "ReleaseDate": "2025-02-13T00:00:00",
+        "Image": "EndministratorMale.png",
+        "Rarity": 6,
+        "Element": "Physical",
+        "Class": "Sword",
+        "Region": [
+            "Endfield Industries"
+        ],
+        "ModFilesName": "EndministratorMale",
+        "InGameSkins": [],
+        "InternalName": "EndministratorMale",
+        "DisplayName": "Endministrator (Male)"
+    },
+    {
+        "Keys": [
+            "endministratorfemale"
+        ],
+        "ReleaseDate": "2025-02-13T00:00:00",
+        "Image": "EndministratorFemale.png",
+        "Rarity": 6,
+        "Element": "Physical",
+        "Class": "Sword",
+        "Region": [
+            "Endfield Industries"
+        ],
+        "ModFilesName": "EndministratorFemale",
+        "InGameSkins": [],
+        "InternalName": "EndministratorFemale",
+        "DisplayName": "Endministrator (Female)"
+    },
+    {
+        "Keys": [
+            "estella"
+        ],
+        "ReleaseDate": "2025-02-13T00:00:00",
+        "Image": "Estella.png",
+        "Rarity": 5,
+        "Element": "Heat",
+        "Class": "ArtsUnit",
+        "Region": [
+            "Endfield Industries"
+        ],
+        "ModFilesName": "Estella",
+        "InGameSkins": [],
+        "InternalName": "Estella",
+        "DisplayName": "Estella"
+    },
+    {
+        "Keys": [
+            "perlica"
+        ],
+        "ReleaseDate": "2025-02-13T00:00:00",
+        "Image": "Perlica.png",
+        "Rarity": 5,
+        "Element": "Cryo",
+        "Class": "ArtsUnit",
+        "Region": [
+            "Endfield Industries"
+        ],
+        "ModFilesName": "Perlica",
+        "InGameSkins": [],
+        "InternalName": "Perlica",
+        "DisplayName": "Perlica"
+    },
+    {
+        "Keys": [
+            "ember"
+        ],
+        "ReleaseDate": "2025-02-13T00:00:00",
+        "Image": "Ember.png",
+        "Rarity": 5,
+        "Element": "Heat",
+        "Class": "Greatsword",
+        "Region": [
+            "Order of Steel Oath"
+        ],
+        "ModFilesName": "Ember",
+        "InGameSkins": [],
+        "InternalName": "Ember",
+        "DisplayName": "Ember"
+    },
+    {
+        "Keys": [
+            "chenqianyu"
+        ],
+        "ReleaseDate": "2025-02-13T00:00:00",
+        "Image": "ChenQianyu.png",
+        "Rarity": 5,
+        "Element": "Heat",
+        "Class": "Sword",
+        "Region": [
+            "Endfield Industries"
+        ],
+        "ModFilesName": "ChenQianyu",
+        "InGameSkins": [],
+        "InternalName": "ChenQianyu",
+        "DisplayName": "Chen Qianyu"
+    },
+    {
+        "Keys": [
+            "avywenna"
+        ],
+        "ReleaseDate": "2025-02-13T00:00:00",
+        "Image": "Avywenna.png",
+        "Rarity": 6,
+        "Element": "Electric",
+        "Class": "Handcannon",
+        "Region": [
+            "TGCC"
+        ],
+        "ModFilesName": "Avywenna",
+        "InGameSkins": [],
+        "InternalName": "Avywenna",
+        "DisplayName": "Avywenna"
+    },
+    {
+        "Keys": [
+            "laevatain"
+        ],
+        "ReleaseDate": "2025-02-13T00:00:00",
+        "Image": "Laevatain.png",
+        "Rarity": 6,
+        "Element": "Heat",
+        "Class": "Sword",
+        "Region": [
+            "Rhodes Island"
+        ],
+        "ModFilesName": "Laevatain",
+        "InGameSkins": [],
+        "InternalName": "Laevatain",
+        "DisplayName": "Laevatain"
+    },
+    {
+        "Keys": [
+            "snowshine"
+        ],
+        "ReleaseDate": "2025-02-13T00:00:00",
+        "Image": "Snowshine.png",
+        "Rarity": 5,
+        "Element": "Cryo",
+        "Class": "Greatsword",
+        "Region": [
+            "Rhodes Island"
+        ],
+        "ModFilesName": "Snowshine",
+        "InGameSkins": [],
+        "InternalName": "Snowshine",
+        "DisplayName": "Snowshine"
+    },
+    {
+        "Keys": [
+            "xaihi"
+        ],
+        "ReleaseDate": "2025-02-13T00:00:00",
+        "Image": "Xaihi.png",
+        "Rarity": 6,
+        "Element": "Electric",
+        "Class": "ArtsUnit",
+        "Region": [
+            "Cabal of Tranquility"
+        ],
+        "ModFilesName": "Xaihi",
+        "InGameSkins": [],
+        "InternalName": "Xaihi",
+        "DisplayName": "Xaihi"
+    },
+    {
+        "Keys": [
+            "gilberta"
+        ],
+        "ReleaseDate": "2025-02-13T00:00:00",
+        "Image": "Gilberta.png",
+        "Rarity": 5,
+        "Element": "Natura",
+        "Class": "ArtsUnit",
+        "Region": [
+            "Rhodes Island"
+        ],
+        "ModFilesName": "Gilberta",
+        "InGameSkins": [],
+        "InternalName": "Gilberta",
+        "DisplayName": "Gilberta"
+    },
+    {
+        "Keys": [
+            "yvonne"
+        ],
+        "ReleaseDate": "2025-02-13T00:00:00",
+        "Image": "Yvonne.png",
+        "Rarity": 5,
+        "Element": "Cryo",
+        "Class": "Handcannon",
+        "Region": [
+            "Endfield Industries"
+        ],
+        "ModFilesName": "Yvonne",
+        "InGameSkins": [],
+        "InternalName": "Yvonne",
+        "DisplayName": "Yvonne"
+    },
+    {
+        "Keys": [
+            "ardelia"
+        ],
+        "ReleaseDate": "2025-02-13T00:00:00",
+        "Image": "Ardelia.png",
+        "Rarity": 5,
+        "Element": "Natura",
+        "Class": "ArtsUnit",
+        "Region": [
+            "Rhodes Island"
+        ],
+        "ModFilesName": "Ardelia",
+        "InGameSkins": [],
+        "InternalName": "Ardelia",
+        "DisplayName": "Ardelia"
+    },
+    {
+        "Keys": [
+            "arclight"
+        ],
+        "ReleaseDate": "2025-02-13T00:00:00",
+        "Image": "Arclight.png",
+        "Rarity": 5,
+        "Element": "Electric",
+        "Class": "Sword",
+        "Region": [
+            "Hannabit Circuit"
+        ],
+        "ModFilesName": "Arclight",
+        "InGameSkins": [],
+        "InternalName": "Arclight",
+        "DisplayName": "Arclight"
+    },
+    {
+        "Keys": [
+            "alesh"
+        ],
+        "ReleaseDate": "2025-02-13T00:00:00",
+        "Image": "Alesh.png",
+        "Rarity": 5,
+        "Element": "Cryo",
+        "Class": "Sword",
+        "Region": [
+            "UWST"
+        ],
+        "ModFilesName": "Alesh",
+        "InGameSkins": [],
+        "InternalName": "Alesh",
+        "DisplayName": "Alesh"
+    },
+    {
+        "Keys": [
+            "fluorite"
+        ],
+        "ReleaseDate": "2025-02-13T00:00:00",
+        "Image": "Fluorite.png",
+        "Rarity": 5,
+        "Element": "Electric",
+        "Class": "Handcannon",
+        "Region": [
+            "Endfield Industries"
+        ],
+        "ModFilesName": "Fluorite",
+        "InGameSkins": [],
+        "InternalName": "Fluorite",
+        "DisplayName": "Fluorite"
+    },
+    {
+        "Keys": [
+            "lastrite"
+        ],
+        "ReleaseDate": "2025-02-13T00:00:00",
+        "Image": "LastRite.png",
+        "Rarity": 5,
+        "Element": "Natura",
+        "Class": "Greatsword",
+        "Region": [
+            "Endfield Industries"
+        ],
+        "ModFilesName": "LastRite",
+        "InGameSkins": [],
+        "InternalName": "LastRite",
+        "DisplayName": "Last Rite"
+    },
+    {
+        "Keys": [
+            "lifeng"
+        ],
+        "ReleaseDate": "2025-02-13T00:00:00",
+        "Image": "Lifeng.png",
+        "Rarity": 5,
+        "Element": "Physical",
+        "Class": "Polearm",
+        "Region": [
+            "Hongshan"
+        ],
+        "ModFilesName": "Lifeng",
+        "InGameSkins": [],
+        "InternalName": "Lifeng",
+        "DisplayName": "Lifeng"
+    },
+    {
+        "Keys": [
+            "wulfgard"
+        ],
+        "ReleaseDate": "2025-02-13T00:00:00",
+        "Image": "Wulfgard.png",
+        "Rarity": 5,
+        "Element": "Physical",
+        "Class": "Handcannon",
+        "Region": [
+            "Endfield Industries"
+        ],
+        "ModFilesName": "Wulfgard",
+        "InGameSkins": [],
+        "InternalName": "Wulfgard",
+        "DisplayName": "Wulfgard"
+    },
+    {
+        "Keys": [
+            "catcher"
+        ],
+        "ReleaseDate": "2025-02-13T00:00:00",
+        "Image": "Catcher.png",
+        "Rarity": 5,
+        "Element": "Natura",
+        "Class": "Greatsword",
+        "Region": [
+            "Endfield Industries"
+        ],
+        "ModFilesName": "Catcher",
+        "InGameSkins": [],
+        "InternalName": "Catcher",
+        "DisplayName": "Catcher"
+    },
+    {
+        "Keys": [
+            "akekuri"
+        ],
+        "ReleaseDate": "2025-02-13T00:00:00",
+        "Image": "Akekuri.png",
+        "Rarity": 5,
+        "Element": "Physical",
+        "Class": "Sword",
+        "Region": [
+            "Endfield Industries"
+        ],
+        "ModFilesName": "Akekuri",
+        "InGameSkins": [],
+        "InternalName": "Akekuri",
+        "DisplayName": "Akekuri"
+    },
+    {
+        "Keys": [
+            "antal"
+        ],
+        "ReleaseDate": "2025-02-13T00:00:00",
+        "Image": "Antal.png",
+        "Rarity": 5,
+        "Element": "Electric",
+        "Class": "ArtsUnit",
+        "Region": [
+            "Endfield Industries"
+        ],
+        "ModFilesName": "Antal",
+        "InGameSkins": [],
+        "InternalName": "Antal",
+        "DisplayName": "Antal"
+    },
+    {
+        "Keys": [
+            "dapan"
+        ],
+        "ReleaseDate": "2025-02-13T00:00:00",
+        "Image": "DaPan.png",
+        "Rarity": 5,
+        "Element": "Heat",
+        "Class": "Greatsword",
+        "Region": [
+            "Hongshan"
+        ],
+        "ModFilesName": "DaPan",
+        "InGameSkins": [],
+        "InternalName": "DaPan",
+        "DisplayName": "Da Pan"
+    },
+    {
+        "Keys": [
+            "pogranichnik"
+        ],
+        "ReleaseDate": "2025-02-13T00:00:00",
+        "Image": "Pogranichnik.png",
+        "Rarity": 5,
+        "Element": "Cryo",
+        "Class": "Sword",
+        "Region": [
+            "Rhodes Island"
+        ],
+        "ModFilesName": "Pogranichnik",
+        "InGameSkins": [],
+        "InternalName": "Pogranichnik",
+        "DisplayName": "Pogranichnik"
+    }
+]
