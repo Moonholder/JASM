@@ -521,7 +521,7 @@ public partial class MainPageVM : ObservableRecipient
 
         Log("正在删除旧文件...", $"路径: {_installedJasmFolder.FullName}");
 
-        string[] doNotDeleteFiles = ["Elevator.exe", "JASM - Just Another Skin Manager.exe.WebView2", "logs"];
+        string[] doNotDeleteFiles = ["JASM - Just Another Skin Manager.exe.WebView2", "logs"];
 
         foreach (var fileSystemInfo in _installedJasmFolder.EnumerateFileSystemInfos())
         {
@@ -557,7 +557,7 @@ public partial class MainPageVM : ObservableRecipient
         foreach (var dir in source.GetDirectories())
             CopyFilesRecursively(dir, target.CreateSubdirectory(dir.Name));
         foreach (var file in source.GetFiles())
-            file.CopyTo(Path.Combine(target.FullName, file.Name));
+            file.CopyTo(Path.Combine(target.FullName, file.Name), overwrite: true);
     }
 
     private void CleanUp()

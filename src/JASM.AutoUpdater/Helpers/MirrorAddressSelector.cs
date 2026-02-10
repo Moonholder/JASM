@@ -13,6 +13,8 @@ public static class MirrorAddressSelector
         new MirrorInfo("https://github.boki.moe/", "美国9 Cloudflare CDN"),
         new MirrorInfo("https://ghproxy.net/", "英国伦敦"),
         new MirrorInfo("https://wget.la/", "其他"),
+        new MirrorInfo("https://gh.jix.de5.net/", "Cloudflare1"),
+        new MirrorInfo("https://dl.jix.de5.net/", "Cloudflare2"),
     ];
 
     private static readonly List<MirrorInfo> usedAddresses = [];
