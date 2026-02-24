@@ -6,6 +6,7 @@ using GIMI_ModManager.Core.GamesService;
 using GIMI_ModManager.Core.Helpers;
 using GIMI_ModManager.Core.Services;
 using GIMI_ModManager.Core.Services.CommandService;
+using GIMI_ModManager.Core.Services.CommandService.Models;
 using GIMI_ModManager.Core.Services.GameBanana;
 using GIMI_ModManager.Core.Services.ModPresetService;
 using GIMI_ModManager.WinUI.Contracts.Services;
@@ -35,6 +36,10 @@ public partial class StartupViewModel : ObservableRecipient, INavigationAware
     private readonly ModArchiveRepository _modArchiveRepository;
     private readonly CommandService _commandService;
     private readonly ILanguageLocalizer _localizer;
+    private readonly GenshinProcessManager _genshinProcessManager;
+    private readonly ThreeDMigtoProcessManager _threeDMigtoProcessManager;
+
+    private string? _xxmiLauncherPath;
 
 
     public PathPicker PathToGIMIFolderPicker { get; }
@@ -63,7 +68,8 @@ public partial class StartupViewModel : ObservableRecipient, INavigationAware
         IWindowManagerService windowManagerService, ISkinManagerService skinManagerService,
         SelectedGameService selectedGameService, IGameService gameService, ModPresetService modPresetService,
         UserPreferencesService userPreferencesService, ModArchiveRepository modArchiveRepository,
-        CommandService commandService, ILanguageLocalizer localizer)
+        CommandService commandService, ILanguageLocalizer localizer,
+        GenshinProcessManager genshinProcessManager, ThreeDMigtoProcessManager threeDMigtoProcessManager)
     {
         _navigationService = navigationService;
         _localSettingsService = localSettingsService;
@@ -76,6 +82,8 @@ public partial class StartupViewModel : ObservableRecipient, INavigationAware
         _modArchiveRepository = modArchiveRepository;
         _commandService = commandService;
         _localizer = localizer;
+        _genshinProcessManager = genshinProcessManager;
+        _threeDMigtoProcessManager = threeDMigtoProcessManager;
 
         PathToGIMIFolderPicker = new PathPicker([]);
 
@@ -85,7 +93,6 @@ public partial class StartupViewModel : ObservableRecipient, INavigationAware
         PathToGIMIFolderPicker.IsValidChanged += (sender, args) => SaveStartupSettingsCommand.NotifyCanExecuteChanged();
         PathToModsFolderPicker.IsValidChanged +=
             (sender, args) => SaveStartupSettingsCommand.NotifyCanExecuteChanged();
-        _localizer = localizer;
     }
 
 
@@ -137,6 +144,8 @@ public partial class StartupViewModel : ObservableRecipient, INavigationAware
             await Task.Run(() => _skinManagerService.ReorganizeModsAsync(disableMods: DisableMods));
         }
 
+        // 如果检测到 XXMI Launcher，自动创建启动命令（已配置则跳过）
+        await TryAutoCreateXxmiCommandsAsync();
 
         _navigationService.NavigateTo(typeof(CharactersViewModel).FullName!, null, true);
         _windowManagerService.ResizeWindowPercent(_windowManagerService.MainWindow, 80, 80);
@@ -227,6 +236,11 @@ public partial class StartupViewModel : ObservableRecipient, INavigationAware
         GameBananaUrl = gameInfo.GameBananaUrl;
         ModelImporterUrl = gameInfo.GameModelImporterUrl;
         PathToGIMIFolderPicker.SetValidators(GimiFolderRootValidators.Validators([Constants.D3DXIniFileName]));
+
+        // 自动检测 XXMI Launcher
+        _xxmiLauncherPath = XxmiDetectionService.TryDetectXxmiLauncherPath();
+        if (_xxmiLauncherPath != null)
+            _logger.Information("XXMI Launcher detected at: {Path}", _xxmiLauncherPath);
     }
 
     private async Task SetGameComboBoxValues()
@@ -258,14 +272,94 @@ public partial class StartupViewModel : ObservableRecipient, INavigationAware
     private void SetPaths(ModManagerOptions settings)
     {
         if (!string.IsNullOrWhiteSpace(settings.GimiRootFolderPath))
+        {
             PathToGIMIFolderPicker.Path = settings.GimiRootFolderPath;
+        }
+        else if (_xxmiLauncherPath != null)
+        {
+            var modLoaderPath = XxmiDetectionService.GetModLoaderPath(_xxmiLauncherPath, ModelImporterShortName);
+            PathToGIMIFolderPicker.Path = Directory.Exists(modLoaderPath) ? modLoaderPath : "";
+        }
         else
+        {
             PathToGIMIFolderPicker.Path = "";
+        }
 
         if (!string.IsNullOrWhiteSpace(settings.ModsFolderPath))
+        {
             PathToModsFolderPicker.Path = settings.ModsFolderPath;
+        }
+        else if (_xxmiLauncherPath != null)
+        {
+            var modsPath = XxmiDetectionService.GetModsPath(_xxmiLauncherPath, ModelImporterShortName);
+            PathToModsFolderPicker.Path = Directory.Exists(modsPath) ? modsPath : "";
+        }
         else
+        {
             PathToModsFolderPicker.Path = "";
+        }
+    }
+
+    /// <summary>
+    /// 如果检测到 XXMI Launcher 且用户未手动配置过命令，自动创建启动命令。
+    /// </summary>
+    private async Task TryAutoCreateXxmiCommandsAsync()
+    {
+        if (_xxmiLauncherPath == null)
+            return;
+
+        var launcherExe = XxmiDetectionService.GetLauncherExePath(_xxmiLauncherPath);
+        if (!File.Exists(launcherExe))
+        {
+            _logger.Warning("XXMI Launcher exe not found at: {Path}", launcherExe);
+            return;
+        }
+
+        var gameInfo = _gameService.GameInfo;
+
+        // 检查是否已有 Model Importer 命令
+        var hasModelImporterCommand = await _threeDMigtoProcessManager.TryInitialize();
+        if (!hasModelImporterCommand)
+        {
+            var modelImporterCommand = new CommandDefinition()
+            {
+                CommandDisplayName = $"Start {gameInfo.GameModelImporterName}",
+                KillOnMainAppExit = false,
+                ExecutionOptions = new CommandExecutionOptions()
+                {
+                    UseShellExecute = true,
+                    RunAsAdmin = true,
+                    Command = launcherExe,
+                    Arguments = null,
+                    WorkingDirectory = Path.GetDirectoryName(launcherExe),
+                    CreateWindow = true
+                }
+            };
+            await _threeDMigtoProcessManager.SetCommandAsync(modelImporterCommand);
+            _logger.Information("Auto-created XXMI model importer command: {Name}", modelImporterCommand.CommandDisplayName);
+        }
+
+        // 检查是否已有 Game Start 命令
+        var hasGameStartCommand = await _genshinProcessManager.TryInitialize();
+        if (!hasGameStartCommand)
+        {
+            var gameStartCommand = new CommandDefinition()
+            {
+                CommandDisplayName = $"Start {gameInfo.GameShortName}",
+                KillOnMainAppExit = false,
+                ExecutionOptions = new CommandExecutionOptions()
+                {
+                    UseShellExecute = true,
+                    RunAsAdmin = true,
+                    Command = launcherExe,
+                    Arguments = $"--nogui --xxmi {gameInfo.GameModelImporterShortName}",
+                    WorkingDirectory = Path.GetDirectoryName(launcherExe),
+                    CreateWindow = true
+                }
+            };
+            await _genshinProcessManager.SetCommandAsync(gameStartCommand);
+            _logger.Information("Auto-created XXMI game start command: {Name}", gameStartCommand.CommandDisplayName);
+        }
     }
 
 
