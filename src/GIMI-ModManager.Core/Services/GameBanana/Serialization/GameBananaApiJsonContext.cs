@@ -11,6 +11,17 @@ namespace GIMI_ModManager.Core.Services.GameBanana.Serialization;
 [JsonSerializable(typeof(ApiAuthor))]
 [JsonSerializable(typeof(ApiImagesRoot))]
 [JsonSerializable(typeof(ApiImageUrl))]
+[JsonSerializable(typeof(ApiCategoryItem))]
+[JsonSerializable(typeof(List<ApiCategoryItem>))]
+[JsonSerializable(typeof(ApiModRecord))]
+[JsonSerializable(typeof(ApiPaginatedResponse<ApiModRecord>))]
+[JsonSerializable(typeof(ApiModSubmitter))]
+[JsonSerializable(typeof(ApiPreviewMedia))]
+[JsonSerializable(typeof(ApiPreviewImage))]
+[JsonSerializable(typeof(ApiRootCategory))]
+[JsonSerializable(typeof(ApiPaginationMetadata))]
+[JsonSerializable(typeof(ApiModUpdate))]
+[JsonSerializable(typeof(ApiModUpdateList))]
 internal partial class GameBananaApiJsonContext : JsonSerializerContext
 {
 }

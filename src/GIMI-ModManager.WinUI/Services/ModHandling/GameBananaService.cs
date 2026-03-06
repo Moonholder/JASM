@@ -38,7 +38,7 @@ public class GameBananaService(
         if (modGbId is null)
             throw new InvalidGameBananaUrlException($"Invalid GameBanana url: {modUrl}");
 
-        var result = await _gameBananaCoreService.GetModProfileAsync(new GbModId(modGbId), cancellationToken)
+        var result = await _gameBananaCoreService.GetModProfileAsync(new GbModId(modGbId), ct: cancellationToken)
             .ConfigureAwait(false);
 
         if (result is null)

@@ -127,7 +127,7 @@ public partial class ModUpdateVM : ObservableRecipient
 
         using (var _ = IgnorePollyLimiterScope.Ignore())
         {
-            _modPageInfo = await _gameBananaCoreService.GetModProfileAsync(new GbModId(_notification.ModsRetrievedResult.ModId), _ct);
+            _modPageInfo = await _gameBananaCoreService.GetModProfileAsync(new GbModId(_notification.ModsRetrievedResult.ModId), ct: _ct);
         }
 
         if (_modPageInfo is null)

@@ -102,6 +102,15 @@
                 </NavigationViewItem>
 
                 <NavigationViewItem
+                    helpers:NavigationHelper.NavigateTo="GIMI_ModManager.WinUI.ViewModels.GameBananaVM"
+                    Content="Mod Store"
+                    l:Uids.Uid="/Shell/ModStoreItem">
+                    <NavigationViewItem.Icon>
+                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE719;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+
+                <NavigationViewItem
                     x:Name="DebugItem"
                     helpers:NavigationHelper.NavigateTo="GIMI_ModManager.WinUI.ViewModels.DebugViewModel"
                     Content="Debug">

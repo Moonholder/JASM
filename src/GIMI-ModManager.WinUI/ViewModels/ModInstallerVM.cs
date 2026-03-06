@@ -163,6 +163,7 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
         ModCharacterName = characterModList.Character.DisplayName;
         _modInstallation = ModInstallation.Start(modToInstall, _characterModList);
         _dispatcherQueue = dispatcherQueue;
+        _dispatcherQueue?.TryEnqueue(() => AddModCommand.NotifyCanExecuteChanged());
         _installOptions = options;
         _inGameSkin = inGameSkin;
         OnPropertyChanged(nameof(IsUpdatingMod));

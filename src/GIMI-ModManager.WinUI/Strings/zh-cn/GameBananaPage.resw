@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="LikesLabel.Text" xml:space="preserve">
+    <value>赞</value>
+  </data>
+  <data name="ViewsLabel.Text" xml:space="preserve">
+    <value>浏览</value>
+  </data>
+  <data name="TabOverviewItem.Content" xml:space="preserve">
+    <value>总览与文件</value>
+  </data>
+  <data name="TabDescriptionItem.Content" xml:space="preserve">
+    <value>图文描述</value>
+  </data>
+  <data name="TabUpdateLogItem.Content" xml:space="preserve">
+    <value>更新日志</value>
+  </data>
+  <data name="OpenInBrowserBtn.Content" xml:space="preserve">
+    <value>在浏览器中查看</value>
+  </data>
+  <data name="DownloadableFilesHdr.Text" xml:space="preserve">
+    <value>可下载文件</value>
+  </data>
+  <data name="DownloadBtn.ToolTipService.ToolTip" xml:space="preserve">
+    <value>下载并安装</value>
+  </data>
+  <data name="CategoriesHdr.Text" xml:space="preserve">
+    <value>分类</value>
+  </data>
+  <data name="SearchModBox.PlaceholderText" xml:space="preserve">
+    <value>搜索模组...</value>
+  </data>
+  <data name="DownloadManagerBtn.ToolTipService.ToolTip" xml:space="preserve">
+    <value>下载管理</value>
+  </data>
+  <data name="DownloadQueueHdr.Text" xml:space="preserve">
+    <value>下载队列</value>
+  </data>
+  <data name="ClearCompletedBtn.Content" xml:space="preserve">
+    <value>清除已完成</value>
+  </data>
+  <data name="RetryBtn.ToolTipService.ToolTip" xml:space="preserve">
+    <value>重新安装重试</value>
+  </data>
+  <data name="CancelBtn.ToolTipService.ToolTip" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  <data name="RemoveBtn.ToolTipService.ToolTip" xml:space="preserve">
+    <value>移除</value>
+  </data>
+  <data name="EmptyQueueHdr.Text" xml:space="preserve">
+    <value>目前暂无下载任务</value>
+  </data>
+  <data name="SortDefault" xml:space="preserve">
+    <value>默认</value>
+  </data>
+  <data name="SortNew" xml:space="preserve">
+    <value>最新</value>
+  </data>
+  <data name="SortUpdated" xml:space="preserve">
+    <value>最近更新</value>
+  </data>
+  <data name="FilterAll" xml:space="preserve">
+    <value>全部分类</value>
+  </data>
+  <data name="FilterModsOnly" xml:space="preserve">
+    <value>仅Mods</value>
+  </data>
+  <data name="NsfwRemove" xml:space="preserve">
+    <value>隐藏 NSFW</value>
+  </data>
+  <data name="NsfwBlur" xml:space="preserve">
+    <value>模糊 NSFW</value>
+  </data>
+  <data name="NsfwShow" xml:space="preserve">
+    <value>显示 NSFW</value>
+  </data>
+  <data name="ErrorGameId" xml:space="preserve">
+    <value>无法获取 GameBanana 游戏 ID</value>
+  </data>
+  <data name="ErrorLoadMods" xml:space="preserve">
+    <value>加载模组失败，请检查网络连接</value>
+  </data>
+  <data name="StatusWaiting" xml:space="preserve">
+    <value>等待中...</value>
+  </data>
+  <data name="StatusParsing" xml:space="preserve">
+    <value>解析文件信息...</value>
+  </data>
+  <data name="StatusAllocating" xml:space="preserve">
+    <value>正在分配内存...</value>
+  </data>
+  <data name="StatusInitDownload" xml:space="preserve">
+    <value>正在初始化下载...</value>
+  </data>
+  <data name="StatusCancelled" xml:space="preserve">
+    <value>已取消</value>
+  </data>
+  <data name="StatusMatching" xml:space="preserve">
+    <value>匹配分类...</value>
+  </data>
+  <data name="StatusPromptCategory" xml:space="preserve">
+    <value>请选择 {0} 的所属对象</value>
+  </data>
+  <data name="StatusInstalling" xml:space="preserve">
+    <value>解压并安装中...</value>
+  </data>
+  <data name="StatusInstallCancelled" xml:space="preserve">
+    <value>安装已取消</value>
+  </data>
+  <data name="StatusCompleted" xml:space="preserve">
+    <value>已完成</value>
+  </data>
+  <data name="StatusHistoryFail" xml:space="preserve">
+    <value>下载历史保存失败</value>
+  </data>
+  <data name="StatusErrorPrefix" xml:space="preserve">
+    <value>发生错误: </value>
+  </data>
+  <data name="ModDetailTitle" xml:space="preserve">
+    <value>模组详情</value>
+  </data>
+  <data name="AllCategories" xml:space="preserve">
+    <value>全部</value>
+  </data>
+  <data name="NoDownloadableFiles" xml:space="preserve">
+    <value>没有可用的文件供下载。</value>
+  </data>
+  <data name="NotificationTaskAddedTitle" xml:space="preserve">
+    <value>添加了一个 GameBanana 任务</value>
+  </data>
+  <data name="NotificationTaskAddedMessage" xml:space="preserve">
+    <value>目标文件即将被下载安装</value>
+  </data>
+  <data name="InQueueTitle" xml:space="preserve"><value>已在队列中</value></data>
+  <data name="InQueueMessage" xml:space="preserve"><value>"{0}" 已在下载队列中</value></data>
+  <data name="TaskAddedTitle" xml:space="preserve"><value>已加入下载队列</value></data>
+  <data name="TaskAddedMessage" xml:space="preserve"><value>正在后台下载 {0}...</value></data>
+  <data name="StatusPreparing" xml:space="preserve"><value>准备中...</value></data>
+  <data name="StatusDownloading" xml:space="preserve"><value>下载中 {0}%</value></data>
+  <data name="StatusWaitingForInstall" xml:space="preserve"><value>正在等待其他安装完成...</value></data>
+  <data name="StatusWaitingCategory" xml:space="preserve"><value>等待选择分类...</value></data>
+  <data name="StatusInstallCancelledCached" xml:space="preserve"><value>已取消安装 (保留在缓存)</value></data>
+  <data name="DownloadCompletedTitle" xml:space="preserve"><value>下载完成</value></data>
+  <data name="DownloadCompletedCachedMessage" xml:space="preserve"><value>模组已下载至缓存: {0}</value></data>
+  <data name="StatusInstalling2" xml:space="preserve"><value>正在安装...</value></data>
+  <data name="StatusInstallSuccess" xml:space="preserve"><value>安装成功</value></data>
+  <data name="DownloadFailedTitle" xml:space="preserve"><value>下载失败</value></data>
+  <data name="StatusErrorPrefix" xml:space="preserve"><value>发生错误: </value></data>
+  <data name="InstallFailedTitle" xml:space="preserve"><value>安装失败</value></data>
+  <data name="InstallFailedNoCharacters" xml:space="preserve"><value>无法找到角色列表，请确保已正确初始化游戏</value></data>
+  <data name="SearchCategoryPlaceholder" xml:space="preserve"><value>搜索分类或名称...</value></data>
+  <data name="MatchCategoryPrompt" xml:space="preserve"><value>无法自动匹配 "{0}" 的目标分类，请手动选择：</value></data>
+  <data name="SelectInstallTarget" xml:space="preserve"><value>选择安装目标</value></data>
+  <data name="DialogOk" xml:space="preserve"><value>确定</value></data>
+  <data name="DialogCancel" xml:space="preserve"><value>取消</value></data>
+</root>

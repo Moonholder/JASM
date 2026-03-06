@@ -23,7 +23,7 @@ public sealed class GameBananaCoreService(
     private readonly ConcurrentDictionary<Uri, DownloadHandle> _downloadHandles = new();
 
 
-    private IApiGameBananaClient CreateApiGameBananaClient() =>
+    public IApiGameBananaClient CreateApiGameBananaClient() =>
         _serviceProvider.GetRequiredService<IApiGameBananaClient>();
 
     /// <summary>
@@ -36,11 +36,10 @@ public sealed class GameBananaCoreService(
         return await apiGameBananaClient.HealthCheckAsync(ct).ConfigureAwait(false);
     }
 
-    /// <summary>
     /// Gets the profile of a mod from GameBanana. Uses caching to reduce the number of API calls.
     /// The return type <see cref="ModPageInfo"/> also contains mod files info <see cref="ModFileInfo"/>
     /// </summary>
-    public async Task<ModPageInfo?> GetModProfileAsync(GbModId modId, CancellationToken ct = default)
+    public async Task<ModPageInfo?> GetModProfileAsync(GbModId modId, string modelName = "Mod", CancellationToken ct = default)
     {
         var cachedModProfile = _cache.Get<ModPageInfo>(modId);
 
@@ -49,13 +48,27 @@ public sealed class GameBananaCoreService(
 
         var apiGameBananaClient = CreateApiGameBananaClient();
 
-        var apiModProfile = await apiGameBananaClient.GetModProfileAsync(modId, ct).ConfigureAwait(false);
+        var profileTask = apiGameBananaClient.GetModProfileAsync(modId, modelName, ct);
+        Task<List<ApiModUpdate>?> updatesTask = Task.FromResult<List<ApiModUpdate>?>(null);
 
+        if (modelName is "Mod" or "Wip" or "Tool")
+        {
+            updatesTask = apiGameBananaClient.GetModUpdatesAsync(modId.ToString(), modelName, ct);
+        }
+
+        await Task.WhenAll(profileTask, updatesTask).ConfigureAwait(false);
+
+        var apiModProfile = profileTask.Result;
         if (apiModProfile == null)
             return null;
 
-
         var modInfo = new ModPageInfo(apiModProfile);
+
+        var updates = updatesTask.Result;
+        if (updates != null && updates.Count > 0)
+        {
+            modInfo.Updates = updates;
+        }
 
         _cache.Set(modId, modInfo);
 
@@ -247,6 +260,91 @@ public sealed class GameBananaCoreService(
 
         _cache.Set(modId, modFilesInfo);
         return modFilesInfo;
+    }
+
+    private List<ApiCategoryItem>? _cachedCategories;
+    private DateTime _categoriesCacheTime = DateTime.MinValue;
+    private string? _categoriesCacheKey;
+
+    /// <summary>
+    /// Gets categories for a game from GameBanana, with caching.
+    /// </summary>
+    public async Task<List<ApiCategoryItem>> GetCategoriesAsync(string parentCategoryId, CancellationToken ct = default)
+    {
+        if (_cachedCategories != null && _categoriesCacheKey == parentCategoryId &&
+            DateTime.UtcNow - _categoriesCacheTime < TimeSpan.FromMinutes(30))
+        {
+            return _cachedCategories;
+        }
+
+        var apiClient = CreateApiGameBananaClient();
+        var categories = await apiClient.GetCategoriesAsync(parentCategoryId, ct).ConfigureAwait(false);
+
+        _cachedCategories = categories;
+        _categoriesCacheKey = parentCategoryId;
+        _categoriesCacheTime = DateTime.UtcNow;
+
+        return categories;
+    }
+
+    /// <summary>
+    /// Gets top-level categories for a game from GameBanana (using _idGameRow), with caching.
+    /// </summary>
+    public async Task<List<ApiCategoryItem>> GetCategoriesForGameAsync(string gameId, CancellationToken ct = default)
+    {
+        if (_cachedCategories != null && _categoriesCacheKey == $"game_{gameId}" &&
+            DateTime.UtcNow - _categoriesCacheTime < TimeSpan.FromMinutes(30))
+        {
+            return _cachedCategories;
+        }
+
+        var apiClient = CreateApiGameBananaClient();
+        var categories = await apiClient.GetCategoriesForGameAsync(gameId, ct).ConfigureAwait(false);
+
+        _cachedCategories = categories;
+        _categoriesCacheKey = $"game_{gameId}";
+        _categoriesCacheTime = DateTime.UtcNow;
+
+        return categories;
+    }
+
+    /// <summary>
+    /// Gets the game subfeed (home page mods).
+    /// </summary>
+    public async Task<List<ApiModRecord>> GetGameSubfeedAsync(string gameId, string sort = "default", int page = 1,
+        CancellationToken ct = default)
+    {
+        var apiClient = CreateApiGameBananaClient();
+        return await apiClient.GetGameSubfeedAsync(gameId, sort, page, ct).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Gets mods filtered by category.
+    /// </summary>
+    public async Task<List<ApiModRecord>> GetModsByCategoryAsync(string categoryId,
+        int page = 1, int perPage = 15, CancellationToken ct = default)
+    {
+        var apiClient = CreateApiGameBananaClient();
+        return await apiClient.GetModsByCategoryAsync(categoryId, page, perPage, ct).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Searches for mods on GameBanana.
+    /// </summary>
+    public async Task<List<ApiModRecord>> SearchModsAsync(string gameId, string query, string? modelName = null, int page = 1,
+        CancellationToken ct = default)
+    {
+        var apiClient = CreateApiGameBananaClient();
+        return await apiClient.SearchModsAsync(gameId, query, modelName, page, ct).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Extracts the Game ID from a GameBanana game URL (e.g. "https://gamebanana.com/games/8552" => "8552").
+    /// </summary>
+    public static string? ExtractGameId(Uri gameBananaUrl)
+    {
+        var segments = gameBananaUrl.AbsolutePath.TrimEnd('/').Split('/');
+        return segments.Length > 0 ? segments[^1] : null;
     }
 }
 

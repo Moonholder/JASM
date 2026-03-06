@@ -22,7 +22,8 @@ public sealed class ApiGameBananaClient(
     public const string HttpClientName = nameof(IApiGameBananaClient);
 
     private const string DownloadUrl = "https://gamebanana.com/dl/";
-    private const string ApiUrl = "https://gamebanana.com/apiv11/Mod/";
+    private const string BaseApiUrl = "https://gamebanana.com/apiv11/";
+    private const string ApiUrl = BaseApiUrl + "Mod/";
     private const string HealthCheckUrl = "https://gamebanana.com/apiv11";
 
     public async Task<bool> HealthCheckAsync(CancellationToken cancellationToken = default)
@@ -43,11 +44,11 @@ public sealed class ApiGameBananaClient(
         return response.StatusCode == HttpStatusCode.OK;
     }
 
-    public async Task<ApiModProfile?> GetModProfileAsync(GbModId modId, CancellationToken cancellationToken = default)
+    public async Task<ApiModProfile?> GetModProfileAsync(GbModId modId, string modelName = "Mod", CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(modId);
 
-        var modPageApiUrl = GetModInfoUrl(modId);
+        var modPageApiUrl = GetModelUrl(modId, modelName, "ProfilePage");
 
         using var response = await SendRequest(modPageApiUrl, cancellationToken).ConfigureAwait(false);
 
@@ -191,6 +192,11 @@ public sealed class ApiGameBananaClient(
         return new Uri(ApiUrl + gbModId + "/ProfilePage");
     }
 
+    private static Uri GetModelUrl(GbModId modId, string modelName, string endpoint)
+    {
+        return new Uri($"{BaseApiUrl}{modelName}/{modId}/{endpoint}");
+    }
+
     private async Task<HttpResponseMessage> SendRequest(Uri downloadsApiUrl, CancellationToken cancellationToken)
     {
         HttpResponseMessage response;
@@ -236,5 +242,91 @@ public sealed class ApiGameBananaClient(
         _logger.Debug("Response received {0} | {1}", DateTime.Now, downloadsApiUrl);
 
         return response;
+    }
+
+    public async Task<List<ApiCategoryItem>> GetCategoriesAsync(string parentCategoryId, CancellationToken cancellationToken = default)
+    {
+        var url = new Uri($"{ApiUrl.Replace("/Mod/", "/Mod/")}Categories?_idCategoryRow={parentCategoryId}&_sSort=a_to_z&_bShowEmpty=true");
+
+        using var response = await SendRequest(url, cancellationToken).ConfigureAwait(false);
+        await using var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+
+        var result = await JsonSerializer.DeserializeAsync(contentStream,
+            Serialization.GameBananaApiJsonContext.Default.ListApiCategoryItem, cancellationToken).ConfigureAwait(false);
+
+        return result ?? new List<ApiCategoryItem>();
+    }
+
+    public async Task<List<ApiCategoryItem>> GetCategoriesForGameAsync(string gameId, CancellationToken cancellationToken = default)
+    {
+        var url = new Uri($"https://gamebanana.com/apiv11/Mod/Categories?_idGameRow={gameId}&_sSort=a_to_z&_nPerpage=50");
+
+        using var response = await SendRequest(url, cancellationToken).ConfigureAwait(false);
+        await using var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+
+        var result = await JsonSerializer.DeserializeAsync(contentStream,
+            Serialization.GameBananaApiJsonContext.Default.ListApiCategoryItem, cancellationToken).ConfigureAwait(false);
+
+        return result ?? new List<ApiCategoryItem>();
+    }
+
+    public async Task<List<ApiModRecord>> GetGameSubfeedAsync(string gameId, string sort = "default", int page = 1,
+        CancellationToken cancellationToken = default)
+    {
+        var sortParam = sort == "default" ? "" : $"&_sSort={sort}";
+        var url = new Uri($"https://gamebanana.com/apiv11/Game/{gameId}/Subfeed?_nPage={page}{sortParam}");
+
+        using var response = await SendRequest(url, cancellationToken).ConfigureAwait(false);
+        await using var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+
+        var result = await JsonSerializer.DeserializeAsync(contentStream,
+            Serialization.GameBananaApiJsonContext.Default.ApiPaginatedResponseApiModRecord, cancellationToken).ConfigureAwait(false);
+
+        return result?.Records ?? new List<ApiModRecord>();
+    }
+
+    public async Task<List<ApiModRecord>> GetModsByCategoryAsync(string categoryId,
+        int page = 1, int perPage = 15, CancellationToken cancellationToken = default)
+    {
+        var url = new Uri(
+            $"https://gamebanana.com/apiv11/Mod/Index?_nPerpage={perPage}&_aFilters%5BGeneric_Category%5D={categoryId}&_nPage={page}");
+
+        using var response = await SendRequest(url, cancellationToken).ConfigureAwait(false);
+        await using var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+
+        var result = await JsonSerializer.DeserializeAsync(contentStream,
+            Serialization.GameBananaApiJsonContext.Default.ApiPaginatedResponseApiModRecord, cancellationToken).ConfigureAwait(false);
+
+        return result?.Records ?? new List<ApiModRecord>();
+    }
+
+    public async Task<List<ApiModRecord>> SearchModsAsync(string gameId, string query, string? modelName = null, int page = 1,
+        CancellationToken cancellationToken = default)
+    {
+        var encodedQuery = Uri.EscapeDataString(query);
+        var modelParam = string.IsNullOrWhiteSpace(modelName) ? "" : $"&_sModelName={modelName}";
+        var url = new Uri(
+            $"https://gamebanana.com/apiv11/Util/Search/Results?_sOrder=best_match&_idGameRow={gameId}&_sSearchString={encodedQuery}&_nPage={page}{modelParam}");
+
+        using var response = await SendRequest(url, cancellationToken).ConfigureAwait(false);
+        await using var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+
+        var result = await JsonSerializer.DeserializeAsync(contentStream,
+            Serialization.GameBananaApiJsonContext.Default.ApiPaginatedResponseApiModRecord, cancellationToken).ConfigureAwait(false);
+
+        return result?.Records ?? new List<ApiModRecord>();
+    }
+
+    public async Task<List<ApiModUpdate>> GetModUpdatesAsync(string modId, string modelName = "Mod", CancellationToken cancellationToken = default)
+    {
+        var url = new Uri($"{BaseApiUrl}{modelName}/{modId}/Updates?_nPage=1&_nPerpage=10");
+
+        using var response = await SendRequest(url, cancellationToken).ConfigureAwait(false);
+        await using var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+
+        var result = await JsonSerializer.DeserializeAsync(contentStream,
+            Serialization.GameBananaApiJsonContext.Default.ApiModUpdateList, cancellationToken).ConfigureAwait(false);
+
+        return result?.Records ?? new List<ApiModUpdate>();
     }
 }

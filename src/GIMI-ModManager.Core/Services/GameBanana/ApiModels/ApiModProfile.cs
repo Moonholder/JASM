@@ -6,13 +6,23 @@ public class ApiModProfile
 {
     [JsonPropertyName("_idRow")] public int ModId { get; init; } = -1;
     [JsonPropertyName("_sName")] public string? ModName { get; init; }
+    [JsonPropertyName("_sText")] public string? Description { get; init; }
 
     [JsonPropertyName("_aSubmitter")] public ApiAuthor? Author { get; init; }
     [JsonPropertyName("_aPreviewMedia")] public ApiImagesRoot? PreviewMedia { get; init; }
+    [JsonPropertyName("_aCategory")] public ApiModCategory? Category { get; init; }
 
     [JsonPropertyName("_sProfileUrl")] public string? ModPageUrl { get; init; }
+    [JsonPropertyName("_nViewCount")] public int ViewCount { get; init; }
 
     [JsonPropertyName("_aFiles")] public ICollection<ApiModFileInfo>? Files { get; init; }
+}
+
+public sealed class ApiModCategory
+{
+    [JsonPropertyName("_sName")] public string? Name { get; init; }
+    [JsonPropertyName("_sProfileUrl")] public string? ProfileUrl { get; init; }
+    [JsonPropertyName("_sIconUrl")] public string? IconUrl { get; init; }
 }
 
 public sealed class ApiAuthor

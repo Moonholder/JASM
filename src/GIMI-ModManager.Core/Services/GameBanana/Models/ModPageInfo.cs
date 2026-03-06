@@ -1,4 +1,5 @@
 ﻿using GIMI_ModManager.Core.Services.GameBanana.ApiModels;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace GIMI_ModManager.Core.Services.GameBanana.Models;
 
@@ -10,10 +11,13 @@ public class ModPageInfo
         ModPageUrl = Uri.TryCreate(apiModProfile.ModPageUrl, UriKind.Absolute, out var modPageUrl) ? modPageUrl : null;
         ModName = apiModProfile.ModName;
         AuthorName = apiModProfile.Author?.AuthorName;
+        AuthorAvatarUrl = apiModProfile.Author?.AvatarImageUrl;
+        CategoryName = apiModProfile.Category?.Name;
+        ViewCount = apiModProfile.ViewCount;
         List<Uri> previewImageUrls = [];
-        if (apiModProfile.PreviewMedia is not null)
+        if (apiModProfile.PreviewMedia?.Images is { } images)
         {
-            foreach (var previewMediaImage in apiModProfile.PreviewMedia.Images)
+            foreach (var previewMediaImage in images)
             {
                 var imageUrl = Uri.TryCreate(previewMediaImage.BaseUrl + "/" + previewMediaImage.ImageId,
                     UriKind.Absolute, out var uri)
@@ -33,6 +37,7 @@ public class ModPageInfo
         }
 
         PreviewImages = previewImageUrls.AsReadOnly();
+        Description = apiModProfile.Description;
 
         Files = apiModProfile.Files?.Select(apiModFileInfo => new ModFileInfo(apiModFileInfo, ModId)).ToList() ??
                 [];
@@ -42,7 +47,13 @@ public class ModPageInfo
     public Uri? ModPageUrl { get; init; }
     public string? ModName { get; init; }
     public string? AuthorName { get; init; }
+    public string? AuthorAvatarUrl { get; init; }
+    public string? CategoryName { get; init; }
+    public int ViewCount { get; init; }
+    public string? Description { get; init; }
     public IReadOnlyList<Uri> PreviewImages { get; init; }
 
     public IReadOnlyList<ModFileInfo> Files { get; init; }
+
+    public System.Collections.Generic.IReadOnlyList<ApiModUpdate>? Updates { get; set; }
 }

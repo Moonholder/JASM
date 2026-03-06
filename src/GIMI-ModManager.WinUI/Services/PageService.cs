@@ -35,6 +35,7 @@ public class PageService : IPageService
         Configure<CharacterGalleryViewModel, CharacterGalleryPage>();
         Configure<CommandsSettingsViewModel, CommandsSettingsPage>();
         Configure<CreateCharacterViewModel, CreateCharacterPage>();
+        Configure<GameBananaVM, GameBananaPage>();
     }
 
     public Type GetPageType(string key)

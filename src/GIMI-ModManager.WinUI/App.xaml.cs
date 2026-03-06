@@ -94,6 +94,7 @@ public partial class App : Application
             .UseSerilog((context, configuration) =>
             {
                 configuration.MinimumLevel.Override("System.Net.Http.HttpClient", LogEventLevel.Warning);
+                configuration.MinimumLevel.Override("Polly", LogEventLevel.Warning);
                 configuration.Filter.ByExcluding(logEvent =>
                     logEvent.Exception is RateLimiterRejectedException ||
                     logEvent.Exception is OperationCanceledException);
@@ -269,6 +270,8 @@ public partial class App : Application
                 services.AddTransient<ContextMenuVM>();
                 services.AddTransient<CreateCharacterPage>();
                 services.AddTransient<CreateCharacterViewModel>();
+                services.AddTransient<GameBananaVM>();
+                services.AddTransient<GameBananaPage>();
 
                 // Configuration
                 services.Configure<LocalSettingsOptions>(

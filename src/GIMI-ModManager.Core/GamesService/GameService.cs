@@ -709,25 +709,64 @@ public class GameService : IGameService
 
     private static int GetBaseSearchResult(string searchQuery, INameable character)
     {
-        var loweredDisplayName = character.DisplayName.ToLower();
         var loweredSearchQuery = searchQuery.ToLower();
+        var bestScore = CalculateMatchScore(character.DisplayName.ToLower(), loweredSearchQuery);
+        var internalNameScore = CalculateMatchScore(character.InternalName.Id.ToLower(), loweredSearchQuery);
 
+        if (internalNameScore > bestScore)
+            bestScore = internalNameScore;
+
+        if (character is IModdableObject modObj && !string.IsNullOrEmpty(modObj.ModFilesName))
+        {
+            var fileNameScore = CalculateMatchScore(modObj.ModFilesName.ToLower(), loweredSearchQuery);
+            if (fileNameScore > bestScore)
+                bestScore = fileNameScore;
+        }
+
+        return bestScore;
+    }
+
+    private static int CalculateMatchScore(string loweredName, string loweredSearchQuery)
+    {
         var result = 0;
 
-        // If the search query is a prefix of the display name, we give it a lot of points
-        if (loweredDisplayName.StartsWith(loweredSearchQuery))
+        if (loweredName == loweredSearchQuery)
+        {
+            result += 100;
+        }
+
+        var loweredNameNoSpaces = loweredName.Replace(" ", "").Replace("_", "").Replace("-", "");
+        var loweredSearchQueryNoSpaces = loweredSearchQuery.Replace(" ", "").Replace("_", "").Replace("-", "");
+
+        if (loweredNameNoSpaces == loweredSearchQueryNoSpaces)
+        {
+            result += 100 + (loweredNameNoSpaces.Length * 15);
+        }
+        else if (loweredNameNoSpaces.Length >= 4 && loweredSearchQueryNoSpaces.Contains(loweredNameNoSpaces))
+        {
+            // Give a massive score based on how long the matched name is. 
+            // This prevents short substring matches (like "Kazuha" matching 6 chars) 
+            // from beating long consecutive weapon matches (like "Haran" matching 17 chars).
+            result += 80 + (loweredNameNoSpaces.Length * 15);
+        }
+
+        // Exact match of word boundaries (useful for short names like "ui" or "x")
+        if (loweredSearchQuery.Split([' ', '\t', '\n', '_', '-'], StringSplitOptions.RemoveEmptyEntries).Contains(loweredName))
+        {
+            result += 50;
+        }
+
+        if (loweredName.StartsWith(loweredSearchQuery) || loweredSearchQuery.StartsWith(loweredName))
         {
             result += 60;
         }
 
-        // If the search query is contained within the display name, we give it some points
-        if (loweredDisplayName.Contains(loweredSearchQuery))
+        if (loweredName.Contains(loweredSearchQuery) || loweredSearchQuery.Contains(loweredName))
         {
             result += 30;
         }
 
-        // Calculate the number of matching starting characters for each name in the display name
-        var splitNames = loweredDisplayName.Split([' ', '\t', '\n'], StringSplitOptions.RemoveEmptyEntries);
+        var splitNames = loweredName.Split([' ', '\t', '\n', '_', '-'], StringSplitOptions.RemoveEmptyEntries);
         var bestResultOfNames = 0;
 
         foreach (var name in splitNames)
@@ -747,11 +786,8 @@ public class GameService : IGameService
             }
         }
 
-        // Give more points for matching starting characters
         result += bestResultOfNames * 11;
-
-        // Use fuzzy matching to calculate the partial match ratio
-        result += Fuzz.PartialRatio(loweredDisplayName, loweredSearchQuery);
+        result += Fuzz.TokenSetRatio(loweredName, loweredSearchQuery);
 
         return result;
     }

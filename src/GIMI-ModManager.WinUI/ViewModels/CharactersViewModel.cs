@@ -122,14 +122,8 @@ public partial class CharactersViewModel : ObservableRecipient, INavigationAware
         _localizer = localizer;
         _modRandomizationService = modRandomizationService;
 
-        ElevatorService.PropertyChanged += (_, args) =>
-        {
-            if (args.PropertyName == nameof(ElevatorService.ElevatorStatus))
-                RefreshModsInGameCommand.NotifyCanExecuteChanged();
-        };
-
-        _modNotificationManager.OnModNotification += (_, _) =>
-            App.MainWindow.DispatcherQueue.EnqueueAsync(RefreshNotificationsAsync);
+        ElevatorService.PropertyChanged += OnElevatorServicePropertyChanged;
+        _modNotificationManager.OnModNotification += OnModNotification;
 
         DockPanelVM = new OverviewDockPanelVM();
         StartGameIcon = _gameService.GameIcon;
@@ -137,16 +131,29 @@ public partial class CharactersViewModel : ObservableRecipient, INavigationAware
         GameBananaLink = _gameService.GameBananaUrl;
 
         CanCheckForUpdates = _modUpdateAvailableChecker.IsReady;
-        _modUpdateAvailableChecker.OnUpdateCheckerEvent += (_, _) =>
-        {
-            App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
-            {
-                CanCheckForUpdates = _modUpdateAvailableChecker.IsReady;
-                return Task.CompletedTask;
-            });
-        };
+        _modUpdateAvailableChecker.OnUpdateCheckerEvent += OnUpdateCheckerEvent;
 
         IsBusy = _busyService.IsPageBusy(this);
+    }
+
+    private void OnElevatorServicePropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs args)
+    {
+        if (args.PropertyName == nameof(ElevatorService.ElevatorStatus))
+            RefreshModsInGameCommand.NotifyCanExecuteChanged();
+    }
+
+    private void OnModNotification(object? sender, EventArgs args)
+    {
+        App.MainWindow.DispatcherQueue.EnqueueAsync(RefreshNotificationsAsync);
+    }
+
+    private void OnUpdateCheckerEvent(object? sender, EventArgs args)
+    {
+        App.MainWindow.DispatcherQueue.EnqueueAsync(() =>
+        {
+            CanCheckForUpdates = _modUpdateAvailableChecker.IsReady;
+            return Task.CompletedTask;
+        });
     }
 
     public event EventHandler<ScrollToCharacterArgs>? OnScrollToCharacter;
@@ -633,6 +640,9 @@ public partial class CharactersViewModel : ObservableRecipient, INavigationAware
     public void OnNavigatedFrom()
     {
         _busyService.BusyChanged -= OnBusyChangedHandler;
+        ElevatorService.PropertyChanged -= OnElevatorServicePropertyChanged;
+        _modNotificationManager.OnModNotification -= OnModNotification;
+        _modUpdateAvailableChecker.OnUpdateCheckerEvent -= OnUpdateCheckerEvent;
     }
 
     [RelayCommand]

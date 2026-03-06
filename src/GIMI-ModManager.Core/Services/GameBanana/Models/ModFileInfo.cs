@@ -1,9 +1,10 @@
-﻿using System.Text.Json.Serialization;
+﻿namespace GIMI_ModManager.Core.Services.GameBanana.Models;
+
 using GIMI_ModManager.Core.Services.GameBanana.ApiModels;
+using System.Text.Json.Serialization;
+using System.ComponentModel;
 
-namespace GIMI_ModManager.Core.Services.GameBanana.Models;
-
-public class ModFileInfo
+public partial class ModFileInfo : INotifyPropertyChanged
 {
     public ModFileInfo(ApiModFileInfo apiModFileInfo, string modId)
     {
@@ -13,7 +14,8 @@ public class ModFileInfo
         Description = apiModFileInfo.Description;
         DateAdded = DateTimeOffset.FromUnixTimeSeconds(apiModFileInfo.DateAdded).DateTime;
         Md5Checksum = apiModFileInfo.Md5Checksum;
-        ModId = modId;
+        DownloadCount = apiModFileInfo.DownloadCount;
+        FileSize = apiModFileInfo.FileSize;
     }
 
     public ModFileInfo(string modId, string fileId, string fileName, string description, string md5Checksum,
@@ -42,4 +44,40 @@ public class ModFileInfo
     public DateTime DateAdded { get; init; }
     [JsonIgnore] public TimeSpan Age => DateTime.Now - DateAdded;
     public string Md5Checksum { get; init; }
+    public int DownloadCount { get; init; }
+    public long FileSize { get; init; }
+
+    [JsonIgnore]
+    public string FormattedFileSize
+    {
+        get
+        {
+            if (FileSize <= 0) return "";
+            if (FileSize < 1024) return $"{FileSize} B";
+            if (FileSize < 1024 * 1024) return $"{FileSize / 1024.0:F1} KB";
+            return $"{FileSize / (1024.0 * 1024.0):F1} MB";
+        }
+    }
+
+    [JsonIgnore]
+    public string FormattedDownloadCount => DownloadCount >= 1000
+        ? $"{DownloadCount / 1000.0:F1}k"
+        : DownloadCount.ToString();
+
+    private bool _isDownloading;
+    [JsonIgnore]
+    public bool IsDownloading
+    {
+        get => _isDownloading;
+        set
+        {
+            if (_isDownloading != value)
+            {
+                _isDownloading = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsDownloading)));
+            }
+        }
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 }

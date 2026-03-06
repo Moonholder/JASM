@@ -106,7 +106,7 @@ public partial class ModPageVM : ObservableRecipient
 
         using (var _ = IgnorePollyLimiterScope.Ignore())
         {
-            _modPageInfo = await _gameBananaCoreService.GetModProfileAsync(_gbModId, _ct);
+            _modPageInfo = await _gameBananaCoreService.GetModProfileAsync(_gbModId, ct: _ct);
         }
 
         if (_modPageInfo is null)
