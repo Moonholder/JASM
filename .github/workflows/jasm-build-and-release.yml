@@ -87,22 +87,36 @@ jobs:
       with:
         dotnet-version: 10.x
 
+    - name: Install Inno Setup
+      run: |
+        $innoUrl = "https://jrsoftware.org/download.php/is.exe"
+        $innoInstaller = "$env:TEMP\innosetup.exe"
+        Invoke-WebRequest -Uri $innoUrl -OutFile $innoInstaller
+        Start-Process -FilePath $innoInstaller -ArgumentList "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-" -Wait
+        echo "ISCC_PATH=C:\Program Files (x86)\Inno Setup 6\ISCC.exe" >> $env:GITHUB_ENV
+
     - name: Test
       run: dotnet test ${{ github.workspace }}\src
 
     - name: Build, publish and zip the app
       run: |
         python ${{ github.workspace }}\Build\Release.py ${{ matrix.build_type == 'SelfContained' && 'SelfContained' || '' }}
-        echo "zipFile=JASM_v${{ github.ref }}_${{ matrix.build_type }}.7z" >> $GITHUB_ENV
 
     - name: List build directory
       run: dir ${{ github.workspace }}
 
-    - name: Upload JASM
+    - name: Upload JASM ZIP
       uses: actions/upload-artifact@v4
       with:
         name: JASM_${{ matrix.build_type }}
-        path: ${{ github.workspace }}\\${{ env.zipFile }}
+        path: ${{ github.workspace }}\${{ env.zipFile }}
+
+    - name: Upload JASM Setup
+      uses: actions/upload-artifact@v4
+      if: "${{ env.setupFile != '' }}"
+      with:
+        name: JASM_Setup
+        path: ${{ github.workspace }}\${{ env.setupFile }}
 
   release:
     needs: build
@@ -123,6 +137,12 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: JASM_SelfContained
+
+      - name: Download setup installer artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: JASM_Setup
+        continue-on-error: true
 
       - name: Fetch all tags
         run: git fetch --tags
@@ -150,3 +170,14 @@ jobs:
           asset_path: ./JASM_${{ steps.get_version.outputs.VERSION }}.7z
           asset_name: JASM_${{ steps.get_version.outputs.VERSION }}.7z
           asset_content_type: application/x-7z-compressed
+
+      - name: Upload setup installer release asset
+        uses: actions/upload-release-asset@v1
+        if: hashFiles(format('./JASM_{0}_Setup.exe', steps.get_version.outputs.VERSION)) != ''
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ env.UPLOAD_URL }}
+          asset_path: ./JASM_${{ steps.get_version.outputs.VERSION }}_Setup.exe
+          asset_name: JASM_${{ steps.get_version.outputs.VERSION }}_Setup.exe
+          asset_content_type: application/vnd.microsoft.portable-executable

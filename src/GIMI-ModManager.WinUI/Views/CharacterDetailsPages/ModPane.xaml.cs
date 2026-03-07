@@ -468,6 +468,7 @@ public sealed partial class ModPane : UserControl
 
     private void ModPane_Unloaded(object sender, RoutedEventArgs e)
     {
+        Bindings.StopTracking();
         // 断开所有可能的引用，帮助GC回收
         ViewModel = null!;
         ModDetailsPaneImage.ImageUri = null!;

@@ -676,12 +676,73 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
     }
 
     [RelayCommand]
-    private void UpdateJasm()
+    private async Task UpdateJasmAsync()
     {
-        var errors = Array.Empty<Error>();
+        var currentTheme = _themeSelectorService.Theme == ElementTheme.Default
+            ? App.Current.RequestedTheme == ApplicationTheme.Dark ? ElementTheme.Dark : ElementTheme.Light
+            : _themeSelectorService.Theme;
+
+        var progressBar = new ProgressBar() { IsIndeterminate = false, Maximum = 100, Value = 0, HorizontalAlignment = HorizontalAlignment.Stretch, Margin = new Thickness(0, 12, 0, 0) };
+        var progressText = new TextBlock() { Text = "0%", HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(0, 6, 0, 0) };
+        var mirrorText = new TextBlock() { Text = "", HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(0, 4, 0, 0), FontSize = 12, Opacity = 0.7 };
+        var stackPanel = new StackPanel() { Children = { progressBar, progressText, mirrorText }, MinWidth = 360 };
+
+        using var downloadCts = new CancellationTokenSource();
+
+        var progressDialog = new ContentDialog
+        {
+            Title = _localizer.GetLocalizedStringOrDefault("/Settings/DownloadingUpdateTitle", "Downloading Update..."),
+            Content = stackPanel,
+            Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
+            CloseButtonText = _localizer.GetLocalizedStringOrDefault("Common_Cancel", "Cancel"),
+            RequestedTheme = currentTheme,
+            XamlRoot = _windowManagerService.MainWindow.Content.XamlRoot
+        };
+
+        // Cancel download when user clicks close button
+        progressDialog.CloseButtonClick += (_, _) => downloadCts.Cancel();
+
+        void OnProgressChanged(object? sender, UpdateDownloadProgressEventArgs e)
+        {
+            _windowManagerService.MainWindow.DispatcherQueue.TryEnqueue(() =>
+            {
+                progressBar.Value = e.ProgressPercent;
+                var downloadedMB = e.BytesReceived / 1024.0 / 1024.0;
+                var totalMB = e.TotalBytes / 1024.0 / 1024.0;
+                var speedMBs = e.SpeedBytesPerSecond / 1024.0 / 1024.0;
+
+                // Build progress text: "45% (42.3 MB / 95.0 MB) · 2.1 MB/s"
+                var text = $"{e.ProgressPercent}% ({downloadedMB:F1} MB / {totalMB:F1} MB)";
+                if (speedMBs > 0.01)
+                {
+                    text += $" · {speedMBs:F1} MB/s";
+                    var remainingBytes = e.TotalBytes - e.BytesReceived;
+                    if (e.SpeedBytesPerSecond > 0 && remainingBytes > 0)
+                    {
+                        var remainingSec = (int)(remainingBytes / e.SpeedBytesPerSecond);
+                        text += remainingSec >= 60 ? $" · ~{remainingSec / 60}m{remainingSec % 60}s" : $" · ~{remainingSec}s";
+                    }
+                }
+                progressText.Text = text;
+
+                // Mirror node display
+                if (!string.IsNullOrEmpty(e.MirrorName))
+                    mirrorText.Text = $"⚡ {e.MirrorName}";
+            });
+        }
+
+        _autoUpdaterService.DownloadProgressChanged += OnProgressChanged;
+
+        var _ = progressDialog.ShowAsync();
+
+        Error[]? errors = null;
         try
         {
-            errors = _autoUpdaterService.StartSelfUpdateProcess();
+            errors = await _autoUpdaterService.DownloadAndInstallUpdateAsync(downloadCts.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            _logger.Information("Update download cancelled by user.");
         }
         catch (Exception e)
         {
@@ -690,6 +751,11 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
                 _localizer.GetLocalizedStringOrDefault("/Settings/UpdateProcessStartError", "Error starting update process"),
                 e.Message,
                 TimeSpan.FromSeconds(10));
+        }
+        finally
+        {
+            _autoUpdaterService.DownloadProgressChanged -= OnProgressChanged;
+            progressDialog.Hide();
         }
 
         if (errors is not null && errors.Any())

@@ -129,21 +129,34 @@ public sealed class UpdateChecker
     {
         using var httpClient = CreateHttpClient();
 
-        var result = await httpClient.GetAsync(ReleasesApiUrl, cancellationToken);
-        if (!result.IsSuccessStatusCode)
+        try
         {
-            _logger.Error("Failed to get latest version from GitHub. Status Code: {StatusCode}, Reason: {ReasonPhrase}",
-                result.StatusCode, result.ReasonPhrase);
+            var result = await httpClient.GetAsync(ReleasesApiUrl, cancellationToken);
+            if (!result.IsSuccessStatusCode)
+            {
+                _logger.Error("Failed to get latest version from GitHub. Status Code: {StatusCode}, Reason: {ReasonPhrase}",
+                    result.StatusCode, result.ReasonPhrase);
+                return null;
+            }
+
+            var text = await result.Content.ReadAsStringAsync(cancellationToken);
+            var gitHubReleases =
+                JsonSerializer.Deserialize<GitHubRelease[]>(text, GitHubJsonContext.Default.GitHubReleaseArray) ?? Array.Empty<GitHubRelease>();
+
+            var latestReleases = gitHubReleases.Where(r => !r.Prerelease);
+            var latestVersion = latestReleases.Select(r => new Version(r.TagName?.Trim('v') ?? "")).Max();
+            return latestVersion;
+        }
+        catch (HttpRequestException e)
+        {
+            _logger.Warning(e, "SSL/Connection error checking for latest version.");
             return null;
         }
-
-        var text = await result.Content.ReadAsStringAsync(cancellationToken);
-        var gitHubReleases =
-            JsonSerializer.Deserialize<GitHubRelease[]>(text, GitHubJsonContext.Default.GitHubReleaseArray) ?? Array.Empty<GitHubRelease>();
-
-        var latestReleases = gitHubReleases.Where(r => !r.Prerelease);
-        var latestVersion = latestReleases.Select(r => new Version(r.TagName?.Trim('v') ?? "")).Max();
-        return latestVersion;
+        catch (Exception e)
+        {
+            _logger.Error(e, "Check updates unknown error.");
+            return null;
+        }
     }
 
     private HttpClient CreateHttpClient()
@@ -200,8 +213,31 @@ public class GitHubRelease
     [JsonPropertyName("url")]
     public string? Url { get; set; }
 
+    [JsonPropertyName("html_url")]
+    public string? HtmlUrl { get; set; }
+
+    [JsonPropertyName("assets")]
+    public GitHubReleaseAsset[]? Assets { get; set; }
+
     [JsonConstructor]
     public GitHubRelease()
+    {
+    }
+}
+
+public class GitHubReleaseAsset
+{
+    [JsonPropertyName("name")]
+    public string? Name { get; set; }
+
+    [JsonPropertyName("browser_download_url")]
+    public string? BrowserDownloadUrl { get; set; }
+
+    [JsonPropertyName("size")]
+    public long Size { get; set; }
+
+    [JsonConstructor]
+    public GitHubReleaseAsset()
     {
     }
 }

@@ -21,12 +21,13 @@ namespace GIMI_ModManager.WinUI.Views.CharacterDetailsPages;
 
 public sealed partial class CharacterDetailsPage : Page
 {
-    public CharacterDetailsViewModel ViewModel { get; } = App.GetService<CharacterDetailsViewModel>();
+    public CharacterDetailsViewModel? ViewModel { get; set; }
 
     private readonly ILanguageLocalizer _localizer = App.GetService<ILanguageLocalizer>();
 
     public CharacterDetailsPage()
     {
+        ViewModel = App.GetService<CharacterDetailsViewModel>();
         InitializeComponent();
         CharacterCard.ViewModel = ViewModel;
         ModPane.ViewModel = ViewModel.ModPaneVM;
@@ -38,16 +39,26 @@ public sealed partial class CharacterDetailsPage : Page
         ViewModel.OnInitializingFinished += OnInitializingFinished;
 
         ViewModel.ContextMenuVM.CloseFlyout += ContextMenuVM_CloseFlyout;
+        Unloaded += CharacterDetailsPage_Unloaded;
+    }
+
+    private void CharacterDetailsPage_Unloaded(object sender, RoutedEventArgs e)
+    {
+        Bindings.StopTracking();
+        ViewModel = null;
     }
 
 
     private void OnModObjectLoaded(object? sender, EventArgs e)
     {
-        ViewModel.OnModObjectLoaded -= OnModObjectLoaded;
-        ViewModel.GridLoadedAwaiter = () => ModGrid.DataGrid.AwaitItemsSourceLoaded(ViewModel.CancellationToken);
+        if (ViewModel != null)
+        {
+            ViewModel.OnModObjectLoaded -= OnModObjectLoaded;
+            ViewModel.GridLoadedAwaiter = () => ModGrid.DataGrid.AwaitItemsSourceLoaded(ViewModel.CancellationToken);
+        }
         var button = CharacterCard.SelectSkinBox;
 
-        if (!ViewModel.IsCharacter || ViewModel.Character.Skins.Count == 0) return;
+        if (ViewModel == null || !ViewModel.IsCharacter || ViewModel.Character.Skins.Count == 0) return;
 
         var tooltip = ToolTipService.GetToolTip(button);
         if (tooltip is ToolTip) return;
@@ -63,17 +74,20 @@ public sealed partial class CharacterDetailsPage : Page
 
     private void OnModsLoaded(object? sender, EventArgs e)
     {
-        ViewModel.OnModsLoaded -= OnModsLoaded;
+        if (ViewModel != null)
+        {
+            ViewModel.OnModsLoaded -= OnModsLoaded;
+        }
         PageInitLoader.Visibility = Visibility.Collapsed;
         RightWorkingArea.Visibility = Visibility.Visible;
 
-        if (ModGrid.ViewModel.ModdableObjectHasAnyMods) return;
+        if (ModGrid?.ViewModel != null && ModGrid.ViewModel.ModdableObjectHasAnyMods) return;
         ShowNoModsElement();
     }
 
     private void OnModsReloaded(object? sender, EventArgs eventArgs)
     {
-        if (ViewModel.ModGridVM.ModdableObjectHasAnyMods)
+        if (ViewModel?.ModGridVM != null && ViewModel.ModGridVM.ModdableObjectHasAnyMods)
             HideNoModsElement();
         else
             ShowNoModsElement();
@@ -81,7 +95,10 @@ public sealed partial class CharacterDetailsPage : Page
 
     private void OnInitializingFinished(object? sender, EventArgs e)
     {
-        ViewModel.OnInitializingFinished -= OnInitializingFinished;
+        if (ViewModel != null)
+        {
+            ViewModel.OnInitializingFinished -= OnInitializingFinished;
+        }
         ModGrid.DataGrid.ContextFlyout = ModRowFlyout;
         ModGrid.DataGrid.Focus(FocusState.Programmatic);
     }
@@ -96,20 +113,23 @@ public sealed partial class CharacterDetailsPage : Page
     protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
     {
         base.OnNavigatingFrom(e);
-        ViewModel.OnModObjectLoaded -= OnModObjectLoaded;
-        ViewModel.OnModsLoaded -= OnModsLoaded;
-        ViewModel.OnInitializingFinished -= OnInitializingFinished;
+        if (ViewModel != null)
+        {
+            ViewModel.OnModObjectLoaded -= OnModObjectLoaded;
+            ViewModel.OnModsLoaded -= OnModsLoaded;
+            ViewModel.OnInitializingFinished -= OnInitializingFinished;
+            ViewModel.ContextMenuVM.CloseFlyout -= ContextMenuVM_CloseFlyout;
+        }
+
         if (ModGrid?.ViewModel is not null)
         {
             ModGrid.ViewModel.OnModsReloaded -= OnModsReloaded;
         }
-        ViewModel.ContextMenuVM.CloseFlyout -= ContextMenuVM_CloseFlyout;
 
-        if (e.NavigationMode == NavigationMode.Back)
+        if (e.NavigationMode == NavigationMode.Back && ViewModel?.ShownModObject != null)
         {
             var navigationService = App.GetService<INavigationService>();
-            if (ViewModel.ShownModObject != null!)
-                navigationService.SetListDataItemForNextConnectedAnimation(ViewModel.ShownModObject);
+            navigationService.SetListDataItemForNextConnectedAnimation(ViewModel.ShownModObject);
         }
 
         ModGrid.ViewModel = null!;

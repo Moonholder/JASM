@@ -284,15 +284,22 @@ public partial class CharacterDetailsViewModel : ObservableObject, INavigationAw
         await ModPaneVM.OnNavigatedToAsync(DispatcherQueue.GetForCurrentThread(), CancellationToken);
     }
 
-    public async void OnNavigatedFrom()
+    public void OnNavigatedFrom()
     {
         try
         {
-            if (_navigationCancellationTokenSource != null)
+            if (_navigationCancellationTokenSource != null && !_navigationCancellationTokenSource.IsCancellationRequested)
             {
-                await _navigationCancellationTokenSource.CancelAsync();
+                _navigationCancellationTokenSource.Cancel();
             }
+        }
+        catch (Exception ex)
+        {
+            _logger.Warning(ex, "Failed to cancel navigation cancellation source.");
+        }
 
+        try
+        {
             ModGridVM.OnModsSelected -= OnModsSelected;
             ModGridVM.OnModsReloaded -= OnModsReloaded;
             ContextMenuVM.ModsMoved -= ContextMenuVM_ModsMoved;
@@ -321,9 +328,6 @@ public partial class CharacterDetailsViewModel : ObservableObject, INavigationAw
                     Log.Error(ex, "Failed to save settings on navigation from CharacterDetails");
                 }
             });
-
-            _navigationCancellationTokenSource?.Dispose();
-            _navigationCancellationTokenSource = null;
         }
         catch (Exception e)
         {
@@ -331,6 +335,15 @@ public partial class CharacterDetailsViewModel : ObservableObject, INavigationAw
 #if DEBUG
             Debugger.Break();
 #endif
+        }
+        finally
+        {
+            try
+            {
+                _navigationCancellationTokenSource?.Dispose();
+                _navigationCancellationTokenSource = null;
+            }
+            catch { }
         }
     }
 

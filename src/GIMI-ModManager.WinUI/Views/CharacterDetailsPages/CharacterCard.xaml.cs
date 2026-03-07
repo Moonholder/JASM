@@ -17,6 +17,12 @@ public sealed partial class CharacterCard : UserControl
         InitializeComponent();
         ItemHero = itemHero;
         SelectSkinBox = selectSkinBox;
+        Unloaded += CharacterCard_Unloaded;
+    }
+
+    private void CharacterCard_Unloaded(object sender, RoutedEventArgs e)
+    {
+        Bindings.StopTracking();
     }
 
 

@@ -101,9 +101,12 @@ public partial class ElevatorService : ObservableRecipient
         var currentUser = WindowsIdentity.GetCurrent().Name;
         currentUser = currentUser.Split("\\").LastOrDefault() ?? currentUser;
 
+        var elevatorPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ElevatorProcessName);
+
         try
         {
-            _elevatorProcess = Process.Start(new ProcessStartInfo(ElevatorProcessName)
+            Environment.SetEnvironmentVariable("SEE_MASK_NOZONECHECKS", "1");
+            _elevatorProcess = Process.Start(new ProcessStartInfo(elevatorPath)
             {
                 UseShellExecute = true,
                 CreateNoWindow = false,
@@ -111,13 +114,22 @@ public partial class ElevatorService : ObservableRecipient
                 Verb = "runas",
                 ArgumentList = { currentUser }
             });
+
+            if (_elevatorProcess != null)
+            {
+                _elevatorProcess.EnableRaisingEvents = true;
+            }
         }
         catch (Win32Exception)
         {
             _logger.Error("Failed to start Elevator.exe with elevated privileges");
         }
+        finally
+        {
+            Environment.SetEnvironmentVariable("SEE_MASK_NOZONECHECKS", null);
+        }
 
-        if (_elevatorProcess == null || _elevatorProcess.HasExited)
+        if (_elevatorProcess == null || !IsElevatorRunning())
         {
             App.MainWindow.DispatcherQueue.TryEnqueue(() => ElevatorStatus = ElevatorStatus.InitializingFailed);
             ErrorMessage = _localizer.GetLocalizedStringOrDefault("/Settings/ElevatorError_StartFailed", "Failed to start Elevator.exe");
@@ -151,11 +163,27 @@ public partial class ElevatorService : ObservableRecipient
         try
         {
             var procs = Process.GetProcessesByName(Path.GetFileNameWithoutExtension(ElevatorProcessName));
-            var proc = procs.FirstOrDefault(p => !p.HasExited);
-            if (proc != null)
+            foreach (var p in procs)
             {
-                _elevatorProcess = proc;
-                return true;
+                try
+                {
+                    if (!p.HasExited)
+                    {
+                        _elevatorProcess = p;
+                        _elevatorProcess.EnableRaisingEvents = true;
+                        return true;
+                    }
+                }
+                catch (Win32Exception)
+                {
+                    // Access is denied, running as Admin. Assume it's running.
+                    _elevatorProcess = p;
+                    return true;
+                }
+                catch (InvalidOperationException)
+                {
+                    // Exited
+                }
             }
         }
         catch (Exception ex)
@@ -166,20 +194,37 @@ public partial class ElevatorService : ObservableRecipient
         return false;
     }
 
+    private bool IsElevatorRunning()
+    {
+        if (_elevatorProcess == null) return false;
+        try
+        {
+            return !_elevatorProcess.HasExited;
+        }
+        catch (Win32Exception)
+        {
+            return true;
+        }
+        catch (InvalidOperationException)
+        {
+            return false;
+        }
+    }
+
 
     private void MainWindowExitHandler(object sender, WindowEventArgs args)
     {
-        if (_elevatorProcess is { HasExited: false })
+        if (IsElevatorRunning())
         {
             _logger.Information("Killing Elevator.exe");
-            _elevatorProcess.Kill();
+            _elevatorProcess?.Kill();
             _logger.Debug("Elevator.exe killed");
         }
     }
 
     public Task RefreshGenshinMods()
     {
-        if (_elevatorProcess is null || _elevatorProcess.HasExited)
+        if (!IsElevatorRunning())
         {
             _logger.Debug("Elevator.exe is not running");
             return Task.CompletedTask;
@@ -315,13 +360,12 @@ public partial class ElevatorService : ObservableRecipient
 
     public ElevatorStatus CheckStatus()
     {
-        // 优先查找并附加已存在Elevator.exe进程
-        if (_elevatorProcess is null || _elevatorProcess.HasExited)
+        if (!IsElevatorRunning())
         {
             AttachToExistingElevatorProcess();
         }
 
-        ElevatorStatus = _elevatorProcess is { HasExited: false } ? ElevatorStatus.Running : ElevatorStatus.NotRunning;
+        ElevatorStatus = IsElevatorRunning() ? ElevatorStatus.Running : ElevatorStatus.NotRunning;
         return ElevatorStatus;
     }
 }
