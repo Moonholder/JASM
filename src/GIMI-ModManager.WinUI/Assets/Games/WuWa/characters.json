@@ -797,8 +797,8 @@
     "ReleaseDate": "2026-02-07T00:00:00",
     "Image": "Luuk.webp",
     "Rarity": 5,
-    "Element": "Unknown",
-    "Class": "Unknown",
+    "Element": "Spectro",
+    "Class": "Gauntlets",
     "Region": [
       "Lahai-Roi"
     ],
@@ -809,12 +809,29 @@
   },
   {
     "Keys": [
+      "Sigrika"
+    ],
+    "ReleaseDate": "2026-03-01T00:00:00",
+    "Image": "Sigrika.webp",
+    "Rarity": 5,
+    "Element": "Aero",
+    "Class": "Gauntlets",
+    "Region": [
+      "Lahai-Roi"
+    ],
+    "ModFilesName": "Sigrika",
+    "InGameSkins": [],
+    "InternalName": "Sigrika",
+    "DisplayName": "Sigrika"
+  },
+  {
+    "Keys": [
       "Lucilla"
     ],
     "ReleaseDate": "2026-03-01T00:00:00",
     "Image": "Lucilla.webp",
     "Rarity": 5,
-    "Element": "Unknown",
+    "Element": "Glacio",
     "Class": "Unknown",
     "Region": [
       "Lahai-Roi"
@@ -823,22 +840,5 @@
     "InGameSkins": [],
     "InternalName": "Lucilla",
     "DisplayName": "Lucilla"
-  },
-  {
-    "Keys": [
-      "Sigrika"
-    ],
-    "ReleaseDate": "2026-03-01T00:00:00",
-    "Image": "Sigrika.webp",
-    "Rarity": 5,
-    "Element": "Unknown",
-    "Class": "Unknown",
-    "Region": [
-      "Lahai-Roi"
-    ],
-    "ModFilesName": "Sigrika",
-    "InGameSkins": [],
-    "InternalName": "Sigrika",
-    "DisplayName": "Sigrika"
   }
 ]

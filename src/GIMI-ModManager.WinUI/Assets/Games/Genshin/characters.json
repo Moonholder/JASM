@@ -2131,5 +2131,22 @@
     "InGameSkins": [],
     "InternalName": "Illuga",
     "DisplayName": "Illuga"
+  },
+  {
+    "Keys": [
+      "Varka"
+    ],
+    "ReleaseDate": "2026-02-25T00:00:00",
+    "Image": "Varka.webp",
+    "Rarity": 5,
+    "Element": "Anemo",
+    "Class": "Claymore",
+    "Region": [
+      "Mondstadt"
+    ],
+    "ModFilesName": "Varka",
+    "InGameSkins": [],
+    "InternalName": "Varka",
+    "DisplayName": "Varka"
   }
 ]

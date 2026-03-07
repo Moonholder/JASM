@@ -992,5 +992,40 @@
     ],
     "InternalName": "Sunna",
     "DisplayName": "Sunna"
+  },
+  {
+    "Keys": [
+      "Cissia"
+    ],
+    "ReleaseDate": "2026-03-25T00:00:00",
+    "Image": "Cissia.webp",
+    "Rarity": 5,
+    "Element": "Electric",
+    "Class": "Attack",
+    "Region": [
+      "Metropolitan Order Division"
+    ],
+    "ModFilesName": "Cissia",
+    "InGameSkins": [],
+    "InternalName": "Cissia",
+    "DisplayName": "Cissia"
+  },
+  {
+    "Keys": [
+      "Nangong",
+      "Yu"
+    ],
+    "ReleaseDate": "2026-03-26T00:00:00",
+    "Image": "NangongYu.webp",
+    "Rarity": 5,
+    "Element": "Ether",
+    "Class": "Stun",
+    "Region": [
+      "Angels of Delusion"
+    ],
+    "ModFilesName": "NangongYu",
+    "InGameSkins": [],
+    "InternalName": "NangongYu",
+    "DisplayName": "Nangong Yu"
   }
 ]
