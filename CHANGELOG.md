@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.27.0](https://github.com/Moonholder/JASM/compare/v2.26.0...v2.27.0) (2026-03-07)
+
+
+### Features
+
+* auto-detect XXMI Launcher and configure mod loader paths & launch commands ([3aba6b7](https://github.com/Moonholder/JASM/commit/3aba6b7149430b064771605aa2848d12641bfac2))
+* **updater:** 引入 Inno Setup 安装程序并重构自动更新流程 ([6b8fa1a](https://github.com/Moonholder/JASM/commit/6b8fa1ad012318de76179734590c28138772ef56))
+* 集成Gamebanana模组在线商店 ([0a00e00](https://github.com/Moonholder/JASM/commit/0a00e00918f975a35dee3af761e074670a602825))
+
+
+### Miscellaneous
+
+* 更新 Genshin 和 ZZZ 角色配置 ([b6ddab6](https://github.com/Moonholder/JASM/commit/b6ddab6d45803f4c38bf70b63ad3d409f8a0ed82))
+
 ## [2.26.0](https://github.com/Moonholder/JASM/compare/v2.25.0...v2.26.0) (2026-02-10)
 
 
