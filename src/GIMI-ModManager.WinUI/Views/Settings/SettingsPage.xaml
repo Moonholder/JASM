@@ -1,4 +1,4 @@
-﻿<Page
+<Page
     x:Class="GIMI_ModManager.WinUI.Views.SettingsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -424,6 +424,17 @@
                     l:Uids.Uid="/Settings/About" />
                 <StackPanel Margin="{StaticResource XSmallTopMargin}">
                     <TextBlock Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind ViewModel.VersionDescription, Mode=OneWay}" />
+
+                    <StackPanel Margin="{StaticResource XSmallTopMargin}" Orientation="Horizontal" Spacing="8">
+                        <Button Command="{x:Bind ViewModel.ManualCheckForUpdateCommand}"
+                                Content="Check for Updates"
+                                l:Uids.Uid="/Settings/CheckForUpdateButton" />
+                        <ProgressRing IsActive="{x:Bind ViewModel.IsCheckingForUpdate, Mode=OneWay}"
+                                      Width="20" Height="20" />
+                        <TextBlock VerticalAlignment="Center"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   Text="{x:Bind ViewModel.UpdateCheckStatusText, Mode=OneWay}" />
+                    </StackPanel>
 
                     <TextBlock
                         Margin="{StaticResource XSmallTopMargin}"

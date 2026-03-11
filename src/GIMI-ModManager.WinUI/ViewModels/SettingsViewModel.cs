@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
@@ -74,6 +74,12 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(IgnoreNewVersionCommand))]
     private bool _CanIgnoreUpdate = false;
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(ManualCheckForUpdateCommand))]
+    private bool _isCheckingForUpdate = false;
+
+    [ObservableProperty] private string _updateCheckStatusText = string.Empty;
 
     [ObservableProperty] private ObservableCollection<string> _languages = new();
     [ObservableProperty] private string _selectedLanguage = string.Empty;
@@ -154,6 +160,7 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
         _versionDescription = GetVersionDescription();
 
         _updateChecker.NewVersionAvailable += UpdateCheckerOnNewVersionAvailable;
+        _updateChecker.CheckStatusChanged += OnCheckStatusChanged;
 
         if (_updateChecker.LatestRetrievedVersion is not null &&
             _updateChecker.LatestRetrievedVersion != _updateChecker.CurrentVersion)
@@ -543,6 +550,31 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
     private async Task IgnoreNewVersion()
     {
         await _updateChecker.IgnoreCurrentVersionAsync();
+    }
+
+    private bool CanManualCheckForUpdate() => !IsCheckingForUpdate;
+
+    [RelayCommand(CanExecute = nameof(CanManualCheckForUpdate))]
+    private async Task ManualCheckForUpdate()
+    {
+        await _updateChecker.ManualCheckForUpdatesAsync();
+    }
+
+    private void OnCheckStatusChanged(object? sender, UpdateCheckStatus status)
+    {
+        App.MainWindow.DispatcherQueue.TryEnqueue(() =>
+        {
+            IsCheckingForUpdate = status == UpdateCheckStatus.Checking;
+            UpdateCheckStatusText = status switch
+            {
+                UpdateCheckStatus.Checking => _localizer.GetLocalizedStringOrDefault("/Settings/UpdateCheckStatus_Checking", "Checking..."),
+                UpdateCheckStatus.Success => ShowNewVersionAvailable
+                    ? string.Empty  // New version info is already shown by existing UI
+                    : _localizer.GetLocalizedStringOrDefault("/Settings/UpdateCheckStatus_UpToDate", "Already up to date ✓"),
+                UpdateCheckStatus.Failed => _localizer.GetLocalizedStringOrDefault("/Settings/UpdateCheckStatus_Failed", "Check failed, please check your network"),
+                _ => string.Empty
+            };
+        });
     }
 
     [ObservableProperty] private bool _exportingMods = false;

@@ -12,13 +12,13 @@ public static class MirrorAddressSelector
 {
     private static readonly MirrorInfo[] MirrorAddresses =
     [
-        new("https://gh-proxy.com/", "美国 Cloudflare CDN 1"),
-        new("https://cors.isteed.cc/", "美国 Cloudflare CDN 2"),
-        new("https://github.boki.moe/", "美国 Cloudflare CDN 3"),
-        new("https://ghproxy.net/", "英国伦敦"),
-        new("https://wget.la/", "通用节点"),
-        new("https://gh.jix.de5.net/", "Cloudflare 节点 1"),
-        new("https://dl.jix.de5.net/", "Cloudflare 节点 2"),
+        new("https://gh-proxy.com/", "美国 Cloudflare CDN 1", supportsApiForward: false),
+        new("https://cors.isteed.cc/", "美国 Cloudflare CDN 2", supportsApiForward: true),
+        new("https://github.boki.moe/", "美国 Cloudflare CDN 3", supportsApiForward: false),
+        new("https://ghproxy.net/", "英国伦敦", supportsApiForward: false),
+        new("https://wget.la/", "通用节点", supportsApiForward: true),
+        new("https://gh.jix.de5.net/", "Cloudflare 节点 1", supportsApiForward: true),
+        new("https://dl.jix.de5.net/", "Cloudflare 节点 2", supportsApiForward: true),
     ];
 
     private const string TestUrl = "https://raw.githubusercontent.com/Moonholder/JASM/main/README.md";
@@ -80,10 +80,11 @@ public static class MirrorAddressSelector
         }
     }
 
-    public class MirrorInfo(string address, string nodeName)
+    public class MirrorInfo(string address, string nodeName, bool supportsApiForward = true)
     {
         public string Address { get; } = address;
         public string NodeName { get; } = nodeName;
+        public bool SupportsApiForward { get; } = supportsApiForward;
     }
 
     public record MirrorTestResult(MirrorInfo Mirror, bool IsAvailable, double LatencyMs);

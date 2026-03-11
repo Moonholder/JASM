@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GIMI_ModManager.Core.GamesService;
 using GIMI_ModManager.WinUI.Contracts.Services;
@@ -75,7 +75,12 @@ public partial class ShellViewModel : ObservableRecipient
 
         if (e.SourcePageType == typeof(SettingsPage))
         {
-            Selected = NavigationViewService.SettingsItem;
+            // Because the native SettingsItem has a WinUI rendering bug in Left-Compact mode, 
+            // the ShellPage.xaml.cs uses a custom item tagged "CustomSettings".
+            // We find it in the navigation view service or simply fall back to null.
+            var customSettings = NavigationViewService.MenuItems?.OfType<Microsoft.UI.Xaml.Controls.NavigationViewItem>().FirstOrDefault(i => (string)i.Tag == "CustomSettings") 
+                                 ?? NavigationViewService.GetSelectedItem(typeof(SettingsPage));
+            Selected = customSettings;
             return;
         }
 

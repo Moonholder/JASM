@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using GIMI_ModManager.WinUI.Contracts.Services;
 using GIMI_ModManager.WinUI.Models.Options;
 using System.Text.Json;
@@ -6,6 +6,14 @@ using System.Text.Json.Serialization;
 using Serilog;
 
 namespace GIMI_ModManager.WinUI.Services.AppManagement.Updating;
+
+public enum UpdateCheckStatus
+{
+    Idle,
+    Checking,
+    Success,
+    Failed
+}
 
 public sealed class UpdateChecker
 {
@@ -20,6 +28,16 @@ public sealed class UpdateChecker
     public Version? IgnoredVersion => _ignoredVersion;
     private bool DisableChecker;
     private CancellationTokenSource _cancellationTokenSource;
+
+    /// <summary>
+    /// Current status of the update check process.
+    /// </summary>
+    public UpdateCheckStatus CheckStatus { get; private set; } = UpdateCheckStatus.Idle;
+
+    /// <summary>
+    /// Raised when <see cref="CheckStatus"/> changes.
+    /// </summary>
+    public event EventHandler<UpdateCheckStatus>? CheckStatusChanged;
 
     private const string ReleasesApiUrl = "https://api.github.com/repos/Moonholder/JASM/releases?per_page=2";
 
@@ -71,6 +89,14 @@ public sealed class UpdateChecker
         OnNewVersionAvailable(new Version());
     }
 
+    /// <summary>
+    /// Manually trigger an update check from UI. Always runs immediately regardless of polling interval.
+    /// </summary>
+    public async Task ManualCheckForUpdatesAsync()
+    {
+        await CheckForUpdatesAsync(CancellationToken.None);
+    }
+
     private void InitCheckerLoop(CancellationToken cancellationToken)
     {
         Task.Factory.StartNew(async () =>
@@ -79,7 +105,7 @@ public sealed class UpdateChecker
                 try
                 {
                     await CheckForUpdatesAsync(cancellationToken);
-                    await Task.Delay(TimeSpan.FromHours(2), cancellationToken);
+                    await Task.Delay(TimeSpan.FromHours(6), cancellationToken);
                 }
                 catch (TaskCanceledException e)
                 {
@@ -101,13 +127,18 @@ public sealed class UpdateChecker
         if (DisableChecker)
             return;
 
+        SetCheckStatus(UpdateCheckStatus.Checking);
+
         var latestVersion = await GetLatestVersionAsync(cancellationToken);
 
         if (latestVersion is null)
         {
             _logger.Warning("No versions found, latestVersion is null");
+            SetCheckStatus(UpdateCheckStatus.Failed);
             return;
         }
+
+        SetCheckStatus(UpdateCheckStatus.Success);
 
         if (CurrentVersion == latestVersion || LatestRetrievedVersion == latestVersion)
         {
@@ -127,15 +158,56 @@ public sealed class UpdateChecker
 
     private async Task<Version?> GetLatestVersionAsync(CancellationToken cancellationToken)
     {
-        using var httpClient = CreateHttpClient();
+        // 1. Try direct GitHub API first
+        var version = await TryFetchVersionFromUrl(ReleasesApiUrl, cancellationToken);
+        if (version is not null)
+        {
+            _logger.Debug("Got version via direct GitHub API.");
+            return version;
+        }
 
+        // 2. Direct access failed, try mirror fallback (only mirrors that support API forwarding)
+        _logger.Information("GitHub API direct access failed, trying mirror fallback for version check...");
         try
         {
-            var result = await httpClient.GetAsync(ReleasesApiUrl, cancellationToken);
+            var mirrors = await MirrorAddressSelector.GetAvailableMirrorsAsync(cancellationToken);
+            foreach (var mirror in mirrors.Where(m => !string.IsNullOrEmpty(m.Address) && m.SupportsApiForward))
+            {
+                if (cancellationToken.IsCancellationRequested) break;
+
+                var mirrorUrl = mirror.Address + ReleasesApiUrl;
+                version = await TryFetchVersionFromUrl(mirrorUrl, cancellationToken);
+                if (version is not null)
+                {
+                    _logger.Information("Got version via mirror {NodeName}.", mirror.NodeName);
+                    return version;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            _logger.Warning(e, "Mirror fallback for version check failed.");
+        }
+
+        _logger.Warning("All sources (direct + mirrors) failed to fetch version info.");
+        return null;
+    }
+
+    /// <summary>
+    /// Attempts to fetch the latest non-prerelease version from the specified URL.
+    /// Returns null on any failure.
+    /// </summary>
+    private async Task<Version?> TryFetchVersionFromUrl(string url, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var httpClient = CreateHttpClient();
+            httpClient.Timeout = TimeSpan.FromSeconds(10);
+
+            var result = await httpClient.GetAsync(url, cancellationToken);
             if (!result.IsSuccessStatusCode)
             {
-                _logger.Error("Failed to get latest version from GitHub. Status Code: {StatusCode}, Reason: {ReasonPhrase}",
-                    result.StatusCode, result.ReasonPhrase);
+                _logger.Debug("Failed to get version from {Url}. Status: {StatusCode}", url, result.StatusCode);
                 return null;
             }
 
@@ -149,12 +221,17 @@ public sealed class UpdateChecker
         }
         catch (HttpRequestException e)
         {
-            _logger.Warning(e, "SSL/Connection error checking for latest version.");
+            _logger.Debug(e, "Connection error fetching version from {Url}.", url);
+            return null;
+        }
+        catch (TaskCanceledException)
+        {
+            // Timeout or cancellation - don't log as error
             return null;
         }
         catch (Exception e)
         {
-            _logger.Error(e, "Check updates unknown error.");
+            _logger.Debug(e, "Error fetching version from {Url}.", url);
             return null;
         }
     }
@@ -165,6 +242,12 @@ public sealed class UpdateChecker
         httpClient.DefaultRequestHeaders.Add("X-GitHub-Api-Version", "2022-11-28");
         httpClient.DefaultRequestHeaders.Add("User-Agent", "JASM-Just_Another_Skin_Manager-Update-Checker");
         return httpClient;
+    }
+
+    private void SetCheckStatus(UpdateCheckStatus status)
+    {
+        CheckStatus = status;
+        CheckStatusChanged?.Invoke(this, status);
     }
 
 

@@ -49,19 +49,43 @@ public sealed partial class ShellPage : Page
 
         Loaded += (sender, args) =>
         {
-            var bindings = new Binding()
+            // The native WinUI 3 SettingsItem exhibits an unfixable clipping/transparent block bug 
+            // in Left-Compact mode when assigned an InfoBadge.
+            // WORKAROUND: We hide the native SettingsItem completely and inject our own exact replica 
+            // into FooterMenuItems, which correctly supports InfoBadge layout.
+            NavigationViewControl.IsSettingsVisible = false;
+
+            var customSettingsItem = new NavigationViewItem
             {
-                Source = ViewModel,
-                Path = new PropertyPath(nameof(ViewModel.SettingsInfoBadgeOpacity)),
-                Mode = BindingMode.OneWay
+                Content = _localizer.GetLocalizedStringOrDefault("/Settings/Title", "Settings"),
+                Icon = new FontIcon { Glyph = "\uE713" },
+                Tag = "CustomSettings",
             };
 
-            var settingsItem = (NavigationViewItem)NavigationViewControl.SettingsItem;
-            var infoBadge = new InfoBadge() { Opacity = 0, Value = 1 };
-            settingsItem.InfoBadge = infoBadge;
+            var infoBadge = new InfoBadge { Value = 1, Visibility = Visibility.Collapsed };
+            customSettingsItem.InfoBadge = infoBadge;
+            
+            NavigationViewControl.FooterMenuItems.Add(customSettingsItem);
 
+            customSettingsItem.Tapped += (s, e) =>
+            {
+                NavigationViewControl.SelectedItem = customSettingsItem;
+                ViewModel.NavigationService.NavigateTo(typeof(SettingsViewModel).FullName!);
+            };
 
-            BindingOperations.SetBinding(settingsItem.InfoBadge, OpacityProperty, bindings);
+            ViewModel.ShowSettingsInfoBadge += (_, show) =>
+            {
+                App.MainWindow.DispatcherQueue.TryEnqueue(() =>
+                {
+                    infoBadge.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
+                });
+            };
+
+            App.MainWindow.DispatcherQueue.TryEnqueue(() =>
+            {
+                if (ViewModel.SettingsInfoBadgeOpacity == 1)
+                    infoBadge.Visibility = Visibility.Visible;
+            });
 
             Bindings.Update();
         };
