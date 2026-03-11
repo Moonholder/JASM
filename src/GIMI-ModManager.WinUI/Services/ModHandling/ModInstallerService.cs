@@ -216,8 +216,21 @@ public sealed class ModInstallation : IDisposable
                 modRootFolder = new DirectoryInfo(mergedIniFile.DirectoryName!);
         }
 
-        modRootFolder ??= _originalModFolder.EnumerateDirectories().FirstOrDefault();
-
+        if (modRootFolder is null)
+        {
+            var directories = _originalModFolder.EnumerateDirectories().ToList();
+            var files = _originalModFolder.EnumerateFiles().ToList();
+            
+            if (directories.Count == 1 && files.Count == 0)
+            {
+                modRootFolder = directories[0];
+            }
+            else
+            {
+                // If there are multiple folders or any files in the root, the root itself is the mod root
+                modRootFolder = _originalModFolder;
+            }
+        }
 
         if (modRootFolder is null)
             return null;

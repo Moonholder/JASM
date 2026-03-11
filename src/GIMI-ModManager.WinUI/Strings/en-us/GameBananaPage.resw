@@ -154,4 +154,5 @@
   <data name="SelectInstallTarget" xml:space="preserve"><value>Select Target</value></data>
   <data name="DialogOk" xml:space="preserve"><value>OK</value></data>
   <data name="DialogCancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="StrongMatchBtn" xml:space="preserve"><value>Cannot find? Try matching based on file name</value></data>
 </root>

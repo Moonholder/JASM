@@ -741,14 +741,9 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
                             var title = System.Net.WebUtility.HtmlEncode(u.Title ?? "Update");
                             var version = !string.IsNullOrEmpty(u.Version) ? $"<span class=\"version\">{System.Net.WebUtility.HtmlEncode(u.Version)}</span>" : "";
 
-                            // Relative time approximation incl. years
+                            // Relative time approximation using FormaterHelpers
                             var ts = DateTimeOffset.Now - DateTimeOffset.FromUnixTimeSeconds(u.DateAdded);
-                            string dateStr;
-                            if (ts.TotalDays >= 365) dateStr = $"{(int)(ts.TotalDays / 365)}y";
-                            else if (ts.TotalDays >= 30) dateStr = $"{(int)(ts.TotalDays / 30)}mo";
-                            else if (ts.TotalDays >= 1) dateStr = $"{(int)ts.TotalDays}d";
-                            else if (ts.TotalHours >= 1) dateStr = $"{(int)ts.TotalHours}h";
-                            else dateStr = $"{(int)ts.TotalMinutes}m";
+                            string dateStr = Helpers.FormaterHelpers.FormatTimeSinceAdded(ts);
 
                             var text = u.Text ?? string.Empty;
 
@@ -1077,12 +1072,6 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
             }
 
             UpdateScores(task.CategoryName);
-            UpdateScores(task.Mod?.Name);
-            if (!string.IsNullOrEmpty(task.FileInfo?.FileName))
-            {
-                var fileNameNoExt = System.IO.Path.GetFileNameWithoutExtension(task.FileInfo.FileName).Replace("_", " ");
-                UpdateScores(fileNameNoExt);
-            }
 
             if (matchScores.Count > 0)
             {
@@ -1098,7 +1087,7 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
             if (targetCharacter == null)
             {
                 _dispatcherQueue.TryEnqueue(() => task.StatusMessage = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/StatusWaitingCategory", "等待选择分类..."));
-                targetCharacter = await PromptUserForCharacterAsync(task.Mod?.Name);
+                targetCharacter = await PromptUserForCharacterAsync(task.Mod?.Name, task.FileInfo?.FileName);
 
                 if (targetCharacter == null)
                 {
@@ -1120,7 +1109,8 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
             _dispatcherQueue.TryEnqueue(() => task.StatusMessage = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/StatusInstalling2", "正在安装..."));
 
             var modList = _skinManagerService.GetCharacterModList(targetCharacter);
-            var modFolder = _archiveService.ExtractArchive(archivePath, App.GetUniqueTmpFolder().FullName);
+            var cleanName = Path.GetFileNameWithoutExtension(task.FileInfo?.FileName ?? task.Mod?.Name ?? "mod");
+            var modFolder = _archiveService.ExtractArchive(archivePath, App.GetUniqueTmpFolder().FullName, extractedFolderName: cleanName);
             var modUrl = !string.IsNullOrEmpty(task.ModUrl) ? new Uri(task.ModUrl) : null;
 
             try
@@ -1191,7 +1181,7 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
         }
     }
 
-    private Task<IModdableObject?> PromptUserForCharacterAsync(string? modName)
+    private Task<IModdableObject?> PromptUserForCharacterAsync(string? modName, string? fileName)
     {
         var tcs = new TaskCompletionSource<IModdableObject?>();
         _dispatcherQueue.TryEnqueue(async () =>
@@ -1254,6 +1244,48 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
                     }
                 };
 
+                var strongMatchBtn = new Microsoft.UI.Xaml.Controls.HyperlinkButton
+                {
+                    Content = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/StrongMatchBtn", "无法找到？尝试基于文件名称进行匹配"),
+                    Margin = new Thickness(0, 4, 0, 4)
+                };
+                strongMatchBtn.Click += (s, e) =>
+                {
+                    var matchScores = new Dictionary<IModdableObject, int>();
+                    void UpdateScores(string? query)
+                    {
+                        if (string.IsNullOrWhiteSpace(query)) return;
+                        var dict = _gameService.QueryModdableObjects(query);
+                        foreach (var kv in dict)
+                        {
+                            if (!matchScores.TryGetValue(kv.Key, out var existingScore) || kv.Value > existingScore)
+                            {
+                                matchScores[kv.Key] = kv.Value;
+                            }
+                        }
+                    }
+                    UpdateScores(modName);
+                    if (!string.IsNullOrEmpty(fileName))
+                    {
+                        var fileNameNoExt = System.IO.Path.GetFileNameWithoutExtension(fileName).Replace("_", " ");
+                        UpdateScores(fileNameNoExt);
+                    }
+                    if (matchScores.Count > 0)
+                    {
+                        var bestMatch = matchScores.MaxBy(x => x.Value);
+                        if (bestMatch.Value > 0)
+                        {
+                            var bestTuple = displayItems.FirstOrDefault(t => t.Item1.InternalName.Equals(bestMatch.Key.InternalName));
+                            if (bestTuple != null)
+                            {
+                                if (!string.IsNullOrEmpty(searchBox.Text)) searchBox.Text = string.Empty;
+                                listView.SelectedItem = bestTuple;
+                                listView.ScrollIntoView(bestTuple);
+                            }
+                        }
+                    }
+                };
+
                 var panel = new Microsoft.UI.Xaml.Controls.StackPanel
                 {
                     Width = 320,
@@ -1264,6 +1296,7 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
                             Text = string.Format(_localizer.GetLocalizedStringOrDefault("/GameBananaPage/MatchCategoryPrompt", "无法自动匹配 \"{0}\" 的目标分类，请手动选择："), modName),
                             TextWrapping = TextWrapping.Wrap
                         },
+                        strongMatchBtn,
                         searchBox,
                         listView
                     }
@@ -1536,10 +1569,7 @@ public partial class GbModDisplayItem : ObservableObject
 
             var dt = DateTimeOffset.FromUnixTimeSeconds(ts).LocalDateTime;
             var diff = DateTime.Now - dt;
-            if (diff.TotalMinutes < 60) return $"{(int)diff.TotalMinutes}分钟前";
-            if (diff.TotalHours < 24) return $"{(int)diff.TotalHours}小时前";
-            if (diff.TotalDays < 30) return $"{(int)diff.TotalDays}天前";
-            return dt.ToString("yyyy-MM-dd");
+            return Helpers.FormaterHelpers.FormatTimeSinceAdded(diff);
         }
     }
 }

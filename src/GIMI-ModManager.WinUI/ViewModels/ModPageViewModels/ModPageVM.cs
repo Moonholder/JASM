@@ -259,25 +259,15 @@ public partial class ModPageVM : ObservableRecipient
         {
             var result = await Task.Run(async () =>
             {
+                var cleanName = Path.GetFileNameWithoutExtension(fileInfoVm.FileName);
+                if (string.IsNullOrWhiteSpace(cleanName)) cleanName = "mod";
+
                 var modFolder = _archiveService.ExtractArchive(fileInfoVm.ArchiveFile!.FullName,
-                    App.GetUniqueTmpFolder().FullName);
-
-                var archiveNameSections = Path.GetFileName(modFolder.Name).Split(ModArchiveRepository.Separator);
-                if (archiveNameSections.Length != 4)
-                    throw new InvalidArchiveNameFormatException();
-
-                var modFolderName = archiveNameSections[0];
-                var modFolderExt = Path.GetExtension(modFolder.Name);
-
-                var modFolderParent = modFolder.Parent!;
-
-                var zipRoot = Directory.CreateDirectory(Path.Combine(modFolderParent.FullName, "ArchiveRoot"));
-
-                modFolder.MoveTo(Path.Combine(zipRoot.FullName, $"{modFolderName}{modFolderExt}"));
+                    App.GetUniqueTmpFolder().FullName, extractedFolderName: cleanName);
 
                 var modUrl = _modPageInfo?.ModPageUrl;
 
-                using var task = await _modInstallerService.StartModInstallationAsync(zipRoot, _characterModList,
+                using var task = await _modInstallerService.StartModInstallationAsync(modFolder, _characterModList,
                     setup: options =>
                     {
                         options.ModUrl = modUrl;

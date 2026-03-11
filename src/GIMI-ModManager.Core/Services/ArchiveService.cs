@@ -18,7 +18,7 @@ public class ArchiveService
         _extractTool = GetExtractTool();
     }
 
-    public DirectoryInfo ExtractArchive(string archivePath, string destinationPath, bool overwritePath = false)
+    public DirectoryInfo ExtractArchive(string archivePath, string destinationPath, bool overwritePath = false, string? extractedFolderName = null)
     {
         var archive = new FileInfo(archivePath);
         if (!archive.Exists)
@@ -29,7 +29,11 @@ public class ArchiveService
 
         var destinationDirectory = Directory.CreateDirectory(destinationPath);
 
-        var extractedFolder = Path.Combine(destinationDirectory.FullName, archive.Name);
+        var folderName = string.IsNullOrWhiteSpace(extractedFolderName) ? Path.GetFileNameWithoutExtension(archive.Name) : extractedFolderName;
+        foreach (var c in Path.GetInvalidFileNameChars())
+            folderName = folderName.Replace(c, '_');
+
+        var extractedFolder = Path.Combine(destinationDirectory.FullName, folderName);
 
         if (Directory.Exists(extractedFolder))
             throw new InvalidOperationException("Destination folder already exists, could not extract folder");

@@ -192,6 +192,7 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
             {
                 var fileSystemItem = RootFolder.First().GetByPath(modDir.FullName);
                 if (fileSystemItem is not null)
+                {
                     dispatcherQueue.EnqueueAsync(async () =>
                     {
                         await SetRootFolderAsync(fileSystemItem);
@@ -201,6 +202,15 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
                             LastSelectedRootFolder.IsSelected = true;
                         }
                     });
+                }
+                else if (string.Equals(modDir.FullName, RootFolder.First().Path, StringComparison.OrdinalIgnoreCase))
+                {
+                    dispatcherQueue.EnqueueAsync(async () =>
+                    {
+                        var rootItem = new FileSystemItem(modDir, 6);
+                        await SetRootFolderAsync(rootItem);
+                    });
+                }
             }
 
             var shaderFixesDir = _modInstallation.AutoSetShaderFixesFolder();

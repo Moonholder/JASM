@@ -166,12 +166,24 @@ public sealed class ApiGameBananaClient(
         try
         {
             var file = new FileInfo(downloadFilePath);
-            while (!cancellationToken.IsCancellationRequested && file.Length < totalSizeBytes)
+            int lastProgress = -1;
+            while (!cancellationToken.IsCancellationRequested)
             {
                 file.Refresh();
-                await Task.Delay(200, cancellationToken).ConfigureAwait(false);
-                var fileSize = file.Length;
-                progress.Report((int)Math.Round((decimal)fileSize / (decimal)totalSizeBytes * 100));
+                if (file.Exists)
+                {
+                    var fileSize = file.Length;
+                    if (fileSize >= totalSizeBytes)
+                        break;
+
+                    var percent = (int)Math.Round((decimal)fileSize / (decimal)totalSizeBytes * 100);
+                    if (percent != lastProgress)
+                    {
+                        progress.Report(percent);
+                        lastProgress = percent;
+                    }
+                }
+                await Task.Delay(500, cancellationToken).ConfigureAwait(false);
             }
         }
         catch (Exception e)

@@ -8,6 +8,20 @@ namespace GIMI_ModManager.WinUI.Helpers
         {
             var localizer = App.GetService<ILanguageLocalizer>();
 
+            if (timeSinceAdded.TotalDays >= 365)
+            {
+                return string.Format(
+                    localizer.GetLocalizedStringOrDefault("TimeAgo_Years", "{0} years ago"),
+                    (int)(timeSinceAdded.TotalDays / 365));
+            }
+
+            if (timeSinceAdded.TotalDays >= 30)
+            {
+                return string.Format(
+                    localizer.GetLocalizedStringOrDefault("TimeAgo_Months", "{0} months ago"),
+                    (int)(timeSinceAdded.TotalDays / 30));
+            }
+
             return timeSinceAdded switch
             {
                 { Days: > 0 } => string.Format(

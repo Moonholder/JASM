@@ -169,6 +169,12 @@
     <value>关闭</value>
   </data>
   <!-- Time Formats -->
+  <data name="TimeAgo_Years" xml:space="preserve">
+    <value>{0} 年前</value>
+  </data>
+  <data name="TimeAgo_Months" xml:space="preserve">
+    <value>{0} 月前</value>
+  </data>
   <data name="TimeAgo_Days" xml:space="preserve">
     <value>{0} 天前</value>
   </data>
