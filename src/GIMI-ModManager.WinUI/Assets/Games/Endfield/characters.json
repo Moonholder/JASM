@@ -45,9 +45,9 @@
         ],
         "ReleaseDate": "2025-02-13T00:00:00",
         "Image": "Estella.png",
-        "Rarity": 5,
+        "Rarity": 4,
         "Element": "Heat",
-        "Class": "ArtsUnit",
+        "Class": "Polearm",
         "Region": [
             "Endfield Industries"
         ],
@@ -79,7 +79,7 @@
         ],
         "ReleaseDate": "2025-02-13T00:00:00",
         "Image": "Ember.png",
-        "Rarity": 5,
+        "Rarity": 6,
         "Element": "Heat",
         "Class": "Greatsword",
         "Region": [
@@ -113,9 +113,9 @@
         ],
         "ReleaseDate": "2025-02-13T00:00:00",
         "Image": "Avywenna.png",
-        "Rarity": 6,
+        "Rarity": 5,
         "Element": "Electric",
-        "Class": "Handcannon",
+        "Class": "Polearm",
         "Region": [
             "TGCC"
         ],
@@ -164,8 +164,8 @@
         ],
         "ReleaseDate": "2025-02-13T00:00:00",
         "Image": "Xaihi.png",
-        "Rarity": 6,
-        "Element": "Electric",
+        "Rarity": 5,
+        "Element": "Cryo",
         "Class": "ArtsUnit",
         "Region": [
             "Cabal of Tranquility"
@@ -181,7 +181,7 @@
         ],
         "ReleaseDate": "2025-02-13T00:00:00",
         "Image": "Gilberta.png",
-        "Rarity": 5,
+        "Rarity": 6,
         "Element": "Natura",
         "Class": "ArtsUnit",
         "Region": [
@@ -198,7 +198,7 @@
         ],
         "ReleaseDate": "2025-02-13T00:00:00",
         "Image": "Yvonne.png",
-        "Rarity": 5,
+        "Rarity": 6,
         "Element": "Cryo",
         "Class": "Handcannon",
         "Region": [
@@ -215,7 +215,7 @@
         ],
         "ReleaseDate": "2025-02-13T00:00:00",
         "Image": "Ardelia.png",
-        "Rarity": 5,
+        "Rarity": 6,
         "Element": "Natura",
         "Class": "ArtsUnit",
         "Region": [
@@ -266,8 +266,8 @@
         ],
         "ReleaseDate": "2025-02-13T00:00:00",
         "Image": "Fluorite.png",
-        "Rarity": 5,
-        "Element": "Electric",
+        "Rarity": 4,
+        "Element": "Natura",
         "Class": "Handcannon",
         "Region": [
             "Endfield Industries"
@@ -283,8 +283,8 @@
         ],
         "ReleaseDate": "2025-02-13T00:00:00",
         "Image": "LastRite.png",
-        "Rarity": 5,
-        "Element": "Natura",
+        "Rarity": 6,
+        "Element": "Cryo",
         "Class": "Greatsword",
         "Region": [
             "Endfield Industries"
@@ -300,7 +300,7 @@
         ],
         "ReleaseDate": "2025-02-13T00:00:00",
         "Image": "Lifeng.png",
-        "Rarity": 5,
+        "Rarity": 6,
         "Element": "Physical",
         "Class": "Polearm",
         "Region": [
@@ -318,7 +318,7 @@
         "ReleaseDate": "2025-02-13T00:00:00",
         "Image": "Wulfgard.png",
         "Rarity": 5,
-        "Element": "Physical",
+        "Element": "Heat",
         "Class": "Handcannon",
         "Region": [
             "Endfield Industries"
@@ -334,8 +334,8 @@
         ],
         "ReleaseDate": "2025-02-13T00:00:00",
         "Image": "Catcher.png",
-        "Rarity": 5,
-        "Element": "Natura",
+        "Rarity": 4,
+        "Element": "Physical",
         "Class": "Greatsword",
         "Region": [
             "Endfield Industries"
@@ -351,8 +351,8 @@
         ],
         "ReleaseDate": "2025-02-13T00:00:00",
         "Image": "Akekuri.png",
-        "Rarity": 5,
-        "Element": "Physical",
+        "Rarity": 4,
+        "Element": "Heat",
         "Class": "Sword",
         "Region": [
             "Endfield Industries"
@@ -368,7 +368,7 @@
         ],
         "ReleaseDate": "2025-02-13T00:00:00",
         "Image": "Antal.png",
-        "Rarity": 5,
+        "Rarity": 4,
         "Element": "Electric",
         "Class": "ArtsUnit",
         "Region": [
@@ -386,7 +386,7 @@
         "ReleaseDate": "2025-02-13T00:00:00",
         "Image": "DaPan.png",
         "Rarity": 5,
-        "Element": "Heat",
+        "Element": "Physical",
         "Class": "Greatsword",
         "Region": [
             "Hongshan"
@@ -402,8 +402,8 @@
         ],
         "ReleaseDate": "2025-02-13T00:00:00",
         "Image": "Pogranichnik.png",
-        "Rarity": 5,
-        "Element": "Cryo",
+        "Rarity": 6,
+        "Element": "Physical",
         "Class": "Sword",
         "Region": [
             "Rhodes Island"
@@ -412,5 +412,39 @@
         "InGameSkins": [],
         "InternalName": "Pogranichnik",
         "DisplayName": "Pogranichnik"
+    },
+    {
+        "Keys": [
+            "Tangtang"
+        ],
+        "ReleaseDate": "2025-03-12T00:00:00",
+        "Image": "Tangtang.png",
+        "Rarity": 6,
+        "Element": "Cryo",
+        "Class": "Handcannon",
+        "Region": [
+            "Endfield Industries"
+        ],
+        "ModFilesName": "Tangtang",
+        "InGameSkins": [],
+        "InternalName": "Tangtang",
+        "DisplayName": "Tangtang"
+    },
+    {
+        "Keys": [
+            "Rossi"
+        ],
+        "ReleaseDate": "2025-03-29T00:00:00",
+        "Image": "Rossi.png",
+        "Rarity": 6,
+        "Element": "Physical",
+        "Class": "Sword",
+        "Region": [
+            "Endfield Industries"
+        ],
+        "ModFilesName": "Rossi",
+        "InGameSkins": [],
+        "InternalName": "Rossi",
+        "DisplayName": "Rossi"
     }
 ]
