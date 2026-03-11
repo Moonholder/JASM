@@ -220,7 +220,7 @@ public sealed class ModInstallation : IDisposable
         {
             var directories = _originalModFolder.EnumerateDirectories().ToList();
             var files = _originalModFolder.EnumerateFiles().ToList();
-            
+
             if (directories.Count == 1 && files.Count == 0)
             {
                 modRootFolder = directories[0];

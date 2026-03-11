@@ -78,7 +78,7 @@ public partial class ShellViewModel : ObservableRecipient
             // Because the native SettingsItem has a WinUI rendering bug in Left-Compact mode, 
             // the ShellPage.xaml.cs uses a custom item tagged "CustomSettings".
             // We find it in the navigation view service or simply fall back to null.
-            var customSettings = NavigationViewService.MenuItems?.OfType<Microsoft.UI.Xaml.Controls.NavigationViewItem>().FirstOrDefault(i => (string)i.Tag == "CustomSettings") 
+            var customSettings = NavigationViewService.MenuItems?.OfType<Microsoft.UI.Xaml.Controls.NavigationViewItem>().FirstOrDefault(i => (string)i.Tag == "CustomSettings")
                                  ?? NavigationViewService.GetSelectedItem(typeof(SettingsPage));
             Selected = customSettings;
             return;

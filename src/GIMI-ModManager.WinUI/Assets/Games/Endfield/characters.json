@@ -412,39 +412,5 @@
         "InGameSkins": [],
         "InternalName": "Pogranichnik",
         "DisplayName": "Pogranichnik"
-    },
-    {
-        "Keys": [
-            "Tangtang"
-        ],
-        "ReleaseDate": "2025-03-12T00:00:00",
-        "Image": "Tangtang.png",
-        "Rarity": 6,
-        "Element": "Cryo",
-        "Class": "Handcannon",
-        "Region": [
-            "Endfield Industries"
-        ],
-        "ModFilesName": "Tangtang",
-        "InGameSkins": [],
-        "InternalName": "Tangtang",
-        "DisplayName": "Tangtang"
-    },
-    {
-        "Keys": [
-            "Rossi"
-        ],
-        "ReleaseDate": "2025-03-29T00:00:00",
-        "Image": "Rossi.png",
-        "Rarity": 6,
-        "Element": "Physical",
-        "Class": "Sword",
-        "Region": [
-            "Endfield Industries"
-        ],
-        "ModFilesName": "Rossi",
-        "InGameSkins": [],
-        "InternalName": "Rossi",
-        "DisplayName": "Rossi"
     }
 ]

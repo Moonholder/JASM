@@ -1,4 +1,4 @@
-﻿using FuzzySharp;
+using FuzzySharp;
 using GIMI_ModManager.Core.Contracts.Services;
 using GIMI_ModManager.Core.GamesService.Exceptions;
 using GIMI_ModManager.Core.GamesService.Interfaces;
@@ -126,7 +126,15 @@ public class GameService : IGameService
 
     public static async Task<GameInfo?> GetGameInfoAsync(SupportedGames game, string? languageCode = null)
     {
-        var gameAssetDir = Path.Combine(AppContext.BaseDirectory, "Assets", "Games", game.ToString());
+        // Priority: AppData remote cache > bundled install directory
+        var remoteAssetDir = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "JASM", "GameAssets", game.ToString());
+        var bundledAssetDir = Path.Combine(AppContext.BaseDirectory, "Assets", "Games", game.ToString());
+
+        var gameAssetDir = Directory.Exists(remoteAssetDir) && File.Exists(Path.Combine(remoteAssetDir, "game.json"))
+            ? remoteAssetDir
+            : bundledAssetDir;
 
         var defaultPath = Path.Combine(gameAssetDir, "game.json");
 

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Reflection;
 using System.Threading.RateLimiting;
 using GIMI_ModManager.Core.Contracts.Services;
@@ -76,6 +76,12 @@ public partial class App : Application
     public static string ROOT_DIR { get; } = AppDomain.CurrentDomain.BaseDirectory;
     public static string ASSET_DIR { get; } = Path.Combine(ROOT_DIR, "Assets");
 
+    /// <summary>
+    /// Returns the game assets directory: AppData remote cache if available, otherwise bundled assets.
+    /// </summary>
+    public static string GetGameAssetsDirectory(string gameName) =>
+        GameAssetSyncService.GetGameAssetsDirectory(gameName);
+
     public static WindowEx MainWindow { get; private set; } = null!;
     public static UIElement? AppTitlebar { get; set; }
 
@@ -134,6 +140,7 @@ public partial class App : Application
 
                 services.AddSingleton<UpdateChecker>();
                 services.AddSingleton<AutoUpdaterService>();
+                services.AddSingleton<GameAssetSyncService>();
 
                 services.AddSingleton<ImageHandlerService>();
                 services.AddSingleton<SelectedGameService>();

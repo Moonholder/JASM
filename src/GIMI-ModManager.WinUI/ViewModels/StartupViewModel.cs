@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GIMI_ModManager.Core.Contracts.Services;
@@ -113,7 +113,7 @@ public partial class StartupViewModel : ObservableRecipient, INavigationAware
         await _selectedGameService.SetSelectedGame(SelectedGame.Value.ToString());
 
         await _gameService.InitializeAsync(
-            Path.Combine(App.ASSET_DIR, "Games", await _selectedGameService.GetSelectedGameAsync()),
+            App.GetGameAssetsDirectory(await _selectedGameService.GetSelectedGameAsync()),
             _localSettingsService.ApplicationDataFolder);
 
         await _localSettingsService.SaveSettingAsync(ModManagerOptions.Section,

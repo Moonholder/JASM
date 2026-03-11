@@ -1,4 +1,4 @@
-﻿using GIMI_ModManager.Core.Contracts.Services;
+using GIMI_ModManager.Core.Contracts.Services;
 using GIMI_ModManager.Core.GamesService;
 using GIMI_ModManager.Core.Services;
 using GIMI_ModManager.Core.Services.CommandService;
@@ -62,7 +62,7 @@ public class FirstTimeStartupActivationHandler : ActivationHandler<LaunchActivat
 
         var gameServiceOptions = new InitializationOptions
         {
-            AssetsDirectory = Path.Combine(App.ASSET_DIR, "Games",
+            AssetsDirectory = App.GetGameAssetsDirectory(
                 await _selectedGameService.GetSelectedGameAsync()),
             LocalSettingsDirectory = _localSettingsService.ApplicationDataFolder,
             CharacterSkinsAsCharacters = modManagerOptions?.CharacterSkinsAsCharacters ?? false

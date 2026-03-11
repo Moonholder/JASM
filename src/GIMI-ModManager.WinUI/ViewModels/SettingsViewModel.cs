@@ -50,9 +50,9 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
     private readonly INavigationService _navigationService;
     private readonly ModArchiveRepository _modArchiveRepository;
 
-
     private readonly NotificationManager _notificationManager;
     private readonly UpdateChecker _updateChecker;
+    private readonly GameAssetSyncService _gameAssetSyncService;
     public ElevatorService ElevatorService;
 
     [ObservableProperty]
@@ -126,6 +126,12 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
 
     [ObservableProperty] private string _modCacheSizeGB = string.Empty;
 
+    // Game Asset Sync
+    [ObservableProperty] private string _assetSyncStatus = "";
+    [ObservableProperty] private int _assetSyncProgress = 0;
+    [ObservableProperty] private bool _isAssetSyncing = false;
+    [ObservableProperty] private string _localAssetVersion = "";
+
     public SettingsViewModel(
         IThemeSelectorService themeSelectorService, ILocalSettingsService localSettingsService,
         ElevatorService elevatorService, ILogger logger, NotificationManager notificationManager,
@@ -135,7 +141,7 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
         IGameService gameService, AutoUpdaterService autoUpdaterService, ILanguageLocalizer localizer,
         SelectedGameService selectedGameService, ModUpdateAvailableChecker modUpdateAvailableChecker,
         LifeCycleService lifeCycleService, INavigationService navigationService,
-        ModArchiveRepository modArchiveRepository)
+        ModArchiveRepository modArchiveRepository, GameAssetSyncService gameAssetSyncService)
     {
         _themeSelectorService = themeSelectorService;
         _localSettingsService = localSettingsService;
@@ -153,6 +159,7 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
         _lifeCycleService = lifeCycleService;
         _navigationService = navigationService;
         _modArchiveRepository = modArchiveRepository;
+        _gameAssetSyncService = gameAssetSyncService;
         GenshinProcessManager = genshinProcessManager;
         ThreeDMigtoProcessManager = threeDMigtoProcessManager;
         _logger = logger.ForContext<SettingsViewModel>();
@@ -919,6 +926,7 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
         await GenshinProcessManager.TryInitialize();
         await ThreeDMigtoProcessManager.TryInitialize();
         ModCacheSizeGB = _modArchiveRepository.GetTotalCacheSizeInGB().ToString("F");
+        RefreshLocalAssetVersion();
     }
 
     [ObservableProperty] private string _maxCacheSizeString = string.Empty;
@@ -956,6 +964,122 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
     {
         var dialog = new DisableAllModsDialog();
         return dialog.ShowDialogAsync();
+    }
+
+    [RelayCommand]
+    private async Task SyncGameAssetsAsync()
+    {
+        if (IsAssetSyncing) return;
+        IsAssetSyncing = true;
+        AssetSyncStatus = _localizer.GetLocalizedStringOrDefault("/Settings/AssetSync_Checking", "Checking for updates...");
+        AssetSyncProgress = 0;
+
+        void OnProgress(object? sender, AssetSyncProgressEventArgs e)
+        {
+            App.MainWindow.DispatcherQueue.TryEnqueue(() =>
+            {
+                AssetSyncProgress = e.ProgressPercent;
+                AssetSyncStatus = e.State switch
+                {
+                    AssetSyncState.CheckingForUpdates => _localizer.GetLocalizedStringOrDefault("/Settings/AssetSync_Checking", "Checking for updates..."),
+                    AssetSyncState.Downloading => string.Format(
+                        _localizer.GetLocalizedStringOrDefault("/Settings/AssetSync_Downloading", "Downloading... {0}%"),
+                        e.ProgressPercent),
+                    AssetSyncState.CleaningUp => _localizer.GetLocalizedStringOrDefault("/Settings/AssetSync_CleaningUp", "Cleaning up..."),
+                    AssetSyncState.Completed => _localizer.GetLocalizedStringOrDefault("/Settings/AssetSync_Completed", "Sync completed ✓"),
+                    AssetSyncState.Failed => _localizer.GetLocalizedStringOrDefault("/Settings/AssetSync_Failed", "Sync failed"),
+                    AssetSyncState.Cancelled => _localizer.GetLocalizedStringOrDefault("/Settings/AssetSync_Cancelled", "Sync cancelled"),
+                    _ => ""
+                };
+            });
+        }
+
+        _gameAssetSyncService.SyncProgressChanged += OnProgress;
+        try
+        {
+            var result = await Task.Run(() => _gameAssetSyncService.SyncAsync());
+
+            App.MainWindow.DispatcherQueue.TryEnqueue(async () =>
+            {
+                if (result.Success)
+                {
+                    RefreshLocalAssetVersion();
+
+                    if (result.DownloadedCount > 0 || result.DeletedCount > 0)
+                    {
+                        var dialog = new ContentDialog
+                        {
+                            XamlRoot = App.MainWindow.Content.XamlRoot,
+                            Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style,
+                            Title = _localizer.GetLocalizedStringOrDefault("/Settings/AssetSync_RestartRequiredTitle", "Restart Required"),
+                            Content = new TextBlock
+                            {
+                                Text = _localizer.GetLocalizedStringOrDefault("/Settings/AssetSync_RestartRequiredMessage", "Game assets have been updated! A restart is required for the new assets to take effect.\n\nWould you like to restart now?"),
+                                TextWrapping = TextWrapping.Wrap
+                            },
+                            PrimaryButtonText = _localizer.GetLocalizedStringOrDefault("Common_Restart", "Restart"),
+                            CloseButtonText = _localizer.GetLocalizedStringOrDefault("Common_Cancel", "Cancel"),
+                            DefaultButton = ContentDialogButton.Primary,
+                            RequestedTheme = ElementTheme
+                        };
+
+                        if (await _windowManagerService.ShowDialogAsync(dialog) == ContentDialogResult.Primary)
+                        {
+                            await RestartAppAsync();
+                        }
+                    }
+                    else
+                    {
+                        _notificationManager.ShowNotification(
+                            _localizer.GetLocalizedStringOrDefault("/Settings/AssetSync_SuccessTitle", "Game Assets Updated"),
+                            string.Format(
+                                _localizer.GetLocalizedStringOrDefault("/Settings/AssetSync_SuccessMessage", "Downloaded {0} files, cleaned {1} files."),
+                                result.DownloadedCount, result.DeletedCount),
+                            TimeSpan.FromSeconds(5));
+                    }
+                }
+                else if (result.IsCancelled)
+                {
+                    // Don't show a failure notification for user-initiated cancellation
+                }
+                else
+                {
+                    _notificationManager.ShowNotification(
+                        _localizer.GetLocalizedStringOrDefault("/Settings/AssetSync_FailTitle", "Asset Sync Failed"),
+                        result.Message,
+                        TimeSpan.FromSeconds(8));
+                }
+            });
+        }
+        finally
+        {
+            _gameAssetSyncService.SyncProgressChanged -= OnProgress;
+            IsAssetSyncing = false;
+        }
+    }
+
+    private void RefreshLocalAssetVersion()
+    {
+        try
+        {
+            var manifestPath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "JASM", "GameAssets", "manifest.json");
+            if (File.Exists(manifestPath))
+            {
+                var json = File.ReadAllText(manifestPath);
+                var manifest = System.Text.Json.JsonSerializer.Deserialize<AssetManifest>(json, AssetManifestJsonContext.Default.AssetManifest);
+                LocalAssetVersion = manifest?.Version ?? "";
+            }
+            else
+            {
+                LocalAssetVersion = _localizer.GetLocalizedStringOrDefault("/Settings/AssetSync_Bundled", "Bundled");
+            }
+        }
+        catch
+        {
+            LocalAssetVersion = "";
+        }
     }
 
     public void OnNavigatedFrom()
