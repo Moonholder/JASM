@@ -1,5 +1,27 @@
 # Changelog
 
+## [2.28.0](https://github.com/Moonholder/JASM/compare/v2.27.0...v2.28.0) (2026-03-11)
+
+
+### Features
+
+* 实现远程游戏资源增量同步功能 ([a6cd05c](https://github.com/Moonholder/JASM/commit/a6cd05c20809ff74a36a734ea5121b814bafdc87))
+
+
+### Bug Fixes
+
+* 改进更新检查机制并修复设置角标渲染问题 ([77941b9](https://github.com/Moonholder/JASM/commit/77941b9dc024b13480f756adc2c6a6efdf427d91))
+
+
+### Miscellaneous
+
+* **Endfield:** 添加角色汤汤和洛茜 ([e2ecd1b](https://github.com/Moonholder/JASM/commit/e2ecd1b7a2b5a3cad2a6cb92d41a16a2f7cf4079))
+
+
+### Code Refactoring
+
+* **store:** 完善 GameBanana 相关的安装匹配与展示逻辑 ([5e2009c](https://github.com/Moonholder/JASM/commit/5e2009c7ee4ef97578aa0f872fb6db801b52ca3a))
+
 ## [2.27.0](https://github.com/Moonholder/JASM/compare/v2.26.0...v2.27.0) (2026-03-07)
 
 
