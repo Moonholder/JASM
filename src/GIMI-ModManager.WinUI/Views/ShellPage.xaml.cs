@@ -64,7 +64,7 @@ public sealed partial class ShellPage : Page
 
             var infoBadge = new InfoBadge { Value = 1, Visibility = Visibility.Collapsed };
             customSettingsItem.InfoBadge = infoBadge;
-            
+
             NavigationViewControl.FooterMenuItems.Add(customSettingsItem);
 
             customSettingsItem.Tapped += (s, e) =>

@@ -1,4 +1,4 @@
-﻿using System.Security.Principal;
+using System.Security.Principal;
 using Windows.Graphics;
 using Windows.Win32;
 using Windows.Win32.Foundation;
@@ -45,6 +45,7 @@ public class ActivationService : IActivationService
     private readonly ModUpdateAvailableChecker _modUpdateAvailableChecker;
     private readonly ModNotificationManager _modNotificationManager;
     private readonly LifeCycleService _lifeCycleService;
+    private readonly GameAssetSyncService _gameAssetSyncService;
     private UIElement? _shell = null;
 
     private readonly string[] _args = Environment.GetCommandLineArgs().Skip(1).ToArray();
@@ -59,7 +60,7 @@ public class ActivationService : IActivationService
         ModUpdateAvailableChecker modUpdateAvailableChecker, ILogger logger,
         ModNotificationManager modNotificationManager, INavigationViewService navigationViewService,
         ISkinManagerService skinManagerService, NotificationManager notificationManager,
-        LifeCycleService lifeCycleService)
+        LifeCycleService lifeCycleService, GameAssetSyncService gameAssetSyncService)
     {
         _defaultHandler = defaultHandler;
         _activationHandlers = activationHandlers;
@@ -80,6 +81,7 @@ public class ActivationService : IActivationService
         _skinManagerService = skinManagerService;
         _notificationManager = notificationManager;
         _lifeCycleService = lifeCycleService;
+        _gameAssetSyncService = gameAssetSyncService;
         _logger = logger.ForContext<ActivationService>();
     }
 
@@ -205,6 +207,33 @@ public class ActivationService : IActivationService
         await _updateChecker.InitializeAsync();
         await _modUpdateAvailableChecker.InitializeAsync().ConfigureAwait(false);
         await Task.Run(() => _elevatorService.Initialize()).ConfigureAwait(false);
+
+        // Background check for game asset updates (fire-and-forget)
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                var newVersion = await _gameAssetSyncService.CheckForUpdatesAsync();
+                if (newVersion != null)
+                {
+                    App.MainWindow.DispatcherQueue.TryEnqueue(() =>
+                    {
+                        _notificationManager.ShowNotification(
+                            _languageLocalizer.GetLocalizedStringOrDefault("/Settings/AssetSync_UpdateAvailableTitle",
+                                "Game Asset Update Available"),
+                            string.Format(
+                                _languageLocalizer.GetLocalizedStringOrDefault("/Settings/AssetSync_UpdateAvailableMessage",
+                                    "New game assets version {0} is available. Go to Settings to sync."),
+                                newVersion),
+                            TimeSpan.FromSeconds(10));
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Debug(ex, "Background game asset update check failed.");
+            }
+        });
     }
 
     const int MinimizedPosition = -32000;

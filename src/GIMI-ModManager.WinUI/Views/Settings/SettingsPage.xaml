@@ -11,10 +11,12 @@
     xmlns:viewModels="using:GIMI_ModManager.WinUI.ViewModels"
     xmlns:xaml="using:Microsoft.UI.Xaml"
     xmlns:xaml1="using:GIMI_ModManager.WinUI.Helpers.Xaml"
+    xmlns:converters="using:CommunityToolkit.WinUI.UI.Converters"
     mc:Ignorable="d">
     <Page.Resources>
         <xaml1:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
         <xaml1:BoolToVisibleConverter x:Key="BoolToVisibleConverter" />
+        <converters:BoolNegationConverter x:Key="BoolNegationConverter" />
     </Page.Resources>
     <Grid>
 
@@ -415,6 +417,47 @@
                         Visibility="{x:Bind ViewModel.ExportingMods, Mode=OneWay}"
                         Text="{x:Bind ViewModel.ExportProgressText, Mode=OneWay}" />
                     <TextBlock Visibility="{x:Bind ViewModel.ExportingMods, Mode=OneWay}" Text="{x:Bind ViewModel.CurrentModName, Mode=OneWay}" />
+                </StackPanel>
+
+
+                <TextBlock
+                    Style="{ThemeResource SubtitleTextBlockStyle}"
+                    Text="Game Asset Sync"
+                    l:Uids.Uid="/Settings/AssetSyncSectionHeader" />
+                <StackPanel Margin="{StaticResource SmallTopBottomMargin}" Spacing="8">
+                    <TextBlock
+                        MaxWidth="600"
+                        HorizontalAlignment="Left"
+                        IsTextSelectionEnabled="True"
+                        TextWrapping="WrapWholeWords"
+                        Text="Sync game character data and images from the cloud. This allows you to get new character support without updating JASM."
+                        l:Uids.Uid="/Settings/AssetSyncDescription" />
+
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock VerticalAlignment="Center"
+                                   Text="Local Version:"
+                                   l:Uids.Uid="/Settings/AssetSyncLocalVersionLabel" />
+                        <TextBlock VerticalAlignment="Center"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   Text="{x:Bind ViewModel.LocalAssetVersion, Mode=OneWay}" />
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button Command="{x:Bind ViewModel.SyncGameAssetsCommand}"
+                                Content="Sync Game Assets"
+                                IsEnabled="{x:Bind ViewModel.IsAssetSyncing, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}"
+                                l:Uids.Uid="/Settings/SyncGameAssetsButton" />
+                        <ProgressRing IsActive="{x:Bind ViewModel.IsAssetSyncing, Mode=OneWay}"
+                                      Width="20" Height="20" />
+                        <TextBlock VerticalAlignment="Center"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   Text="{x:Bind ViewModel.AssetSyncStatus, Mode=OneWay}" />
+                    </StackPanel>
+
+                    <ProgressBar IsIndeterminate="False"
+                                 Maximum="100"
+                                 Value="{x:Bind ViewModel.AssetSyncProgress, Mode=OneWay}"
+                                 Visibility="{x:Bind ViewModel.IsAssetSyncing, Mode=OneWay}" />
                 </StackPanel>
 
 

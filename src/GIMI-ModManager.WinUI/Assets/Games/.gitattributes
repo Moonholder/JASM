@@ -1,0 +1,13 @@
+* text=auto
+
+# Enforce LF line endings for JSON and text asset files
+# This ensures bundled files exactly match their GitHub Raw hashes
+*.json text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+
+# Explicitly declare binary files to prevent Git from altering them
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary

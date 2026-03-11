@@ -304,7 +304,7 @@ public partial class ModUpdateVM : ObservableRecipient
             {
                 var cleanName = Path.GetFileNameWithoutExtension(fileInfoVm.FileName);
                 if (string.IsNullOrWhiteSpace(cleanName)) cleanName = "mod";
-                
+
                 var modFolder = _archiveService.ExtractArchive(fileInfoVm.ArchiveFile!.FullName,
                     App.GetUniqueTmpFolder().FullName, extractedFolderName: cleanName);
 
