@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.29.0](https://github.com/Moonholder/JASM/compare/v2.28.0...v2.29.0) (2026-03-24)
+
+
+### Features
+
+* **store:** 优化模组卡片 UI 与下载传输稳定性 ([59c8e1b](https://github.com/Moonholder/JASM/commit/59c8e1b7d14ff71f016136f2987048b66f9d65ff))
+
 ## [2.28.0](https://github.com/Moonholder/JASM/compare/v2.27.0...v2.28.0) (2026-03-11)
 
 
