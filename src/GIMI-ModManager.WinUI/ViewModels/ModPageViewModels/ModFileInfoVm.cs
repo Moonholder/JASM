@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GIMI_ModManager.Core.Contracts.Services;
 using GIMI_ModManager.Core.Services.GameBanana.Models;
@@ -11,9 +11,12 @@ public partial class ModFileInfoVm : ObservableObject
     private readonly ModFileInfo _modFileInfo;
     private readonly ILanguageLocalizer _localizer = App.GetService<ILanguageLocalizer>();
 
+    public ModFileInfo ModFileInfo => _modFileInfo;
+
     public string ModId => _modFileInfo.ModId;
     public string FileId => _modFileInfo.FileId;
     public string FileName => _modFileInfo.FileName;
+    public string FormattedVersion => _modFileInfo.FormattedVersion;
 
     public DateTime DateAdded => _modFileInfo.DateAdded;
 

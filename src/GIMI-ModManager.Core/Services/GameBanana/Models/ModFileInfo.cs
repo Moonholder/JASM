@@ -1,4 +1,4 @@
-﻿namespace GIMI_ModManager.Core.Services.GameBanana.Models;
+namespace GIMI_ModManager.Core.Services.GameBanana.Models;
 
 using GIMI_ModManager.Core.Services.GameBanana.ApiModels;
 using System.Text.Json.Serialization;
@@ -16,6 +16,9 @@ public partial class ModFileInfo : INotifyPropertyChanged
         Md5Checksum = apiModFileInfo.Md5Checksum;
         DownloadCount = apiModFileInfo.DownloadCount;
         FileSize = apiModFileInfo.FileSize;
+        DownloadUrl = apiModFileInfo.DownloadUrl;
+        Version = apiModFileInfo.Version;
+        AvResult = apiModFileInfo.AvResult;
     }
 
     public ModFileInfo(string modId, string fileId, string fileName, string description, string md5Checksum,
@@ -46,6 +49,9 @@ public partial class ModFileInfo : INotifyPropertyChanged
     public string Md5Checksum { get; init; }
     public int DownloadCount { get; init; }
     public long FileSize { get; init; }
+    public string? DownloadUrl { get; init; }
+    public string? Version { get; init; }
+    public string? AvResult { get; init; }
 
     [JsonIgnore]
     public string FormattedFileSize
@@ -63,6 +69,23 @@ public partial class ModFileInfo : INotifyPropertyChanged
     public string FormattedDownloadCount => DownloadCount >= 1000
         ? $"{DownloadCount / 1000.0:F1}k"
         : DownloadCount.ToString();
+
+    [JsonIgnore]
+    public string FormattedVersion
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(Version)) return string.Empty;
+            return Version.StartsWith("v", StringComparison.OrdinalIgnoreCase) ? Version : $"v{Version}";
+        }
+    }
+
+    [JsonIgnore]
+    public string AvStatusIcon => AvResult switch
+    {
+        "clean" => "\uE73E",  // Checkmark
+        _ => string.Empty
+    };
 
     private bool _isDownloading;
     [JsonIgnore]

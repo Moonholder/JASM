@@ -168,6 +168,7 @@ public partial class App : Application
 
                 services.AddTransient<HttpLoggerHandler>();
                 services.AddSingleton<GameBananaService>();
+                services.AddSingleton<IGameBananaDownloadSessionService, GameBananaDownloadSessionService>();
 
                 // Even though I've followed the docs, I keep getting "Exception thrown: 'System.IO.IOException' in System.Net.Sockets.dll"
                 // I've read just about every microsoft docs page httpclients, and I can't figure out what I'm doing wrong

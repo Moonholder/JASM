@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using GIMI_ModManager.Core.Helpers;
 using GIMI_ModManager.Core.Services.GameBanana.ApiModels;
 using GIMI_ModManager.Core.Services.GameBanana.Models;
@@ -90,12 +90,12 @@ public sealed class GameBananaCoreService(
     /// <param name="ignoreCache"></param>
     /// <param name="ct"></param>
     /// <returns></returns>
-    public async Task<IReadOnlyList<ModFileInfo>?> GetModFilesInfoAsync(GbModId modId, bool ignoreCache = false,
+    public async Task<IReadOnlyList<ModFileInfo>?> GetModFilesInfoAsync(GbModId modId, string modelName = "Mod", bool ignoreCache = false,
         CancellationToken ct = default)
     {
         var apiGameBananaClient = CreateApiGameBananaClient();
 
-        var modFilesInfo = await GetModFilesInfoAsync(apiGameBananaClient, modId, ignoreCache: ignoreCache, ct: ct)
+        var modFilesInfo = await GetModFilesInfoAsync(apiGameBananaClient, modId, modelName, ignoreCache: ignoreCache, ct: ct)
             .ConfigureAwait(false);
 
         if (modFilesInfo == null)
@@ -151,7 +151,7 @@ public sealed class GameBananaCoreService(
     /// <param name="ct"></param>
     /// <returns>The Absolute path to the downloaded archive</returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public async Task<string> DownloadModAsync(GbModFileIdentifier modFileIdentifier, IProgress<int>? progress = null,
+    public async Task<string> DownloadModAsync(GbModFileIdentifier modFileIdentifier, string modelName = "Mod", IProgress<int>? progress = null,
         CancellationToken ct = default)
     {
         var cachedDataUsed = true;
@@ -160,7 +160,7 @@ public sealed class GameBananaCoreService(
 
         if (modFilesInfo is null)
         {
-            modFilesInfo = await GetModFilesInfoAsync(apiGameBananaClient, modFileIdentifier.ModId, ct: ct)
+            modFilesInfo = await GetModFilesInfoAsync(apiGameBananaClient, modFileIdentifier.ModId, modelName, ct: ct)
                 .ConfigureAwait(false);
 
             if (modFilesInfo == null)
@@ -174,7 +174,7 @@ public sealed class GameBananaCoreService(
         {
             if (cachedDataUsed)
                 // Mod file not found in cache, try to get it directly from the API
-                modFileInfo = (await GetModFilesInfoAsync(apiGameBananaClient, modFileIdentifier.ModId, true, ct)
+                modFileInfo = (await GetModFilesInfoAsync(apiGameBananaClient, modFileIdentifier.ModId, modelName, true, ct)
                         .ConfigureAwait(false))
                     ?.Files.FirstOrDefault(x => x.FileId.ToString() == modFileIdentifier.ModFileId);
 
@@ -207,8 +207,16 @@ public sealed class GameBananaCoreService(
             downloadTask = _modArchiveRepository.CreateAndTrackModArchiveAsync(
                 async (fileStream) =>
                 {
-                    await apiGameBananaClient.DownloadModAsync(modFileIdentifier.ModFileId, fileStream, progress, ct)
-                        .ConfigureAwait(false);
+                    if (!string.IsNullOrWhiteSpace(modFileInfo.DownloadUrl))
+                    {
+                        await apiGameBananaClient.DownloadModByUrlAsync(modFileInfo.DownloadUrl, fileStream, progress, ct)
+                            .ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        await apiGameBananaClient.DownloadModAsync(modFileIdentifier.ModFileId, fileStream, progress, ct)
+                            .ConfigureAwait(false);
+                    }
                     return modFileInfo.FileName;
                 }, modFileIdentifier, cancellationToken: ct);
 
@@ -239,9 +247,76 @@ public sealed class GameBananaCoreService(
         return modArchiveHandle.FullName;
     }
 
+    /// <summary>
+    /// Downloads a mod using the direct download URL from ModFileInfo (obtained from ProfilePage API's _aFiles._sDownloadUrl).
+    /// Completely bypasses GetModFilesInfoAsync, making it work for all model types (Mod, Tool, Wip, etc.).
+    /// </summary>
+    public async Task<string> DownloadModByDirectUrlAsync(ModFileInfo fileInfo, IProgress<int>? progress = null,
+        CancellationToken ct = default)
+    {
+        ArgumentNullException.ThrowIfNull(fileInfo);
+        if (string.IsNullOrWhiteSpace(fileInfo.DownloadUrl))
+            throw new InvalidOperationException($"ModFileInfo for '{fileInfo.FileName}' has no DownloadUrl");
+
+        // Check local archive cache by MD5
+        if (!string.IsNullOrWhiteSpace(fileInfo.Md5Checksum))
+        {
+            var existingArchive = await GetLocalModArchiveByMd5HashAsync(fileInfo.Md5Checksum, ct).ConfigureAwait(false);
+            if (existingArchive != null)
+                return existingArchive.FullName;
+        }
+
+        var downloadUri = Uri.TryCreate(fileInfo.DownloadUrl, UriKind.Absolute, out var parsedUri) ? parsedUri : null;
+        var apiGameBananaClient = CreateApiGameBananaClient();
+        var modFileIdentifier = new GbModFileIdentifier(new GbModId(fileInfo.ModId), new GbModFileId(fileInfo.FileId));
+
+        Task<ModArchiveHandle> downloadTask;
+
+        // Prevent duplicate downloads from the same url
+        using (var _ = await _downloadLock.LockAsync(cancellationToken: ct).ConfigureAwait(false))
+        {
+            if (downloadUri is not null && _downloadHandles.TryGetValue(downloadUri, out var downloadHandle))
+            {
+                var handle = await downloadHandle.DownloadTask.ConfigureAwait(false);
+                return handle.FullName;
+            }
+
+            downloadTask = _modArchiveRepository.CreateAndTrackModArchiveAsync(
+                async (fileStream) =>
+                {
+                    await apiGameBananaClient.DownloadModByUrlAsync(fileInfo.DownloadUrl, fileStream, progress, ct)
+                        .ConfigureAwait(false);
+                    return fileInfo.FileName;
+                }, modFileIdentifier, cancellationToken: ct);
+
+            if (downloadUri is not null)
+            {
+                var handle = new DownloadHandle()
+                {
+                    DownloadUri = downloadUri,
+                    DownloadTask = downloadTask
+                };
+                _downloadHandles.AddOrUpdate(downloadUri, handle, (_, _) => handle);
+            }
+        }
+
+        ModArchiveHandle modArchiveHandle;
+        try
+        {
+            modArchiveHandle = await downloadTask.ConfigureAwait(false);
+        }
+        finally
+        {
+            if (downloadUri is not null)
+                _downloadHandles.TryRemove(downloadUri, out _);
+        }
+
+        return modArchiveHandle.FullName;
+    }
+
 
     private async Task<ApiModFilesInfo?> GetModFilesInfoAsync(
-        IApiGameBananaClient apiClient, GbModId modId,
+        IApiGameBananaClient apiClient, GbModId modId, string modelName = "Mod",
         bool ignoreCache = false, CancellationToken ct = default)
     {
         if (!ignoreCache)
@@ -252,7 +327,7 @@ public sealed class GameBananaCoreService(
         }
 
 
-        var modFilesInfo = await apiClient.GetModFilesInfoAsync(modId, ct)
+        var modFilesInfo = await apiClient.GetModFilesInfoAsync(modId, modelName, ct)
             .ConfigureAwait(false);
 
         if (modFilesInfo == null)

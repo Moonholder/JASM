@@ -1,4 +1,4 @@
-﻿using GIMI_ModManager.Core.Services.GameBanana.ApiModels;
+using GIMI_ModManager.Core.Services.GameBanana.ApiModels;
 using GIMI_ModManager.Core.Services.GameBanana.Models;
 
 namespace GIMI_ModManager.Core.Services.GameBanana;
@@ -24,7 +24,7 @@ public interface IApiGameBananaClient
     /// <param name="modId">The Game banana's mod Id</param>
     /// <param name="cancellationToken"></param>
     /// <returns>ApiModFilesInfo if mod exists or null</returns>
-    public Task<ApiModFilesInfo?> GetModFilesInfoAsync(GbModId modId, CancellationToken cancellationToken = default);
+    public Task<ApiModFilesInfo?> GetModFilesInfoAsync(GbModId modId, string modelName = "Mod", CancellationToken cancellationToken = default);
 
 
     /// <summary>
@@ -35,8 +35,7 @@ public interface IApiGameBananaClient
     /// <param name="cancellationToken"></param>
     /// <returns>ApiModFileInfo if file exists or null</returns>
     [Obsolete("Use GetModFilesInfoAsync instead")]
-    public Task<ApiModFileInfo?> GetModFileInfoAsync(GbModId modId, GbModFileId modFileId,
-        CancellationToken cancellationToken = default);
+    public Task<ApiModFileInfo?> GetModFileInfoAsync(GbModId modId, GbModFileId modFileId, string modelName = "Mod", CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Checks if the mod file exists on GameBanana.
@@ -53,6 +52,12 @@ public interface IApiGameBananaClient
     /// <exception cref="InvalidOperationException">When mod is not found</exception>
     /// <exception cref="HttpRequestException"></exception>
     public Task DownloadModAsync(GbModFileId modFileId, FileStream destinationFile, IProgress<int>? progress,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Download mod file from GameBanana using the direct download URL from _sDownloadUrl.
+    /// </summary>
+    public Task DownloadModByUrlAsync(string downloadUrl, FileStream destinationFile, IProgress<int>? progress,
         CancellationToken cancellationToken = default);
 
     /// <summary>

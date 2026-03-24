@@ -1,7 +1,8 @@
-﻿using Windows.Storage;
+using GIMI_ModManager.Core.Contracts.Services;
+using GIMI_ModManager.Core.GamesService.Interfaces;
 using GIMI_ModManager.Core.Helpers;
 using GIMI_ModManager.Core.Services.GameBanana;
-using GIMI_ModManager.Core.GamesService.Interfaces;
+using Windows.Storage;
 
 namespace GIMI_ModManager.WinUI.ViewModels.CharacterDetailsViewModels;
 
@@ -38,8 +39,10 @@ public partial class CharacterDetailsViewModel
     {
         if (!CanDragDropMod(items))
         {
-            _notificationService.ShowNotification("拖放操作失败",
-                "操作失败，因为所选项目不是有效的模组文件或文件夹。",
+            var localizer = App.GetService<ILanguageLocalizer>();
+            _notificationService.ShowNotification(
+                localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/DragDropFailedTitle", "Drag and drop failed"),
+                localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/InvalidStorageItemError", "Operation failed because the selected item is not a valid mod file or folder."),
                 TimeSpan.FromSeconds(5));
             return;
         }
@@ -55,9 +58,11 @@ public partial class CharacterDetailsViewModel
             }
             catch (Exception e)
             {
+                var localizer = App.GetService<ILanguageLocalizer>();
                 _logger.Error(e, "Error while adding storage items.");
-                _notificationService.ShowNotification("拖放操作失败",
-                    $"在添加存储项时发生错误。原因:\n{e.Message}",
+                _notificationService.ShowNotification(
+                    localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/DragDropFailedTitle", "Drag and drop failed"),
+                    string.Format(localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/ErrorAddingStorageItemFormat", "An error occurred while adding storage items. Reason:\n{0}"), e.Message),
                     TimeSpan.FromSeconds(5));
             }
         }).ConfigureAwait(false);
@@ -77,7 +82,11 @@ public partial class CharacterDetailsViewModel
         if (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps)
             return false;
 
-        if (!GameBananaUrlHelper.TryGetModIdFromUrl(uri, out _))
+        if (!GameBananaUrlHelper.TryGetModIdFromUrl(uri, out _, out var modelName))
+            return false;
+
+        // Request and Question types don't have downloadable files
+        if (!GameBananaUrlHelper.HasDownloadableFiles(modelName))
             return false;
 
         return true;
@@ -87,8 +96,10 @@ public partial class CharacterDetailsViewModel
     {
         if (!CanDragDropModUrl(uri))
         {
-            _notificationService.ShowNotification("拖放操作失败",
-                "操作失败，因为所选项目不是有效的GameBanana模组链接.",
+            var localizer = App.GetService<ILanguageLocalizer>();
+            _notificationService.ShowNotification(
+                localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/DragDropFailedTitle", "Drag and drop failed"),
+                localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/InvalidModUrlError", "Operation failed because the selected item is not a valid GameBanana mod link."),
                 TimeSpan.FromSeconds(5));
             return;
         }

@@ -18,6 +18,9 @@ public class DownloadHistoryEntry
     public string CategoryName { get; set; } = string.Empty;
     public string ModUrl { get; set; } = string.Empty;
     public string ModName { get; set; } = string.Empty;
+    public string ModelName { get; set; } = "Mod";
+    public string DownloadUrl { get; set; } = string.Empty;
+    public string Md5Checksum { get; set; } = string.Empty;
     public string FileName { get; set; } = string.Empty;
     public string FileId { get; set; } = string.Empty;
     public string StatusMessage { get; set; } = string.Empty;

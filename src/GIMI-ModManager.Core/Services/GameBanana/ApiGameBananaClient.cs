@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Net;
 using System.Text.Json;
 using GIMI_ModManager.Core.Services.GameBanana.ApiModels;
@@ -72,14 +72,17 @@ public sealed class ApiGameBananaClient(
         return apiResponse;
     }
 
-    public async Task<ApiModFilesInfo?> GetModFilesInfoAsync(GbModId modId,
+    public async Task<ApiModFilesInfo?> GetModFilesInfoAsync(GbModId modId, string modelName = "Mod",
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(modId);
 
-        var requestUrl = GetModFilesInfoUrl(modId);
+        var downloadsApiUrl = GetModelUrl(modId, modelName, "DownloadPage");
 
-        using var response = await SendRequest(requestUrl, cancellationToken).ConfigureAwait(false);
+        using var response = await SendRequest(downloadsApiUrl, cancellationToken).ConfigureAwait(false);
+
+        if (response.StatusCode == HttpStatusCode.NotFound)
+            return null;
 
         _logger.Debug("Got response from GameBanana: {response}", response.StatusCode);
         await using var contentStream =
@@ -101,12 +104,12 @@ public sealed class ApiGameBananaClient(
         return apiResponse;
     }
 
-    public async Task<ApiModFileInfo?> GetModFileInfoAsync(GbModId modId, GbModFileId modFileId,
+    public async Task<ApiModFileInfo?> GetModFileInfoAsync(GbModId modId, GbModFileId modFileId, string modelName = "Mod",
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(modFileId);
 
-        var modFilesInfo = await GetModFilesInfoAsync(modId, cancellationToken).ConfigureAwait(false);
+        var modFilesInfo = await GetModFilesInfoAsync(modId, modelName, cancellationToken).ConfigureAwait(false);
 
         return modFilesInfo?.Files.FirstOrDefault(x => x.FileId.ToString() == modFileId);
     }
@@ -137,7 +140,21 @@ public sealed class ApiGameBananaClient(
         ArgumentNullException.ThrowIfNull(destinationFile);
         var downloadUrl = DownloadUrl + modFileId;
 
+        await DownloadFromUrlAsync(downloadUrl, destinationFile, progress, cancellationToken).ConfigureAwait(false);
+    }
 
+    public async Task DownloadModByUrlAsync(string downloadUrl, FileStream destinationFile, IProgress<int>? progress,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(downloadUrl, nameof(downloadUrl));
+        ArgumentNullException.ThrowIfNull(destinationFile);
+
+        await DownloadFromUrlAsync(downloadUrl, destinationFile, progress, cancellationToken).ConfigureAwait(false);
+    }
+
+    private async Task DownloadFromUrlAsync(string downloadUrl, FileStream destinationFile, IProgress<int>? progress,
+        CancellationToken cancellationToken)
+    {
         using var response = await _httpClient
             .GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
 
@@ -148,61 +165,50 @@ public sealed class ApiGameBananaClient(
             throw new HttpRequestException(
                 $"Failed to download mod from GameBanana. Reason: {response?.ReasonPhrase}");
 
-        var contentLength = response.Content.Headers.ContentLength;
+        var totalSizeBytes = response.Content.Headers.ContentLength;
 
         await using var downloadStream =
             await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
 
-        if (contentLength is not null && progress is not null)
-            _ = Task.Run(() => DownloadMonitor(contentLength.Value, destinationFile.Name, progress, cancellationToken),
-                cancellationToken);
-
-        await downloadStream.CopyToAsync(destinationFile, cancellationToken).ConfigureAwait(false);
-    }
-
-    private static async Task DownloadMonitor(long totalSizeBytes, string downloadFilePath, IProgress<int> progress,
-        CancellationToken cancellationToken = default)
-    {
-        try
+        if (totalSizeBytes.HasValue && totalSizeBytes.Value > 0 && progress != null)
         {
-            var file = new FileInfo(downloadFilePath);
-            int lastProgress = -1;
-            while (!cancellationToken.IsCancellationRequested)
+            // Rent a 128KB buffer for blazing-fast network-to-disk throughput
+            var buffer = System.Buffers.ArrayPool<byte>.Shared.Rent(131072);
+            try
             {
-                file.Refresh();
-                if (file.Exists)
-                {
-                    var fileSize = file.Length;
-                    if (fileSize >= totalSizeBytes)
-                        break;
+                long totalRead = 0;
+                int bytesRead;
+                int lastPercent = -1;
 
-                    var percent = (int)Math.Round((decimal)fileSize / (decimal)totalSizeBytes * 100);
-                    if (percent != lastProgress)
+                // Read directly from the network stream in chunks and report progress naturally
+                while ((bytesRead = await downloadStream.ReadAsync(buffer, cancellationToken).ConfigureAwait(false)) > 0)
+                {
+                    await destinationFile.WriteAsync(buffer.AsMemory(0, bytesRead), cancellationToken).ConfigureAwait(false);
+                    totalRead += bytesRead;
+
+                    var percent = (int)((double)totalRead / totalSizeBytes.Value * 100);
+                    // De-duplicate progress reports
+                    if (percent != lastPercent)
                     {
                         progress.Report(percent);
-                        lastProgress = percent;
+                        lastPercent = percent;
                     }
                 }
-                await Task.Delay(500, cancellationToken).ConfigureAwait(false);
+            }
+            finally
+            {
+                System.Buffers.ArrayPool<byte>.Shared.Return(buffer);
             }
         }
-        catch (Exception e)
+        else
         {
-#if DEBUG
-            throw;
-#endif
+            // Fallback for chunked transfers without content length
+            await downloadStream.CopyToAsync(destinationFile, cancellationToken).ConfigureAwait(false);
         }
+
+        await destinationFile.FlushAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    private Uri GetModFilesInfoUrl(GbModId gbModId)
-    {
-        return new Uri(ApiUrl + gbModId + "/DownloadPage");
-    }
-
-    private Uri GetModInfoUrl(GbModId gbModId)
-    {
-        return new Uri(ApiUrl + gbModId + "/ProfilePage");
-    }
 
     private static Uri GetModelUrl(GbModId modId, string modelName, string endpoint)
     {

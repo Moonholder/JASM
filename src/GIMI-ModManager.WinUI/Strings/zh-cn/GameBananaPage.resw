@@ -132,6 +132,7 @@
   <data name="NotificationTaskAddedMessage" xml:space="preserve">
     <value>目标文件即将被下载安装</value>
   </data>
+  <data name="ErrorLoadModDetail" xml:space="preserve"><value>加载模组详情失败</value></data>
   <data name="InQueueTitle" xml:space="preserve"><value>已在队列中</value></data>
   <data name="InQueueMessage" xml:space="preserve"><value>"{0}" 已在下载队列中</value></data>
   <data name="TaskAddedTitle" xml:space="preserve"><value>已加入下载队列</value></data>
@@ -152,6 +153,17 @@
   <data name="SearchCategoryPlaceholder" xml:space="preserve"><value>搜索分类或名称...</value></data>
   <data name="MatchCategoryPrompt" xml:space="preserve"><value>无法自动匹配 "{0}" 的目标分类，请手动选择：</value></data>
   <data name="SelectInstallTarget" xml:space="preserve"><value>选择安装目标</value></data>
+  <data name="StrongMatchBtn" xml:space="preserve"><value>无法找到？尝试基于文件名称进行匹配</value></data>
   <data name="DialogOk" xml:space="preserve"><value>确定</value></data>
   <data name="DialogCancel" xml:space="preserve"><value>取消</value></data>
+  <data name="StatusDownloadToCache" xml:space="preserve"><value>下载至缓存区</value></data>
+  <data name="RawFileDownloadedTitle" xml:space="preserve">
+    <value>独立文件已下载</value>
+  </data>
+  <data name="RawFileDownloadedMsg" xml:space="preserve">
+    <value>该项目为一个独立文件或工具，而非标准模组压缩包，已保存至缓存库暂存区。您可以直接打开源目录进行操作。</value>
+  </data>
+  <data name="RawFileOpenDir" xml:space="preserve">
+    <value>在资源管理器中显示</value>
+  </data>
 </root>

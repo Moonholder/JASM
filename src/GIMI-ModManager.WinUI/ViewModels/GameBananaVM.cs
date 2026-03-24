@@ -35,6 +35,7 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
     private readonly ILocalSettingsService _localSettingsService = App.GetService<ILocalSettingsService>();
     private readonly ILogger _logger = App.GetService<ILogger>().ForContext<GameBananaVM>();
     private readonly ILanguageLocalizer _localizer = App.GetService<ILanguageLocalizer>();
+    private readonly IGameBananaDownloadSessionService _downloadSessionService = App.GetService<IGameBananaDownloadSessionService>();
 
     private DispatcherQueue _dispatcherQueue = null!;
 
@@ -45,7 +46,6 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
     private int _currentPage = 1;
     private bool _hasMorePages = true;
     private CancellationTokenSource? _loadCts;
-    private CancellationTokenSource? _searchDebounce;
     private readonly SemaphoreSlim _loadLock = new(1, 1);
     private const int MinItemsPerLoad = 10;
     private const int MaxBackfillIterations = 5;
@@ -96,8 +96,7 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
     public ObservableCollection<GbModDisplayItem> Mods { get; } = new();
     public ObservableCollection<GbPreviewImageItem> PreviewImages { get; } = new();
     public ObservableCollection<ModFileInfo> ModFiles { get; } = new();
-    public ObservableCollection<GbDownloadTask> DownloadQueue => _downloadQueue;
-    private static readonly ObservableCollection<GbDownloadTask> _downloadQueue = new();
+    public ObservableCollection<GbDownloadTask> DownloadQueue => _downloadSessionService.DownloadQueue;
     public ObservableCollection<SortOption> SortOptions { get; }
 
     public ObservableCollection<FilterOption<GbModelFilter>> ModelFilterOptions { get; }
@@ -106,26 +105,26 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
 
     public GameBananaVM()
     {
-        _selectedModName = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/ModDetailTitle", "模组详情");
+        _selectedModName = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/ModDetailTitle", "Mod Detail");
 
         SortOptions = new ObservableCollection<SortOption>
         {
-            new(_localizer.GetLocalizedStringOrDefault("/GameBananaPage/SortDefault", "默认"), "default"),
-            new(_localizer.GetLocalizedStringOrDefault("/GameBananaPage/SortNew", "最新"), "new"),
-            new(_localizer.GetLocalizedStringOrDefault("/GameBananaPage/SortUpdated", "最近更新"), "updated")
+            new(_localizer.GetLocalizedStringOrDefault("/GameBananaPage/SortDefault", "Default"), "default"),
+            new(_localizer.GetLocalizedStringOrDefault("/GameBananaPage/SortNew", "Newest"), "new"),
+            new(_localizer.GetLocalizedStringOrDefault("/GameBananaPage/SortUpdated", "Updated"), "updated")
         };
 
         ModelFilterOptions = new ObservableCollection<FilterOption<GbModelFilter>>
         {
-            new(_localizer.GetLocalizedStringOrDefault("/GameBananaPage/FilterAll", "全部分类"), GbModelFilter.All),
-            new(_localizer.GetLocalizedStringOrDefault("/GameBananaPage/FilterModsOnly", "仅Mods"), GbModelFilter.ModsOnly)
+            new(_localizer.GetLocalizedStringOrDefault("/GameBananaPage/FilterAll", "All Categories"), GbModelFilter.All),
+            new(_localizer.GetLocalizedStringOrDefault("/GameBananaPage/FilterModsOnly", "Mods Only"), GbModelFilter.ModsOnly)
         };
 
         NsfwPolicyOptions = new ObservableCollection<FilterOption<GbNsfwDisplayPolicy>>
         {
-            new(_localizer.GetLocalizedStringOrDefault("/GameBananaPage/NsfwRemove", "隐藏 NSFW"), GbNsfwDisplayPolicy.Remove),
-            new(_localizer.GetLocalizedStringOrDefault("/GameBananaPage/NsfwBlur", "模糊 NSFW"), GbNsfwDisplayPolicy.Blur),
-            new(_localizer.GetLocalizedStringOrDefault("/GameBananaPage/NsfwShow", "显示 NSFW"), GbNsfwDisplayPolicy.Show)
+            new(_localizer.GetLocalizedStringOrDefault("/GameBananaPage/NsfwRemove", "Hide NSFW"), GbNsfwDisplayPolicy.Remove),
+            new(_localizer.GetLocalizedStringOrDefault("/GameBananaPage/NsfwBlur", "Blur NSFW"), GbNsfwDisplayPolicy.Blur),
+            new(_localizer.GetLocalizedStringOrDefault("/GameBananaPage/NsfwShow", "Show NSFW"), GbNsfwDisplayPolicy.Show)
         };
     }
 
@@ -147,7 +146,7 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
     {
         _dispatcherQueue?.TryEnqueue(() =>
         {
-            var count = _downloadQueue.Count(t => !t.IsCompleted && !t.IsError);
+            var count = DownloadQueue.Count(t => !t.IsCompleted && !t.IsError);
             ActiveDownloadCount = count;
             HasActiveDownloads = count > 0 ? Visibility.Visible : Visibility.Collapsed;
         });
@@ -166,30 +165,28 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
 
         if (_gameId == null)
         {
-            ShowError(_localizer.GetLocalizedStringOrDefault("/GameBananaPage/ErrorGameId", "无法获取 GameBanana 游戏 ID"));
+            ShowError(_localizer.GetLocalizedStringOrDefault("/GameBananaPage/ErrorGameId", "Failed to get GameBanana game ID"));
             return;
         }
 
         await LoadSettingsAsync();
 
         _ = LoadCategoriesAsync();
-        _ = LoadDownloadHistoryAsync();
+        _ = _downloadSessionService.LoadDownloadHistoryAsync();
         _ = LoadModsAsync(reset: true);
 
         GbDownloadTask.ActiveTasksChanged += OnActiveTasksChanged;
-        _downloadQueue.CollectionChanged += UpdateActiveDownloadCount;
+        DownloadQueue.CollectionChanged += UpdateActiveDownloadCount;
         UpdateActiveDownloadCount();
     }
 
     public void OnNavigatedFrom()
     {
         CancelLoad();
-        _searchDebounce?.Cancel();
-        _searchDebounce?.Dispose();
         _ = SaveSettingsAsync();
 
         GbDownloadTask.ActiveTasksChanged -= OnActiveTasksChanged;
-        _downloadQueue.CollectionChanged -= UpdateActiveDownloadCount;
+        DownloadQueue.CollectionChanged -= UpdateActiveDownloadCount;
     }
 
     private async Task LoadSettingsAsync()
@@ -319,7 +316,7 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
             _dispatcherQueue.TryEnqueue(() =>
             {
                 Categories.Clear();
-                var allName = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/AllCategories", "全部");
+                var allName = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/AllCategories", "All");
                 Categories.Add(new GbCategoryDisplayItem { Name = allName, CategoryId = null, ItemCount = 0 });
                 foreach (var item in cached)
                 {
@@ -422,7 +419,7 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
                 _dispatcherQueue.TryEnqueue(() =>
                 {
                     Categories.Clear();
-                    var allName = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/AllCategories", "全部");
+                    var allName = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/AllCategories", "All");
                     Categories.Add(new GbCategoryDisplayItem { Name = allName, CategoryId = null, ItemCount = 0 });
                     foreach (var item in finalList)
                     {
@@ -516,7 +513,7 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
             catch (Exception ex)
             {
                 _logger.Error(ex, "Failed to load mods from GameBanana");
-                ShowError(_localizer.GetLocalizedStringOrDefault("/GameBananaPage/ErrorLoadMods", "加载模组失败，请检查网络连接"));
+                ShowError(_localizer.GetLocalizedStringOrDefault("/GameBananaPage/ErrorLoadMods", "Failed to load mods, please check your network connection"));
             }
             finally
             {
@@ -729,7 +726,7 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
                     // Description (keep raw HTML for WebView2 rendering)
                     if (!string.IsNullOrWhiteSpace(detail.Description))
                     {
-                        SelectedModDescription = WrapHtml(detail.Description);
+                        SelectedModDescription = Helpers.GameBananaHtmlHelper.WrapHtml(detail.Description);
                         HasDescription = Visibility.Visible;
                     }
 
@@ -806,7 +803,7 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
 </div>";
                         }));
 
-                        SelectedModUpdateLog = WrapHtml(log);
+                        SelectedModUpdateLog = Helpers.GameBananaHtmlHelper.WrapHtml(log);
                         HasUpdateLog = Visibility.Visible;
                     }
 
@@ -817,7 +814,7 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
         catch (Exception ex)
         {
             _logger.Error(ex, "Failed to load mod detail for {modId}", mod.ModId);
-            _notificationManager.ShowNotification("加载模组详情失败", ex.Message, TimeSpan.FromSeconds(5));
+            _notificationManager.ShowNotification(_localizer.GetLocalizedStringOrDefault("/GameBananaPage/ErrorLoadModDetail", "Failed to load mod detail"), ex.Message, TimeSpan.FromSeconds(5));
         }
         finally
         {
@@ -825,518 +822,29 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
         }
     }
 
-    private static string WrapHtml(string htmlContent)
-    {
-        const string css = @"
-            body {
-                background: transparent;
-                font-family: 'Segoe UI Variable', 'Segoe UI', -apple-system, sans-serif;
-                font-size: 13px;
-                line-height: 1.6;
-                margin: 0;
-                padding: 12px;
-                word-wrap: break-word;
-            }
-            .update-entry {
-                margin-bottom: 24px;
-                padding-bottom: 24px;
-                border-bottom: 1px solid rgba(128,128,128,0.2);
-            }
-            .update-entry:last-child { border-bottom: none; }
-            .update-header {
-                display: flex;
-                align-items: baseline;
-                margin-bottom: 12px;
-            }
-            .icon { font-size: 11px; margin-right: 6px; color: #888; }
-            .title { font-size: 15px; font-weight: 600; color: #e3c454; }
-            .version { font-size: 12px; color: #d15a5a; margin-left: 8px; font-weight: 300; }
-            .date-right { margin-left: auto; font-size: 13px; color: #888; }
-            .changelog-items { margin-bottom: 12px; display: flex; flex-direction: column; gap: 6px; }
-            .cl-item { display: flex; font-size: 12px; line-height: 1.4; align-items: flex-start; }
-            .tag {
-                display: inline-block; padding: 1px 6px; border-radius: 4px; font-size: 11px;
-                font-weight: 500; margin-right: 12px; white-space: nowrap; font-family: 'Segoe UI', sans-serif;
-            }
-            .cl-text { flex: 1; font-family: monospace; font-size: 13px;}
-            .update-text { margin-top: 14px; font-size: 14px; }
-            .update-files { margin-top: 20px; }
-            .files-label { font-size: 11px; font-weight: 600; color: #888; margin-bottom: 6px; }
-            .file-list { list-style-type: none; padding: 0; margin: 0; }
-            .file-list li {
-                position: relative; padding-left: 16px; font-family: 'Consolas', monospace;
-                font-size: 13px; color: #e3c454; margin-bottom: 4px;
-            }
-            .file-list li::before { content: '•'; position: absolute; left: 4px; color: #888; }
-
-            ::-webkit-scrollbar { width: 14px; height: 14px; }
-            ::-webkit-scrollbar-track { background: transparent; }
-            ::-webkit-scrollbar-thumb {
-                background-color: rgba(128, 128, 128, 0.4);
-                background-clip: padding-box; border: 4px solid rgba(0, 0, 0, 0); border-radius: 8px;
-            }
-            ::-webkit-scrollbar-thumb:hover { background-color: rgba(128, 128, 128, 0.6); }
-
-            @media (prefers-color-scheme: dark) {
-                body { color: #d0d0d0; }
-                a { color: #5bc2e7; }
-                .tag-adjustment { background-color: rgba(60, 100, 60, 0.4); border: 1px solid rgba(80, 160, 80, 0.5); color: #8FBC8F; }
-                .tag-addition { background-color: rgba(60, 80, 120, 0.4); border: 1px solid rgba(80, 120, 180, 0.5); color: #8FAACC; }
-                .tag-bugfix { background-color: rgba(120, 60, 60, 0.4); border: 1px solid rgba(180, 80, 80, 0.5); color: #CC8F8F; }
-                .tag-improvement { background-color: rgba(120, 60, 100, 0.4); border: 1px solid rgba(180, 80, 150, 0.5); color: #CC8FCC; }
-                .tag-overhaul { background-color: rgba(120, 80, 40, 0.4); border: 1px solid rgba(180, 120, 60, 0.5); color: #CCAA8F; }
-                .tag-optimization { background-color: rgba(80, 60, 120, 0.4); border: 1px solid rgba(120, 80, 180, 0.5); color: #AA8FCC; }
-                .tag-removal { background-color: rgba(180, 60, 60, 0.4); border: 1px solid rgba(220, 80, 80, 0.5); color: #E88F8F; }
-                .tag-default { background-color: rgba(128, 128, 128, 0.4); border: 1px solid rgba(160, 160, 160, 0.5); color: #CCCCCC; }
-                .cl-text { color: #9cbbd3; }
-            }
-            @media (prefers-color-scheme: light) {
-                body { color: #1a1a1a; }
-                a { color: #005fb8; }
-                .title { color: #a18a3a; }
-                .file-list li { color: #a18a3a; }
-                .icon { color: #666; }
-                .tag-adjustment { background-color: rgba(60, 100, 60, 0.1); border: 1px solid rgba(80, 160, 80, 0.3); color: #4F7F4F; }
-                .tag-addition { background-color: rgba(60, 80, 120, 0.1); border: 1px solid rgba(80, 120, 180, 0.3); color: #4F6F9C; }
-                .tag-bugfix { background-color: rgba(120, 60, 60, 0.1); border: 1px solid rgba(180, 80, 80, 0.3); color: #9C4F4F; }
-                .tag-improvement { background-color: rgba(120, 60, 100, 0.1); border: 1px solid rgba(180, 80, 150, 0.3); color: #9C4F9C; }
-                .tag-overhaul { background-color: rgba(120, 80, 40, 0.1); border: 1px solid rgba(180, 120, 60, 0.3); color: #9C7A4F; }
-                .tag-optimization { background-color: rgba(80, 60, 120, 0.1); border: 1px solid rgba(120, 80, 180, 0.3); color: #7A4F9C; }
-                .tag-removal { background-color: rgba(180, 60, 60, 0.1); border: 1px solid rgba(220, 80, 80, 0.3); color: #AF4F4F; }
-                .tag-default { background-color: rgba(128, 128, 128, 0.1); border: 1px solid rgba(160, 160, 160, 0.3); color: #666666; }
-                .cl-text { color: #3b5a73; }
-            }
-            img { max-width: 100%; height: auto; border-radius: 4px; margin: 4px 0; }
-            a { text-decoration: none; }
-            a:hover { text-decoration: underline; }
-            ul, ol { padding-left: 20px; }
-            blockquote { margin: 8px 0; padding: 4px 12px; border-left: 3px solid #555; color: #aaa; }
-            @media (prefers-color-scheme: light) { blockquote { border-left-color: #ccc; color: #444; } }";
-
-        return $"<!DOCTYPE html><html><head><meta charset=\"utf-8\"/><style>{css}</style></head><body>{htmlContent}</body></html>";
-    }
 
     // ── Download and Install ──
 
     [RelayCommand]
-    private async Task DownloadAndInstall(ModFileInfo? fileInfo)
+    private void DownloadAndInstall(ModFileInfo? fileInfo)
     {
-        if (fileInfo == null || SelectedModDetail == null || SelectedMod == null) return;
-        if (string.IsNullOrEmpty(_gameId)) return;
-
-        // Prevent duplicate downloads, but remove older completed/error tasks if retrying
-        var existingTask = DownloadQueue.FirstOrDefault(t => t.FileInfo?.FileId == fileInfo.FileId);
-        if (existingTask != null)
+        if (fileInfo != null && SelectedMod != null && SelectedModDetail != null)
         {
-            if (!existingTask.IsCompleted && !existingTask.IsError)
-            {
-                var title = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/InQueueTitle", "已在队列中");
-                var msgTpl = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/InQueueMessage", "\"{0}\" 已在下载队列中");
-                _notificationManager.ShowNotification(title, string.Format(msgTpl, fileInfo.FileName), TimeSpan.FromSeconds(3));
-                return;
-            }
-            // Remove the old task so we can add a fresh one without duplicating records
-            DownloadQueue.Remove(existingTask);
-        }
-
-        // If it's cached, the downloading task will finish instantly and immediately trigger the install flow.
-        var cts = new CancellationTokenSource();
-        fileInfo.IsDownloading = true;
-        var downloadTask = new GbDownloadTask
-        {
-            Mod = SelectedMod,
-            FileInfo = fileInfo,
-            CategoryName = SelectedModDetail.CategoryName,
-            ModUrl = SelectedModDetail?.ModPageUrl?.ToString(),
-            Cts = cts
-        };
-        DownloadQueue.Add(downloadTask);
-
-        var addedTitle = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/TaskAddedTitle", "已加入下载队列");
-        var addedMsgTpl = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/TaskAddedMessage", "正在后台下载 {0}...");
-        _notificationManager.ShowNotification(addedTitle, string.Format(addedMsgTpl, SelectedMod?.Name), TimeSpan.FromSeconds(3));
-
-        // Run the actual download/install in background
-        _ = Task.Run(() => ProcessDownloadTaskAsync(downloadTask));
-    }
-
-    [RelayCommand]
-    private void CancelDownloadTask(GbDownloadTask? task)
-    {
-        if (task is not { IsCompleted: false }) return;
-        task.Cts?.Cancel();
-        _dispatcherQueue.TryEnqueue(() =>
-        {
-            task.StatusMessage = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/StatusCancelled", "已取消");
-            task.IsCompleted = true;
-            task.IsError = true;
-            if (task.FileInfo != null) task.FileInfo.IsDownloading = false;
-            _ = SaveDownloadHistoryAsync();
-        });
-    }
-
-    private void CleanupDownloadAssets(GbDownloadTask task)
-    {
-        if (!string.IsNullOrEmpty(task.ArchivePath) && System.IO.File.Exists(task.ArchivePath))
-        {
-            try { File.Delete(task.ArchivePath); } catch { }
+            _downloadSessionService.DownloadAndInstall(fileInfo, SelectedMod, SelectedModDetail, _gameId);
         }
     }
 
     [RelayCommand]
-    private void RemoveDownloadTask(GbDownloadTask? task)
-    {
-        if (task == null) return;
-        DownloadQueue.Remove(task);
-        CleanupDownloadAssets(task);
-        _ = SaveDownloadHistoryAsync();
-    }
+    private void CancelDownloadTask(GbDownloadTask? task) => _downloadSessionService.CancelDownloadTask(task);
 
     [RelayCommand]
-    private void ClearAllCompletedTasks()
-    {
-        var toRemove = DownloadQueue.Where(t => t.IsCompleted || t.IsError).ToList();
-        foreach (var task in toRemove)
-        {
-            DownloadQueue.Remove(task);
-            CleanupDownloadAssets(task);
-        }
-        _ = SaveDownloadHistoryAsync();
-    }
+    private void RemoveDownloadTask(GbDownloadTask? task) => _downloadSessionService.RemoveDownloadTask(task);
 
     [RelayCommand]
-    private void RetryDownloadTask(GbDownloadTask? task)
-    {
-        if (task == null) return;
+    private void ClearAllCompletedTasks() => _downloadSessionService.ClearAllCompletedTasks();
 
-        // Ensure it is not currently running
-        if (!task.IsCompleted && !task.IsError) return;
-
-        task.IsCompleted = false;
-        task.IsError = false;
-        task.StatusMessage = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/StatusPreparing", "准备中...");
-        task.ProgressPercentage = 0;
-        task.Cts = new CancellationTokenSource();
-
-        _ = Task.Run(() => ProcessDownloadTaskAsync(task));
-    }
-
-    private static readonly SemaphoreSlim _downloadQueueLock = new(1, 1);
-
-    private async Task ProcessDownloadTaskAsync(GbDownloadTask task)
-    {
-        bool lockAcquired = false;
-        try
-        {
-
-            var progress = new Progress<int>(p =>
-            {
-                _dispatcherQueue.TryEnqueue(() =>
-                {
-                    task.ProgressPercentage = p;
-                    var dlMsgTpl = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/StatusDownloading", "下载中 {0}%");
-                    task.StatusMessage = string.Format(dlMsgTpl, p);
-                });
-            });
-
-            var identifier = new GbModFileIdentifier(
-                new GbModId(task.FileInfo.ModId), new GbModFileId(task.FileInfo.FileId));
-
-            // Downloading using the service
-            var archivePath = await Task.Run(
-                () => _gbService.DownloadModAsync(identifier, progress, task.Cts?.Token ?? CancellationToken.None));
-
-            _dispatcherQueue.TryEnqueue(() => task.StatusMessage = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/StatusWaitingForInstall", "正在等待其他安装完成..."));
-            task.ArchivePath = archivePath;
-
-            await _downloadQueueLock.WaitAsync(task.Cts?.Token ?? CancellationToken.None);
-            lockAcquired = true;
-
-            _dispatcherQueue.TryEnqueue(() => task.StatusMessage = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/StatusMatching", "匹配分类..."));
-
-            // Try to match to a local character — aggregate scores from Category, Mod Name, and File Name
-            IModdableObject? targetCharacter = null;
-            var matchScores = new Dictionary<IModdableObject, int>();
-
-            void UpdateScores(string? query)
-            {
-                if (string.IsNullOrWhiteSpace(query)) return;
-                var dict = _gameService.QueryModdableObjects(query);
-                foreach (var kv in dict)
-                {
-                    if (!matchScores.TryGetValue(kv.Key, out var existingScore) || kv.Value > existingScore)
-                    {
-                        matchScores[kv.Key] = kv.Value;
-                    }
-                }
-            }
-
-            UpdateScores(task.CategoryName);
-
-            if (matchScores.Count > 0)
-            {
-                var bestMatch = matchScores.MaxBy(x => x.Value);
-                // "Swords" matching "Silver Sword" yields ~145 points. 
-                // We raise the threshold to 150 to ensure only strong, definitive matches are automatically selected.
-                if (bestMatch.Value >= 150)
-                {
-                    targetCharacter = bestMatch.Key;
-                }
-            }
-
-            if (targetCharacter == null)
-            {
-                _dispatcherQueue.TryEnqueue(() => task.StatusMessage = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/StatusWaitingCategory", "等待选择分类..."));
-                targetCharacter = await PromptUserForCharacterAsync(task.Mod?.Name, task.FileInfo?.FileName);
-
-                if (targetCharacter == null)
-                {
-                    _dispatcherQueue.TryEnqueue(() =>
-                    {
-                        task.StatusMessage = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/StatusInstallCancelledCached", "已取消安装 (保留在缓存)");
-                        task.IsCompleted = true;
-                        if (task.FileInfo != null) task.FileInfo.IsDownloading = false;
-                        _ = SaveDownloadHistoryAsync();
-                    });
-
-                    var doneTitle = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/DownloadCompletedTitle", "下载完成");
-                    var doneMsgTpl = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/DownloadCompletedCachedMessage", "模组已下载至缓存: {0}");
-                    _notificationManager.ShowNotification(doneTitle, string.Format(doneMsgTpl, System.IO.Path.GetFileName(archivePath)), TimeSpan.FromSeconds(10));
-                    return;
-                }
-            }
-
-            _dispatcherQueue.TryEnqueue(() => task.StatusMessage = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/StatusInstalling2", "正在安装..."));
-
-            var modList = _skinManagerService.GetCharacterModList(targetCharacter);
-            var cleanName = Path.GetFileNameWithoutExtension(task.FileInfo?.FileName ?? task.Mod?.Name ?? "mod");
-            var modFolder = _archiveService.ExtractArchive(archivePath, App.GetUniqueTmpFolder().FullName, extractedFolderName: cleanName);
-            var modUrl = !string.IsNullOrEmpty(task.ModUrl) ? new Uri(task.ModUrl) : null;
-
-            try
-            {
-                using var installerTask = await _modInstallerService.StartModInstallationAsync(modFolder, modList,
-                    setup: options => { options.ModUrl = modUrl; });
-
-                var result = await installerTask.WaitForCloseAsync();
-
-                _dispatcherQueue.TryEnqueue(() =>
-                {
-                    if (result.CloseReason == CloseRequestedArgs.CloseReasons.Canceled)
-                    {
-                        task.StatusMessage = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/StatusInstallCancelled", "取消安装");
-                        task.IsCompleted = true; // Technically download finished, just install canceled.
-                        if (task.FileInfo != null) task.FileInfo.IsDownloading = false;
-                    }
-                    else
-                    {
-                        task.StatusMessage = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/StatusInstallSuccess", "安装成功");
-                        task.IsCompleted = true;
-                        task.ProgressPercentage = 100;
-                        if (task.FileInfo != null) task.FileInfo.IsDownloading = false;
-                    }
-                    _ = SaveDownloadHistoryAsync();
-                });
-            }
-            finally
-            {
-                if (modFolder.Exists)
-                {
-                    try { modFolder.Delete(true); } catch { }
-                }
-            }
-        }
-        catch (OperationCanceledException)
-        {
-            _dispatcherQueue.TryEnqueue(() =>
-            {
-                task.StatusMessage = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/StatusCancelled", "已取消");
-                task.IsError = true;
-                task.IsCompleted = true;
-                if (task.FileInfo != null) task.FileInfo.IsDownloading = false;
-                _ = SaveDownloadHistoryAsync();
-            });
-        }
-        catch (Exception ex)
-        {
-            _logger.Error(ex, "Failed to download/install mod");
-            _dispatcherQueue.TryEnqueue(() =>
-            {
-                var errPrefix = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/StatusErrorPrefix", "错误: ");
-                task.StatusMessage = $"{errPrefix}{ex.Message}";
-                task.IsError = true;
-                task.IsCompleted = true;
-                if (task.FileInfo != null) task.FileInfo.IsDownloading = false;
-                _ = SaveDownloadHistoryAsync();
-            });
-            var failTitle = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/DownloadFailedTitle", "下载/安装失败");
-            _notificationManager.ShowNotification(failTitle, ex.Message, TimeSpan.FromSeconds(10));
-        }
-        finally
-        {
-            if (lockAcquired)
-            {
-                _downloadQueueLock.Release();
-            }
-        }
-    }
-
-    private Task<IModdableObject?> PromptUserForCharacterAsync(string? modName, string? fileName)
-    {
-        var tcs = new TaskCompletionSource<IModdableObject?>();
-        _dispatcherQueue.TryEnqueue(async () =>
-        {
-            try
-            {
-                var characters = _gameService.GetAllModdableObjects().ToList();
-                if (characters.Count == 0)
-                {
-                    var failTitleInstall = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/InstallFailedTitle", "安装失败");
-                    var failMsgNoChars = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/InstallFailedNoCharacters", "无法找到角色列表，请确保已正确初始化游戏");
-                    _notificationManager.ShowNotification(failTitleInstall, failMsgNoChars, TimeSpan.FromSeconds(10));
-                    tcs.SetResult(null);
-                    return;
-                }
-
-                var localizedCategories = _gameService.GetCategories()
-                    .ToDictionary(c => c.InternalName.Id, c => c.DisplayName);
-
-                var displayItems = characters
-                    .Select(c =>
-                    {
-                        var catId = c.ModCategory?.InternalName?.Id ?? "Unknown";
-                        var localizedName = localizedCategories.GetValueOrDefault(catId, catId);
-                        return Tuple.Create(c, $"[{localizedName}] {c.DisplayName}");
-                    })
-                    .OrderBy(x => x.Item2)
-                    .ToList();
-
-                var listView = new Microsoft.UI.Xaml.Controls.ListView
-                {
-                    MaxHeight = 300,
-                    SelectionMode = Microsoft.UI.Xaml.Controls.ListViewSelectionMode.Single,
-                    ItemsSource = displayItems,
-                    DisplayMemberPath = "Item2",
-                    Margin = new Thickness(0, 8, 0, 0)
-                };
-                if (displayItems.Count > 0)
-                    listView.SelectedIndex = 0;
-
-                var searchBox = new Microsoft.UI.Xaml.Controls.AutoSuggestBox
-                {
-                    PlaceholderText = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/SearchCategoryPlaceholder", "搜索分类或名称..."),
-                    QueryIcon = new Microsoft.UI.Xaml.Controls.SymbolIcon(Microsoft.UI.Xaml.Controls.Symbol.Find),
-                    Margin = new Thickness(0, 8, 0, 0)
-                };
-
-                searchBox.TextChanged += (s, e) =>
-                {
-                    var query = s.Text?.Trim();
-                    if (string.IsNullOrEmpty(query))
-                    {
-                        listView.ItemsSource = displayItems;
-                    }
-                    else
-                    {
-                        listView.ItemsSource = displayItems
-                            .Where(n => n.Item2.Contains(query, StringComparison.OrdinalIgnoreCase))
-                            .ToList();
-                    }
-                };
-
-                var strongMatchBtn = new Microsoft.UI.Xaml.Controls.HyperlinkButton
-                {
-                    Content = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/StrongMatchBtn", "无法找到？尝试基于文件名称进行匹配"),
-                    Margin = new Thickness(0, 4, 0, 4)
-                };
-                strongMatchBtn.Click += (s, e) =>
-                {
-                    var matchScores = new Dictionary<IModdableObject, int>();
-                    void UpdateScores(string? query)
-                    {
-                        if (string.IsNullOrWhiteSpace(query)) return;
-                        var dict = _gameService.QueryModdableObjects(query);
-                        foreach (var kv in dict)
-                        {
-                            if (!matchScores.TryGetValue(kv.Key, out var existingScore) || kv.Value > existingScore)
-                            {
-                                matchScores[kv.Key] = kv.Value;
-                            }
-                        }
-                    }
-                    UpdateScores(modName);
-                    if (!string.IsNullOrEmpty(fileName))
-                    {
-                        var fileNameNoExt = System.IO.Path.GetFileNameWithoutExtension(fileName).Replace("_", " ");
-                        UpdateScores(fileNameNoExt);
-                    }
-                    if (matchScores.Count > 0)
-                    {
-                        var bestMatch = matchScores.MaxBy(x => x.Value);
-                        if (bestMatch.Value > 0)
-                        {
-                            var bestTuple = displayItems.FirstOrDefault(t => t.Item1.InternalName.Equals(bestMatch.Key.InternalName));
-                            if (bestTuple != null)
-                            {
-                                if (!string.IsNullOrEmpty(searchBox.Text)) searchBox.Text = string.Empty;
-                                listView.SelectedItem = bestTuple;
-                                listView.ScrollIntoView(bestTuple);
-                            }
-                        }
-                    }
-                };
-
-                var panel = new Microsoft.UI.Xaml.Controls.StackPanel
-                {
-                    Width = 320,
-                    Children =
-                    {
-                        new Microsoft.UI.Xaml.Controls.TextBlock
-                        {
-                            Text = string.Format(_localizer.GetLocalizedStringOrDefault("/GameBananaPage/MatchCategoryPrompt", "无法自动匹配 \"{0}\" 的目标分类，请手动选择："), modName),
-                            TextWrapping = TextWrapping.Wrap
-                        },
-                        strongMatchBtn,
-                        searchBox,
-                        listView
-                    }
-                };
-
-                var dialog = new Microsoft.UI.Xaml.Controls.ContentDialog
-                {
-                    Title = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/SelectInstallTarget", "选择安装目标"),
-                    Content = panel,
-                    PrimaryButtonText = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/DialogOk", "确定"),
-                    CloseButtonText = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/DialogCancel", "取消"),
-                    DefaultButton = Microsoft.UI.Xaml.Controls.ContentDialogButton.Primary,
-                    Style = Application.Current.Resources["DefaultContentDialogStyle"] as Style
-                };
-
-                var result = await _windowManagerService.ShowDialogAsync(dialog);
-
-                if (result == Microsoft.UI.Xaml.Controls.ContentDialogResult.Primary)
-                {
-                    if (listView.SelectedItem is Tuple<IModdableObject, string> selected)
-                    {
-                        tcs.SetResult(selected.Item1);
-                    }
-                    else
-                    {
-                        tcs.SetResult(null);
-                    }
-                }
-                else
-                {
-                    tcs.SetResult(null);
-                }
-            }
-            catch (Exception ex)
-            {
-                tcs.SetException(ex);
-            }
-        });
-        return tcs.Task;
-    }
+    [RelayCommand]
+    private void RetryDownloadTask(GbDownloadTask? task) => _downloadSessionService.RetryDownloadTask(task);
 
     [RelayCommand]
     private void CloseDetailPane()
@@ -1351,83 +859,7 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
         ModFiles.Clear();
     }
 
-    // ── Download history persistence ──
 
-    private async Task SaveDownloadHistoryAsync()
-    {
-        try
-        {
-            var entries = DownloadQueue
-                .Where(t => t.IsCompleted || t.IsError)
-                .TakeLast(20) // Keep max 20 entries
-                .Select(t => new DownloadHistoryEntry
-                {
-                    ModId = t.FileInfo?.ModId ?? "",
-                    CategoryName = t.CategoryName ?? "",
-                    ModUrl = t.ModUrl ?? "",
-                    ModName = t.Mod?.Name ?? "",
-                    FileName = t.FileInfo?.FileName ?? "",
-                    FileId = t.FileInfo?.FileId ?? "",
-                    StatusMessage = t.StatusMessage,
-                    ArchivePath = t.ArchivePath ?? "",
-                    IsError = t.IsError,
-                    IsCompleted = t.IsCompleted,
-                    ProgressPercentage = t.ProgressPercentage
-                })
-                .ToList();
-
-            await _localSettingsService.SaveSettingAsync(
-                GameBananaSettings.DownloadHistoryKey, entries);
-        }
-        catch (Exception ex)
-        {
-            _logger.Warning(ex, "Failed to save download history");
-        }
-    }
-
-    private async Task LoadDownloadHistoryAsync()
-    {
-        try
-        {
-            if (DownloadQueue.Any()) return; // Already loaded
-
-            var history = await _localSettingsService.ReadSettingAsync<List<DownloadHistoryEntry>>(GameBananaSettings.DownloadHistoryKey);
-            if (history != null && history.Any())
-            {
-                var dict = new Dictionary<string, GbDownloadTask>();
-
-                foreach (var entry in history)
-                {
-                    var task = new GbDownloadTask
-                    {
-                        Mod = new GbModDisplayItem { Name = entry.ModName },
-                        FileInfo = new ModFileInfo(!string.IsNullOrEmpty(entry.ModId) ? entry.ModId : "0", entry.FileId, entry.FileName, string.Empty, string.Empty, DateTime.MinValue),
-                        CategoryName = entry.CategoryName,
-                        ModUrl = entry.ModUrl,
-                        StatusMessage = entry.StatusMessage,
-                        ArchivePath = entry.ArchivePath,
-                        IsError = entry.IsError,
-                        IsCompleted = entry.IsCompleted,
-                        ProgressPercentage = entry.ProgressPercentage
-                    };
-                    dict[entry.FileId] = task;
-                }
-
-                _dispatcherQueue.TryEnqueue(() =>
-                {
-                    DownloadQueue.Clear();
-                    foreach (var task in dict.Values.OrderBy(t => t.IsCompleted).ThenBy(t => t.IsError))
-                    {
-                        DownloadQueue.Add(task);
-                    }
-                });
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.Error(ex, "Failed to load download history");
-        }
-    }
 
     [RelayCommand]
     private void OpenInBrowser()
@@ -1509,6 +941,7 @@ public partial class GbModDisplayItem : ObservableObject
     public Visibility NsfwVisibility => IsNsfw && NsfwPolicy == GbNsfwDisplayPolicy.Show ? Visibility.Visible : (IsNsfw && NsfwPolicy == GbNsfwDisplayPolicy.Blur ? Visibility.Visible : Visibility.Collapsed);
     public double NsfwBlurRadius => IsNsfw && NsfwPolicy == GbNsfwDisplayPolicy.Blur ? 15.0 : 0.0;
     public Visibility NsfwLabelVisibility => IsNsfw && NsfwPolicy == GbNsfwDisplayPolicy.Blur ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility IsNsfwVisible => IsNsfw ? Visibility.Visible : Visibility.Collapsed;
 
     /// <summary>
     /// Type label to show on the card (empty for regular Mods).
@@ -1516,11 +949,8 @@ public partial class GbModDisplayItem : ObservableObject
     public string TypeLabel => ModelName switch
     {
         "Mod" => string.Empty,
-        "Wip" => "[WIP]",
-        "Tool" => "[Tool]",
-        "Request" => "[Request]",
-        "Question" => "[Question]",
-        _ => $"[{ModelName}]"
+        "Wip" => "WIP",
+        _ => ModelName
     };
 
     public Visibility TypeLabelVisibility => string.IsNullOrEmpty(TypeLabel)

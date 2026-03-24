@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using Windows.Storage;
 using Windows.System;
@@ -347,7 +347,7 @@ public partial class CharactersViewModel : ObservableRecipient, INavigationAware
 
         var firstType = characters.FirstOrDefault()?.GetType();
         if (characters.Any(ch => ch.GetType() != firstType))
-            throw new InvalidOperationException("角色列表中存在不同类型的角色");
+            throw new InvalidOperationException(_localizer.GetLocalizedStringOrDefault("/CharactersPage/MixedCharacterTypesError", "Different types of characters exist in the character list"));
 
         var others =
             characters.FirstOrDefault(ch =>
@@ -1008,11 +1008,20 @@ public partial class CharactersViewModel : ObservableRecipient, INavigationAware
             return;
         }
 
-        if (!GameBananaUrlHelper.TryGetModIdFromUrl(uri, out _))
+        if (!GameBananaUrlHelper.TryGetModIdFromUrl(uri, out _, out var modelName))
         {
             NotificationManager.ShowNotification(
                 _localizer.GetLocalizedStringOrDefault("/CharactersPage/InvalidGameBananaUrlTitle", "Invalid GameBanana Mod Page URL"),
                 "", null);
+            return;
+        }
+
+        if (!GameBananaUrlHelper.HasDownloadableFiles(modelName))
+        {
+            NotificationManager.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/CharactersPage/NoDownloadableFilesTitle", "No Downloadable Files"),
+                string.Format(_localizer.GetLocalizedStringOrDefault("/CharactersPage/NoDownloadableFilesMessage", "GameBanana {0} pages do not contain downloadable files."), modelName),
+                TimeSpan.FromSeconds(5));
             return;
         }
 

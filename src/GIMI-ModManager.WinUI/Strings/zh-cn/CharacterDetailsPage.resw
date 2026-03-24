@@ -334,4 +334,16 @@
   <data name="DeleteError_DeleteHeader" xml:space="preserve">
     <value>删除错误模组:</value>
   </data>
+  <data name="DragDropFailedTitle" xml:space="preserve">
+    <value>拖放操作失败</value>
+  </data>
+  <data name="InvalidStorageItemError" xml:space="preserve">
+    <value>操作失败，因为所选项目不是有效的模组文件或文件夹。</value>
+  </data>
+  <data name="ErrorAddingStorageItemFormat" xml:space="preserve">
+    <value>在添加存储项时发生错误。原因:\n{0}</value>
+  </data>
+  <data name="InvalidModUrlError" xml:space="preserve">
+    <value>操作失败，因为所选项目不是有效的GameBanana模组链接。</value>
+  </data>
 </root>

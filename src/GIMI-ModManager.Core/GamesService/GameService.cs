@@ -665,17 +665,7 @@ public class GameService : IGameService
 
         foreach (var character in charactersToSearch)
         {
-            var result = GetBaseSearchResult(searchQuery, character);
-
-            // A character can have multiple keys, so we take the best one. The keys are only used to help with searching
-            if (character.Keys.Count > 0)
-            {
-                var bestKeyMatch = character.Keys.Max(key => Fuzz.Ratio(key, searchQuery));
-                result += bestKeyMatch;
-            }
-
-            if (character.Keys.Any(key => key.Equals(searchQuery, StringComparison.CurrentCultureIgnoreCase)))
-                result += 100;
+            var result = CalculateObjectMatchScore(searchQuery, character);
 
             if (result < minScore) continue;
 
@@ -692,20 +682,17 @@ public class GameService : IGameService
         var searchResult = new Dictionary<IModdableObject, int>();
         searchQuery = searchQuery.ToLower().Trim();
 
-
         if (category?.ModCategory == ModCategory.Character)
             return QueryCharacters(searchQuery, GetAllModdableObjectsAsCategory<ICharacter>(), minScore)
                 .ToDictionary(x => x.Key as IModdableObject, x => x.Value);
-
 
         var charactersToSearch = category is null
             ? GetAllModdableObjects()
             : GetModdableObjects(category);
 
-
         foreach (var moddableObject in charactersToSearch)
         {
-            var result = GetBaseSearchResult(searchQuery, moddableObject);
+            var result = CalculateObjectMatchScore(searchQuery, moddableObject);
 
             if (result < minScore) continue;
 
@@ -713,6 +700,25 @@ public class GameService : IGameService
         }
 
         return searchResult;
+    }
+
+    private static int CalculateObjectMatchScore(string searchQuery, IModdableObject moddableObject)
+    {
+        var result = GetBaseSearchResult(searchQuery, moddableObject);
+
+        if (moddableObject is ICharacter character)
+        {
+            if (character.Keys.Count > 0)
+            {
+                var bestKeyMatch = character.Keys.Max(key => Fuzz.Ratio(key, searchQuery));
+                result += bestKeyMatch;
+            }
+
+            if (character.Keys.Any(key => key.Equals(searchQuery, StringComparison.CurrentCultureIgnoreCase)))
+                result += 100;
+        }
+
+        return result;
     }
 
     private static int GetBaseSearchResult(string searchQuery, INameable character)

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Security.Cryptography;
 using Serilog;
 using SharpCompress.Archives;
@@ -24,9 +24,6 @@ public class ArchiveService
         if (!archive.Exists)
             throw new FileNotFoundException("Archive not found", archivePath);
 
-        if (!IsArchive(archivePath))
-            throw new InvalidOperationException("File is not an archive");
-
         var destinationDirectory = Directory.CreateDirectory(destinationPath);
 
         var folderName = string.IsNullOrWhiteSpace(extractedFolderName) ? Path.GetFileNameWithoutExtension(archive.Name) : extractedFolderName;
@@ -40,9 +37,16 @@ public class ArchiveService
 
         Directory.CreateDirectory(extractedFolder);
 
-        var extractor = Extractor(extractedFolder);
-
-        extractor?.Invoke(archive.FullName, extractedFolder);
+        if (!IsArchive(archivePath))
+        {
+            var targetFilePath = Path.Combine(extractedFolder, folderName + archive.Extension);
+            archive.CopyTo(targetFilePath, true);
+        }
+        else
+        {
+            var extractor = Extractor(extractedFolder);
+            extractor?.Invoke(archive.FullName, extractedFolder);
+        }
 
         return new DirectoryInfo(extractedFolder);
     }
@@ -67,7 +71,7 @@ public class ArchiveService
         return hash1.SequenceEqual(hash2);
     }
 
-    private bool IsArchive(string path)
+    public static bool IsArchive(string path)
     {
         return Path.GetExtension(path) switch
         {

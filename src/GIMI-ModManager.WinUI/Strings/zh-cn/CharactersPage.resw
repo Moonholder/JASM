@@ -236,4 +236,13 @@
   <data name="PasswordManager_RemoveButton.Content" xml:space="preserve">
     <value>删除</value>
   </data>
+  <data name="MixedCharacterTypesError" xml:space="preserve">
+    <value>角色列表中存在不同类型的角色</value>
+  </data>
+  <data name="NoDownloadableFilesTitle" xml:space="preserve">
+    <value>没有可下载的文件</value>
+  </data>
+  <data name="NoDownloadableFilesMessage" xml:space="preserve">
+    <value>GameBanana {0} 页面不包含可下载的文件。</value>
+  </data>
 </root>

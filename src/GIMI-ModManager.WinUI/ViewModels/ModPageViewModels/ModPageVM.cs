@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GIMI_ModManager.Core.Contracts.Entities;
@@ -85,12 +85,17 @@ public partial class ModPageVM : ObservableRecipient
     }
 
 
+    private string _modelName = "Mod";
+
     private async Task InternalInitialize()
     {
         IsWindowBusy = true;
 
-        if (GameBananaUrlHelper.TryGetModIdFromUrl(ModPage, out var modId))
+        if (GameBananaUrlHelper.TryGetModIdFromUrl(ModPage, out var modId, out var modelName))
+        {
             _gbModId = modId;
+            _modelName = modelName;
+        }
         else
             await LogErrorAndClose(new InvalidGameBananaUrlException($"Invalid GameBanana url: {ModPage}"));
 
@@ -106,7 +111,7 @@ public partial class ModPageVM : ObservableRecipient
 
         using (var _ = IgnorePollyLimiterScope.Ignore())
         {
-            _modPageInfo = await _gameBananaCoreService.GetModProfileAsync(_gbModId, ct: _ct);
+            _modPageInfo = await _gameBananaCoreService.GetModProfileAsync(_gbModId, _modelName, ct: _ct);
         }
 
         if (_modPageInfo is null)
@@ -196,10 +201,8 @@ public partial class ModPageVM : ObservableRecipient
             fileInfoVm.Status = ModFileInfoVm.InstallStatus.Downloading;
             fileInfoVm.IsBusy = true;
 
-            var identifier = new GbModFileIdentifier(new GbModId(fileInfoVm.ModId), new GbModFileId(fileInfoVm.FileId));
-
             var archivePath =
-                await Task.Run(() => _gameBananaCoreService.DownloadModAsync(identifier, fileInfoVm.Progress, _ct),
+                await Task.Run(() => _gameBananaCoreService.DownloadModByDirectUrlAsync(fileInfoVm.ModFileInfo, fileInfoVm.Progress, _ct),
                     _ct);
 
             fileInfoVm.ArchiveFile = new FileInfo(archivePath);

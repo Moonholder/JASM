@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GIMI_ModManager.Core.Contracts.Entities;
@@ -239,10 +239,8 @@ public partial class ModUpdateVM : ObservableRecipient
             fileInfoVm.Status = ModFileInfoVm.InstallStatus.Downloading;
             fileInfoVm.IsBusy = true;
 
-            var identifier = new GbModFileIdentifier(new GbModId(fileInfoVm.ModId), new GbModFileId(fileInfoVm.FileId));
-
             var archivePath =
-                await Task.Run(() => _gameBananaCoreService.DownloadModAsync(identifier, fileInfoVm.Progress, _ct),
+                await Task.Run(() => _gameBananaCoreService.DownloadModByDirectUrlAsync(fileInfoVm.ModFileInfo, fileInfoVm.Progress, _ct),
                     _ct);
 
             fileInfoVm.ArchiveFile = new FileInfo(archivePath);

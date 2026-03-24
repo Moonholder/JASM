@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 using GIMI_ModManager.Core.Services.GameBanana.Models;
 using Serilog;
@@ -269,9 +269,37 @@ public class ModArchiveHandle
 
     public bool Exists => _archiveFile.Exists;
 
-    public double SizeInGb => _archiveFile.Length / 1024D / 1024D / 1024D;
+    public double SizeInGb
+    {
+        get
+        {
+            try
+            {
+                _archiveFile.Refresh();
+                return _archiveFile.Exists ? _archiveFile.Length / 1024D / 1024D / 1024D : 0;
+            }
+            catch (Exception)
+            {
+                return 0;
+            }
+        }
+    }
 
-    public DateTime LastWriteTime => _archiveFile.LastWriteTime;
+    public DateTime LastWriteTime
+    {
+        get
+        {
+            try
+            {
+                _archiveFile.Refresh();
+                return _archiveFile.Exists ? _archiveFile.LastWriteTime : DateTime.MinValue;
+            }
+            catch (Exception)
+            {
+                return DateTime.MinValue;
+            }
+        }
+    }
 
     public void Refresh() => _archiveFile.Refresh();
 

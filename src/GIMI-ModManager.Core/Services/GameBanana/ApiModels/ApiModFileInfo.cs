@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
 namespace GIMI_ModManager.Core.Services.GameBanana.ApiModels;
 
@@ -20,4 +20,10 @@ public class ApiModFileInfo
     [JsonPropertyName("_sMd5Checksum")] public string Md5Checksum { get; init; } = null!;
 
     [JsonPropertyName("_nDownloadCount")] public int DownloadCount { get; init; } = -1;
+
+    [JsonPropertyName("_sVersion")] public string? Version { get; init; }
+
+    [JsonPropertyName("_sAvResult")] public string? AvResult { get; init; }
+
+    [JsonPropertyName("_bHasContents")] public bool HasContents { get; init; }
 }

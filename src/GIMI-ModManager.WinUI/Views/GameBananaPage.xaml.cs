@@ -392,7 +392,21 @@ public sealed partial class GameBananaPage : Page
     {
         if (sender is Grid grid)
         {
-            grid.Scale = new System.Numerics.Vector3(1.03f, 1.03f, 1f);
+            // Set the center point to the true center of the card so it scales symmetrically 
+            // instead of expanding from the top-left corner.
+            grid.CenterPoint = new System.Numerics.Vector3((float)(grid.ActualWidth / 2), (float)(grid.ActualHeight / 2), 0f);
+
+            if (grid.ScaleTransition == null)
+            {
+                var transition = new Vector3Transition();
+                transition.Duration = TimeSpan.FromMilliseconds(150);
+                grid.ScaleTransition = transition;
+            }
+
+            grid.Scale = new System.Numerics.Vector3(1.02f, 1.02f, 1f);
+
+            // Bring element to front to avoid overlapping clipping from adjacent smaller cards
+            Canvas.SetZIndex(grid, 50);
         }
     }
 
@@ -400,7 +414,11 @@ public sealed partial class GameBananaPage : Page
     {
         if (sender is Grid grid)
         {
+            grid.CenterPoint = new System.Numerics.Vector3((float)(grid.ActualWidth / 2), (float)(grid.ActualHeight / 2), 0f);
             grid.Scale = new System.Numerics.Vector3(1f, 1f, 1f);
+
+            // Restore original Z-Index
+            Canvas.SetZIndex(grid, 0);
         }
     }
 
