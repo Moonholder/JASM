@@ -109,14 +109,10 @@ public partial class SkinModKeySwapManager(ISkinMod skinMod)
         }
 
         var keySwap = IniConfigHelpers.ParseKeySwap(keySwapLines, sectionLine);
-        keySwap ??= new IniKeySwapSection
+        if (keySwap != null)
         {
-            SectionKey = sectionLine,
-            ForwardKeys = [],
-            BackwardKeys = [],
-            Type = string.Empty
-        };
-        iniKeySwaps.Add(keySwap);
+            iniKeySwaps.Add(keySwap);
+        }
     }
 
     private static bool IsKeySection(string line)
