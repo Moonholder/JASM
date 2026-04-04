@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.WinUI.UI.Animations;
+using CommunityToolkit.WinUI.Animations;
 using GIMI_ModManager.Core.Contracts.Services;
 using GIMI_ModManager.WinUI.Contracts.Services;
 using GIMI_ModManager.WinUI.Helpers.Xaml;
@@ -265,6 +265,13 @@ public sealed partial class CharacterDetailsPage : Page
 
     private async void ModListArea_OnDragEnter(object sender, DragEventArgs e)
     {
+        if (e.DataView.Properties.ContainsKey("IsModManagerDragOut"))
+        {
+            e.AcceptedOperation = DataPackageOperation.None;
+            e.Handled = true;
+            return;
+        }
+
         var deferral = e.GetDeferral();
         try
         {

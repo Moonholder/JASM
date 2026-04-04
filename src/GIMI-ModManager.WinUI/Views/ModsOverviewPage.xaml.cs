@@ -1,5 +1,5 @@
 using Windows.Foundation;
-using CommunityToolkit.WinUI.UI;
+using CommunityToolkit.WinUI;
 using GIMI_ModManager.WinUI.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;

@@ -1,5 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using CommunityToolkit.WinUI.UI.Animations;
+using System.Diagnostics.CodeAnalysis;
+using CommunityToolkit.WinUI.Animations;
 using GIMI_ModManager.WinUI.Contracts.Services;
 using GIMI_ModManager.WinUI.Contracts.ViewModels;
 using GIMI_ModManager.WinUI.Helpers;

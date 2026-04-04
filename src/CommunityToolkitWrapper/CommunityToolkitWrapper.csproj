@@ -15,7 +15,7 @@
 
   <ItemGroup>
       <PackageReference Include="CommunityToolkit.WinUI.Extensions" Version="8.2.250402" />
-      <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.6901" />
-      <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.251003001" />
+      <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.1721" />
+      <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260317003" />
   </ItemGroup>
 </Project>
