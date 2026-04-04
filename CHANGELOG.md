@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.29.1](https://github.com/Moonholder/JASM/compare/v2.29.0...v2.29.1) (2026-04-04)
+
+
+### Bug Fixes
+
+* 修复同步切换项时多文件 Namespace 冲突，完善偏好同步与编码保护 ([da5b089](https://github.com/Moonholder/JASM/commit/da5b089991dd2b50d229a1a5a9387f76f51b3627))
+* 修复特殊账户环境下 Elevator 进程启动秒退，优化自动更新流程 ([eb4f4e2](https://github.com/Moonholder/JASM/commit/eb4f4e2d3f2f13e3824c1b95e1e7c8d21fdf3c7c))
+
+
+### Miscellaneous
+
+* Updated packages and winappsdk ([c1d1173](https://github.com/Moonholder/JASM/commit/c1d1173a931170b27809316281b515bf2793aff0))
+* 优化侧边栏布局并实现点击放大预览图 ([36a6cb6](https://github.com/Moonholder/JASM/commit/36a6cb6f8ba157d15b7c11c711269393c8e9a080))
+
 ## [2.29.0](https://github.com/Moonholder/JASM/compare/v2.28.0...v2.29.0) (2026-03-24)
 
 
