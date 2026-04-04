@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using GIMI_ModManager.Core.Contracts.Entities;
 using GIMI_ModManager.Core.Contracts.Services;
 using GIMI_ModManager.Core.Entities;
@@ -14,6 +14,7 @@ using GIMI_ModManager.WinUI.Models.CustomControlTemplates;
 using GIMI_ModManager.WinUI.Models.Settings;
 using GIMI_ModManager.WinUI.Services;
 using GIMI_ModManager.WinUI.Services.ModHandling;
+using GIMI_ModManager.WinUI.Services.Notifications;
 using Serilog;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -32,6 +33,7 @@ public partial class CharacterGalleryViewModel : ObservableRecipient, INavigatio
     private readonly IGameService _gameService;
     private readonly ILogger _logger;
     private readonly ILanguageLocalizer _localizer;
+    private readonly NotificationManager _notificationService;
 
 
     private ICategory? _category;
@@ -114,7 +116,10 @@ public partial class CharacterGalleryViewModel : ObservableRecipient, INavigatio
         ILocalSettingsService localSettingsService,
         CharacterSkinService characterSkinService,
         UserPreferencesService userPreferencesService,
-        ElevatorService elevatorService, ILanguageLocalizer localizer, ILogger logger)
+        ElevatorService elevatorService,
+        ILanguageLocalizer localizer,
+        ILogger logger,
+        NotificationManager notificationService)
     {
         _skinManagerService = skinManagerService;
         _localSettingsService = localSettingsService;
@@ -125,6 +130,7 @@ public partial class CharacterGalleryViewModel : ObservableRecipient, INavigatio
         _navigationService = navigationService;
         _gameService = gameService;
         _localizer = localizer;
+        _notificationService = notificationService;
 
         var settings = _localSettingsService.ReadSetting<CharacterGallerySettings>(CharacterGallerySettings.Key) ??
                        new CharacterGallerySettings();

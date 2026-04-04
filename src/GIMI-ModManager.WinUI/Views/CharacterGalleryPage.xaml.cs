@@ -1,5 +1,5 @@
 using CommunityToolkit.WinUI;
-using CommunityToolkit.WinUI.UI.Animations;
+using CommunityToolkit.WinUI.Animations;
 using GIMI_ModManager.WinUI.ViewModels.CharacterGalleryViewModels;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
@@ -24,6 +24,7 @@ public sealed partial class CharacterGalleryPage : Page
     {
         InitializeComponent();
         Loaded += CharacterGalleryPage_Loaded;
+        Unloaded += CharacterGalleryPage_Unloaded;
         ViewModel.Initialized += ViewModel_Initialized;
 
         var comboBoxItems = SortingComboBox.Items.OfType<ComboBoxItem>();
@@ -154,5 +155,77 @@ public sealed partial class CharacterGalleryPage : Page
     private void SortByDescendingToggleButton_OnUnchecked(object sender, RoutedEventArgs e)
     {
         ViewModel.OnSortToggleButtonChanged(false);
+    }
+
+    private void CharacterGalleryPage_Unloaded(object sender, RoutedEventArgs e)
+    {
+        if (this.XamlRoot != null)
+        {
+            this.XamlRoot.Changed -= XamlRoot_Changed;
+        }
+    }
+
+    private void CustomImage_Tapped(object sender, TappedRoutedEventArgs e)
+    {
+        if (e.OriginalSource is not Image)
+            return;
+
+        if ((sender as FrameworkElement)?.DataContext is ModGridItemVm vm)
+        {
+            try
+            {
+                var bitmapImage = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage
+                {
+                    CreateOptions = Microsoft.UI.Xaml.Media.Imaging.BitmapCreateOptions.IgnoreImageCache,
+                    UriSource = vm.ImagePath
+                };
+                ImagePopupSource.Source = bitmapImage;
+            }
+            catch { }
+
+            if (this.XamlRoot != null && this.XamlRoot.Content != null)
+            {
+                PopupGrid.Width = this.XamlRoot.Size.Width;
+                PopupGrid.Height = this.XamlRoot.Size.Height;
+                try
+                {
+                    var t = this.TransformToVisual(this.XamlRoot.Content);
+                    var bounds = t.TransformPoint(new Windows.Foundation.Point(0, 0));
+                    ImagePopup.HorizontalOffset = -bounds.X;
+                    ImagePopup.VerticalOffset = -bounds.Y;
+                }
+                catch { }
+
+                this.XamlRoot.Changed -= XamlRoot_Changed;
+                this.XamlRoot.Changed += XamlRoot_Changed;
+            }
+            ImagePopup.IsOpen = true;
+        }
+    }
+
+    private void ImageLightbox_Tapped(object sender, TappedRoutedEventArgs e)
+    {
+        ImagePopup.IsOpen = false;
+        if (this.XamlRoot != null)
+        {
+            this.XamlRoot.Changed -= XamlRoot_Changed;
+        }
+    }
+
+    private void XamlRoot_Changed(XamlRoot sender, XamlRootChangedEventArgs args)
+    {
+        if (ImagePopup.IsOpen && sender.Content != null)
+        {
+            PopupGrid.Width = sender.Size.Width;
+            PopupGrid.Height = sender.Size.Height;
+            try
+            {
+                var t = this.TransformToVisual(sender.Content);
+                var bounds = t.TransformPoint(new Windows.Foundation.Point(0, 0));
+                ImagePopup.HorizontalOffset = -bounds.X;
+                ImagePopup.VerticalOffset = -bounds.Y;
+            }
+            catch { }
+        }
     }
 }

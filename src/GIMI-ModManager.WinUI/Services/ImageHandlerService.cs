@@ -1,4 +1,4 @@
-﻿using GIMI_ModManager.Core.Helpers;
+using GIMI_ModManager.Core.Helpers;
 using GIMI_ModManager.WinUI.ViewModels.SubVms;
 using Microsoft.UI.Xaml;
 using Microsoft.Windows.Storage.Pickers;
@@ -98,13 +98,18 @@ public class ImageHandlerService
             RequestedOperation = DataPackageOperation.Copy
         };
 
-
         var imageStream = RandomAccessStreamReference.CreateFromFile(file);
         package.SetBitmap(imageStream);
         package.SetStorageItems([file]);
 
         Clipboard.SetContent(package);
-        Clipboard.Flush();
+
+        // Note: Clipboard.Flush() is intentionally omitted.
+        // Flush() is unreliable in WinUI 3 desktop apps and consistently throws
+        // COMException 0x800401D0 (CLIPBRD_E_CANT_OPEN). SetContent alone is
+        // sufficient — the only trade-off is that clipboard data won't persist
+        // after the application exits, which is acceptable for image copying.
+
         return Task.CompletedTask;
     }
 

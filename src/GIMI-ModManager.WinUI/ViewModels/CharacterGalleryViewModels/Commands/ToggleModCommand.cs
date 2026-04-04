@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Input;
 using GIMI_ModManager.Core.Entities;
 using GIMI_ModManager.Core.GamesService.Interfaces;
 
@@ -19,9 +19,10 @@ public partial class CharacterGalleryViewModel
         if (IsNavigating) return;
 
         IsBusy = true;
+        CharacterSkinEntry? modEntryToToggle = null;
+        var modsToDisable = new List<CharacterSkinEntry>();
         try
         {
-            CharacterSkinEntry modEntryToToggle = null!;
             var modsInScope = new List<CharacterSkinEntry>();
 
             await Task.Run(async () =>
@@ -46,7 +47,7 @@ public partial class CharacterGalleryViewModel
             });
 
             var shouldEnable = !modEntryToToggle.IsEnabled;
-            var modsToDisable = (shouldEnable && IsSingleSelection)
+            modsToDisable = (shouldEnable && IsSingleSelection)
                 ? modsInScope.Where(m => m.Id != modEntryToToggle.Id && m.IsEnabled).ToList()
                 : new List<CharacterSkinEntry>();
 
@@ -94,7 +95,18 @@ public partial class CharacterGalleryViewModel
         }
         catch (Exception e)
         {
-            _logger.Error(e, "Failed to toggle mod");
+            var message = e.Message.Contains("Access to the path") || e.Message.Contains("UnauthorizedAccess_IODenied_Path") ?
+                _localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/ToggleModFailed", "Cannot toggle mod state, target file is being used by another program.\n\nPlease:\n1. Close the mod folder opened in Resource Manager\n2. Close any program that may be editing the mod files\n3. Try again later") : e.Message;
+            _notificationService.ShowNotification(_localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/OperationFailed", "Operation Failed"), message, TimeSpan.FromSeconds(8));
+
+            if (modEntryToToggle is not null)
+            {
+                await UpdateGridItemAsync(modEntryToToggle);
+            }
+            foreach (var otherModEntry in modsToDisable)
+            {
+                await UpdateGridItemAsync(otherModEntry);
+            }
         }
         finally
         {

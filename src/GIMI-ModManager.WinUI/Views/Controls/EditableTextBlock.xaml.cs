@@ -93,4 +93,31 @@ public sealed partial class EditableTextBlock : UserControl
         get { return (int)GetValue(TextSelectionStartProperty); }
         set { SetValue(TextSelectionStartProperty, value); }
     }
+
+    public static readonly DependencyProperty MaxLinesProperty = DependencyProperty.Register(
+        nameof(MaxLines), typeof(int), typeof(EditableTextBlock), new PropertyMetadata(0));
+
+    public int MaxLines
+    {
+        get { return (int)GetValue(MaxLinesProperty); }
+        set { SetValue(MaxLinesProperty, value); }
+    }
+
+    public static readonly DependencyProperty TextTrimmingProperty = DependencyProperty.Register(
+        nameof(TextTrimming), typeof(TextTrimming), typeof(EditableTextBlock), new PropertyMetadata(TextTrimming.None));
+
+    public TextTrimming TextTrimming
+    {
+        get { return (TextTrimming)GetValue(TextTrimmingProperty); }
+        set { SetValue(TextTrimmingProperty, value); }
+    }
+
+    public static readonly DependencyProperty TextWrappingProperty = DependencyProperty.Register(
+        nameof(TextWrapping), typeof(TextWrapping), typeof(EditableTextBlock), new PropertyMetadata(TextWrapping.WrapWholeWords));
+
+    public TextWrapping TextWrapping
+    {
+        get { return (TextWrapping)GetValue(TextWrappingProperty); }
+        set { SetValue(TextWrappingProperty, value); }
+    }
 }

@@ -463,11 +463,42 @@ public sealed partial class ModPane : UserControl
     public ModPane()
     {
         InitializeComponent();
+        Loaded += ModPane_Loaded;
         Unloaded += ModPane_Unloaded;
+    }
+
+    private void ModPane_Loaded(object sender, RoutedEventArgs e)
+    {
+        if (this.XamlRoot != null)
+        {
+            this.XamlRoot.Changed -= XamlRoot_Changed;
+            this.XamlRoot.Changed += XamlRoot_Changed;
+        }
+    }
+
+    private void XamlRoot_Changed(Microsoft.UI.Xaml.XamlRoot sender, Microsoft.UI.Xaml.XamlRootChangedEventArgs args)
+    {
+        if (ImagePopup.IsOpen && sender.Content != null)
+        {
+            PopupGrid.Width = sender.Size.Width;
+            PopupGrid.Height = sender.Size.Height;
+            try
+            {
+                var t = this.TransformToVisual(sender.Content);
+                var bounds = t.TransformPoint(new Windows.Foundation.Point(0, 0));
+                ImagePopup.HorizontalOffset = -bounds.X;
+                ImagePopup.VerticalOffset = -bounds.Y;
+            }
+            catch { }
+        }
     }
 
     private void ModPane_Unloaded(object sender, RoutedEventArgs e)
     {
+        if (this.XamlRoot != null)
+        {
+            this.XamlRoot.Changed -= XamlRoot_Changed;
+        }
         Bindings.StopTracking();
         // 断开所有可能的引用，帮助GC回收
         ViewModel = null!;
@@ -534,6 +565,34 @@ public sealed partial class ModPane : UserControl
         }
 
         deferral.Complete();
+    }
+
+    private void ModDetailsPaneImage_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
+    {
+        if (e.OriginalSource is not Microsoft.UI.Xaml.Controls.Image)
+        {
+            return;
+        }
+
+        if (this.XamlRoot != null && this.XamlRoot.Content != null)
+        {
+            PopupGrid.Width = this.XamlRoot.Size.Width;
+            PopupGrid.Height = this.XamlRoot.Size.Height;
+            try
+            {
+                var t = this.TransformToVisual(this.XamlRoot.Content);
+                var bounds = t.TransformPoint(new Windows.Foundation.Point(0, 0));
+                ImagePopup.HorizontalOffset = -bounds.X;
+                ImagePopup.VerticalOffset = -bounds.Y;
+            }
+            catch { }
+        }
+        ImagePopup.IsOpen = true;
+    }
+
+    private void ImageLightbox_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
+    {
+        ImagePopup.IsOpen = false;
     }
 
     private bool _isHelpExpanded = false;

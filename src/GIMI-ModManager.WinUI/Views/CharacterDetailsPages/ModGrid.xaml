@@ -150,14 +150,22 @@
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
 
-                <controls:DataGridTextColumn
+                <controls:DataGridTemplateColumn
                     Width="SizeToCells"
                     MinWidth="94"
-                    Binding="{Binding DisplayName, Mode=OneWay}"
                     CanUserSort="True"
+                    ClipboardContentBinding="{Binding DisplayName, Mode=OneWay}"
                     Header="{x:Bind ViewModel.GetLocalized('/CharacterDetailsPage/ModNameColumnHeader', 'Mod Name'), Mode=OneWay}"
                     IsReadOnly="True"
-                    Tag="DisplayName" />
+                    Tag="DisplayName">
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="subViewModels:ModRowVM">
+                            <Grid Background="Transparent" CanDrag="True" DragStarting="ModRow_DragStarting">
+                                <TextBlock Text="{x:Bind DisplayName, Mode=OneWay}" Margin="12,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                            </Grid>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
 
                 <controls:DataGridTextColumn
                     Width="SizeToCells"

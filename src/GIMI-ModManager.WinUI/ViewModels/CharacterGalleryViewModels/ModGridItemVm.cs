@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GIMI_ModManager.Core.GamesService.Interfaces;
 using GIMI_ModManager.WinUI.Helpers;
@@ -133,6 +133,19 @@ namespace GIMI_ModManager.WinUI.ViewModels.CharacterGalleryViewModels
             _modModel.ImagePath = ImageHandlerService.StaticPlaceholderImageUri;
             OnPropertyChanged(nameof(ImagePath));
             OnPropertyChanged(nameof(CanSaveImage));
+        });
+
+        public IAsyncRelayCommand CopyImageToClipboardCommand => new AsyncRelayCommand(async () =>
+        {
+            try
+            {
+                var file = await StorageFile.GetFileFromPathAsync(ImagePath.LocalPath);
+                await ImageHandlerService.CopyImageToClipboardAsync(file);
+            }
+            catch (Exception)
+            {
+                // Silently fail if image file doesn't exist or clipboard fails
+            }
         });
 
         public IAsyncRelayCommand SaveImageCommand => new AsyncRelayCommand(async () =>

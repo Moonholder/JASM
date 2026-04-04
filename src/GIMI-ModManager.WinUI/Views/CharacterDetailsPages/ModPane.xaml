@@ -21,30 +21,24 @@
         <local:StringToVisibilityConverter x:Name="StringToVisibilityConverter" />
     </UserControl.Resources>
 
-    <Grid
-        x:Name="ModDetailsPane"
-        Grid.Column="1"
+    <Grid Grid.Column="1">
+        <Grid
+            x:Name="ModDetailsPane"
         Margin="0,0,0,8"
         Padding="5,5,5,5"
         Background="{ThemeResource ControlFillColorDefaultBrush}"
         CornerRadius="10">
 
         <Grid.RowDefinitions>
-            <RowDefinition
-                Height="Auto"
-                MinHeight="80"
-                MaxHeight="450" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" MinHeight="120" />
+            <RowDefinition Height="1*" MinHeight="160" MaxHeight="300" />
+            <RowDefinition Height="2*" MinHeight="120" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <!--  图片区域  -->
         <Grid
             Grid.Row="0"
-            MinWidth="200"
             MinHeight="80"
-            MaxHeight="450"
             AllowDrop="True"
             Background="{ThemeResource ControlFillColorTertiaryBrush}"
             CornerRadius="10"
@@ -53,10 +47,9 @@
             Drop="PaneImage_OnDrop">
             <controls:CustomImage
                 x:Name="ModDetailsPaneImage"
-                Width="Auto"
-                Height="Auto"
-                MaxWidth="400"
-                MaxHeight="450"
+                IsAmbientBackgroundEnabled="True"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
                 ButtonHorizontalAlignment="Right"
                 ButtonVerticalAlignment="Top"
                 ClearButtonCommand="{x:Bind ViewModel.ClearImageCommand}"
@@ -65,23 +58,12 @@
                 ImageUri="{x:Bind ViewModel.ModModel.ImageUri, Mode=OneWay}"
                 IsContextMenuEnabled="True"
                 PasteButtonCommand="{x:Bind ViewModel.PasteImageFromClipboardCommand}"
-                Stretch="Uniform" />
+                Stretch="Uniform"
+                Tapped="ModDetailsPaneImage_Tapped" />
         </Grid>
 
-        <!--  分割器  -->
-        <controls1:GridSplitter
-            Grid.Row="1"
-            Width="40"
-            Height="8"
-            Margin="0,-6,0,0"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Top"
-            CornerRadius="4"
-            ResizeBehavior="PreviousAndNext"
-            ResizeDirection="Rows" />
-
         <!--  模组信息和Keyswap管理区域  -->
-        <Grid Grid.Row="2">
+        <Grid Grid.Row="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
@@ -105,10 +87,13 @@
                         Margin="0,8"
                         HorizontalAlignment="Stretch"
                         IsEditMode="{x:Bind ViewModel.IsEditingModName, Mode=OneWay}"
+                        MaxLines="1"
                         Style="{ThemeResource SubtitleTextBlockStyle}"
                         Text="{x:Bind ViewModel.ModModel.ModDisplayName, Mode=TwoWay}"
                         TextAlignment="Center"
-                        ToolTipService.ToolTip="Change Mod Display Name"
+                        TextTrimming="CharacterEllipsis"
+                        TextWrapping="NoWrap"
+                        ToolTipService.ToolTip="{x:Bind ViewModel.ModModel.ModDisplayName, Mode=OneWay}"
                         l:Uids.Uid="/CharacterDetailsPage/ModNameEditableBlock" />
 
                     <SplitButton
@@ -475,8 +460,8 @@
                                                                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                                                 Style="{ThemeResource CaptionTextBlockStyle}"
                                                                                 Text="Variations: " 
-                                                                                l:Uids.Uid="/CharacterDetailsPage/VariationsLabel"
-                                                                                TextWrapping="NoWrap" />
+                                                                                TextWrapping="NoWrap"
+                                                                                l:Uids.Uid="/CharacterDetailsPage/VariationsLabel" />
                                                                             <TextBlock
                                                                                 Margin="2,-1,0,0"
                                                                                 FontWeight="SemiBold"
@@ -549,7 +534,7 @@
         </Grid>
 
         <!--  底部按钮区域  -->
-        <Grid Grid.Row="3" Padding="0,12">
+        <Grid Grid.Row="2" Padding="0,12">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />
@@ -598,5 +583,34 @@
                 IsEnabled="{x:Bind ViewModel.IsNotReadOnly, Mode=OneWay}"
                 l:Uids.Uid="/CharacterDetailsPage/OpenModFolderButton" />
         </Grid>
+        </Grid>
+        
+        <Popup x:Name="ImagePopup" IsOpen="False">
+            <Grid
+                x:Name="PopupGrid"
+                Background="#D9000000"
+                Tapped="ImageLightbox_Tapped">
+                <Image
+                    Margin="40"
+                    Stretch="Uniform">
+                    <Image.Source>
+                        <BitmapImage CreateOptions="IgnoreImageCache" UriSource="{x:Bind ViewModel.ModModel.ImageUri, Mode=OneWay}" />
+                    </Image.Source>
+                </Image>
+                
+                <StackPanel
+                    Margin="0,0,0,40"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Bottom"
+                    Background="{ThemeResource SystemControlBackgroundAltMediumBrush}"
+                    CornerRadius="8"
+                    Orientation="Horizontal"
+                    Padding="16,10"
+                    Spacing="8">
+                    <FontIcon FontSize="14" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Glyph="&#xE711;" />
+                    <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="Click anywhere to close" l:Uids.Uid="/CharacterDetailsPage/LightboxCloseTip" />
+                </StackPanel>
+            </Grid>
+        </Popup>
     </Grid>
 </UserControl>

@@ -17,7 +17,7 @@ public sealed partial class CustomImage : UserControl
 
 
     public static readonly DependencyProperty ImageUriProperty = DependencyProperty.Register(
-        nameof(ImageUri), typeof(Uri), typeof(CustomImage), new PropertyMetadata(default(Uri)));
+        nameof(ImageUri), typeof(Uri), typeof(CustomImage), new PropertyMetadata(default(Uri), (d, e) => ((CustomImage)d).UpdateAmbientBackground()));
 
     public Uri ImageUri
     {
@@ -162,5 +162,29 @@ public sealed partial class CustomImage : UserControl
     {
         get => (Stretch)GetValue(StretchProperty);
         set => SetValue(StretchProperty, value);
+    }
+
+    public static readonly DependencyProperty IsAmbientBackgroundEnabledProperty = DependencyProperty.Register(
+        nameof(IsAmbientBackgroundEnabled), typeof(bool), typeof(CustomImage), new PropertyMetadata(false, (d, e) => ((CustomImage)d).UpdateAmbientBackground()));
+
+    public bool IsAmbientBackgroundEnabled
+    {
+        get => (bool)GetValue(IsAmbientBackgroundEnabledProperty);
+        set => SetValue(IsAmbientBackgroundEnabledProperty, value);
+    }
+
+    public static readonly DependencyProperty IsActualAmbientBackgroundEnabledProperty = DependencyProperty.Register(
+        nameof(IsActualAmbientBackgroundEnabled), typeof(bool), typeof(CustomImage), new PropertyMetadata(false));
+
+    public bool IsActualAmbientBackgroundEnabled
+    {
+        get => (bool)GetValue(IsActualAmbientBackgroundEnabledProperty);
+        private set => SetValue(IsActualAmbientBackgroundEnabledProperty, value);
+    }
+
+    private void UpdateAmbientBackground()
+    {
+        IsActualAmbientBackgroundEnabled = IsAmbientBackgroundEnabled
+            && ImageUri != GIMI_ModManager.WinUI.Services.ImageHandlerService.StaticPlaceholderImageUri;
     }
 }

@@ -39,6 +39,18 @@
 
 
     <Grid>
+        <!--  Ambient Background Layer for Non-Uniform Images  -->
+        <Image
+            x:Name="AmbientBackground"
+            x:Load="{x:Bind IsActualAmbientBackgroundEnabled, Mode=OneWay}"
+            Opacity="0.25"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            Margin="-40"
+            Source="{Binding ElementName=CustomImageControl, Path=Source, Mode=OneWay}"
+            Stretch="UniformToFill" />
+
+        <!--  Main Crisp Foreground Image  -->
         <Image
             x:Name="CustomImageControl"
             Width="{Binding ElementName=CustomImageRoot, Path=Width, Mode=OneWay}"
@@ -47,9 +59,7 @@
             MaxHeight="{x:Bind MaxHeight, Mode=OneWay}"
             Stretch="{x:Bind Stretch, Mode=OneWay}">
             <Image.Source>
-                <BitmapImage
-                    CreateOptions="IgnoreImageCache"
-                    UriSource="{x:Bind ImageUri, Mode=OneWay}" />
+                <BitmapImage CreateOptions="IgnoreImageCache" UriSource="{x:Bind ImageUri, Mode=OneWay}" />
             </Image.Source>
         </Image>
         <Button

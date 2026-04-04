@@ -5,9 +5,9 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations"
+    xmlns:animations="using:CommunityToolkit.WinUI.Animations"
     xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
-    xmlns:converters="using:CommunityToolkit.WinUI.UI.Converters"
+    xmlns:converters="using:CommunityToolkit.WinUI.Converters"
     xmlns:xaml="using:GIMI_ModManager.WinUI.Helpers.Xaml"
     xmlns:characterGalleryViewModels="using:GIMI_ModManager.WinUI.ViewModels.CharacterGalleryViewModels"
     xmlns:controls1="using:GIMI_ModManager.WinUI.Views.Controls"
@@ -25,7 +25,8 @@
 
     </Page.Resources>
 
-    <Grid Margin="{StaticResource NegativeNavigationViewPageContentMargin}" RowSpacing="4">
+    <Grid>
+        <Grid Margin="{StaticResource NegativeNavigationViewPageContentMargin}" RowSpacing="4">
 
         <Grid.Resources>
             <Flyout x:Name="SelectInGameSkin">
@@ -371,10 +372,11 @@
                                                 ImageUri="{x:Bind ImagePath, Mode=OneWay}"
                                                 Width="{Binding ElementName=RootPageName, Path=ViewModel.GridItemWidth, Mode=OneWay}"
                                                 EditButtonVisibility="Collapsed"
-                                                CopyButtonVisibility="Collapsed"
+                                                CopyButtonCommand="{x:Bind CopyImageToClipboardCommand}"
                                                 IsContextMenuEnabled="True"
                                                 PasteButtonCommand="{x:Bind PasteImageFromClipboardCommand}"
-                                                ClearButtonCommand="{x:Bind ClearImageCommand}"/>
+                                                ClearButtonCommand="{x:Bind ClearImageCommand}"
+                                                Tapped="CustomImage_Tapped"/>
                                         </Grid>
 
                                         <Grid
@@ -447,5 +449,31 @@
 
         </Grid>
 
+        </Grid>
+
+        <Popup x:Name="ImagePopup" IsOpen="False">
+            <Grid
+                x:Name="PopupGrid"
+                Background="#D9000000"
+                Tapped="ImageLightbox_Tapped">
+                <Image
+                    x:Name="ImagePopupSource"
+                    Margin="40"
+                    Stretch="Uniform" />
+                
+                <StackPanel
+                    Margin="0,0,0,40"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Bottom"
+                    Background="{ThemeResource SystemControlBackgroundAltMediumBrush}"
+                    CornerRadius="8"
+                    Orientation="Horizontal"
+                    Padding="16,10"
+                    Spacing="8">
+                    <FontIcon FontSize="14" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Glyph="&#xE711;" />
+                    <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="Click anywhere to close" l:Uids.Uid="/CharacterDetailsPage/LightboxCloseTip" />
+                </StackPanel>
+            </Grid>
+        </Popup>
     </Grid>
 </Page>

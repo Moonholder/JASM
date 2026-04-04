@@ -239,6 +239,63 @@ public sealed partial class ModGrid : UserControl
         }
     }
 
+    private async void ModRow_DragStarting(UIElement sender, DragStartingEventArgs args)
+    {
+        if (sender is not FrameworkElement element || element.DataContext is not ModRowVM row)
+        {
+            args.Cancel = true;
+            return;
+        }
+
+        var selectedRows = ModListGrid.SelectedItems.OfType<ModRowVM>().ToList();
+
+        if (!selectedRows.Contains(row))
+        {
+            selectedRows = new List<ModRowVM> { row };
+        }
+
+        var deferral = args.GetDeferral();
+
+        try
+        {
+            var storageItems = new List<Windows.Storage.IStorageItem>();
+
+            foreach (var r in selectedRows)
+            {
+                if (!string.IsNullOrEmpty(r.AbsFolderPath))
+                {
+                    try
+                    {
+                        var folder = await Windows.Storage.StorageFolder.GetFolderFromPathAsync(r.AbsFolderPath);
+                        storageItems.Add(folder);
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
+
+            if (storageItems.Count > 0)
+            {
+                args.Data.SetStorageItems(storageItems);
+                args.Data.RequestedOperation = Windows.ApplicationModel.DataTransfer.DataPackageOperation.Copy | Windows.ApplicationModel.DataTransfer.DataPackageOperation.Link;
+                args.Data.Properties.Add("IsModManagerDragOut", true);
+            }
+            else
+            {
+                args.Cancel = true;
+            }
+        }
+        catch
+        {
+            args.Cancel = true;
+        }
+        finally
+        {
+            deferral.Complete();
+        }
+    }
+
     private void ModListGrid_OnCellEditEnded(object? sender, DataGridCellEditEndedEventArgs e)
     {
         if (e.EditAction == DataGridEditAction.Cancel) return;

@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using CommunityToolkit.WinUI.UI.Controls;
@@ -387,8 +387,8 @@ public partial class ModGridVM(
 
         var modNotifications = await _modNotificationManager.GetNotificationsForModAsync(characterSkinEntry.Id);
 
-
         existingMod.UpdateModel(characterSkinEntry, skinModSettings, presetNames, modNotifications);
+        existingMod.TriggerPropertyChanged(nameof(existingMod.IsEnabled));
     }
 
     public ModRowVM[] SearchFilterMods(string searchText)
@@ -531,16 +531,20 @@ public partial class ModGridVM(
                 Messenger.Send(new ModChangedMessage(this, modEntryToToggle, null));
             }
         }
-        catch (IOException ex)
-        {
-            var message = ex.Message.Contains("Access to the path")
-                ? "无法切换模组状态，目标文件正被其他程序占用。\n\n请：\n1. 关闭资源管理器中打开的模组文件夹\n2. 关闭可能正在编辑模组文件的程序\n3. 稍后重试"
-                : ex.Message;
-            _notificationService.ShowNotification("操作失败", message, TimeSpan.FromSeconds(10));
-        }
         catch (Exception e)
         {
-            _notificationService.ShowNotification("出错", e.Message, TimeSpan.FromSeconds(5));
+            var message = e.Message.Contains("Access to the path") || e.Message.Contains("UnauthorizedAccess_IODenied_Path") ?
+                _localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/ToggleModFailed", "Cannot toggle mod state, target file is being used by another program.\n\nPlease:\n1. Close the mod folder opened in Resource Manager\n2. Close any program that may be editing the mod files\n3. Try again later") : e.Message;
+            _notificationService.ShowNotification(_localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/OperationFailed", "Operation Failed"), message, TimeSpan.FromSeconds(8));
+
+            await UpdateModVmAsync(modEntryToToggle, false, CancellationToken.None);
+            Messenger.Send(new ModChangedMessage(this, modEntryToToggle, null));
+
+            foreach (var otherModEntry in modsToDisable)
+            {
+                await UpdateModVmAsync(otherModEntry, false, CancellationToken.None);
+                Messenger.Send(new ModChangedMessage(this, otherModEntry, null));
+            }
         }
     }
 
