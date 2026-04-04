@@ -39,6 +39,7 @@ public sealed class UpdateChecker
     /// </summary>
     public event EventHandler<UpdateCheckStatus>? CheckStatusChanged;
 
+    private bool _isManualChecking;
     private const string ReleasesApiUrl = "https://api.github.com/repos/Moonholder/JASM/releases?per_page=2";
 
     public UpdateChecker(ILogger logger, ILocalSettingsService localSettingsService,
@@ -94,7 +95,16 @@ public sealed class UpdateChecker
     /// </summary>
     public async Task ManualCheckForUpdatesAsync()
     {
-        await CheckForUpdatesAsync(CancellationToken.None);
+        if (_isManualChecking) return;
+        _isManualChecking = true;
+        try
+        {
+            await CheckForUpdatesAsync(CancellationToken.None);
+        }
+        finally
+        {
+            _isManualChecking = false;
+        }
     }
 
     private void InitCheckerLoop(CancellationToken cancellationToken)
@@ -138,22 +148,18 @@ public sealed class UpdateChecker
             return;
         }
 
-        SetCheckStatus(UpdateCheckStatus.Success);
-
-        if (CurrentVersion == latestVersion || LatestRetrievedVersion == latestVersion)
-        {
-            _logger.Debug("No new version available");
-            return;
-        }
-
-
         if (CurrentVersion < latestVersion)
         {
             if (_ignoredVersion is not null && _ignoredVersion >= latestVersion)
+            {
+                SetCheckStatus(UpdateCheckStatus.Success);
                 return;
+            }
             LatestRetrievedVersion = latestVersion;
             OnNewVersionAvailable(latestVersion);
         }
+
+        SetCheckStatus(UpdateCheckStatus.Success);
     }
 
     private async Task<Version?> GetLatestVersionAsync(CancellationToken cancellationToken)

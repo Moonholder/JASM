@@ -32,16 +32,16 @@ using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using Polly;
-using Polly.Contrib.WaitAndRetry;
-using Polly.Extensions.Http;
 using Polly.RateLimiting;
 using Polly.Retry;
+using Microsoft.Extensions.Http.Resilience;
 using Serilog;
 using Serilog.Events;
 using Serilog.Templates;
 using CreateCommandViewModel = GIMI_ModManager.WinUI.ViewModels.SettingsViewModels.CreateCommandViewModel;
 using GameBananaService = GIMI_ModManager.WinUI.Services.ModHandling.GameBananaService;
 using NotificationManager = GIMI_ModManager.WinUI.Services.Notifications.NotificationManager;
+using System.Threading;
 
 namespace GIMI_ModManager.WinUI;
 
@@ -54,6 +54,9 @@ public partial class App : Application
     // https://docs.microsoft.com/dotnet/core/extensions/configuration
     // https://docs.microsoft.com/dotnet/core/extensions/logging
     public IHost Host { get; }
+
+    private static Mutex? _appMutex;
+    private const string AppMutexName = "JASM_WinUI_App_Mutex";
 
     public static T GetService<T>()
         where T : class
@@ -93,6 +96,7 @@ public partial class App : Application
 
     public App()
     {
+        _appMutex = new Mutex(true, AppMutexName, out _);
         InitializeComponent();
 
         Host = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder()
@@ -230,10 +234,16 @@ public partial class App : Application
                     client.DefaultRequestHeaders.Add("Accept", "application/json");
                 })
                     .AddHttpMessageHandler<HttpLoggerHandler>()
-                    .AddPolicyHandler(
-                        HttpPolicyExtensions.HandleTransientHttpError()
-                            .WaitAndRetryAsync(Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromMilliseconds(500), 3, null, true))
-                    );
+                    .AddResilienceHandler("default-retry", resilienceBuilder =>
+                    {
+                        resilienceBuilder.AddRetry(new HttpRetryStrategyOptions()
+                        {
+                            BackoffType = DelayBackoffType.Exponential,
+                            UseJitter = true,
+                            MaxRetryAttempts = 3,
+                            Delay = TimeSpan.FromMilliseconds(500)
+                        });
+                    });
 
                 // Views and ViewModels
                 services.AddTransient<SettingsViewModel>();

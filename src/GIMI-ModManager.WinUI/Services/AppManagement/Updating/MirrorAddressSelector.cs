@@ -12,6 +12,7 @@ public static class MirrorAddressSelector
 {
     private static readonly MirrorInfo[] MirrorAddresses =
     [
+        new("", "Github Direct", supportsApiForward: false),
         new("https://gh-proxy.com/", "美国 Cloudflare CDN 1", supportsApiForward: false),
         new("https://cors.isteed.cc/", "美国 Cloudflare CDN 2", supportsApiForward: true),
         new("https://github.boki.moe/", "美国 Cloudflare CDN 3", supportsApiForward: false),
@@ -40,12 +41,14 @@ public static class MirrorAddressSelector
 
             var available = results
                 .Where(r => r.IsAvailable)
-                .OrderBy(r => r.LatencyMs)
+                .OrderByDescending(r => string.IsNullOrEmpty(r.Mirror.Address))
+                .ThenBy(r => r.LatencyMs)
                 .Select(r => r.Mirror)
                 .ToList();
 
-            // Always add GitHub Direct as ultimate fallback
-            available.Add(new MirrorInfo("", "GitHub Direct"));
+            if (!available.Any(m => string.IsNullOrEmpty(m.Address)))
+                available.Add(new MirrorInfo("", "GitHub Direct"));
+
             return available;
         }
         catch (OperationCanceledException)
@@ -54,7 +57,8 @@ public static class MirrorAddressSelector
             var available = tasks
                 .Where(t => t.IsCompletedSuccessfully && t.Result.IsAvailable)
                 .Select(t => t.Result)
-                .OrderBy(r => r.LatencyMs)
+                .OrderByDescending(r => string.IsNullOrEmpty(r.Mirror.Address))
+                .ThenBy(r => r.LatencyMs)
                 .Select(r => r.Mirror)
                 .ToList();
 

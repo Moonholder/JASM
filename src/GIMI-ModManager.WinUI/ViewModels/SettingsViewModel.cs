@@ -545,6 +545,8 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
             }
 
             LatestVersion = VersionFormatter(e.Version);
+            ShowNewVersionAvailable = true;
+            CanIgnoreUpdate = e.Version != _updateChecker.IgnoredVersion;
         });
     }
 
@@ -575,8 +577,8 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
             UpdateCheckStatusText = status switch
             {
                 UpdateCheckStatus.Checking => _localizer.GetLocalizedStringOrDefault("/Settings/UpdateCheckStatus_Checking", "Checking..."),
-                UpdateCheckStatus.Success => ShowNewVersionAvailable
-                    ? string.Empty  // New version info is already shown by existing UI
+                UpdateCheckStatus.Success => (LatestVersion != string.Empty && ShowNewVersionAvailable)
+                    ? string.Empty
                     : _localizer.GetLocalizedStringOrDefault("/Settings/UpdateCheckStatus_UpToDate", "Already up to date ✓"),
                 UpdateCheckStatus.Failed => _localizer.GetLocalizedStringOrDefault("/Settings/UpdateCheckStatus_Failed", "Check failed, please check your network"),
                 _ => string.Empty

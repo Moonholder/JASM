@@ -14,6 +14,7 @@
 
 [Setup]
 AppId={{A7B8C9D0-E1F2-4A5B-8C7D-0123456789AB}
+AppMutex=JASM_WinUI_App_Mutex
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppVerName={#MyAppName} v{#MyAppVersion}
@@ -68,8 +69,9 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: de
 ; 安装 VC++ Redistributable（仅在未安装时）
 Filename: "{tmp}\vc_redist.x64.exe"; Parameters: "/install /quiet /norestart"; StatusMsg: "正在安装 Visual C++ 运行库..."; Check: not VCRedistInstalled; Flags: waituntilterminated
 ; 手动安装模式下提供启动复选框
-Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
-Filename: "{app}\{#MyAppExeName}"; Flags: nowait skipifnotsilent
+Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; WorkingDir: "{app}"; Flags: nowait postinstall skipifsilent shellexec
+; 静默安装完成后的强制自启动
+Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{app}"; Flags: nowait shellexec; Check: IsAutoRun
 
 [UninstallDelete]
 ; 卸载时清理可能生成的运行时文件，但不删除用户数据（%LOCALAPPDATA%\JASM 中的设置）
@@ -101,5 +103,48 @@ begin
            ExpandConstant('{localappdata}\JASM') + #13#10 + #13#10 +
            '如需完全清除，请手动删除该文件夹。',
            mbInformation, MB_OK);
+  end;
+end;
+
+// 检测是否传入了 /AUTORUN 参数
+function IsAutoRun: Boolean;
+var
+  i: Integer;
+begin
+  Result := False;
+  for i := 1 to ParamCount do
+  begin
+    if CompareText(ParamStr(i), '/AUTORUN') = 0 then
+    begin
+      Result := True;
+      Break;
+    end;
+  end;
+end;
+
+// 安装程序启动时，智能等待主进程完全退出
+function InitializeSetup(): Boolean;
+var
+  i: Integer;
+begin
+  // 如果是静默更新模式，循环等待 Mutex 释放（最多等待 10 秒）
+  if WizardSilent then
+  begin
+    for i := 0 to 10 do
+    begin
+      if not CheckForMutexes('JASM_WinUI_App_Mutex') then
+        break;
+      Sleep(1000);
+    end;
+  end;
+  Result := True;
+end;
+
+procedure InitializeWizard();
+begin
+  if IsAutoRun then
+  begin
+    WizardForm.CancelButton.Visible := False;
+    WizardForm.Caption := '正在更新 {#MyAppName}...';
   end;
 end;

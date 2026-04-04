@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using GIMI_ModManager.Core.Contracts.Services;
 using GIMI_ModManager.Core.GamesService;
 using GIMI_ModManager.Core.Helpers;
@@ -98,8 +98,9 @@ public partial class ElevatorService : ObservableRecipient
             return true;
         }
 
-        var currentUser = WindowsIdentity.GetCurrent().Name;
-        currentUser = currentUser.Split("\\").LastOrDefault() ?? currentUser;
+        var currentUserSid = System.Security.Principal.WindowsIdentity.GetCurrent().User?.Value;
+        if (string.IsNullOrEmpty(currentUserSid))
+            currentUserSid = WindowsIdentity.GetCurrent().Name; // Fallback just in case
 
         var elevatorPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ElevatorProcessName);
 
@@ -112,7 +113,7 @@ public partial class ElevatorService : ObservableRecipient
                 CreateNoWindow = false,
                 WindowStyle = ProcessWindowStyle.Hidden,
                 Verb = "runas",
-                ArgumentList = { currentUser }
+                ArgumentList = { currentUserSid, Environment.ProcessId.ToString() }
             });
 
             if (_elevatorProcess != null)
@@ -216,9 +217,8 @@ public partial class ElevatorService : ObservableRecipient
     {
         if (IsElevatorRunning())
         {
-            _logger.Information("Killing Elevator.exe");
-            _elevatorProcess?.Kill();
-            _logger.Debug("Elevator.exe killed");
+            _logger.Information("JASM exiting, Elevator.exe will auto-terminate via parent monitoring.");
+            _elevatorProcess?.Dispose();
         }
     }
 

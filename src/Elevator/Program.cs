@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.IO.Pipes;
 using System.Runtime.InteropServices;
 using System.Security.AccessControl;
@@ -27,18 +27,30 @@ internal class Program
         var userName = "";
         try
         {
-            userName = args.First();
+            userName = args[0];
+            if (args.Length > 1 && int.TryParse(args[1], out int parentPid))
+            {
+                MonitorParentProcess(parentPid);
+            }
         }
         catch
         {
-            Console.Error.WriteLine("Please provide a username");
+            Console.Error.WriteLine("Usage: Elevator.exe <userName> [parentPid]");
             Environment.Exit(2);
         }
 
+        var specificUserSid = default(SecurityIdentifier);
         try
         {
-            var specificUserAccount = new NTAccount(userName);
-            var specificUserSid = (SecurityIdentifier)specificUserAccount.Translate(typeof(SecurityIdentifier));
+            if (userName.StartsWith("S-1-"))
+            {
+                specificUserSid = new SecurityIdentifier(userName);
+            }
+            else
+            {
+                var specificUserAccount = new NTAccount(userName);
+                specificUserSid = (SecurityIdentifier)specificUserAccount.Translate(typeof(SecurityIdentifier));
+            }
 
             var ps = new PipeSecurity();
 
@@ -244,6 +256,34 @@ internal class Program
         }
 
         return process.MainWindowHandle;
+    }
+
+    private static void MonitorParentProcess(int parentPid)
+    {
+        var monitorThread = new Thread(() =>
+        {
+            try
+            {
+                var parent = Process.GetProcessById(parentPid);
+                parent.WaitForExit();
+            }
+            catch (ArgumentException)
+            {
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Monitor error: {ex.Message}");
+            }
+
+            Console.WriteLine("Parent process exited, terminating Elevator...");
+            Environment.Exit(0);
+        })
+        {
+            IsBackground = true,
+            Name = "ParentMonitorThread"
+        };
+
+        monitorThread.Start();
     }
 }
 
