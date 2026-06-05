@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using CommunityToolkit.WinUI.UI.Controls;
+using Microsoft.UI.Xaml.Controls;
 using CommunityToolkitWrapper;
 using GIMI_ModManager.Core.Contracts.Entities;
 using GIMI_ModManager.Core.Contracts.Services;
@@ -37,7 +38,8 @@ public partial class ModGridVM(
     ElevatorService elevatorService,
     UserPreferencesService userPreferencesService,
     IWindowManagerService windowManagerService,
-    ILanguageLocalizer localizer)
+    ILanguageLocalizer localizer,
+    ModVariantHandlerService modVariantHandlerService)
     : ObservableRecipient, IRecipient<ModChangedMessage>
 {
     private readonly ISkinManagerService _skinManagerService = skinManagerService;
@@ -50,6 +52,7 @@ public partial class ModGridVM(
     private readonly ElevatorService _elevatorService = elevatorService;
     private readonly UserPreferencesService _userPreferencesService = userPreferencesService;
     private readonly IWindowManagerService _windowManagerService = windowManagerService;
+    private readonly ModVariantHandlerService _modVariantHandlerService = modVariantHandlerService;
     private readonly ILogger _logger = Log.ForContext<ModGridVM>();
     private readonly ILanguageLocalizer _localizer = localizer;
 
@@ -91,6 +94,7 @@ public partial class ModGridVM(
     public ObservableCollection<ModRowVM> SelectedMods { get; } = [];
 
     public bool IsSingleModSelected => SelectedMods.Count == 1;
+    public ModRowVM? SelectedMod => SelectedMods.Count == 1 ? SelectedMods[0] : null;
 
     public bool ModdableObjectHasAnyMods => _modsBackend.Count != 0;
 
@@ -365,7 +369,11 @@ public partial class ModGridVM(
 
         var modNotifications = await _modNotificationManager.GetNotificationsForModAsync(characterSkinEntry.Id);
 
-        return new ModRowVM(characterSkinEntry, skinModSettings, presetNames, modNotifications)
+        var variants = await _modVariantHandlerService.GetVariantsAsync(characterSkinEntry.Id).ConfigureAwait(false);
+        var variantNames = variants.Select(v => v.Name);
+        var activeVariant = await _modVariantHandlerService.GetActiveVariantNameAsync(characterSkinEntry.Id).ConfigureAwait(false) ?? string.Empty;
+
+        return new ModRowVM(characterSkinEntry, skinModSettings, presetNames, modNotifications, variantNames, activeVariant)
         {
             ToggleEnabledCommand = new AsyncRelayCommand<ModRowVM>(ToggleModAsync),
             UpdateModSettingsCommand = new AsyncRelayCommand<UpdateModSettingsArgument>(UpdateModSettingsAsync)
@@ -387,8 +395,24 @@ public partial class ModGridVM(
 
         var modNotifications = await _modNotificationManager.GetNotificationsForModAsync(characterSkinEntry.Id);
 
-        existingMod.UpdateModel(characterSkinEntry, skinModSettings, presetNames, modNotifications);
-        existingMod.TriggerPropertyChanged(nameof(existingMod.IsEnabled));
+        var variants = await _modVariantHandlerService.GetVariantsAsync(characterSkinEntry.Id);
+        var variantNames = variants.Select(v => v.Name);
+        var activeVariant = await _modVariantHandlerService.GetActiveVariantNameAsync(characterSkinEntry.Id) ?? string.Empty;
+
+        void UpdateUi()
+        {
+            existingMod.UpdateModel(characterSkinEntry, skinModSettings, presetNames, modNotifications, variantNames, activeVariant);
+            existingMod.TriggerPropertyChanged(nameof(existingMod.IsEnabled));
+        }
+
+        if (_dispatcherQueue != null && !_dispatcherQueue.HasThreadAccess)
+        {
+            _dispatcherQueue.TryEnqueue(UpdateUi);
+        }
+        else
+        {
+            UpdateUi();
+        }
     }
 
     public ModRowVM[] SearchFilterMods(string searchText)
@@ -678,6 +702,7 @@ public partial class ModGridVM(
         if (anyChanges)
         {
             OnPropertyChanged(nameof(IsSingleModSelected));
+            OnPropertyChanged(nameof(SelectedMod));
             OnModsSelected?.Invoke(this, new ModRowSelectedEventArgs(SelectedMods));
         }
     }
@@ -779,6 +804,167 @@ public partial class ModGridVM(
                 continue;
 
             GridMods.Move(oldPosition, newPosition);
+        }
+    }
+
+    [RelayCommand]
+    private async Task SaveVariantAsync(ModRowVM modRowVm)
+    {
+        if (modRowVm == null) return;
+
+        var textBox = new TextBox
+        {
+            PlaceholderText = _localizer.GetLocalizedStringOrDefault("/ModVariant/InputNamePlaceholder", "Enter variant name"),
+            AcceptsReturn = false
+        };
+
+        var dialog = new ContentDialog
+        {
+            Title = _localizer.GetLocalizedStringOrDefault("/ModVariant/InputNameTitle", "Save as Variant"),
+            Content = textBox,
+            PrimaryButtonText = _localizer.GetLocalizedStringOrDefault("Common_Save", "Save"),
+            CloseButtonText = _localizer.GetLocalizedStringOrDefault("Common_Cancel", "Cancel"),
+            DefaultButton = ContentDialogButton.Primary,
+            XamlRoot = App.MainWindow.Content.XamlRoot
+        };
+
+        var result = await _windowManagerService.ShowDialogAsync(dialog);
+        if (result != ContentDialogResult.Primary) return;
+
+        var name = textBox.Text.Trim();
+        if (string.IsNullOrEmpty(name))
+        {
+            _notificationService.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/ModVariant/InvalidNameTitle", "Invalid Name"),
+                _localizer.GetLocalizedStringOrDefault("/ModVariant/InvalidNameMessage", "Variant name cannot be empty"),
+                TimeSpan.FromSeconds(5)
+            );
+            return;
+        }
+
+        var existingVariants = await _modVariantHandlerService.GetVariantsAsync(modRowVm.Id).ConfigureAwait(true);
+        if (existingVariants.Any(v => v.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
+        {
+            var overwriteDialog = new ContentDialog
+            {
+                Title = _localizer.GetLocalizedStringOrDefault("/ModVariant/OverwriteTitle", "Overwrite Variant"),
+                Content = string.Format(_localizer.GetLocalizedStringOrDefault("/ModVariant/OverwriteMessage", "Variant '{0}' already exists. Do you want to overwrite it?"), name),
+                PrimaryButtonText = _localizer.GetLocalizedStringOrDefault("Common_Yes", "Yes"),
+                CloseButtonText = _localizer.GetLocalizedStringOrDefault("Common_Cancel", "Cancel"),
+                DefaultButton = ContentDialogButton.Close,
+                XamlRoot = App.MainWindow.Content.XamlRoot
+            };
+
+            var overwriteResult = await _windowManagerService.ShowDialogAsync(overwriteDialog);
+            if (overwriteResult != ContentDialogResult.Primary) return;
+        }
+
+        var handlerResult = await _modVariantHandlerService.SaveCurrentAsVariantAsync(modRowVm.Id, name, CancellationToken.None).ConfigureAwait(true);
+        if (handlerResult.IsSuccess)
+        {
+            if (handlerResult.HasNotification)
+            {
+                _notificationService.ShowNotification(handlerResult.Notification);
+            }
+            var skinEntry = _modList?.Mods?.FirstOrDefault(m => m.Id == modRowVm.Id);
+            if (skinEntry != null)
+            {
+                await UpdateModVmAsync(skinEntry, useSettingsCache: false, CancellationToken.None).ConfigureAwait(true);
+            }
+        }
+        else
+        {
+            if (handlerResult.HasNotification)
+            {
+                _notificationService.ShowNotification(handlerResult.Notification);
+            }
+        }
+    }
+
+    [RelayCommand]
+    private async Task ApplyVariantAsync(string variantName)
+    {
+        if (string.IsNullOrEmpty(variantName)) return;
+        var modRowVm = SelectedMod;
+        if (modRowVm == null) return;
+
+        var handlerResult = await _modVariantHandlerService.ApplyVariantAsync(modRowVm.Id, variantName, CancellationToken.None).ConfigureAwait(true);
+        if (handlerResult.IsSuccess)
+        {
+            var skinEntry = _modList?.Mods?.FirstOrDefault(m => m.Id == modRowVm.Id);
+            if (skinEntry != null)
+            {
+                await UpdateModVmAsync(skinEntry, useSettingsCache: false, CancellationToken.None).ConfigureAwait(true);
+                Messenger.Send(new ModChangedMessage(this, skinEntry, null));
+            }
+        }
+        else
+        {
+            if (handlerResult.HasNotification)
+            {
+                _notificationService.ShowNotification(handlerResult.Notification);
+            }
+        }
+    }
+
+    [RelayCommand]
+    private async Task RenameVariantAsync(string newName)
+    {
+        if (string.IsNullOrEmpty(newName)) return;
+        var modRowVm = SelectedMod;
+        if (modRowVm == null) return;
+        var oldName = modRowVm.ActiveVariant;
+        if (string.IsNullOrEmpty(oldName) || oldName == newName) return;
+
+        var handlerResult = await _modVariantHandlerService.RenameVariantAsync(modRowVm.Id, oldName, newName, CancellationToken.None).ConfigureAwait(true);
+        if (handlerResult.IsSuccess)
+        {
+            if (handlerResult.HasNotification)
+            {
+                _notificationService.ShowNotification(handlerResult.Notification);
+            }
+            var skinEntry = _modList?.Mods?.FirstOrDefault(m => m.Id == modRowVm.Id);
+            if (skinEntry != null)
+            {
+                await UpdateModVmAsync(skinEntry, useSettingsCache: false, CancellationToken.None).ConfigureAwait(true);
+            }
+        }
+        else
+        {
+            if (handlerResult.HasNotification)
+            {
+                _notificationService.ShowNotification(handlerResult.Notification);
+            }
+        }
+    }
+
+    [RelayCommand]
+    private async Task DeleteVariantAsync()
+    {
+        var modRowVm = SelectedMod;
+        if (modRowVm == null) return;
+        var variantName = modRowVm.ActiveVariant;
+        if (string.IsNullOrEmpty(variantName)) return;
+
+        var handlerResult = await _modVariantHandlerService.DeleteVariantAsync(modRowVm.Id, variantName, CancellationToken.None).ConfigureAwait(true);
+        if (handlerResult.IsSuccess)
+        {
+            if (handlerResult.HasNotification)
+            {
+                _notificationService.ShowNotification(handlerResult.Notification);
+            }
+            var skinEntry = _modList?.Mods?.FirstOrDefault(m => m.Id == modRowVm.Id);
+            if (skinEntry != null)
+            {
+                await UpdateModVmAsync(skinEntry, useSettingsCache: false, CancellationToken.None).ConfigureAwait(true);
+            }
+        }
+        else
+        {
+            if (handlerResult.HasNotification)
+            {
+                _notificationService.ShowNotification(handlerResult.Notification);
+            }
         }
     }
 

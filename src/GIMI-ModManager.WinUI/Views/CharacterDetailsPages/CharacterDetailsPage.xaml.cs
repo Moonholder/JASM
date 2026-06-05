@@ -1,6 +1,7 @@
 using CommunityToolkit.WinUI.Animations;
 using GIMI_ModManager.Core.Contracts.Services;
 using GIMI_ModManager.WinUI.Contracts.Services;
+using GIMI_ModManager.WinUI.Services.AppManagement;
 using GIMI_ModManager.WinUI.Helpers.Xaml;
 using GIMI_ModManager.WinUI.ViewModels.CharacterDetailsViewModels;
 using GIMI_ModManager.WinUI.ViewModels.CharacterDetailsViewModels.SubViewModels;
@@ -392,6 +393,76 @@ public sealed partial class CharacterDetailsPage : Page
     {
         ViewModel.ContextMenuVM.OnSuggestionChosen((SuggestedModObject)args.ChosenSuggestion);
         MoveModsButton.Focus(FocusState.Programmatic);
+    }
+
+    private async void VariantSelector_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (sender is ComboBox comboBox && comboBox.SelectedItem is string variantName)
+        {
+            var vm = ViewModel?.ModGridVM;
+            var selectedMod = vm?.SelectedMod;
+            if (vm != null && selectedMod != null && selectedMod.ActiveVariant != variantName)
+            {
+                await vm.ApplyVariantCommand.ExecuteAsync(variantName);
+            }
+        }
+    }
+
+    private async void RenameVariant_OnClick(object sender, RoutedEventArgs e)
+    {
+        var vm = ViewModel?.ModGridVM;
+        var selectedMod = vm?.SelectedMod;
+        if (vm == null || selectedMod == null || string.IsNullOrEmpty(selectedMod.ActiveVariant)) return;
+
+        var oldName = selectedMod.ActiveVariant;
+        var textBox = new TextBox
+        {
+            Text = oldName,
+            PlaceholderText = _localizer.GetLocalizedStringOrDefault("/ModVariant/InputNamePlaceholder", "Enter variant name"),
+            AcceptsReturn = false
+        };
+
+        var dialog = new ContentDialog
+        {
+            Title = _localizer.GetLocalizedStringOrDefault("/ModVariant/RenameTitle", "Rename Variant"),
+            Content = textBox,
+            PrimaryButtonText = _localizer.GetLocalizedStringOrDefault("Common_Save", "Save"),
+            CloseButtonText = _localizer.GetLocalizedStringOrDefault("Common_Cancel", "Cancel"),
+            DefaultButton = ContentDialogButton.Primary,
+            XamlRoot = App.MainWindow.Content.XamlRoot
+        };
+
+        var result = await App.GetService<IWindowManagerService>().ShowDialogAsync(dialog);
+        if (result != ContentDialogResult.Primary) return;
+
+        var newName = textBox.Text.Trim();
+        if (string.IsNullOrEmpty(newName) || newName == oldName) return;
+
+        await vm.RenameVariantCommand.ExecuteAsync(newName);
+    }
+
+    private async void DeleteVariant_OnClick(object sender, RoutedEventArgs e)
+    {
+        var vm = ViewModel?.ModGridVM;
+        var selectedMod = vm?.SelectedMod;
+        if (vm == null || selectedMod == null || string.IsNullOrEmpty(selectedMod.ActiveVariant)) return;
+
+        var variantName = selectedMod.ActiveVariant;
+
+        var dialog = new ContentDialog
+        {
+            Title = _localizer.GetLocalizedStringOrDefault("/ModVariant/DeleteConfirmTitle", "Delete Variant"),
+            Content = string.Format(_localizer.GetLocalizedStringOrDefault("/ModVariant/DeleteConfirmMessage", "Are you sure you want to delete variant '{0}'?"), variantName),
+            PrimaryButtonText = _localizer.GetLocalizedStringOrDefault("Common_Yes", "Yes"),
+            CloseButtonText = _localizer.GetLocalizedStringOrDefault("Common_Cancel", "Cancel"),
+            DefaultButton = ContentDialogButton.Close,
+            XamlRoot = App.MainWindow.Content.XamlRoot
+        };
+
+        var result = await App.GetService<IWindowManagerService>().ShowDialogAsync(dialog);
+        if (result != ContentDialogResult.Primary) return;
+
+        await vm.DeleteVariantCommand.ExecuteAsync(null);
     }
 
     #endregion

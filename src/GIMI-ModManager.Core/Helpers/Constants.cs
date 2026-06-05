@@ -1,4 +1,4 @@
-﻿namespace GIMI_ModManager.Core.Helpers;
+namespace GIMI_ModManager.Core.Helpers;
 
 public static class Constants
 {
@@ -6,6 +6,7 @@ public static class Constants
         { ".png", ".jpg", ".jpeg", ".bmp", ".gif", ".tif", ".tiff", ".ico", ".svg", ".webp", ".bitmap" };
     public static readonly IReadOnlyList<string> SupportedArchiveTypes = [".zip", ".rar", ".7z"];
     public static readonly string ModConfigFileName = ".JASM_ModConfig.json";
+    public static readonly string ModVariantsFileName = ".JASM_Variants.json";
     public static readonly string ShaderFixesFolderName = "ShaderFixes";
     public static readonly string[] ScriptIniNames = ["Script.ini", "merged.ini", "mod.ini"];
     public static readonly string[] MergedIniPrefixes = ["Master", "merged"];

@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GIMI_ModManager.Core.Entities;
 using GIMI_ModManager.Core.Entities.Mods.Contract;
@@ -23,20 +23,25 @@ public partial class ModRowVM : ObservableObject
     [ObservableProperty] private string[] _presets = [];
     [ObservableProperty] private string _inPresets = string.Empty;
     [ObservableProperty] private string _description = string.Empty;
+    [ObservableProperty] private string[] _variants = [];
+    [ObservableProperty] private string _activeVariant = string.Empty;
+    [ObservableProperty] private bool _hasVariants;
+    [ObservableProperty] private bool _hasActiveVariant;
 
     public ObservableCollection<ModRowVM_ModNotificationVM> ModNotifications { get; } = new();
 
     public string SearchableText { get; private set; } = string.Empty;
 
     public ModRowVM(CharacterSkinEntry characterSkinEntry, ModSettings? modSettings, IEnumerable<string> presetNames,
-        IEnumerable<ModNotification> modNotifications)
+        IEnumerable<ModNotification> modNotifications, IEnumerable<string> variantNames, string activeVariant)
     {
         Id = characterSkinEntry.Mod.Id;
-        UpdateModel(characterSkinEntry, modSettings, presetNames, modNotifications);
+        UpdateModel(characterSkinEntry, modSettings, presetNames, modNotifications, variantNames, activeVariant);
     }
 
     public void UpdateModel(CharacterSkinEntry characterSkinEntry, ModSettings? modSettings,
-        IEnumerable<string> presetNames, IEnumerable<ModNotification> modNotifications)
+        IEnumerable<string> presetNames, IEnumerable<ModNotification> modNotifications,
+        IEnumerable<string> variantNames, string activeVariant)
     {
         IsEnabled = characterSkinEntry.IsEnabled;
         DisplayName = characterSkinEntry.Mod.GetDisplayName();
@@ -49,6 +54,11 @@ public partial class ModRowVM : ObservableObject
 
         Presets = presetNames as string[] ?? presetNames.ToArray();
         InPresets = string.Join(',', Presets);
+
+        Variants = variantNames as string[] ?? variantNames.ToArray();
+        ActiveVariant = activeVariant ?? string.Empty;
+        HasVariants = Variants.Length > 0;
+        HasActiveVariant = !string.IsNullOrEmpty(ActiveVariant);
 
         ModNotifications.Clear();
 

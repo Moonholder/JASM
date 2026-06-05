@@ -163,7 +163,9 @@ public partial class App : Application
                 services.AddSingleton<IKeySwapService, KeySwapService>();
                 services.AddSingleton<ILanguageLocalizer, Localizer>();
                 services.AddSingleton<ModPresetService>();
+                services.AddSingleton<ModVariantService>();
                 services.AddSingleton<UserPreferencesService>();
+                services.AddSingleton<ModVariantHandlerService>();
                 services.AddSingleton<ArchiveService>();
                 services.AddSingleton<ModArchiveRepository>();
                 services.AddSingleton<GameBananaCoreService>();

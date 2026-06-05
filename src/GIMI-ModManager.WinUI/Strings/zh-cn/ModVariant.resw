@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- XAML Elements -->
+  <data name="Title.Text" xml:space="preserve">
+    <value>变体预设</value>
+  </data>
+  <data name="ComboBoxPlaceholder.PlaceholderText" xml:space="preserve">
+    <value>选择变体预设...</value>
+  </data>
+  <data name="SaveButton.Content" xml:space="preserve">
+    <value>保存</value>
+  </data>
+  <data name="SaveButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>保存当前设置</value>
+  </data>
+  <data name="RenameButton.Content" xml:space="preserve">
+    <value>重命名</value>
+  </data>
+  <data name="RenameButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>重命名当前变体</value>
+  </data>
+  <data name="DeleteButton.Content" xml:space="preserve">
+    <value>删除</value>
+  </data>
+  <data name="DeleteButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>删除当前变体</value>
+  </data>
+
+  <!-- Dialogs & Notifications -->
+  <data name="InputNamePlaceholder" xml:space="preserve">
+    <value>输入变体预设名称</value>
+  </data>
+  <data name="InputNameTitle" xml:space="preserve">
+    <value>另存为变体预设</value>
+  </data>
+  <data name="InvalidNameTitle" xml:space="preserve">
+    <value>名称无效</value>
+  </data>
+  <data name="InvalidNameMessage" xml:space="preserve">
+    <value>变体名称不能为空</value>
+  </data>
+  <data name="SaveSuccessTitle" xml:space="preserve">
+    <value>保存变体</value>
+  </data>
+  <data name="SaveSuccessMessage" xml:space="preserve">
+    <value>变体预设 '{0}' 保存成功</value>
+  </data>
+  <data name="SaveFailedTitle" xml:space="preserve">
+    <value>保存变体失败</value>
+  </data>
+  <data name="ApplySuccessTitle" xml:space="preserve">
+    <value>应用变体</value>
+  </data>
+  <data name="ApplySuccessMessage" xml:space="preserve">
+    <value>变体预设 '{0}' 应用成功</value>
+  </data>
+  <data name="ApplyFailedTitle" xml:space="preserve">
+    <value>应用变体失败</value>
+  </data>
+  <data name="DeleteSuccessTitle" xml:space="preserve">
+    <value>删除变体</value>
+  </data>
+  <data name="DeleteSuccessMessage" xml:space="preserve">
+    <value>变体预设 '{0}' 已成功删除</value>
+  </data>
+  <data name="DeleteFailedTitle" xml:space="preserve">
+    <value>删除变体失败</value>
+  </data>
+  <data name="RenameSuccessTitle" xml:space="preserve">
+    <value>重命名变体</value>
+  </data>
+  <data name="RenameSuccessMessage" xml:space="preserve">
+    <value>变体预设已成功重命名为 '{0}'</value>
+  </data>
+  <data name="RenameFailedTitle" xml:space="preserve">
+    <value>重命名变体失败</value>
+  </data>
+  <data name="RenameTitle" xml:space="preserve">
+    <value>重命名变体</value>
+  </data>
+  <data name="DeleteConfirmTitle" xml:space="preserve">
+    <value>删除变体</value>
+  </data>
+  <data name="DeleteConfirmMessage" xml:space="preserve">
+    <value>确定要删除变体预设 '{0}' 吗？</value>
+  </data>
+  <data name="OverwriteTitle" xml:space="preserve">
+    <value>覆盖变体</value>
+  </data>
+  <data name="OverwriteMessage" xml:space="preserve">
+    <value>变体预设 '{0}' 已存在。是否覆盖？</value>
+  </data>
+</root>

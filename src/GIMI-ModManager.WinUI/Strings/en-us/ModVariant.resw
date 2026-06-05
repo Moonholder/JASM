@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- XAML Elements -->
+  <data name="Title.Text" xml:space="preserve">
+    <value>Variants</value>
+  </data>
+  <data name="ComboBoxPlaceholder.PlaceholderText" xml:space="preserve">
+    <value>Select variant...</value>
+  </data>
+  <data name="SaveButton.Content" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="RenameButton.Content" xml:space="preserve">
+    <value>Rename</value>
+  </data>
+  <data name="DeleteButton.Content" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+
+  <!-- Dialogs & Notifications -->
+  <data name="InputNamePlaceholder" xml:space="preserve">
+    <value>Enter variant name</value>
+  </data>
+  <data name="InputNameTitle" xml:space="preserve">
+    <value>Save as Variant</value>
+  </data>
+  <data name="InvalidNameTitle" xml:space="preserve">
+    <value>Invalid Name</value>
+  </data>
+  <data name="InvalidNameMessage" xml:space="preserve">
+    <value>Variant name cannot be empty</value>
+  </data>
+  <data name="SaveSuccessTitle" xml:space="preserve">
+    <value>Save Variant</value>
+  </data>
+  <data name="SaveSuccessMessage" xml:space="preserve">
+    <value>Variant '{0}' saved successfully</value>
+  </data>
+  <data name="SaveFailedTitle" xml:space="preserve">
+    <value>Failed to save variant</value>
+  </data>
+  <data name="ApplySuccessTitle" xml:space="preserve">
+    <value>Apply Variant</value>
+  </data>
+  <data name="ApplySuccessMessage" xml:space="preserve">
+    <value>Variant '{0}' applied successfully</value>
+  </data>
+  <data name="ApplyFailedTitle" xml:space="preserve">
+    <value>Failed to apply variant</value>
+  </data>
+  <data name="DeleteSuccessTitle" xml:space="preserve">
+    <value>Delete Variant</value>
+  </data>
+  <data name="DeleteSuccessMessage" xml:space="preserve">
+    <value>Variant '{0}' deleted successfully</value>
+  </data>
+  <data name="DeleteFailedTitle" xml:space="preserve">
+    <value>Failed to delete variant</value>
+  </data>
+  <data name="RenameSuccessTitle" xml:space="preserve">
+    <value>Rename Variant</value>
+  </data>
+  <data name="RenameSuccessMessage" xml:space="preserve">
+    <value>Variant renamed to '{0}' successfully</value>
+  </data>
+  <data name="RenameFailedTitle" xml:space="preserve">
+    <value>Failed to rename variant</value>
+  </data>
+  <data name="RenameTitle" xml:space="preserve">
+    <value>Rename Variant</value>
+  </data>
+  <data name="DeleteConfirmTitle" xml:space="preserve">
+    <value>Delete Variant</value>
+  </data>
+  <data name="DeleteConfirmMessage" xml:space="preserve">
+    <value>Are you sure you want to delete variant '{0}'?</value>
+  </data>
+  <data name="OverwriteTitle" xml:space="preserve">
+    <value>Overwrite Variant</value>
+  </data>
+  <data name="OverwriteMessage" xml:space="preserve">
+    <value>Variant '{0}' already exists. Do you want to overwrite it?</value>
+  </data>
+</root>

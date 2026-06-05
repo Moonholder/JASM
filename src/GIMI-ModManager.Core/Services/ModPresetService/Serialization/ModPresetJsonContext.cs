@@ -8,6 +8,8 @@ namespace GIMI_ModManager.Core.Services.ModPresetService.Serialization;
 [JsonSourceGenerationOptions(WriteIndented = true)]
 [JsonSerializable(typeof(JsonModPreset))]
 [JsonSerializable(typeof(JsonModPresetEntry))]
+[JsonSerializable(typeof(JsonModVariantCollection))]
+[JsonSerializable(typeof(JsonModVariantPreset))]
 internal partial class ModPresetJsonContext : JsonSerializerContext
 {
 }

@@ -30,9 +30,10 @@
                 Placement="RightEdgeAlignedBottom">
                 <Grid MinWidth="200">
                     <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <Grid BorderBrush="{ThemeResource ControlElevationBorderBrush}" BorderThickness="0,0,0,4">
                         <Grid>
@@ -125,6 +126,64 @@
                                 </StackPanel>
                             </Expander.Content>
                         </Expander>
+                    </StackPanel>
+
+                    <StackPanel
+                        Grid.Row="3"
+                        Margin="0,4,0,4"
+                        Padding="0,4,0,0"
+                        BorderBrush="{ThemeResource ControlElevationBorderBrush}"
+                        BorderThickness="0,4,0,0"
+                        Visibility="{x:Bind ViewModel.ModGridVM.IsSingleModSelected, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                        
+                        <TextBlock 
+                            Text="Variants (变体)" 
+                            FontWeight="SemiBold" 
+                            Margin="0,0,0,8" 
+                            FontSize="14"
+                            l:Uids.Uid="/ModVariant/Title"/>
+
+                        <Grid ColumnSpacing="8" RowSpacing="8" Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            
+                            <ComboBox
+                                x:Name="VariantSelector"
+                                HorizontalAlignment="Stretch"
+                                ItemsSource="{x:Bind ViewModel.ModGridVM.SelectedMod.Variants, Mode=OneWay}"
+                                SelectedItem="{x:Bind ViewModel.ModGridVM.SelectedMod.ActiveVariant, Mode=OneWay}"
+                                SelectionChanged="VariantSelector_OnSelectionChanged"
+                                IsEnabled="{x:Bind ViewModel.ModGridVM.SelectedMod.HasVariants, Mode=OneWay}"
+                                PlaceholderText="Select variant..."
+                                l:Uids.Uid="/ModVariant/ComboBoxPlaceholder"/>
+
+                            <Button
+                                Grid.Column="1"
+                                Content="Save"
+                                Command="{x:Bind ViewModel.ModGridVM.SaveVariantCommand}"
+                                CommandParameter="{x:Bind ViewModel.ModGridVM.SelectedMod, Mode=OneWay}"
+                                IsEnabled="{x:Bind ViewModel.ModGridVM.SelectedMod.IsEnabled, Mode=OneWay}"
+                                ToolTipService.ToolTip="Save current settings as variant"
+                                l:Uids.Uid="/ModVariant/SaveButton"/>
+                        </Grid>
+
+                         <StackPanel Orientation="Horizontal" Spacing="8" Visibility="{x:Bind ViewModel.ModGridVM.SelectedMod.HasVariants, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <Button 
+                                Content="Rename" 
+                                Click="RenameVariant_OnClick"
+                                IsEnabled="{x:Bind ViewModel.ModGridVM.SelectedMod.HasActiveVariant, Mode=OneWay}"
+                                ToolTipService.ToolTip="Rename selected variant"
+                                l:Uids.Uid="/ModVariant/RenameButton"/>
+                            <Button 
+                                Content="Delete" 
+                                Click="DeleteVariant_OnClick"
+                                IsEnabled="{x:Bind ViewModel.ModGridVM.SelectedMod.HasActiveVariant, Mode=OneWay}"
+                                ToolTipService.ToolTip="Delete selected variant"
+                                l:Uids.Uid="/ModVariant/DeleteButton"/>
+                        </StackPanel>
+
                     </StackPanel>
                 </Grid>
             </Flyout>
