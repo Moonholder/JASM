@@ -144,12 +144,12 @@ else:
 
 # Export filenames to GITHUB_ENV
 env_file = os.getenv('GITHUB_ENV')
-if env_file is None:
-	exit(1)
-
-with open(env_file, "a") as myfile:
-	myfile.write(f"zipFile={releaseArchiveName}\n")
-	myfile.write(f"setupFile={setupFileName}\n")
+if env_file is not None:
+	with open(env_file, "a") as myfile:
+		myfile.write(f"zipFile={releaseArchiveName}\n")
+		myfile.write(f"setupFile={setupFileName}\n")
+else:
+	print(f"Local build completed: zipFile={releaseArchiveName}, setupFile={setupFileName}")
 
 exit(0)
 
