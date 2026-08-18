@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI.UI.Controls;
 using GIMI_ModManager.Core.GamesService.Interfaces;
@@ -112,14 +112,24 @@ public partial class CharacterDetailsViewModel
         {
             var newSingleSelectState = !IsSingleSelectEnabled;
 
-            var request = new OverrideCharacterRequest
-            {
-                IsMultiMod = NewValue<bool>.Set(!newSingleSelectState)
-            };
-
             if (_modList.Character is ICharacter character)
             {
-                await _gameService.SetCharacterOverrideAsync(character, request);
+                if (character.IsCustomModObject)
+                {
+                    var request = new EditCustomCharacterRequest
+                    {
+                        IsMultiMod = NewValue<bool>.Set(!newSingleSelectState)
+                    };
+                    await _gameService.EditCustomCharacterAsync(character.InternalName, request);
+                }
+                else
+                {
+                    var request = new OverrideCharacterRequest
+                    {
+                        IsMultiMod = NewValue<bool>.Set(!newSingleSelectState)
+                    };
+                    await _gameService.SetCharacterOverrideAsync(character, request);
+                }
             }
             else
             {

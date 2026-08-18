@@ -224,12 +224,12 @@
                                         VerticalAlignment="Center"
                                         FontSize="16"
                                         IsTextSelectionEnabled="True"
-                                        Text="{Binding Mode=OneWay}" />
+                                        Text="{x:Bind}" />
                                     <Button
                                         Grid.Column="1"
                                         HorizontalAlignment="Right"
-                                        Command="{Binding ElementName=CreateCharacterPageName, Path=ViewModel.RemoveKeyCommand, Mode=OneWay}"
-                                        CommandParameter="{Binding Mode=OneTime}"
+                                        Click="RemoveKey_Click"
+                                        Tag="{x:Bind}"
                                         Content="Remove"
                                         l:Uids.Uid="/CharacterManager/RemoveKeywordButton" />
                                 </Grid>

@@ -46,4 +46,12 @@ public sealed partial class EditCharacterPage : Page
         base.OnNavigatedTo(e);
         ViewModel.OnNavigatedTo(e.Parameter);
     }
+
+    private void RemoveKey_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement { Tag: string key })
+        {
+            ViewModel.RemoveKeyCommand.Execute(key);
+        }
+    }
 }

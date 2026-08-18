@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Input;
 using GIMI_ModManager.Core.GamesService.Interfaces;
 using GIMI_ModManager.Core.GamesService.Requests;
 using GIMI_ModManager.Core.Helpers;
@@ -18,14 +18,24 @@ public partial class CharacterGalleryViewModel
     {
         var newSingleSelectState = !IsSingleSelection;
 
-        var request = new OverrideCharacterRequest
-        {
-            IsMultiMod = NewValue<bool>.Set(!newSingleSelectState)
-        };
-
         if (_moddableObject is ICharacter character)
         {
-            await _gameService.SetCharacterOverrideAsync(character, request);
+            if (character.IsCustomModObject)
+            {
+                var request = new EditCustomCharacterRequest
+                {
+                    IsMultiMod = NewValue<bool>.Set(!newSingleSelectState)
+                };
+                await _gameService.EditCustomCharacterAsync(character.InternalName, request);
+            }
+            else
+            {
+                var request = new OverrideCharacterRequest
+                {
+                    IsMultiMod = NewValue<bool>.Set(!newSingleSelectState)
+                };
+                await _gameService.SetCharacterOverrideAsync(character, request);
+            }
         }
         else
         {
