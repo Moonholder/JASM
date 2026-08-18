@@ -62,34 +62,48 @@ public partial class CreateCommandViewModel : ObservableObject
         };
     }
 
-    [ObservableProperty] private string _commandDisplayName = string.Empty;
+    [ObservableProperty]
+    public partial string CommandDisplayName { get; set; } = string.Empty;
 
-    [ObservableProperty] private string _command = string.Empty;
+    [ObservableProperty]
+    public partial string Command { get; set; } = string.Empty;
 
-    [ObservableProperty] private string _arguments = string.Empty;
+    [ObservableProperty]
+    public partial string Arguments { get; set; } = string.Empty;
 
-    [ObservableProperty] private bool _canEditWorkingDirectory = true;
+    [ObservableProperty]
+    public partial bool CanEditWorkingDirectory { get; set; } = true;
 
-    [ObservableProperty] private string _workingDirectory = string.Empty;
+    [ObservableProperty]
+    public partial string WorkingDirectory { get; set; } = string.Empty;
 
-    [ObservableProperty] private string _effectiveWorkingDirectory = string.Empty;
+    [ObservableProperty]
+    public partial string EffectiveWorkingDirectory { get; set; } = string.Empty;
 
-    [ObservableProperty] private bool _runAsAdmin;
+    [ObservableProperty]
+    public partial bool RunAsAdmin { get; set; }
 
-    [ObservableProperty] private bool _canToggleUseShellExecute = true;
-    [ObservableProperty] private bool _useShellExecute;
+    [ObservableProperty]
+    public partial bool CanToggleUseShellExecute { get; set; } = true;
 
-    [ObservableProperty] private bool _canToggleCreateWindow = true;
+    [ObservableProperty]
+    public partial bool UseShellExecute { get; set; }
 
-    [ObservableProperty] private bool _createWindow = true;
+    [ObservableProperty]
+    public partial bool CanToggleCreateWindow { get; set; } = true;
 
-    [ObservableProperty] private bool _killProcessOnMainAppExit;
+    [ObservableProperty]
+    public partial bool CreateWindow { get; set; } = true;
+
+    [ObservableProperty]
+    public partial bool KillProcessOnMainAppExit { get; set; }
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(CreateCommandCommand))]
-    private bool _isValidCommand;
+    public partial bool IsValidCommand { get; set; }
 
-    [ObservableProperty] private string _commandPreview = string.Empty;
+    [ObservableProperty]
+    public partial string CommandPreview { get; set; } = string.Empty;
 
 
     public async Task Initialize(CreateCommandOptions? options = null)

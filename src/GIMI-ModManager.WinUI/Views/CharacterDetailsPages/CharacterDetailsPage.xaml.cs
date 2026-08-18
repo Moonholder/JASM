@@ -22,7 +22,7 @@ namespace GIMI_ModManager.WinUI.Views.CharacterDetailsPages;
 
 public sealed partial class CharacterDetailsPage : Page
 {
-    public CharacterDetailsViewModel? ViewModel { get; set; }
+    public CharacterDetailsViewModel ViewModel { get; set; } = null!;
 
     private readonly ILanguageLocalizer _localizer = App.GetService<ILanguageLocalizer>();
 
@@ -46,7 +46,7 @@ public sealed partial class CharacterDetailsPage : Page
     private void CharacterDetailsPage_Unloaded(object sender, RoutedEventArgs e)
     {
         Bindings.StopTracking();
-        ViewModel = null;
+        ViewModel = null!;
     }
 
 
@@ -133,7 +133,7 @@ public sealed partial class CharacterDetailsPage : Page
             navigationService.SetListDataItemForNextConnectedAnimation(ViewModel.ShownModObject);
         }
 
-        ModGrid.ViewModel = null!;
+        ModGrid!.ViewModel = null!;
         ModPane.ViewModel = null!;
         CharacterCard.ViewModel = null!;
     }

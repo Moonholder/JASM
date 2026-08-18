@@ -81,4 +81,46 @@
   <data name="OverwriteMessage" xml:space="preserve">
     <value>Variant '{0}' already exists. Do you want to overwrite it?</value>
   </data>
+  <data name="SaveButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Save current settings as new variant</value>
+  </data>
+  <data name="RenameButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Rename selected variant</value>
+  </data>
+  <data name="DeleteButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Delete selected variant</value>
+  </data>
+  <data name="UpdateButton.Content" xml:space="preserve">
+    <value>Update</value>
+  </data>
+  <data name="UpdateButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Overwrite the selected variant preset with current settings</value>
+  </data>
+  <data name="UpdateConfirmTitle" xml:space="preserve">
+    <value>Update Variant</value>
+  </data>
+  <data name="UpdateConfirmMessage" xml:space="preserve">
+    <value>Are you sure you want to update the variant preset '{0}' with current settings?</value>
+  </data>
+  <data name="Error_NameEmpty" xml:space="preserve">
+    <value>Variant name cannot be empty</value>
+  </data>
+  <data name="Error_ReadSettingsFailed" xml:space="preserve">
+    <value>Failed to read mod settings</value>
+  </data>
+  <data name="Error_ConfigNotFound" xml:space="preserve">
+    <value>Variant configuration file not found</value>
+  </data>
+  <data name="Error_ReadConfigFailed" xml:space="preserve">
+    <value>Failed to read variant configuration file</value>
+  </data>
+  <data name="Error_VariantNotFound" xml:space="preserve">
+    <value>Variant named '{0}' was not found</value>
+  </data>
+  <data name="Error_ApplyIniFailed" xml:space="preserve">
+    <value>Failed to apply variant to d3dx_user.ini</value>
+  </data>
+  <data name="Error_VariantAlreadyExists" xml:space="preserve">
+    <value>A variant named '{0}' already exists</value>
+  </data>
 </root>

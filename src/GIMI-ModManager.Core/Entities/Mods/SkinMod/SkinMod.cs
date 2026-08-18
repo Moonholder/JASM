@@ -1,4 +1,4 @@
-﻿using GIMI_ModManager.Core.Contracts.Entities;
+using GIMI_ModManager.Core.Contracts.Entities;
 using GIMI_ModManager.Core.Helpers;
 
 namespace GIMI_ModManager.Core.Entities.Mods.SkinMod;
@@ -81,7 +81,7 @@ public class SkinMod : Mod, ISkinMod
         Refresh();
     }
 
-    private void Refresh()
+    private new void Refresh()
     {
         _modDirectory.Refresh();
         _configFilePath = Path.Combine(FullPath, _configFileName);

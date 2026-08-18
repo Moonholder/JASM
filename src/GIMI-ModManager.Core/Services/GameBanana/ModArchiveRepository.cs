@@ -59,7 +59,7 @@ public sealed class ModArchiveRepository
 
                 TrackArchive(archiveHandle);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 _logger.Information("Invalid archive, deleting: {ArchiveName}", archive.FullName);
                 deleteTasks.Add(Task.Run(archive.Delete));

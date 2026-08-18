@@ -1,4 +1,7 @@
-﻿using GIMI_ModManager.Core.Contracts.Services;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using GIMI_ModManager.Core.Contracts.Services;
 using GIMI_ModManager.Core.Helpers;
 using GIMI_ModManager.Core.Services;
 using GIMI_ModManager.Core.Services.ModPresetService;
@@ -17,7 +20,8 @@ public sealed class ModPresetHandlerService(
     NotificationManager notificationManager,
     ElevatorService elevatorService,
     ILocalSettingsService localSettingsService,
-    ILanguageLocalizer localizer)
+    ILanguageLocalizer localizer,
+    ISkinManagerService skinManagerService)
 {
     private readonly ILogger _logger = logger.ForContext<ModPresetHandlerService>();
     private readonly ModPresetService _modPresetService = modPresetService;
@@ -26,6 +30,7 @@ public sealed class ModPresetHandlerService(
     private readonly ElevatorService _elevatorService = elevatorService;
     private readonly ILocalSettingsService _localSettingsService = localSettingsService;
     private readonly ILanguageLocalizer _localizer = localizer;
+    private readonly ISkinManagerService _skinManagerService = skinManagerService;
 
 
     public Task<IEnumerable<ModPreset>> GetModPresetsAsync()
@@ -67,9 +72,7 @@ public sealed class ModPresetHandlerService(
                 null);
         }
 
-
         var modPreset = _modPresetService.GetPreset(presetName);
-
 
         var simpleNotification = new SimpleNotification
         (
@@ -78,36 +81,41 @@ public sealed class ModPresetHandlerService(
             TimeSpan.FromSeconds(5)
         );
 
-
         if (await CanAutoSyncAsync().ConfigureAwait(false))
         {
-            await _elevatorService.RefreshGenshinMods().ConfigureAwait(false);
-            if (modPreset.Mods.Count == 0)
-                return Result.Success(simpleNotification);
+            var modsToSync = _skinManagerService.GetAllMods(GetOptions.Enabled)
+                .Where(ske => ske.Mod.Settings.TryGetSettings(out var modSettings) && modSettings.Preferences.Any())
+                .ToList();
 
-            await Task.Delay(5000, cancellationToken).ConfigureAwait(false);
-            await _userPreferencesService.SetModPreferencesAsync(cancellationToken: cancellationToken)
-                .ConfigureAwait(false);
+            if (modsToSync.Count > 0)
+            {
+                await Parallel.ForEachAsync(modsToSync, cancellationToken, async (ske, ct) =>
+                {
+                    try
+                    {
+                        await _userPreferencesService.SyncPreferencesToModLocalFilesAsync(ske.Mod.Id).ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Error(ex, "Failed to sync preferences for mod {ModName} during preset apply", ske.Mod.Name);
+                    }
+                }).ConfigureAwait(false);
+            }
+
+            try
+            {
+                _userPreferencesService.SetUserIniReadOnly(true);
+                await _elevatorService.RefreshGenshinMods().ConfigureAwait(false);
+            }
+            finally
+            {
+                _ = Task.Run(async () =>
+                {
+                    await Task.Delay(3000).ConfigureAwait(false);
+                    _userPreferencesService.SetUserIniReadOnly(false);
+                });
+            }
         }
-
-
-        if (await CanAutoSyncAsync().ConfigureAwait(false))
-        {
-            //await ElevatorService.RefreshGenshinMods().ConfigureAwait(false); // Wait and check for changes timout 5 seconds
-            //await Task.Delay(5000).ConfigureAwait(false);
-            await _elevatorService.RefreshAndWaitForUserIniChangesAsync().ConfigureAwait(false);
-            await Task.Delay(1000, cancellationToken).ConfigureAwait(false);
-            await _userPreferencesService.SetModPreferencesAsync(cancellationToken: cancellationToken)
-                .ConfigureAwait(false);
-        }
-
-
-        if (await CanAutoSyncAsync().ConfigureAwait(false))
-        {
-            await Task.Delay(2000, cancellationToken).ConfigureAwait(false);
-            await _elevatorService.RefreshGenshinMods().ConfigureAwait(false);
-        }
-
 
         return Result.Success(simpleNotification);
     }

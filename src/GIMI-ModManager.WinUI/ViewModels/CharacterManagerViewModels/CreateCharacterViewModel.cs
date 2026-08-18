@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
 using Windows.System;
@@ -17,7 +17,6 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Serilog;
 using static GIMI_ModManager.WinUI.Helpers.Extensions;
-using GIMI_ModManager.Core.Contracts.Services;
 
 namespace GIMI_ModManager.WinUI.ViewModels.CharacterManagerViewModels;
 

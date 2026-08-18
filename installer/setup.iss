@@ -57,8 +57,8 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 [Files]
 ; 主程序文件
 Source: "{#PublishDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-; VC++ Redistributable（安装后删除临时文件）
-Source: "redist\vc_redist.x64.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall; Check: not VCRedistInstalled
+; WebView2 Evergreen Runtime（在线商店/Mod 页面依赖，安装后删除临时文件）
+Source: "redist\MicrosoftEdgeWebview2Setup.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall; Check: not WebView2RuntimeInstalled
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
@@ -66,12 +66,12 @@ Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
-; 安装 VC++ Redistributable（仅在未安装时）
-Filename: "{tmp}\vc_redist.x64.exe"; Parameters: "/install /quiet /norestart"; StatusMsg: "正在安装 Visual C++ 运行库..."; Check: not VCRedistInstalled; Flags: waituntilterminated
+; 安装 WebView2 Evergreen Runtime（仅在未检测到运行时，失败不影响主程序安装）
+Filename: "{tmp}\MicrosoftEdgeWebview2Setup.exe"; Parameters: "/silent /install"; StatusMsg: "正在安装 WebView2 运行时..."; Check: not WebView2RuntimeInstalled; Flags: waituntilterminated
 ; 手动安装模式下提供启动复选框
-Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; WorkingDir: "{app}"; Flags: nowait postinstall skipifsilent shellexec
+Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; WorkingDir: "{app}"; Flags: nowait postinstall skipifsilent shellexec runasoriginaluser
 ; 静默安装完成后的强制自启动
-Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{app}"; Flags: nowait shellexec; Check: IsAutoRun
+Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{app}"; Flags: nowait shellexec runasoriginaluser; Check: IsAutoRun
 
 [UninstallDelete]
 ; 卸载时清理可能生成的运行时文件，但不删除用户数据（%LOCALAPPDATA%\JASM 中的设置）
@@ -79,18 +79,29 @@ Type: files; Name: "{app}\*.log"
 Type: dirifempty; Name: "{app}"
 
 [Code]
-// 检查 VC++ Redistributable 2015-2022 (x64) 是否已安装
-function VCRedistInstalled: Boolean;
+// 检查 WebView2 Evergreen Runtime 是否已安装
+// 官方客户端 GUID: {F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}
+// 同时检查 64/32 位注册表视图与当前用户级安装，避免误判
+function WebView2RuntimeInstalled: Boolean;
 var
   Version: String;
 begin
-  Result := RegQueryStringValue(HKLM,
-    'SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64',
-    'Version', Version);
-  if Result then
-    Log('VC++ Redistributable found: ' + Version)
+  Result := False;
+  if RegQueryStringValue(HKLM,
+      'SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}',
+      'pv', Version) or
+     RegQueryStringValue(HKLM,
+      'SOFTWARE\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}',
+      'pv', Version) or
+     RegQueryStringValue(HKCU,
+      'SOFTWARE\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}',
+      'pv', Version) then
+  begin
+    Result := True;
+    Log('WebView2 Runtime found: ' + Version);
+  end
   else
-    Log('VC++ Redistributable not found, will install');
+    Log('WebView2 Runtime not found, will install bootstrapper');
 end;
 
 // 自定义卸载提示：提醒用户设置数据保留

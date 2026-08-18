@@ -2,6 +2,8 @@ using System.Diagnostics;
 using System.Security.Cryptography;
 using Serilog;
 using SharpCompress.Archives;
+using SharpCompress.Archives.Rar;
+using SharpCompress.Archives.SevenZip;
 using SharpCompress.Archives.Zip;
 using SharpCompress.Common;
 
@@ -106,6 +108,14 @@ public class ArchiveService
         _logger.Information("Extracting {ArchiveType} archive", archive.Type);
         foreach (var entry in archive.Entries)
         {
+            if (string.IsNullOrWhiteSpace(entry.Key))
+                continue;
+
+            ArchiveExtractionGuard.ValidateEntryPath(entry.Key, extractPath);
+
+            if (entry.IsDirectory)
+                continue;
+
             _logger.Debug("Extracting {EntryName}", entry.Key);
             entry.WriteToDirectory(extractPath, new ExtractionOptions()
             {
@@ -118,8 +128,21 @@ public class ArchiveService
 
     private void SharpExtract(string archivePath, string extractPath)
     {
-        using var archive = ZipArchive.Open(archivePath);
-        ExtractEntries(archive, extractPath);
+        switch (Path.GetExtension(archivePath).ToLowerInvariant())
+        {
+            case ".zip":
+                using (var archive = ZipArchive.OpenArchive(archivePath))
+                    ExtractEntries(archive, extractPath);
+                break;
+            case ".rar":
+                using (var archive = RarArchive.OpenArchive(archivePath))
+                    ExtractEntries(archive, extractPath);
+                break;
+            case ".7z":
+                using (var archive = SevenZipArchive.OpenArchive(archivePath))
+                    ExtractEntries(archive, extractPath);
+                break;
+        }
     }
 
 

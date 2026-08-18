@@ -2,6 +2,8 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using GIMI_ModManager.Core.Contracts.Services;
 using GIMI_ModManager.Core.GamesService;
 using GIMI_ModManager.Core.Helpers;
+using GIMI_ModManager.WinUI.Contracts.Services;
+using GIMI_ModManager.WinUI.Models.Settings;
 using Microsoft.UI.Xaml;
 using Serilog;
 using System.ComponentModel;
@@ -53,11 +55,14 @@ public partial class ElevatorService : ObservableRecipient
 
     private bool _IsInitialized;
 
-    public ElevatorService(ILogger logger, ISkinManagerService skinManagerService, IGameService gameService, ILanguageLocalizer localizer)
+    private readonly ILocalSettingsService _localSettingsService;
+
+    public ElevatorService(ILogger logger, ISkinManagerService skinManagerService, IGameService gameService, ILanguageLocalizer localizer, ILocalSettingsService localSettingsService)
     {
         _skinManagerService = skinManagerService;
         _gameService = gameService;
         _localizer = localizer;
+        _localSettingsService = localSettingsService;
         _logger = logger.ForContext<ElevatorService>();
     }
 
@@ -283,7 +288,7 @@ public partial class ElevatorService : ObservableRecipient
             _userIniWatcher.EnableRaisingEvents = true;
 
             // Create timeout
-            _ = Task.Delay(5000).ContinueWith(task =>
+            _ = Task.Delay(15000).ContinueWith(task =>
             {
                 if (_userIniChangedTcs is { Task: { IsCompleted: false } })
                     _userIniChangedTcs.TrySetResult(true);
@@ -327,7 +332,10 @@ public partial class ElevatorService : ObservableRecipient
 
             using var reader = new StreamReader(pipeClient, System.Text.Encoding.UTF8, true, 1024, leaveOpen: true);
 
-            var command = $"0:{_gameService.GameShortName}:{Environment.ProcessId}";
+            var behaviorSettings = await _localSettingsService.ReadOrCreateSettingAsync<AppBehaviorSettings>(AppBehaviorSettings.Key, SettingScope.App);
+            var restorePid = behaviorSettings.RestoreFocusAfterSync ? Environment.ProcessId.ToString() : "0";
+
+            var command = $"0:{_gameService.GameShortName}:{restorePid}";
             await writer.WriteLineAsync(command);
 
             var readTask = reader.ReadLineAsync();

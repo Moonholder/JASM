@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkitWrapper;
 using GIMI_ModManager.Core.Contracts.Services;
@@ -162,10 +162,10 @@ public sealed partial class PresetDetailsViewModel(
             _cancellationTokenSource = null;
             cts.Dispose();
         }
-        catch (TaskCanceledException e)
+        catch (TaskCanceledException)
         {
         }
-        catch (OperationCanceledException e)
+        catch (OperationCanceledException)
         {
         }
 

@@ -139,6 +139,7 @@ public partial class App : Application
                 services.AddSingleton<CharacterSkinService>();
 
                 services.AddSingleton<ElevatorService>();
+                services.AddSingleton<HotkeyService>();
                 services.AddSingleton<GenshinProcessManager>();
                 services.AddSingleton<ThreeDMigtoProcessManager>();
 

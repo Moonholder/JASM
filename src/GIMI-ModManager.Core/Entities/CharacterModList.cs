@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GIMI_ModManager.Core.Contracts.Entities;
 using GIMI_ModManager.Core.Entities.Mods.SkinMod;
 using GIMI_ModManager.Core.GamesService.Interfaces;
@@ -398,7 +398,7 @@ public sealed class CharacterModList : ICharacterModList
     public DisableWatcher DisableWatcher()
     {
         InstantiateCharacterFolder();
-        return new DisableWatcher(_watcher);
+        return new DisableWatcher(_watcher!);
     }
 
     public bool FolderAlreadyExists(string folderName)

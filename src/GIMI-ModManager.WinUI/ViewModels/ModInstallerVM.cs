@@ -193,7 +193,7 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
                 var fileSystemItem = RootFolder.First().GetByPath(modDir.FullName);
                 if (fileSystemItem is not null)
                 {
-                    dispatcherQueue.EnqueueAsync(async () =>
+                    _ = dispatcherQueue.EnqueueAsync(async () =>
                     {
                         await SetRootFolderAsync(fileSystemItem);
                         if (LastSelectedRootFolder is not null)
@@ -205,7 +205,7 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
                 }
                 else if (string.Equals(modDir.FullName, RootFolder.First().Path, StringComparison.OrdinalIgnoreCase))
                 {
-                    dispatcherQueue.EnqueueAsync(async () =>
+                    _ = dispatcherQueue.EnqueueAsync(async () =>
                     {
                         var rootItem = new FileSystemItem(modDir, 6);
                         await SetRootFolderAsync(rootItem);
@@ -427,37 +427,12 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
     {
         //TODO: Enable later
         return false;
-
-        if (fileSystemObject is not FileSystemItem fileSystemItem || _modInstallation is null)
-            return false;
-
-        if (!fileSystemItem.IsFolder)
-            return false;
-
-        if (fileSystemItem.Path == LastSelectedRootFolder?.Path ||
-            fileSystemItem.Path == LastSelectedShaderFixesFolder?.Path)
-            return false;
-
-        return true;
     }
 
     [RelayCommand(CanExecute = nameof(_canSetShaderFixesFolder))]
     private void SetShaderFixesFolder(object? fileSystemObject)
     {
         //TODO: Enable later
-        return;
-        if (fileSystemObject is not FileSystemItem fileSystemItem || _modInstallation is null)
-            return;
-
-        if (!fileSystemItem.IsFolder)
-            return;
-
-        if (LastSelectedShaderFixesFolder is not null)
-            LastSelectedShaderFixesFolder.RightIcon = null;
-
-        _modInstallation.SetShaderFixesFolder(new DirectoryInfo(fileSystemItem.Path));
-        fileSystemItem.RightIcon = ShaderFixesFolderIcon;
-        LastSelectedShaderFixesFolder = fileSystemItem;
     }
 
     private bool _canSetModPreviewImage(object? fileSystemObject)
@@ -897,7 +872,7 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
 
             if (ModPreviewImagePath == _placeholderImageUri || overrideCurrent || skipLocalImageFallback)
             {
-                var newImageUrl = modInfo.PreviewImages?.FirstOrDefault();
+                var newImageUrl = modInfo.PreviewImages?.FirstOrDefault()?.Original;
 
                 try
                 {

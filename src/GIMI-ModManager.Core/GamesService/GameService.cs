@@ -648,7 +648,8 @@ public class GameService : IGameService
     public IModdableObject? GetModdableObjectByIdentifier(InternalName? internalName,
         GetOnly getOnlyStatus = GetOnly.Enabled)
     {
-        return GetAllModdableObjects(getOnlyStatus).FirstOrDefault(x => x.InternalNameEquals(internalName));
+        return GetAllModdableObjects(getOnlyStatus)
+            .FirstOrDefault(x => internalName is { } name && x.InternalNameEquals(name));
     }
 
 

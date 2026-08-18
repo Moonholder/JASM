@@ -668,4 +668,5 @@ Testing_wuwa/
 Testing_ZZZ/
 output/
 *.7z
+testcsharp/
 # End of https://www.toptal.com/developers/gitignore/api/visualstudio,csharp,rider

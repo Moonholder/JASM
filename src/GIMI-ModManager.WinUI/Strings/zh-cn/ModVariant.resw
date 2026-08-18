@@ -90,4 +90,37 @@
   <data name="OverwriteMessage" xml:space="preserve">
     <value>变体预设 '{0}' 已存在。是否覆盖？</value>
   </data>
+  <data name="UpdateButton.Content" xml:space="preserve">
+    <value>更新</value>
+  </data>
+  <data name="UpdateButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>用当前设置覆盖更新此变体预设</value>
+  </data>
+  <data name="UpdateConfirmTitle" xml:space="preserve">
+    <value>更新变体预设</value>
+  </data>
+  <data name="UpdateConfirmMessage" xml:space="preserve">
+    <value>确定要用当前设置更新变体预设 '{0}' 吗？</value>
+  </data>
+  <data name="Error_NameEmpty" xml:space="preserve">
+    <value>变体名称不能为空</value>
+  </data>
+  <data name="Error_ReadSettingsFailed" xml:space="preserve">
+    <value>无法读取模组设置</value>
+  </data>
+  <data name="Error_ConfigNotFound" xml:space="preserve">
+    <value>未找到变体配置文件</value>
+  </data>
+  <data name="Error_ReadConfigFailed" xml:space="preserve">
+    <value>无法读取变体配置文件</value>
+  </data>
+  <data name="Error_VariantNotFound" xml:space="preserve">
+    <value>未找到名为 {0} 的变体</value>
+  </data>
+  <data name="Error_ApplyIniFailed" xml:space="preserve">
+    <value>应用变体到 d3dx_user.ini 失败</value>
+  </data>
+  <data name="Error_VariantAlreadyExists" xml:space="preserve">
+    <value>已存在名为 {0} 的变体</value>
+  </data>
 </root>

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Reflection;
 using CommunityToolkitWrapper;
 using GIMI_ModManager.Core.Helpers;
@@ -216,7 +216,7 @@ public class LifeCycleService(
             _modUpdateAvailableChecker.CancelAndStop();
             _updateChecker.CancelAndStop();
             _notificationManager.CancelAndStop();
-            commandService.Cleanup();
+            _commandService.Cleanup();
         });
 
         await notificationCleanupTask;

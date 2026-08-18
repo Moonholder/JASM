@@ -154,7 +154,14 @@ internal class Program
     [DllImport("user32.dll")]
     private static extern IntPtr GetForegroundWindow();
 
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool IsWindow(IntPtr hWnd);
+
     private const int SW_RESTORE = 9;
+
+    private static IntPtr _cachedGameHandle = IntPtr.Zero;
+    private static string _cachedGameName = "";
 
     static void RefreshGameMods(string game, int restorePid)
     {
@@ -174,20 +181,31 @@ internal class Program
             return;
         }
 
-        IntPtr? ptr = null;
-        foreach (var processName in processNames)
-        {
-            ptr = GetGameProcess(processName, true);
-            if (ptr != null) break;
-        }
+        IntPtr gameHandle = IntPtr.Zero;
 
-        if (ptr == null)
+        if (_cachedGameHandle != IntPtr.Zero && string.Equals(_cachedGameName, game, StringComparison.OrdinalIgnoreCase) && IsWindow(_cachedGameHandle))
         {
-            Console.Error.WriteLine($"Game process for {game} not found (tried: {string.Join(", ", processNames)}).");
-            return;
+            gameHandle = _cachedGameHandle;
         }
+        else
+        {
+            IntPtr? ptr = null;
+            foreach (var processName in processNames)
+            {
+                ptr = GetGameProcess(processName, true);
+                if (ptr != null) break;
+            }
 
-        IntPtr gameHandle = ptr.Value;
+            if (ptr == null)
+            {
+                Console.Error.WriteLine($"Game process for {game} not found (tried: {string.Join(", ", processNames)}).");
+                return;
+            }
+
+            gameHandle = ptr.Value;
+            _cachedGameHandle = gameHandle;
+            _cachedGameName = game;
+        }
 
         if (gameHandle != IntPtr.Zero)
         {

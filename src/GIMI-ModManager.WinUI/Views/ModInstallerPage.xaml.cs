@@ -83,8 +83,8 @@ public sealed partial class ModInstallerPage : Page, IDisposable
 
 class ExplorerItemTemplateSelector : DataTemplateSelector
 {
-    public DataTemplate RootFolderTemplate { get; set; }
-    public DataTemplate FileSystemItem { get; set; }
+    public DataTemplate RootFolderTemplate { get; set; } = null!;
+    public DataTemplate FileSystemItem { get; set; } = null!;
 
     protected override DataTemplate SelectTemplateCore(object item)
     {

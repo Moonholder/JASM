@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.WinUI;
+using CommunityToolkit.WinUI;
 using GIMI_ModManager.WinUI.Helpers.Xaml;
 using GIMI_ModManager.WinUI.Models;
 using GIMI_ModManager.WinUI.Services.Notifications;
@@ -16,7 +16,7 @@ namespace GIMI_ModManager.WinUI.Views;
 public sealed partial class CharactersPage : Page
 {
     private readonly NotificationManager _notificationService = App.GetService<NotificationManager>();
-    public CharactersViewModel? ViewModel { get; set; }
+    public CharactersViewModel ViewModel { get; set; } = null!;
 
     public CharactersPage()
     {
@@ -43,7 +43,7 @@ public sealed partial class CharactersPage : Page
     private void CharactersPage_Unloaded(object sender, RoutedEventArgs e)
     {
         Bindings.StopTracking();
-        ViewModel = null;
+        ViewModel = null!;
     }
 
     protected override void OnNavigatedFrom(NavigationEventArgs e)
@@ -52,7 +52,7 @@ public sealed partial class CharactersPage : Page
 
         ViewModel.OnScrollToCharacter -= ViewModel_OnScrollToCharacter;
 
-        ViewModel.SimpleSelectProcessDialogVM.Dialog = null;
+        ViewModel.SimpleSelectProcessDialogVM.Dialog = null!;
 
         if (CharactersGridView != null)
         {

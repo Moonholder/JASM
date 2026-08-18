@@ -50,7 +50,7 @@ public sealed class ModVariantHandlerService(
         {
             _logger.Error(e, "An error occurred when saving variant {VariantName} for mod {ModId}", name, modId);
             var title = _localizer.GetLocalizedStringOrDefault("/ModVariant/SaveFailedTitle", "Failed to save variant");
-            return Result.Error(new SimpleNotification(title, e.Message, TimeSpan.FromSeconds(5)));
+            return Result.Error(new SimpleNotification(title, GetLocalizedErrorMessage(e), TimeSpan.FromSeconds(5)));
         }
     }
 
@@ -66,7 +66,19 @@ public sealed class ModVariantHandlerService(
 
             if (await CanAutoSyncAsync().ConfigureAwait(false))
             {
-                await _elevatorService.RefreshGenshinMods().ConfigureAwait(false);
+                try
+                {
+                    _userPreferencesService.SetUserIniReadOnly(true);
+                    await _elevatorService.RefreshGenshinMods().ConfigureAwait(false);
+                }
+                finally
+                {
+                    _ = Task.Run(async () =>
+                    {
+                        await Task.Delay(3000).ConfigureAwait(false);
+                        _userPreferencesService.SetUserIniReadOnly(false);
+                    });
+                }
             }
 
             return Result.Success(simpleNotification);
@@ -75,7 +87,7 @@ public sealed class ModVariantHandlerService(
         {
             _logger.Error(e, "An error occurred when applying variant {VariantName} for mod {ModId}", name, modId);
             var title = _localizer.GetLocalizedStringOrDefault("/ModVariant/ApplyFailedTitle", "Failed to apply variant");
-            return Result.Error(new SimpleNotification(title, e.Message, TimeSpan.FromSeconds(5)));
+            return Result.Error(new SimpleNotification(title, GetLocalizedErrorMessage(e), TimeSpan.FromSeconds(5)));
         }
     }
 
@@ -98,7 +110,7 @@ public sealed class ModVariantHandlerService(
         {
             _logger.Error(e, "An error occurred when deleting variant {VariantName} for mod {ModId}", name, modId);
             var title = _localizer.GetLocalizedStringOrDefault("/ModVariant/DeleteFailedTitle", "Failed to delete variant");
-            return Result.Error(new SimpleNotification(title, e.Message, TimeSpan.FromSeconds(5)));
+            return Result.Error(new SimpleNotification(title, GetLocalizedErrorMessage(e), TimeSpan.FromSeconds(5)));
         }
     }
 
@@ -115,7 +127,7 @@ public sealed class ModVariantHandlerService(
         {
             _logger.Error(e, "An error occurred when renaming variant '{OldName}' to '{NewName}' for mod {ModId}", oldName, newName, modId);
             var title = _localizer.GetLocalizedStringOrDefault("/ModVariant/RenameFailedTitle", "Failed to rename variant");
-            return Result.Error(new SimpleNotification(title, e.Message, TimeSpan.FromSeconds(5)));
+            return Result.Error(new SimpleNotification(title, GetLocalizedErrorMessage(e), TimeSpan.FromSeconds(5)));
         }
     }
 
@@ -131,5 +143,62 @@ public sealed class ModVariantHandlerService(
             .ConfigureAwait(false);
 
         return _elevatorService.CheckStatus() == ElevatorStatus.Running && autoSync.AutoSyncMods;
+    }
+
+    private string GetLocalizedErrorMessage(Exception e)
+    {
+        if (e is ArgumentException argEx)
+        {
+            if (argEx.Message.Contains("Variant name cannot be empty") || argEx.Message.Contains("New variant name cannot be empty"))
+            {
+                return _localizer.GetLocalizedStringOrDefault("/ModVariant/Error_NameEmpty", "Variant name cannot be empty");
+            }
+            if (argEx.Message.Contains("was not found"))
+            {
+                var start = argEx.Message.IndexOf('\'');
+                var end = argEx.Message.LastIndexOf('\'');
+                if (start >= 0 && end > start)
+                {
+                    var name = argEx.Message.Substring(start + 1, end - start - 1);
+                    return string.Format(_localizer.GetLocalizedStringOrDefault("/ModVariant/Error_VariantNotFound", "Variant named '{0}' was not found"), name);
+                }
+                return _localizer.GetLocalizedStringOrDefault("/ModVariant/Error_VariantNotFound", "Variant was not found");
+            }
+        }
+        else if (e is InvalidOperationException invEx)
+        {
+            if (invEx.Message.Contains("Failed to read mod settings"))
+            {
+                return _localizer.GetLocalizedStringOrDefault("/ModVariant/Error_ReadSettingsFailed", "Failed to read mod settings");
+            }
+            if (invEx.Message.Contains("Failed to read variant configuration file"))
+            {
+                return _localizer.GetLocalizedStringOrDefault("/ModVariant/Error_ReadConfigFailed", "Failed to read variant configuration file");
+            }
+            if (invEx.Message.Contains("Failed to apply variant to d3dx_user.ini"))
+            {
+                return _localizer.GetLocalizedStringOrDefault("/ModVariant/Error_ApplyIniFailed", "Failed to apply variant to d3dx_user.ini");
+            }
+            if (invEx.Message.Contains("already exists"))
+            {
+                var start = invEx.Message.IndexOf('\'');
+                var end = invEx.Message.LastIndexOf('\'');
+                if (start >= 0 && end > start)
+                {
+                    var name = invEx.Message.Substring(start + 1, end - start - 1);
+                    return string.Format(_localizer.GetLocalizedStringOrDefault("/ModVariant/Error_VariantAlreadyExists", "A variant named '{0}' already exists"), name);
+                }
+                return _localizer.GetLocalizedStringOrDefault("/ModVariant/Error_VariantAlreadyExists", "A variant with this name already exists");
+            }
+        }
+        else if (e is FileNotFoundException fileEx)
+        {
+            if (fileEx.Message.Contains("Variant configuration file not found"))
+            {
+                return _localizer.GetLocalizedStringOrDefault("/ModVariant/Error_ConfigNotFound", "Variant configuration file not found");
+            }
+        }
+
+        return e.Message;
     }
 }

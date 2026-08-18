@@ -118,9 +118,9 @@ public sealed partial class ModsOverviewPage : Page
 public sealed partial class ItemTemplateSelector : DataTemplateSelector
 {
     public ItemTemplateSelector() { }
-    public DataTemplate ModTemplate { get; set; }
-    public DataTemplate CharacterTemplate { get; set; }
-    public DataTemplate CategoryTemplate { get; set; }
+    public DataTemplate ModTemplate { get; set; } = null!;
+    public DataTemplate CharacterTemplate { get; set; } = null!;
+    public DataTemplate CategoryTemplate { get; set; } = null!;
 
     protected override DataTemplate SelectTemplateCore(object item)
     {

@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using GIMI_ModManager.Core.Contracts.Services;
@@ -491,7 +491,7 @@ public sealed class ModPresetService(
     // To avoid race conditions, we lock all the preset methods
     // There is no big need for parallelism here, so we just lock the whole service
     private Task<LockReleaser> LockAsync(CancellationToken cancellationToken = default) =>
-        _asyncLock.LockAsync(TimeSpan.FromSeconds(2), cancellationToken);
+        _asyncLock.LockAsync(cancellationToken: cancellationToken);
 
     public void Dispose() => _asyncLock.Dispose();
 

@@ -49,7 +49,7 @@ public sealed partial class GbModPageWindow : WindowEx
         {
             CoreWebView2Environment.GetAvailableBrowserVersionString();
         }
-        catch (Exception e)
+        catch (Exception)
         {
             return;
         }

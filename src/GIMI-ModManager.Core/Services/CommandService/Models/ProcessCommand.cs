@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using GIMI_ModManager.Core.Helpers;
 
 namespace GIMI_ModManager.Core.Services.CommandService.Models;
@@ -75,7 +75,7 @@ public sealed class ProcessCommand
         {
             result = _process.Start();
         }
-        catch (Exception e)
+        catch (Exception)
         {
             _process.Exited -= ExitHandler;
             throw;

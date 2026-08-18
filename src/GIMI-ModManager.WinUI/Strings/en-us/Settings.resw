@@ -1,0 +1,753 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="3dmigotoFolderSelector.Title" xml:space="preserve">
+    <value>Select Mod Loader path</value>
+  </data>
+  <data name="About.Text" xml:space="preserve">
+    <value>About this app</value>
+  </data>
+  <data name="AboutDescription.Text" xml:space="preserve">
+    <value>JASM aims to make organizing large collections of skin mods simple</value>
+  </data>
+  <data name="AssetSync_Bundled" xml:space="preserve">
+    <value>Bundled version</value>
+  </data>
+  <data name="AssetSync_Cancelled" xml:space="preserve">
+    <value>Sync cancelled</value>
+  </data>
+  <data name="AssetSync_Checking" xml:space="preserve">
+    <value>Checking for updates...</value>
+  </data>
+  <data name="AssetSync_CleaningUp" xml:space="preserve">
+    <value>Cleaning up...</value>
+  </data>
+  <data name="AssetSync_Completed" xml:space="preserve">
+    <value>Sync completed ✓</value>
+  </data>
+  <data name="AssetSync_Downloading" xml:space="preserve">
+    <value>Downloading... {0}%</value>
+  </data>
+  <data name="AssetSync_Failed" xml:space="preserve">
+    <value>Sync failed</value>
+  </data>
+  <data name="AssetSync_FailTitle" xml:space="preserve">
+    <value>Data sync failed</value>
+  </data>
+  <data name="AssetSync_RestartRequiredMessage" xml:space="preserve">
+    <value>The game character data was updated successfully! The application needs to be restarted for the new data to take effect.</value>
+  </data>
+  <data name="AssetSync_RestartRequiredTitle" xml:space="preserve">
+    <value>Application restart required</value>
+  </data>
+  <data name="AssetSync_SuccessMessage" xml:space="preserve">
+    <value>Downloaded {0} files, cleaned up {1} files.</value>
+  </data>
+  <data name="AssetSync_SuccessTitle" xml:space="preserve">
+    <value>Game data updated</value>
+  </data>
+  <data name="AssetSync_UpdateAvailableMessage" xml:space="preserve">
+    <value>A new game data version {0} is available. Go to the settings page to sync.</value>
+  </data>
+  <data name="AssetSync_UpdateAvailableTitle" xml:space="preserve">
+    <value>Game data update available</value>
+  </data>
+  <data name="AssetSyncDescription.Text" xml:space="preserve">
+    <value>Sync game character data and image assets from the cloud. Get support for new characters without updating JASM.</value>
+  </data>
+  <data name="AssetSyncLocalVersionLabel.Text" xml:space="preserve">
+    <value>Local version:</value>
+  </data>
+  <data name="AssetSyncSectionHeader.Text" xml:space="preserve">
+    <value>Game data sync</value>
+  </data>
+  <data name="AutoUpdater_AlreadyRunning" xml:space="preserve">
+    <value>The auto-updater is already running.</value>
+  </data>
+  <data name="AutoUpdater_Exception" xml:space="preserve">
+    <value>An error occurred while starting the auto-updater. Error message: {0}</value>
+  </data>
+  <data name="AutoUpdater_ExeNotFound" xml:space="preserve">
+    <value>The current auto-updater folder does not contain the auto-updater executable. Could not find {0} in {1}</value>
+  </data>
+  <data name="AutoUpdater_FolderNotFound" xml:space="preserve">
+    <value>The current auto-updater folder does not exist. Could not find update folder: {0}</value>
+  </data>
+  <data name="AutoUpdater_ProcessAlreadyStarted" xml:space="preserve">
+    <value>The auto-updater process has already been started.</value>
+  </data>
+  <data name="AutoUpdater_StartFailed" xml:space="preserve">
+    <value>Failed to start the auto-updater.</value>
+  </data>
+  <data name="CacheLimitDescription.Text" xml:space="preserve">
+    <value>When downloading mods with JASM, it automatically caches archives or zip files. You can specify a maximum limit in GB for the cache directory, and JASM will keep the cache size below the limit at startup.</value>
+  </data>
+  <data name="ChangeLanguageDialogText" xml:space="preserve">
+    <value>Changing the language requires restarting the application.</value>
+  </data>
+  <data name="ChangeLanguageRestartButton" xml:space="preserve">
+    <value>Change language and restart</value>
+  </data>
+  <data name="CharacterSkinsAsCharactersCheckBox.Content" xml:space="preserve">
+    <value>Treat character skins as separate characters</value>
+  </data>
+  <data name="CheckForUpdateButton.Content" xml:space="preserve">
+    <value>Check for updates</value>
+  </data>
+  <data name="CleanModsFolderButton.Content" xml:space="preserve">
+    <value>Clean mods folder</value>
+  </data>
+  <data name="ClearHotkeyButton.Content" xml:space="preserve">
+    <value>Clear</value>
+  </data>
+  <data name="CommandHandler_CommandNotFoundId" xml:space="preserve">
+    <value>Could not find a command with ID &apos;{0}&apos;</value>
+  </data>
+  <data name="CommandHandler_CommandNotFoundTitle" xml:space="preserve">
+    <value>Command not found</value>
+  </data>
+  <data name="CommandHandler_CommandStartedMessage" xml:space="preserve">
+    <value>Command &apos;{0}&apos; has been started</value>
+  </data>
+  <data name="CommandHandler_CommandStartedTitle" xml:space="preserve">
+    <value>Command started</value>
+  </data>
+  <data name="CommandHandler_CommandStartFailedMessage" xml:space="preserve">
+    <value>Command &apos;{0}&apos; could not be started due to the following error: {1}</value>
+  </data>
+  <data name="CommandHandler_CommandStartFailedTitle" xml:space="preserve">
+    <value>Command could not be started</value>
+  </data>
+  <data name="CommandHandler_ErrorCheckingStart" xml:space="preserve">
+    <value>An error occurred while checking whether the command can be started: {0}</value>
+  </data>
+  <data name="CommandHandler_ErrorStartingCommand" xml:space="preserve">
+    <value>An error occurred while starting the command</value>
+  </data>
+  <data name="CommandHandler_ExecutableNotFound" xml:space="preserve">
+    <value>The executable &apos;{0}&apos; was not found in $PATH or the file does not exist</value>
+  </data>
+  <data name="CommandHandler_ExecutablePathEmpty" xml:space="preserve">
+    <value>The executable path is empty or invalid</value>
+  </data>
+  <data name="CommandHandler_SpecialVarsRequired" xml:space="preserve">
+    <value>This command requires a special variable</value>
+  </data>
+  <data name="CommandHandler_SpecificVarRequired" xml:space="preserve">
+    <value>This command requires the special variable &apos;{0}&apos;</value>
+  </data>
+  <data name="CommandHandler_TargetPathNotFound" xml:space="preserve">
+    <value>The target path &apos;{0}&apos; does not exist</value>
+  </data>
+  <data name="CommandHandler_WorkingDirNotFound" xml:space="preserve">
+    <value>The working directory &apos;{0}&apos; does not exist</value>
+  </data>
+  <data name="CommandsPage_AttributesPrefix" xml:space="preserve">
+    <value>Options: </value>
+  </data>
+  <data name="CommandsPage_CommandNotFoundMessage" xml:space="preserve">
+    <value>Command not found</value>
+  </data>
+  <data name="CommandsPage_CommandNotFoundTitle" xml:space="preserve">
+    <value>Failed to get command</value>
+  </data>
+  <data name="CommandsPage_CreateCommandButton.Content" xml:space="preserve">
+    <value>Create new command</value>
+  </data>
+  <data name="CommandsPage_CreateCommandCard.Description" xml:space="preserve">
+    <value>Here you can define custom commands that JASM can run. Currently, commands containing {{TargetPath}} can only be executed in the mods overview</value>
+  </data>
+  <data name="CommandsPage_CreateCommandCard.Header" xml:space="preserve">
+    <value>Create new command</value>
+  </data>
+  <data name="CommandsPage_DefinitionsExpander.Description" xml:space="preserve">
+    <value>Here you can view and delete the commands you have created</value>
+  </data>
+  <data name="CommandsPage_DefinitionsExpander.Header" xml:space="preserve">
+    <value>Command definitions</value>
+  </data>
+  <data name="CommandsPage_DeleteFailedTitle" xml:space="preserve">
+    <value>Failed to delete command</value>
+  </data>
+  <data name="CommandsPage_DeleteSuccessTitle" xml:space="preserve">
+    <value>Command &apos;{0}&apos; deleted successfully</value>
+  </data>
+  <data name="CommandsPage_Item_ArgumentsLabel.Text" xml:space="preserve">
+    <value>Arguments: </value>
+  </data>
+  <data name="CommandsPage_Item_ConfirmButton.Content" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="CommandsPage_Item_DeleteButton.Content" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="CommandsPage_Item_DeleteConfirmText.Text" xml:space="preserve">
+    <value>Are you sure you want to delete this command?</value>
+  </data>
+  <data name="CommandsPage_Item_DisplayNameLabel.Text" xml:space="preserve">
+    <value>Display name: </value>
+  </data>
+  <data name="CommandsPage_Item_EditButton.Content" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="CommandsPage_Item_ExecutableLabel.Text" xml:space="preserve">
+    <value>Executable: </value>
+  </data>
+  <data name="CommandsPage_Item_ExecuteButton.Content" xml:space="preserve">
+    <value>Execute</value>
+  </data>
+  <data name="CommandsPage_Item_RunConfirmButton.Content" xml:space="preserve">
+    <value>Run</value>
+  </data>
+  <data name="CommandsPage_Item_RunConfirmText.Text" xml:space="preserve">
+    <value>Are you sure you want to run this command?</value>
+  </data>
+  <data name="CommandsPage_Item_WorkingDirLabel.Text" xml:space="preserve">
+    <value>Working directory: </value>
+  </data>
+  <data name="CommandsPage_KillFailedTitle" xml:space="preserve">
+    <value>Failed to terminate process</value>
+  </data>
+  <data name="CommandsPage_KillSuccessTitle" xml:space="preserve">
+    <value>Process terminated successfully</value>
+  </data>
+  <data name="CommandsPage_ProcessNotRunningTitle" xml:space="preserve">
+    <value>Process is not running</value>
+  </data>
+  <data name="CommandsPage_RunningExpander.Description" xml:space="preserve">
+    <value>Commands started from JASM for the currently running instances</value>
+  </data>
+  <data name="CommandsPage_RunningExpander.Header" xml:space="preserve">
+    <value>Currently running commands</value>
+  </data>
+  <data name="CommandsPage_Title.Text" xml:space="preserve">
+    <value>Command settings</value>
+  </data>
+  <data name="CommandsPage_WarningCancelButton" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="CommandsPage_WarningConfirmButton" xml:space="preserve">
+    <value>I understand</value>
+  </data>
+  <data name="CommandsPage_WarningText" xml:space="preserve">
+    <value>Please be careful when creating commands. Commands can be used to run any executable on your system. Only create commands from trusted sources.</value>
+  </data>
+  <data name="CommandsPage_WarningTitle" xml:space="preserve">
+    <value>Friendly reminder</value>
+  </data>
+  <data name="CommandsSectionHeader.Text" xml:space="preserve">
+    <value>Commands</value>
+  </data>
+  <data name="CreateCommand_ArgsHelp.Text" xml:space="preserve">
+    <value>When the command runs on a file system object (i.e. a skin/mod folder), {{TargetPath}} will be replaced with the actual path.</value>
+  </data>
+  <data name="CreateCommand_ArgsInput.Header" xml:space="preserve">
+    <value>Arguments</value>
+  </data>
+  <data name="CreateCommand_ArgsInput.PlaceholderText" xml:space="preserve">
+    <value>Arguments to pass to the executable</value>
+  </data>
+  <data name="CreateCommand_CreateFailedTitle" xml:space="preserve">
+    <value>Command creation failed.</value>
+  </data>
+  <data name="CreateCommand_CreateSuccessMessage" xml:space="preserve">
+    <value>Command &apos;{0}&apos; created successfully.</value>
+  </data>
+  <data name="CreateCommand_DefaultStartGameName" xml:space="preserve">
+    <value>Start {0}</value>
+  </data>
+  <data name="CreateCommand_EffectiveWorkDirPrefix" xml:space="preserve">
+    <value>Effective working directory: </value>
+  </data>
+  <data name="CreateCommand_ExecutableInput.PlaceHolderText" xml:space="preserve">
+    <value>Must be in $PATH or an absolute path to an executable (required)</value>
+  </data>
+  <data name="CreateCommand_ExecutableInput.Title" xml:space="preserve">
+    <value>* Executable</value>
+  </data>
+  <data name="CreateCommand_InvalidWorkDir" xml:space="preserve">
+    <value>Invalid working directory</value>
+  </data>
+  <data name="CreateCommand_KillOnExit.Content" xml:space="preserve">
+    <value>Terminate process when JASM exits</value>
+  </data>
+  <data name="CreateCommand_KillOnExit.ToolTipService.ToolTip" xml:space="preserve">
+    <value>If checked, the process will be terminated when JASM exits</value>
+  </data>
+  <data name="CreateCommand_NameInput.Header" xml:space="preserve">
+    <value>* Command name:</value>
+  </data>
+  <data name="CreateCommand_NameInput.PlaceholderText" xml:space="preserve">
+    <value>Command display name (required)</value>
+  </data>
+  <data name="CreateCommand_NewWindow.Content" xml:space="preserve">
+    <value>Create new window</value>
+  </data>
+  <data name="CreateCommand_NewWindow.ToolTipService.ToolTip" xml:space="preserve">
+    <value>If checked, it will run in an external window</value>
+  </data>
+  <data name="CreateCommand_Preview.Header" xml:space="preserve">
+    <value>Command to run:</value>
+  </data>
+  <data name="CreateCommand_RunAsAdmin.Content" xml:space="preserve">
+    <value>Run as administrator</value>
+  </data>
+  <data name="CreateCommand_RunAsAdmin.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Run as administrator</value>
+  </data>
+  <data name="CreateCommand_SaveButton.Content" xml:space="preserve">
+    <value>Save command</value>
+  </data>
+  <data name="CreateCommand_Title.Text" xml:space="preserve">
+    <value>Create command</value>
+  </data>
+  <data name="CreateCommand_Type_Chained.Content" xml:space="preserve">
+    <value>Custom chained command</value>
+  </data>
+  <data name="CreateCommand_Type_Chained.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Not implemented yet</value>
+  </data>
+  <data name="CreateCommand_Type_Custom.Content" xml:space="preserve">
+    <value>Custom command</value>
+  </data>
+  <data name="CreateCommand_UpdateFailedTitle" xml:space="preserve">
+    <value>Command update failed.</value>
+  </data>
+  <data name="CreateCommand_UpdateSuccessMessage" xml:space="preserve">
+    <value>Command &apos;{0}&apos; updated successfully.</value>
+  </data>
+  <data name="CreateCommand_UseShellExecute.Content" xml:space="preserve">
+    <value>Use shell to execute</value>
+  </data>
+  <data name="CreateCommand_UseShellExecute.ToolTipService.ToolTip" xml:space="preserve">
+    <value>If checked, the executable will be launched by the operating system</value>
+  </data>
+  <data name="CreateCommand_WorkDirInput.PlaceHolderText" xml:space="preserve">
+    <value>When specifying a path manually, the folder must exist</value>
+  </data>
+  <data name="CreateCommand_WorkDirInput.Title" xml:space="preserve">
+    <value>Working directory</value>
+  </data>
+  <data name="CreateCustomCommandsCard.Description" xml:space="preserve">
+    <value>You can define commands (scripts) that can then be run on a specified mod</value>
+  </data>
+  <data name="CreateCustomCommandsCard.Header" xml:space="preserve">
+    <value>Create custom commands</value>
+  </data>
+  <data name="CurrentCacheSizeLabel" xml:space="preserve">
+    <value>Current size of the mod file cache </value>
+  </data>
+  <data name="DisableAllModsButton.Content" xml:space="preserve">
+    <value>Disable all mods</value>
+  </data>
+  <data name="DownloadingUpdateProgress" xml:space="preserve">
+    <value>{0}% ({1:F1} MB / {2:F1} MB)</value>
+  </data>
+  <data name="DownloadingUpdateTitle" xml:space="preserve">
+    <value>Downloading update...</value>
+  </data>
+  <data name="ElevatorError_NotFound" xml:space="preserve">
+    <value>Elevator.exe not found</value>
+  </data>
+  <data name="ElevatorError_StartFailed" xml:space="preserve">
+    <value>Failed to start Elevator.exe</value>
+  </data>
+  <data name="ElevatorSectionHeader.Text" xml:space="preserve">
+    <value>Sync process</value>
+  </data>
+  <data name="ElevatorStatus_InitFailed" xml:space="preserve">
+    <value>Initialization failed</value>
+  </data>
+  <data name="ElevatorStatus_NotRunning" xml:space="preserve">
+    <value>Not running</value>
+  </data>
+  <data name="ElevatorStatus_Running" xml:space="preserve">
+    <value>Running</value>
+  </data>
+  <data name="ElevatorStatus_Unknown" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+  <data name="ElevatorStatusTitle.Text" xml:space="preserve">
+    <value>Sync status:</value>
+  </data>
+  <data name="Export_Button.Text" xml:space="preserve">
+    <value>Export mods</value>
+  </data>
+  <data name="Export_Title.Text" xml:space="preserve">
+    <value>Export/backup mods</value>
+  </data>
+  <data name="ExportAllModsTitle" xml:space="preserve">
+    <value>Export all mods</value>
+  </data>
+  <data name="ExportDialog_ChangeStatus.Text" xml:space="preserve">
+    <value>Change the status of exported mods</value>
+  </data>
+  <data name="ExportDialog_KeepStructure.Text" xml:space="preserve">
+    <value>Keep the CharacterName/Mods folder structure in the export folder</value>
+  </data>
+  <data name="ExportDialog_RemoveJasm.Text" xml:space="preserve">
+    <value>Remove JASM config files from exported mods</value>
+  </data>
+  <data name="ExportDialogChangeStatus.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Whether to add or remove the &apos;DISABLED_&apos; prefix on exported mods</value>
+  </data>
+  <data name="ExportDialogDescription.Text" xml:space="preserve">
+    <value>This will export all mods managed by JASM to the export folder you choose. The mods are copied to the export folder and are not removed from their original folders.</value>
+  </data>
+  <data name="ExportDialogKeepStructure.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Keep the JASM mod folder structure. E.g.: Characters/Diluc/SomeDilucSkinMod</value>
+  </data>
+  <data name="ExportDialogRemoveJasm.ToolTipService.ToolTip" xml:space="preserve">
+    <value>This is recursive and will delete all files and folders starting with .JASM_</value>
+  </data>
+  <data name="ExportErrorTitle" xml:space="preserve">
+    <value>An error occurred while exporting mods</value>
+  </data>
+  <data name="ExportSuccessMessage" xml:space="preserve">
+    <value>Exported mods to {0}</value>
+  </data>
+  <data name="ExportSuccessTitle" xml:space="preserve">
+    <value>Mods exported successfully</value>
+  </data>
+  <data name="FolderSectionHeader.Text" xml:space="preserve">
+    <value>Folders</value>
+  </data>
+  <data name="GameBananaLink.Content" xml:space="preserve">
+    <value>Just Another Skin Manager on GameBanana</value>
+  </data>
+  <data name="GameSelectorComboBox.Header" xml:space="preserve">
+    <value>Select game:</value>
+  </data>
+  <data name="GameSelectorSectionHeader.Text" xml:space="preserve">
+    <value>Game</value>
+  </data>
+  <data name="GameSelectorSubtitle.Text" xml:space="preserve">
+    <value>Settings are saved independently for each selected game.</value>
+  </data>
+  <data name="GameSelectorTitle.Text" xml:space="preserve">
+    <value>JASM supports Genshin Impact, Honkai: Star Rail, Wuthering Waves, Zenless Zone Zero, and Endfield.</value>
+  </data>
+  <data name="GithubLinkChinese.Content" xml:space="preserve">
+    <value>Just Another Skin Manager Chinese GitHub</value>
+  </data>
+  <data name="GithubLinkOriginal.Content" xml:space="preserve">
+    <value>Just Another Skin Manager Original GitHub</value>
+  </data>
+  <data name="GlobalHotkeyCard.Description" xml:space="preserve">
+    <value>Press this hotkey from anywhere to bring the JASM main window to the foreground</value>
+  </data>
+  <data name="GlobalHotkeyCard.Header" xml:space="preserve">
+    <value>Quick-switch JASM to foreground</value>
+  </data>
+  <data name="HotkeyNone" xml:space="preserve">
+    <value>Record</value>
+  </data>
+  <data name="HotkeyRecordingText" xml:space="preserve">
+    <value>Press keys...</value>
+  </data>
+  <data name="HotkeyRegistrationFailedMessage" xml:space="preserve">
+    <value>This hotkey combination is already in use by another application. Please choose a different combination.</value>
+  </data>
+  <data name="HotkeyRegistrationFailedTitle" xml:space="preserve">
+    <value>Hotkey registration failed</value>
+  </data>
+  <data name="IgnoreUpdateButton.Content" xml:space="preserve">
+    <value>Ignore this update?</value>
+  </data>
+  <data name="KeySwap_LoadFailedMessage" xml:space="preserve">
+    <value>Could not load the mod&apos;s key swap configuration: {0}</value>
+  </data>
+  <data name="KeySwap_LoadFailedTitle" xml:space="preserve">
+    <value>Failed to load key swaps</value>
+  </data>
+  <data name="KeySwap_ModNotFoundMessage" xml:space="preserve">
+    <value>Could not find a mod with ID {0}</value>
+  </data>
+  <data name="KeySwap_ModNotFoundTitle" xml:space="preserve">
+    <value>Mod not found</value>
+  </data>
+  <data name="KeySwap_NotSupportedMessage" xml:space="preserve">
+    <value>The current mod does not support key swaps</value>
+  </data>
+  <data name="KeySwap_NotSupportedTitle" xml:space="preserve">
+    <value>Key swaps not supported</value>
+  </data>
+  <data name="KeySwap_SaveFailedMessage" xml:space="preserve">
+    <value>An error occurred while saving the mod&apos;s key swap configuration: {0}</value>
+  </data>
+  <data name="KeySwap_SaveFailedTitle" xml:space="preserve">
+    <value>Failed to save key swaps</value>
+  </data>
+  <data name="KeySwap_SaveSuccessMessage" xml:space="preserve">
+    <value>The key swap configuration has been updated</value>
+  </data>
+  <data name="KeySwap_SaveSuccessTitle" xml:space="preserve">
+    <value>Saved successfully</value>
+  </data>
+  <data name="LanguageSelectionSectionHeader.Text" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="LanguageSelectorComboBox.Header" xml:space="preserve">
+    <value>Select display language:</value>
+  </data>
+  <data name="LogLocationSubtitle.Text" xml:space="preserve">
+    <value>Notifications and logs will be written to:</value>
+  </data>
+  <data name="ModSettings_FileNotFoundTitle" xml:space="preserve">
+    <value>Could not find the mod&apos;s settings file {0}</value>
+  </data>
+  <data name="ModSettings_ImageNotFoundMessage" xml:space="preserve">
+    <value>The image file was not found while saving mod settings</value>
+  </data>
+  <data name="ModSettings_ImageNotFoundTitle" xml:space="preserve">
+    <value>Image file not found</value>
+  </data>
+  <data name="ModSettings_NoChangesMessage" xml:space="preserve">
+    <value>The mod settings were not changed, nothing to save</value>
+  </data>
+  <data name="ModSettings_NoChangesTitle" xml:space="preserve">
+    <value>No changes detected</value>
+  </data>
+  <data name="ModSettings_ReadFailedMessage" xml:space="preserve">
+    <value>An error occurred. Reason: {0}</value>
+  </data>
+  <data name="ModSettings_ReadFailedTitle" xml:space="preserve">
+    <value>Failed to read mod settings {0}</value>
+  </data>
+  <data name="ModSettings_SaveFailedMessage" xml:space="preserve">
+    <value>An error occurred. Reason: {0}</value>
+  </data>
+  <data name="ModSettings_SaveFailedTitle" xml:space="preserve">
+    <value>Failed to save mod settings {0}</value>
+  </data>
+  <data name="ModSettings_UpdatedMessage" xml:space="preserve">
+    <value>The settings of mod {0} have been updated</value>
+  </data>
+  <data name="ModSettings_UpdatedTitle" xml:space="preserve">
+    <value>Mod settings updated</value>
+  </data>
+  <data name="ModsFolderSelector.Title" xml:space="preserve">
+    <value>Select mods folder</value>
+  </data>
+  <data name="ModUpdateCheckerCheckBox.Content" xml:space="preserve">
+    <value>Mod update checker:</value>
+  </data>
+  <data name="ModUpdateCheckerDescription.Text" xml:space="preserve">
+    <value>The mod update checker checks for updates at startup and periodically in the background. GameBanana only.</value>
+  </data>
+  <data name="ModUpdateCheckerNextText.Text" xml:space="preserve">
+    <value>Next check:</value>
+  </data>
+  <data name="ModUpdateCheckerSectionHeader.Text" xml:space="preserve">
+    <value>Mod update checker</value>
+  </data>
+  <data name="NewVersionAvailableText.Text" xml:space="preserve">
+    <value>A new version is available:</value>
+  </data>
+  <data name="OpenCacheDirectoryLink.Text" xml:space="preserve">
+    <value>Open cache directory...</value>
+  </data>
+  <data name="PageTitle.Text" xml:space="preserve">
+    <value>All notifications shown during the current application run</value>
+  </data>
+  <data name="Personalization.Text" xml:space="preserve">
+    <value>Personalization</value>
+  </data>
+  <data name="Process_StartFailed" xml:space="preserve">
+    <value>Failed to start {0}</value>
+  </data>
+  <data name="Process_StartFailed_AdminProp" xml:space="preserve">
+    <value>Failed to start {0}. This may happen if the &quot;Run as administrator&quot; option is enabled in the properties of the executable (exe)</value>
+  </data>
+  <data name="Process_StartFailed_UAC" xml:space="preserve">
+    <value>Failed to start {0}. This may be because the user cancelled the UAC (administrator) prompt</value>
+  </data>
+  <data name="Process_UnableToStartTitle" xml:space="preserve">
+    <value>Could not start process</value>
+  </data>
+  <data name="Process_UnknownError" xml:space="preserve">
+    <value>An unknown error occurred</value>
+  </data>
+  <data name="RememberWindowPosition.Content" xml:space="preserve">
+    <value>Remember window position</value>
+  </data>
+  <data name="RememberWindowPosition.ToolTipService.ToolTip" xml:space="preserve">
+    <value>If checked, the main window position is saved when JASM exits</value>
+  </data>
+  <data name="RememberWindowSize.Content" xml:space="preserve">
+    <value>Remember window size</value>
+  </data>
+  <data name="RememberWindowSize.ToolTipService.ToolTip" xml:space="preserve">
+    <value>If checked, the main window size is saved when JASM exits</value>
+  </data>
+  <data name="ReorganizeModsButton.Content" xml:space="preserve">
+    <value>Reorganize mods folder</value>
+  </data>
+  <data name="ReorganizeModsFailedTitle" xml:space="preserve">
+    <value>An error occurred while reorganizing mods</value>
+  </data>
+  <data name="ReorganizeModsMessage" xml:space="preserve">
+    <value>Do you want to reorganize the mods folder?</value>
+  </data>
+  <data name="ReorganizeModsSuccessMessage" xml:space="preserve">
+    <value>Moved {0} mods to character folders</value>
+  </data>
+  <data name="ReorganizeModsSuccessTitle" xml:space="preserve">
+    <value>Mod reorganization complete</value>
+  </data>
+  <data name="ReorganizeModsTitle" xml:space="preserve">
+    <value>Do you want to reorganize the mods folder?</value>
+  </data>
+  <data name="ResetGamePathButton.Content" xml:space="preserve">
+    <value>Reset game exe path</value>
+  </data>
+  <data name="ResetLoaderPathButton.Content" xml:space="preserve">
+    <value>Reset loader exe path</value>
+  </data>
+  <data name="RestartingNotificationMessage" xml:space="preserve">
+    <value>The application will now restart</value>
+  </data>
+  <data name="RestartingNotificationTitle" xml:space="preserve">
+    <value>Restarting...</value>
+  </data>
+  <data name="RestartRequiredTitle" xml:space="preserve">
+    <value>The application needs to be restarted</value>
+  </data>
+  <data name="RestoreFocusAfterSync.Content" xml:space="preserve">
+    <value>Switch back to the manager after refreshing mods</value>
+  </data>
+  <data name="RestoreFocusAfterSync.ToolTipService.ToolTip" xml:space="preserve">
+    <value>If enabled, the JASM main window will automatically be brought to the foreground after refreshing to the game</value>
+  </data>
+  <data name="SeeLogsDetails" xml:space="preserve">
+    <value>See the logs for more details</value>
+  </data>
+  <data name="SeeWhatsNewLink.Text" xml:space="preserve">
+    <value>See what&apos;s new in the latest version</value>
+  </data>
+  <data name="SettingsSavedNotificationMessage" xml:space="preserve">
+    <value>Restarting the application...</value>
+  </data>
+  <data name="SettingsSavedNotificationTitle" xml:space="preserve">
+    <value>Settings saved</value>
+  </data>
+  <data name="StartElevatorButton.Content" xml:space="preserve">
+    <value>Start Elevator</value>
+  </data>
+  <data name="StartElevatorDialogDontShowContent" xml:space="preserve">
+    <value>Don&apos;t show this message again</value>
+  </data>
+  <data name="StartElevatorDialogText" xml:space="preserve">
+    <value>Press start to launch Elevator. Elevator is an elevated (administrator) process used to communicate with the game process.</value>
+  </data>
+  <data name="StartElevatorDialogTitle" xml:space="preserve">
+    <value>Start the sync process?</value>
+  </data>
+  <data name="SwitchGameMessage" xml:space="preserve">
+    <value>Switching games will restart the application. This is to make sure the application is configured correctly for the selected game.</value>
+  </data>
+  <data name="SwitchGameTitle" xml:space="preserve">
+    <value>Switch game</value>
+  </data>
+  <data name="SwitchToGameButton" xml:space="preserve">
+    <value>Switch to {0}</value>
+  </data>
+  <data name="SyncGameAssetsButton.Content" xml:space="preserve">
+    <value>Sync game data</value>
+  </data>
+  <data name="Theme.Text" xml:space="preserve">
+    <value>Theme</value>
+  </data>
+  <data name="Theme_Dark.Content" xml:space="preserve">
+    <value>Dark</value>
+  </data>
+  <data name="Theme_Default.Content" xml:space="preserve">
+    <value>Default</value>
+  </data>
+  <data name="Theme_Light.Content" xml:space="preserve">
+    <value>Light</value>
+  </data>
+  <data name="ThemeRestartMessage" xml:space="preserve">
+    <value>You need to restart the application for the theme to take effect, otherwise the application may become unstable. Most likely because I haven&apos;t configured the theme properly. Dark mode is recommended.</value>
+  </data>
+  <data name="ThemeRestartTitle" xml:space="preserve">
+    <value>The application needs to restart</value>
+  </data>
+  <data name="Title.Text" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="UpdateChecker_CheckCompleteCharacterMessage" xml:space="preserve">
+    <value>Finished checking {0} mods for {1}</value>
+  </data>
+  <data name="UpdateChecker_CheckCompleteGenericMessage" xml:space="preserve">
+    <value>Finished mod update check</value>
+  </data>
+  <data name="UpdateChecker_CheckCompleteTitle" xml:space="preserve">
+    <value>Finished mod update check</value>
+  </data>
+  <data name="UpdateChecker_CheckErrorMessage" xml:space="preserve">
+    <value>Stopping the background mod update checker...</value>
+  </data>
+  <data name="UpdateChecker_CheckErrorTitle" xml:space="preserve">
+    <value>An error occurred while checking for mod updates</value>
+  </data>
+  <data name="UpdateChecker_FatalErrorMessage" xml:space="preserve">
+    <value>A fatal error occurred in the background checker ({0} : {1}). This means JASM can no longer check for mod updates in the background or manually. Error message: {2}</value>
+  </data>
+  <data name="UpdateChecker_FatalErrorTitle" xml:space="preserve">
+    <value>An error occurred in the background mod update checker</value>
+  </data>
+  <data name="UpdateChecker_NewUpdateAvailableMessage" xml:space="preserve">
+    <value>New or updated mods are available {0}</value>
+  </data>
+  <data name="UpdateChecker_NoModsMessage" xml:space="preserve">
+    <value>All mods are invalid, so no checks were performed</value>
+  </data>
+  <data name="UpdateChecker_NoModsTitle" xml:space="preserve">
+    <value>No mods to check for updates</value>
+  </data>
+  <data name="UpdateCheckStatus_Checking" xml:space="preserve">
+    <value>Checking...</value>
+  </data>
+  <data name="UpdateCheckStatus_Failed" xml:space="preserve">
+    <value>Check failed, please check your network connection</value>
+  </data>
+  <data name="UpdateCheckStatus_UpToDate" xml:space="preserve">
+    <value>Up to date ✓</value>
+  </data>
+  <data name="UpdateConfirmationText.Text" xml:space="preserve">
+    <value>JASM will exit and the update will start. Do you want to continue?</value>
+  </data>
+  <data name="UpdateConfirmButton.Content" xml:space="preserve">
+    <value>Yes, update JASM 😎</value>
+  </data>
+  <data name="UpdateFolderPathsMessage" xml:space="preserve">
+    <value>Do you want to save the new folder paths? The application will restart afterwards.</value>
+  </data>
+  <data name="UpdateFolderPathsTitle" xml:space="preserve">
+    <value>Update folder paths?</value>
+  </data>
+  <data name="UpdateJasmButtonPrefix.Text" xml:space="preserve">
+    <value>Update JASM to version </value>
+  </data>
+  <data name="UpdatePathsButton.Content" xml:space="preserve">
+    <value>Update paths</value>
+  </data>
+  <data name="UpdatePathsButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Update folder paths?</value>
+  </data>
+  <data name="UpdateProcessStartError" xml:space="preserve">
+    <value>An error occurred while starting the update process</value>
+  </data>
+  <data name="UpdateProcessUnableToStart" xml:space="preserve">
+    <value>Could not start the update process</value>
+  </data>
+  <data name="WindowSectionTitle.Text" xml:space="preserve">
+    <value>Window</value>
+  </data>
+  <data name="ImageCacheLimitDescription.Text" xml:space="preserve">
+    <value>JASM also keeps a small shared cache of mod thumbnails and preview images. Set the maximum size in MB.</value>
+  </data>
+  <data name="ClearImageCacheBtn.Content" xml:space="preserve">
+    <value>Clear Image Cache</value>
+  </data>
+</root>

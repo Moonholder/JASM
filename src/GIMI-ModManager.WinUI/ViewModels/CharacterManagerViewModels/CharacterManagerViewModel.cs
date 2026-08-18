@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GIMI_ModManager.Core.GamesService;
@@ -16,7 +16,7 @@ public partial class CharacterManagerViewModel : ObservableRecipient, INavigatio
     private readonly ImageHandlerService _imageHandlerService;
 
     [ObservableProperty] private ICharacter? _selectedCharacter;
-    [ObservableProperty] private string _searchBoxText;
+    [ObservableProperty] private string _searchBoxText = string.Empty;
 
     private List<ICharacter> _characters = new();
 

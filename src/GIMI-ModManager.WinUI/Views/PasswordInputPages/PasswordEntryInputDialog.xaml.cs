@@ -1,4 +1,4 @@
-﻿using GIMI_ModManager.WinUI.Models;
+using GIMI_ModManager.WinUI.Models;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
@@ -6,8 +6,8 @@ namespace GIMI_ModManager.WinUI.Views.PasswordInputPages
 {
     public sealed partial class PasswordEntryInputDialog : ContentDialog
     {
-        public PasswordEntry Entry { get; set; }
-        public PasswordManagerDialog ParentDialog { get; set; }
+        public PasswordEntry Entry { get; set; } = null!;
+        public PasswordManagerDialog ParentDialog { get; set; } = null!;
 
         public PasswordEntryInputDialog()
         {

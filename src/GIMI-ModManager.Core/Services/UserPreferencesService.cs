@@ -1,4 +1,4 @@
-﻿using GIMI_ModManager.Core.Contracts.Services;
+using GIMI_ModManager.Core.Contracts.Services;
 using GIMI_ModManager.Core.Entities;
 using GIMI_ModManager.Core.Helpers;
 using Serilog;
@@ -340,6 +340,32 @@ public partial class UserPreferencesService(ILogger logger, ISkinManagerService 
                 await ske.Mod.Settings.SaveSettingsAsync(settings).ConfigureAwait(false);
             }
         });
+    }
+
+    public void SetUserIniReadOnly(bool readOnly)
+    {
+        try
+        {
+            if (!_threeMigotoFolder.Exists) return;
+            var d3dxUserIniPath = Path.Combine(_threeMigotoFolder.FullName, D3DX_USER_INI);
+            if (!File.Exists(d3dxUserIniPath)) return;
+
+            var attributes = File.GetAttributes(d3dxUserIniPath);
+            if (readOnly)
+            {
+                File.SetAttributes(d3dxUserIniPath, attributes | FileAttributes.ReadOnly);
+                _logger.Debug("Set d3dx_user.ini to ReadOnly");
+            }
+            else
+            {
+                File.SetAttributes(d3dxUserIniPath, attributes & ~FileAttributes.ReadOnly);
+                _logger.Debug("Set d3dx_user.ini to Normal");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "Failed to set d3dx_user.ini ReadOnly attribute to {ReadOnly}", readOnly);
+        }
     }
 
     internal class IniPreference(string fullPath, string key, string value)

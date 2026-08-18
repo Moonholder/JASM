@@ -1,4 +1,4 @@
-﻿namespace GIMI_ModManager.Core.Helpers;
+namespace GIMI_ModManager.Core.Helpers;
 
 public sealed class AsyncLock : IDisposable
 {

@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Text.Json;
 using GIMI_ModManager.Core.Services.CommandService.JsonModels;
@@ -25,7 +25,7 @@ public sealed class CommandService(ILogger logger)
 
     public bool IsInitialized { get; private set; }
 
-    public event EventHandler<RunningCommandChangedEventArgs> RunningCommandsChanged;
+    public event EventHandler<RunningCommandChangedEventArgs>? RunningCommandsChanged;
 
     public async Task InitializeAsync(string appDataDirectoryPath)
     {

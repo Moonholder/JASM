@@ -528,7 +528,7 @@ public sealed partial class ModPaneVM(
                 // 保存模组设置
                 if (updateRequest.AnyUpdates)
                 {
-                    var settingsResult = await _modSettingsService.SaveSettingsAsync(_loadedModId.Value, updateRequest, _cancellationToken);
+                    var settingsResult = await _modSettingsService.SaveSettingsAsync(_loadedModId!.Value, updateRequest, _cancellationToken);
 
                     // 检查是否有通知需要显示
                     if (settingsResult.HasNotification)
@@ -574,7 +574,7 @@ public sealed partial class ModPaneVM(
                         updatedKeySwaps[group.IniFileName] = list;
                     }
 
-                    var keySwapResult = await keySwapService.SaveKeySwapsAsync(_loadedModId.Value, updatedKeySwaps);
+                    var keySwapResult = await keySwapService.SaveKeySwapsAsync(_loadedModId!.Value, updatedKeySwaps);
 
                     if (keySwapResult.HasNotification)
                     {

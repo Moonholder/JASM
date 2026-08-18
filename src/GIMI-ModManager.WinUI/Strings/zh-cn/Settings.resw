@@ -821,4 +821,37 @@ JASM 并不完美，不能保护您免受恶意脚本或 JASM 错误/故障的�
 
 是否现在重启？</value>
   </data>
+  <data name="RestoreFocusAfterSync.Content" xml:space="preserve">
+    <value>刷新模组后自动切回管理器</value>
+  </data>
+  <data name="RestoreFocusAfterSync.ToolTipService.ToolTip" xml:space="preserve">
+    <value>如果启用，在刷新到游戏后，会自动将 JASM 主窗口切换至前台</value>
+  </data>
+  <data name="GlobalHotkeyCard.Header" xml:space="preserve">
+    <value>快捷切换 JASM 至前台</value>
+  </data>
+  <data name="GlobalHotkeyCard.Description" xml:space="preserve">
+    <value>在任意界面按下此快捷键即可将 JASM 主窗口激活至最前台</value>
+  </data>
+  <data name="ClearHotkeyButton.Content" xml:space="preserve">
+    <value>清除</value>
+  </data>
+  <data name="HotkeyRecordingText" xml:space="preserve">
+    <value>按下按键...</value>
+  </data>
+  <data name="HotkeyRegistrationFailedTitle" xml:space="preserve">
+    <value>快捷键注册失败</value>
+  </data>
+  <data name="HotkeyRegistrationFailedMessage" xml:space="preserve">
+    <value>该快捷键组合已被其他应用程序占用，请选择其他按键组合。</value>
+  </data>
+  <data name="HotkeyNone" xml:space="preserve">
+    <value>录制</value>
+  </data>
+  <data name="ImageCacheLimitDescription.Text" xml:space="preserve">
+    <value>JASM 还会保存一份跨游戏共享的模组缩略图与预览图缓存。</value>
+  </data>
+  <data name="ClearImageCacheBtn.Content" xml:space="preserve">
+    <value>清空图片缓存</value>
+  </data>
 </root>

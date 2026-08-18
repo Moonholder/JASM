@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="using:GIMI_ModManager.WinUI.Views.Controls"
     xmlns:controls1="using:CommunityToolkit.WinUI.Controls"
+    xmlns:converters="using:CommunityToolkit.WinUI.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:l="using:WinUI3Localizer"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -11,7 +12,6 @@
     xmlns:viewModels="using:GIMI_ModManager.WinUI.ViewModels"
     xmlns:xaml="using:Microsoft.UI.Xaml"
     xmlns:xaml1="using:GIMI_ModManager.WinUI.Helpers.Xaml"
-    xmlns:converters="using:CommunityToolkit.WinUI.Converters"
     mc:Ignorable="d">
     <Page.Resources>
         <xaml1:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
@@ -39,8 +39,8 @@
 
                         <TextBlock
                             IsTextSelectionEnabled="True"
-                            TextWrapping="WrapWholeWords"
                             Text="This will export all mods currently managed by JASM to your selected export folder. These mods will be copied to the export folder and will not be removed from the original folder."
+                            TextWrapping="WrapWholeWords"
                             l:Uids.Uid="/Settings/ExportDialogDescription" />
 
                         <StackPanel
@@ -51,8 +51,8 @@
                             <CheckBox IsChecked="{x:Bind KeepFolderStructure, Mode=TwoWay}" />
                             <TextBlock
                                 IsTextSelectionEnabled="True"
-                                TextWrapping="WrapWholeWords"
                                 Text="Keep folder structure of CharacterName/Mods in export folder"
+                                TextWrapping="WrapWholeWords"
                                 l:Uids.Uid="/Settings/ExportDialog_KeepStructure" />
                         </StackPanel>
                         <StackPanel
@@ -136,7 +136,7 @@
                     </StackPanel>
 
                     <StackPanel Margin="0,8,0,0">
-                        <TextBlock Text="Window" l:Uids.Uid="/Settings/WindowSectionTitle"/>
+                        <TextBlock Text="Window" l:Uids.Uid="/Settings/WindowSectionTitle" />
                         <CheckBox
                             Command="{x:Bind ViewModel.WindowSizePositionToggleCommand}"
                             CommandParameter="size"
@@ -179,8 +179,8 @@
                 <StackPanel Margin="{StaticResource SmallTopBottomMargin}">
                     <TextBlock
                         IsTextSelectionEnabled="True"
-                        TextWrapping="WrapWholeWords"
                         Text="JASM supports Genshin Impact, Honkai Star Rail, Wuthering Waves, Zenless Zone Zero and Arknights: Endfield."
+                        TextWrapping="WrapWholeWords"
                         l:Uids.Uid="/Settings/GameSelectorTitle" />
                     <TextBlock
                         Margin="0,0,0,8"
@@ -228,6 +228,31 @@
                         Content="Start Elevator Process..."
                         IsEnabled="{x:Bind ViewModel.ElevatorService.CanStartElevator, Mode=OneWay}"
                         l:Uids.Uid="/Settings/StartElevatorButton" />
+
+                    <CheckBox
+                        Margin="0,12,0,0"
+                        Content="Switch back to manager after auto-sync"
+                        IsChecked="{x:Bind ViewModel.RestoreFocusAfterSync, Mode=TwoWay}"
+                        l:Uids.Uid="/Settings/RestoreFocusAfterSync" />
+
+                    <controls1:SettingsCard
+                        Margin="0,12,0,0"
+                        Description="Press this shortcut from anywhere to bring the JASM window to the front"
+                        Header="Quick Switch JASM to Foreground"
+                        HeaderIcon="{ui:FontIcon Glyph=&#xE765;}"
+                        l:Uids.Uid="/Settings/GlobalHotkeyCard">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <Button
+                                x:Name="HotkeyButton"
+                                Command="{x:Bind ViewModel.StartRecordHotkeyCommand}"
+                                Content="{x:Bind ViewModel.HotkeyText, Mode=OneWay}"
+                                PreviewKeyDown="HotkeyButton_PreviewKeyDown" />
+                            <Button
+                                Command="{x:Bind ViewModel.ClearHotkeyCommand}"
+                                Content="Clear"
+                                l:Uids.Uid="/Settings/ClearHotkeyButton" />
+                        </StackPanel>
+                    </controls1:SettingsCard>
                 </StackPanel>
 
                 <TextBlock
@@ -262,13 +287,16 @@
                         Margin="0,8"
                         VerticalAlignment="Center"
                         IsTextSelectionEnabled="True"
-                        TextWrapping="WrapWholeWords"
                         Text="Mod update checker checks for updates on startup and periodically in the background. Only supports GameBanana.&#x0a;When enabled, checks every 2 hours, but only for mods that haven't been checked for at least 1 hour.&#x0a;Manual checks always query GameBanana directly."
+                        TextWrapping="WrapWholeWords"
                         l:Uids.Uid="/Settings/ModUpdateCheckerDescription" />
 
                 </StackPanel>
 
-                <TextBlock Style="{ThemeResource SubtitleTextBlockStyle}" Text="Commands" l:Uids.Uid="/Settings/CommandsSectionHeader" />
+                <TextBlock
+                    Style="{ThemeResource SubtitleTextBlockStyle}"
+                    Text="Commands"
+                    l:Uids.Uid="/Settings/CommandsSectionHeader" />
                 <controls1:SettingsCard
                     Command="{x:Bind ViewModel.NavigateToCommandsSettingsCommand}"
                     Description="Define commands (scripts) to run on specified mods"
@@ -303,7 +331,11 @@
                         l:Uids.Uid="/Settings/ModsFolderSelector" />
 
                     <StackPanel Orientation="Horizontal">
-                        <Button Command="{x:Bind ViewModel.SaveSettingsCommand}" ToolTipService.ToolTip="Update folder paths?" Content="Update Paths" l:Uids.Uid="/Settings/UpdatePathsButton" />
+                        <Button
+                            Command="{x:Bind ViewModel.SaveSettingsCommand}"
+                            Content="Update Paths"
+                            ToolTipService.ToolTip="Update folder paths?"
+                            l:Uids.Uid="/Settings/UpdatePathsButton" />
                         <Button
                             Margin="40,0,0,0"
                             Command="{x:Bind ViewModel.ReorganizeModsCommand}"
@@ -329,14 +361,17 @@
                             l:Uids.Uid="/Settings/ResetLoaderPathButton">
                             <ToolTipService.ToolTip>
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock TextWrapping="WrapWholeWords" Text="{x:Bind ViewModel.ThreeDMigtoProcessManager.ProcessPath, Mode=OneWay}" />
+                                    <TextBlock Text="{x:Bind ViewModel.ThreeDMigtoProcessManager.ProcessPath, Mode=OneWay}" TextWrapping="WrapWholeWords" />
                                 </StackPanel>
                             </ToolTipService.ToolTip>
                         </Button>
-                        <Button Command="{x:Bind ViewModel.ResetGenshinExePathCommand}" Content="Reset Game EXE Path" l:Uids.Uid="/Settings/ResetGamePathButton">
+                        <Button
+                            Command="{x:Bind ViewModel.ResetGenshinExePathCommand}"
+                            Content="Reset Game EXE Path"
+                            l:Uids.Uid="/Settings/ResetGamePathButton">
                             <ToolTipService.ToolTip>
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock TextWrapping="WrapWholeWords" Text="{x:Bind ViewModel.GenshinProcessManager.ProcessPath, Mode=OneWay}" />
+                                    <TextBlock Text="{x:Bind ViewModel.GenshinProcessManager.ProcessPath, Mode=OneWay}" TextWrapping="WrapWholeWords" />
                                 </StackPanel>
                             </ToolTipService.ToolTip>
                         </Button>
@@ -356,8 +391,8 @@
                             MaxWidth="600"
                             HorizontalAlignment="Left"
                             IsTextSelectionEnabled="True"
-                            TextWrapping="WrapWholeWords"
                             Text="When downloading mods with JASM, it automatically caches archives or zip files. You can specify a maximum limit in GB for the cache directory, and JASM will keep the cache size below the limit on startup."
+                            TextWrapping="WrapWholeWords"
                             l:Uids.Uid="/Settings/CacheLimitDescription" />
 
                         <StackPanel Orientation="Horizontal" Spacing="16">
@@ -368,21 +403,48 @@
                                 ValueChanged="LocalCacheSlider_OnValueChanged"
                                 Value="{x:Bind ViewModel.MaxCacheLimit, Mode=OneWay}" />
                             <TextBlock VerticalAlignment="Center" Text="{x:Bind ViewModel.MaxCacheSizeString, Mode=OneWay}" />
-                            <controls:LinkButton Link="{x:Bind ViewModel.ArchiveCacheFolderPath}" Text="Open Cache Directory..." l:Uids.Uid="/Settings/OpenCacheDirectoryLink" />
+                            <controls:LinkButton
+                                Link="{x:Bind ViewModel.ArchiveCacheFolderPath}"
+                                Text="Open Cache Directory..."
+                                l:Uids.Uid="/Settings/OpenCacheDirectoryLink" />
 
                         </StackPanel>
-                        
+
                     </StackPanel>
-
-
                     <TextBlock IsTextSelectionEnabled="True">
-                        <Run Text="Current Mod File Cache Size" l:Uids.Uid="/Settings/CurrentCacheSizeLabel"/>
+                        <Run Text="Current Mod File Cache Size" l:Uids.Uid="/Settings/CurrentCacheSizeLabel" />
                         <Run Text="{x:Bind ViewModel.SelectedGame, Mode=OneWay}" />
                         <Run Text=":" />
                         <Run Text="{x:Bind ViewModel.ModCacheSizeGB, Mode=OneWay}" />
                         <Run Text="GB" />
 
                     </TextBlock>
+                    <StackPanel Margin="0,16,0,0" Spacing="8">
+                        <TextBlock
+                            MaxWidth="600"
+                            HorizontalAlignment="Left"
+                            IsTextSelectionEnabled="True"
+                            Text="JASM also keeps a small shared cache of mod thumbnails and preview images. Set the maximum size in MB; cached images are re-downloaded on demand."
+                            TextWrapping="WrapWholeWords"
+                            l:Uids.Uid="/Settings/ImageCacheLimitDescription" />
+
+                        <StackPanel Orientation="Horizontal" Spacing="16">
+                            <Slider
+                                x:Name="ImageCacheSlider"
+                                Width="200"
+                                Maximum="1024"
+                                Minimum="32"
+                                StepFrequency="32"
+                                ValueChanged="ImageCacheSlider_OnValueChanged"
+                                Value="{x:Bind ViewModel.MaxImageCacheLimit, Mode=OneWay}" />
+                            <TextBlock VerticalAlignment="Center" Text="{x:Bind ViewModel.ImageCacheSizeString, Mode=OneWay}" />
+                            <Button
+                                VerticalAlignment="Center"
+                                Command="{x:Bind ViewModel.ClearImageCacheCommand}"
+                                Content="Clear Image Cache"
+                                l:Uids.Uid="/Settings/ClearImageCacheBtn" />
+                        </StackPanel>
+                    </StackPanel>
 
                 </StackPanel>
 
@@ -414,9 +476,9 @@
                         Value="{x:Bind ViewModel.ExportProgress, Mode=OneWay}" />
                     <TextBlock
                         Margin="0,0,8,0"
-                        Visibility="{x:Bind ViewModel.ExportingMods, Mode=OneWay}"
-                        Text="{x:Bind ViewModel.ExportProgressText, Mode=OneWay}" />
-                    <TextBlock Visibility="{x:Bind ViewModel.ExportingMods, Mode=OneWay}" Text="{x:Bind ViewModel.CurrentModName, Mode=OneWay}" />
+                        Text="{x:Bind ViewModel.ExportProgressText, Mode=OneWay}"
+                        Visibility="{x:Bind ViewModel.ExportingMods, Mode=OneWay}" />
+                    <TextBlock Text="{x:Bind ViewModel.CurrentModName, Mode=OneWay}" Visibility="{x:Bind ViewModel.ExportingMods, Mode=OneWay}" />
                 </StackPanel>
 
 
@@ -429,35 +491,42 @@
                         MaxWidth="600"
                         HorizontalAlignment="Left"
                         IsTextSelectionEnabled="True"
-                        TextWrapping="WrapWholeWords"
                         Text="Sync game character data and images from the cloud. This allows you to get new character support without updating JASM."
+                        TextWrapping="WrapWholeWords"
                         l:Uids.Uid="/Settings/AssetSyncDescription" />
 
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <TextBlock VerticalAlignment="Center"
-                                   Text="Local Version:"
-                                   l:Uids.Uid="/Settings/AssetSyncLocalVersionLabel" />
-                        <TextBlock VerticalAlignment="Center"
-                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                   Text="{x:Bind ViewModel.LocalAssetVersion, Mode=OneWay}" />
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Text="Local Version:"
+                            l:Uids.Uid="/Settings/AssetSyncLocalVersionLabel" />
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Text="{x:Bind ViewModel.LocalAssetVersion, Mode=OneWay}" />
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <Button Command="{x:Bind ViewModel.SyncGameAssetsCommand}"
-                                Content="Sync Game Assets"
-                                IsEnabled="{x:Bind ViewModel.IsAssetSyncing, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}"
-                                l:Uids.Uid="/Settings/SyncGameAssetsButton" />
-                        <ProgressRing IsActive="{x:Bind ViewModel.IsAssetSyncing, Mode=OneWay}"
-                                      Width="20" Height="20" />
-                        <TextBlock VerticalAlignment="Center"
-                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                   Text="{x:Bind ViewModel.AssetSyncStatus, Mode=OneWay}" />
+                        <Button
+                            Command="{x:Bind ViewModel.SyncGameAssetsCommand}"
+                            Content="Sync Game Assets"
+                            IsEnabled="{x:Bind ViewModel.IsAssetSyncing, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}"
+                            l:Uids.Uid="/Settings/SyncGameAssetsButton" />
+                        <ProgressRing
+                            Width="20"
+                            Height="20"
+                            IsActive="{x:Bind ViewModel.IsAssetSyncing, Mode=OneWay}" />
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Text="{x:Bind ViewModel.AssetSyncStatus, Mode=OneWay}" />
                     </StackPanel>
 
-                    <ProgressBar IsIndeterminate="False"
-                                 Maximum="100"
-                                 Value="{x:Bind ViewModel.AssetSyncProgress, Mode=OneWay}"
-                                 Visibility="{x:Bind ViewModel.IsAssetSyncing, Mode=OneWay}" />
+                    <ProgressBar
+                        IsIndeterminate="False"
+                        Maximum="100"
+                        Visibility="{x:Bind ViewModel.IsAssetSyncing, Mode=OneWay}"
+                        Value="{x:Bind ViewModel.AssetSyncProgress, Mode=OneWay}" />
                 </StackPanel>
 
 
@@ -468,15 +537,22 @@
                 <StackPanel Margin="{StaticResource XSmallTopMargin}">
                     <TextBlock Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind ViewModel.VersionDescription, Mode=OneWay}" />
 
-                    <StackPanel Margin="{StaticResource XSmallTopMargin}" Orientation="Horizontal" Spacing="8">
-                        <Button Command="{x:Bind ViewModel.ManualCheckForUpdateCommand}"
-                                Content="Check for Updates"
-                                l:Uids.Uid="/Settings/CheckForUpdateButton" />
-                        <ProgressRing IsActive="{x:Bind ViewModel.IsCheckingForUpdate, Mode=OneWay}"
-                                      Width="20" Height="20" />
-                        <TextBlock VerticalAlignment="Center"
-                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                   Text="{x:Bind ViewModel.UpdateCheckStatusText, Mode=OneWay}" />
+                    <StackPanel
+                        Margin="{StaticResource XSmallTopMargin}"
+                        Orientation="Horizontal"
+                        Spacing="8">
+                        <Button
+                            Command="{x:Bind ViewModel.ManualCheckForUpdateCommand}"
+                            Content="Check for Updates"
+                            l:Uids.Uid="/Settings/CheckForUpdateButton" />
+                        <ProgressRing
+                            Width="20"
+                            Height="20"
+                            IsActive="{x:Bind ViewModel.IsCheckingForUpdate, Mode=OneWay}" />
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Text="{x:Bind ViewModel.UpdateCheckStatusText, Mode=OneWay}" />
                     </StackPanel>
 
                     <TextBlock
@@ -501,13 +577,19 @@
                         l:Uids.Uid="/Settings/GameBananaLink" />
 
                     <StackPanel Orientation="Horizontal" Visibility="{x:Bind ViewModel.ShowNewVersionAvailable, Mode=OneWay, Converter={StaticResource BoolToVisibleConverter}}">
-                        <TextBlock VerticalAlignment="Center" Text="New version available:" l:Uids.Uid="/Settings/NewVersionAvailableText" />
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Text="New version available:"
+                            l:Uids.Uid="/Settings/NewVersionAvailableText" />
                         <TextBlock
                             Margin="8,0"
                             VerticalAlignment="Center"
                             Text="{x:Bind ViewModel.LatestVersion, Mode=OneWay}" />
 
-                        <controls:LinkButton Link="https://github.com/Moonholder/JASM/releases/latest" Text="See what's new" l:Uids.Uid="/Settings/SeeWhatsNewLink" />
+                        <controls:LinkButton
+                            Link="https://github.com/Moonholder/JASM/releases/latest"
+                            Text="See what's new"
+                            l:Uids.Uid="/Settings/SeeWhatsNewLink" />
 
                     </StackPanel>
 
@@ -521,14 +603,23 @@
                             <Button.Flyout>
                                 <Flyout ShouldConstrainToRootBounds="False">
                                     <StackPanel>
-                                        <TextBlock TextWrapping="WrapWholeWords" Text="JASM will exit and the update will start. Do you want to continue?" l:Uids.Uid="/Settings/UpdateConfirmationText" />
-                                        <Button Command="{x:Bind ViewModel.UpdateJasmCommand}" Content="Yes, Update JASM 😎" l:Uids.Uid="/Settings/UpdateConfirmButton" />
+                                        <TextBlock
+                                            Text="JASM will exit and the update will start. Do you want to continue?"
+                                            TextWrapping="WrapWholeWords"
+                                            l:Uids.Uid="/Settings/UpdateConfirmationText" />
+                                        <Button
+                                            Command="{x:Bind ViewModel.UpdateJasmCommand}"
+                                            Content="Yes, Update JASM 😎"
+                                            l:Uids.Uid="/Settings/UpdateConfirmButton" />
                                     </StackPanel>
                                 </Flyout>
                             </Button.Flyout>
                             <Button.Content>
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock VerticalAlignment="Center" Text="Update JASM to " l:Uids.Uid="/Settings/UpdateJasmButtonPrefix" />
+                                    <TextBlock
+                                        VerticalAlignment="Center"
+                                        Text="Update JASM to "
+                                        l:Uids.Uid="/Settings/UpdateJasmButtonPrefix" />
                                     <TextBlock
                                         Margin="4,0"
                                         VerticalAlignment="Center"

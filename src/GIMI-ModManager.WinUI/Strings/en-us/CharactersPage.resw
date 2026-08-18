@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- English (neutral) resources -->
+  <data name="AddModErrorTitle" xml:space="preserve">
+    <value>An error occurred while adding the mod</value>
+  </data>
+  <data name="ApplyPresetLabel.Text" xml:space="preserve">
+    <value>Apply preset:</value>
+  </data>
+  <data name="CheckForUpdatesMenuItem.Text" xml:space="preserve">
+    <value>Check for updates</value>
+  </data>
+  <data name="ClearNotificationsMenuItem.Text" xml:space="preserve">
+    <value>Clear notifications</value>
+  </data>
+  <data name="ConfirmButton.Text" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
+  <data name="CreateAdvancedCommandButton.Content" xml:space="preserve">
+    <value>Create advanced command</value>
+  </data>
+  <data name="DisableAllModsMenuItem.Text" xml:space="preserve">
+    <value>Disable all mods</value>
+  </data>
+  <data name="DisableModsErrorTitle" xml:space="preserve">
+    <value>An error occurred while disabling mods</value>
+  </data>
+  <data name="DragAndDropText.Text" xml:space="preserve">
+    <value>Drop here to auto-detect mods...</value>
+  </data>
+  <data name="DragDrop_AlreadyInstallingMessage" xml:space="preserve">
+    <value>JASM does not support installing multiple mods for the same character</value>
+  </data>
+  <data name="DragDrop_AlreadyInstallingTitle" xml:space="preserve">
+    <value>Please finish adding the mod for &apos;{0}&apos; first</value>
+  </data>
+  <data name="DragDrop_MultiFilesWarningMessage" xml:space="preserve">
+    <value>This is currently not supported</value>
+  </data>
+  <data name="DragDrop_MultiFilesWarningTitle" xml:space="preserve">
+    <value>Drag and drop was performed with multiple storage items</value>
+  </data>
+  <data name="FilterAppBarButton.Label" xml:space="preserve">
+    <value>Filter</value>
+  </data>
+  <data name="InvalidGameBananaUrlTitle" xml:space="preserve">
+    <value>Invalid GameBanana mod page link</value>
+  </data>
+  <data name="MixedCharacterTypesError" xml:space="preserve">
+    <value>The character list contains characters of different types</value>
+  </data>
+  <data name="ModPresetsAppBarButton.Label" xml:space="preserve">
+    <value>Mod presets</value>
+  </data>
+  <data name="ModsDisabledMessageFormat" xml:space="preserve">
+    <value>All mods for {0} are disabled</value>
+  </data>
+  <data name="ModsDisabledTitle" xml:space="preserve">
+    <value>Mods disabled</value>
+  </data>
+  <data name="ModsSubMenu.Text" xml:space="preserve">
+    <value>Mods</value>
+  </data>
+  <data name="NoCharacterFoundFormat" xml:space="preserve">
+    <value>No {0} found...</value>
+  </data>
+  <data name="NoDownloadableFilesMessage" xml:space="preserve">
+    <value>The GameBanana {0} page does not contain any downloadable files.</value>
+  </data>
+  <data name="NoDownloadableFilesTitle" xml:space="preserve">
+    <value>No downloadable files</value>
+  </data>
+  <data name="OpenFolderMenuItem.Text" xml:space="preserve">
+    <value>Open folder...</value>
+  </data>
+  <data name="OpenModPageErrorTitle" xml:space="preserve">
+    <value>An error occurred while opening the mod page</value>
+  </data>
+  <data name="Overview" xml:space="preserve">
+    <value>Overview</value>
+  </data>
+  <data name="OverviewTitleSuffix" xml:space="preserve">
+    <value>Overview</value>
+  </data>
+  <data name="PasswordDialog.CloseButtonText" xml:space="preserve">
+    <value>Password manager</value>
+  </data>
+  <data name="PasswordDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
+  <data name="PasswordDialog.SecondaryButtonText" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="PasswordDialog.Title" xml:space="preserve">
+    <value>Enter the password for the encrypted file</value>
+  </data>
+  <data name="PasswordDialog_ExtractFailedMessage" xml:space="preserve">
+    <value>The password is incorrect, please try another password</value>
+  </data>
+  <data name="PasswordDialog_ExtractFailedTitle" xml:space="preserve">
+    <value>Extraction failed</value>
+  </data>
+  <data name="PasswordDialog_Input.PlaceholderText" xml:space="preserve">
+    <value>Enter password</value>
+  </data>
+  <data name="PasswordEntryDialog.PrimaryButtonText" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="PasswordEntryDialog.SecondaryButtonText" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="PasswordEntryDialog.Title" xml:space="preserve">
+    <value>Enter password information</value>
+  </data>
+  <data name="PasswordEntryDialog_DisplayNameLabel.Text" xml:space="preserve">
+    <value>Display name (optional)</value>
+  </data>
+  <data name="PasswordEntryDialog_PasswordLabel.Text" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="PasswordManager_AddButton.Content" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="PasswordManager_DisplayNameHeader.Text" xml:space="preserve">
+    <value>Display name</value>
+  </data>
+  <data name="PasswordManager_EditButton.Content" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="PasswordManager_PasswordHeader.Text" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="PasswordManager_RemoveButton.Content" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="PasswordManagerDialog.PrimaryButtonText" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="PasswordManagerDialog.SecondaryButtonText" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="PasswordManagerDialog.Title" xml:space="preserve">
+    <value>Password manager</value>
+  </data>
+  <data name="PinCharacter" xml:space="preserve">
+    <value>Pin character</value>
+  </data>
+  <data name="RandomizeModsButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Opens a dialog with more information</value>
+  </data>
+  <data name="RandomizeModsText.Text" xml:space="preserve">
+    <value>Randomly enable mods</value>
+  </data>
+  <data name="RefreshModsButton.Content" xml:space="preserve">
+    <value>Refresh mods</value>
+  </data>
+  <data name="SearchBoxPlaceholderFormat" xml:space="preserve">
+    <value>Search {0}...</value>
+  </data>
+  <data name="SelectGameExecutablePlaceholder" xml:space="preserve">
+    <value>Select game executable</value>
+  </data>
+  <data name="SelectModLoaderExecutablePlaceholder" xml:space="preserve">
+    <value>Select the executable Mod Loader exe</value>
+  </data>
+  <data name="SelectProcessDescription.Text" xml:space="preserve">
+    <value>Select the path of the process you want to start. After saving, this process will be started when the start button is pressed. This can be reset on the settings page.</value>
+  </data>
+  <data name="SelectProcessDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="SelectProcessDialog.SecondaryButtonText" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="SelectProcessDialog.Title" xml:space="preserve">
+    <value>Select process path</value>
+  </data>
+  <data name="ShowOnlyWithEnabledModsToggle.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Show items that have at least one enabled mod</value>
+  </data>
+  <data name="ShowOnlyWithEnabledModsToggleFormat" xml:space="preserve">
+    <value>Only show {0} with enabled mods</value>
+  </data>
+  <data name="ShowOnlyWithModsToggleFormat" xml:space="preserve">
+    <value>Only show {0} with mods</value>
+  </data>
+  <data name="ShowOnlyWithNotificationsToggleFormat" xml:space="preserve">
+    <value>Only show {0} with update notifications</value>
+  </data>
+  <data name="SortByLabel.Text" xml:space="preserve">
+    <value>Sort by:</value>
+  </data>
+  <data name="Sorter_Alphabetical" xml:space="preserve">
+    <value>Alphabetical</value>
+  </data>
+  <data name="Sorter_ModCount" xml:space="preserve">
+    <value>Mod count</value>
+  </data>
+  <data name="Sorter_Rarity" xml:space="preserve">
+    <value>Rarity</value>
+  </data>
+  <data name="Sorter_RecentlyAdded" xml:space="preserve">
+    <value>Recently added</value>
+  </data>
+  <data name="Sorter_ReleaseDate" xml:space="preserve">
+    <value>Release date</value>
+  </data>
+  <data name="SortingComboBox.PlaceholderText" xml:space="preserve">
+    <value>Sort characters...</value>
+  </data>
+  <data name="StartGameButtonFormat" xml:space="preserve">
+    <value>Start {0}</value>
+  </data>
+  <data name="StartModLoaderButton.Content" xml:space="preserve">
+    <value>Start mod loader</value>
+  </data>
+  <data name="UnpinCharacter" xml:space="preserve">
+    <value>Unpin character</value>
+  </data>
+</root>

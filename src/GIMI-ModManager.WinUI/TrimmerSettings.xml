@@ -5,6 +5,7 @@
 		<type fullname="GIMI_ModManager.WinUI.ViewModels.ShellViewModel" />
 		<type fullname="GIMI_ModManager.WinUI.ViewModels.CharacterDetailsViewModels.SubViewModels.ModRowVM" />
 		<type fullname="GIMI_ModManager.WinUI.ViewModels.ModPageViewModels.ModFileInfoVm" />
+		<type fullname="GIMI_ModManager.WinUI.Models.PasswordEntry" preserve="all" />
 	</assembly>
 	<assembly fullname="Microsoft.WinUI" preserve="all" />
 </linker>

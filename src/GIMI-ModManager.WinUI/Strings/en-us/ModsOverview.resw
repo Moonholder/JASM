@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- English (neutral) resources -->
+  <data name="CloseAllButton.Content" xml:space="preserve">
+    <value>Close all</value>
+  </data>
+  <data name="GoToDetailsButton.Content" xml:space="preserve">
+    <value>Go to details</value>
+  </data>
+  <data name="OpenAllButton.Content" xml:space="preserve">
+    <value>Expand all</value>
+  </data>
+  <data name="PageTitle.Text" xml:space="preserve">
+    <value>Mods Overview</value>
+  </data>
+  <data name="SearchBox.PlaceholderText" xml:space="preserve">
+    <value>Press Enter to search...</value>
+  </data>
+</root>

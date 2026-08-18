@@ -4,6 +4,7 @@ using GIMI_ModManager.Core.Entities;
 using Serilog;
 using SharpCompress.Archives;
 using SharpCompress.Archives.Rar;
+using SharpCompress.Archives.SevenZip;
 using SharpCompress.Archives.Zip;
 using SharpCompress.Common;
 
@@ -104,6 +105,14 @@ public sealed class DragAndDropScanner
         _logger.Information("Extracting {ArchiveType} archive", archive.Type);
         foreach (var entry in archive.Entries)
         {
+            if (string.IsNullOrWhiteSpace(entry.Key))
+                continue;
+
+            ArchiveExtractionGuard.ValidateEntryPath(entry.Key, _workFolder);
+
+            if (entry.IsDirectory)
+                continue;
+
             _logger.Debug("Extracting {EntryName}", entry.Key);
             entry.WriteToDirectory(_workFolder, new ExtractionOptions()
             {
@@ -116,21 +125,21 @@ public sealed class DragAndDropScanner
 
     private void SharpExtractZip(string path)
     {
-        using var archive = ZipArchive.Open(path);
+        using var archive = ZipArchive.OpenArchive(path);
         ExtractEntries(archive);
     }
 
 
     private void SharpExtractRar(string path)
     {
-        using var archive = RarArchive.Open(path);
+        using var archive = RarArchive.OpenArchive(path);
         ExtractEntries(archive);
     }
 
     // ReSharper disable once InconsistentNaming
     private void SharpExtract7z(string path)
     {
-        using var archive = ArchiveFactory.Open(path);
+        using var archive = SevenZipArchive.OpenArchive(path);
         ExtractEntries(archive);
     }
 

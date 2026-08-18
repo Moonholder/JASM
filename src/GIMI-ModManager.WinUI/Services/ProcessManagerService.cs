@@ -1,4 +1,4 @@
-﻿using GIMI_ModManager.Core.Contracts.Services;
+using GIMI_ModManager.Core.Contracts.Services;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -107,6 +107,8 @@ public abstract partial class BaseProcessManager<TProcessOptions> : ObservableOb
             return;
         }
 
+        if (_commandDefinition is null)
+            return;
 
         var result = await _commandHandler.RunCommandAsync(_commandDefinition.Id, null);
 

@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using GIMI_ModManager.Core.Contracts.Services;
@@ -476,7 +476,7 @@ public sealed class ModUpdateAvailableChecker
             {
                 await Task.Delay(_waitTime, _producerWaitingCancellationTokenSource.Token).ConfigureAwait(false);
             }
-            catch (TaskCanceledException e)
+            catch (TaskCanceledException)
             {
             }
         }

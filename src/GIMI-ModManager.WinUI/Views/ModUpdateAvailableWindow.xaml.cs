@@ -48,7 +48,7 @@ public sealed partial class ModUpdateAvailableWindow : WindowEx
         {
             CoreWebView2Environment.GetAvailableBrowserVersionString();
         }
-        catch (Exception e)
+        catch (Exception)
         {
             return;
         }

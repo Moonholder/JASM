@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics;
 using GIMI_ModManager.Core.GamesService.Interfaces;
 using GIMI_ModManager.Core.GamesService.Models;
 using GIMI_ModManager.Core.Helpers;
@@ -19,7 +18,7 @@ internal class GameSettingsManager
     internal readonly DirectoryInfo CharacterOverrideImageFlder;
 
     private const string GameServiceFileName = "GameService";
-    private GameServiceRoot? _settings;
+    private GameServiceRoot _settings = null!;
 
     internal GameSettingsManager(ILogger logger, DirectoryInfo settingsDirectory)
     {
@@ -103,7 +102,6 @@ internal class GameSettingsManager
         }
     }
 
-    [MemberNotNull(nameof(_settings))]
     internal async Task<GameServiceRoot> ReadSettingsAsync(bool useCache = true)
     {
         if (useCache && _settings != null)

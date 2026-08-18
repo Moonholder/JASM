@@ -135,7 +135,10 @@ public partial class ModGridVM(
                 }
                 catch (Exception e)
                 {
-                    _notificationService?.ShowNotification("刷新模组时发生错误", e.Message, null);
+                    _notificationService?.ShowNotification(
+                        _localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/RefreshModsErrorTitle", "Error reloading mods"),
+                        e.Message,
+                        null);
                 }
             }
         }
@@ -252,14 +255,17 @@ public partial class ModGridVM(
 
                 if (refreshResult.ModsDuplicate.Any() && !_isDisposed)
                 {
-                    var message = $"在 {_context.ModObjectDisplayName} 的模组文件夹中检测到重复的模组.\n";
+                    var title = _localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/DuplicateModsDetectedTitle", "Duplicate Mods Detected");
+                    var formatMessage = _localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/DuplicateModsDetectedMessage", "Detected duplicate mods in '{0}''s mod folder.\n");
+                    var message = string.Format(formatMessage, _context.ModObjectDisplayName);
 
+                    var formatItem = _localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/DuplicateModRenamedMessage", "Mod: '{0}' was renamed to '{1}' to avoid conflicts.\n");
                     message = refreshResult.ModsDuplicate.Aggregate(message,
                         (current, duplicateMod) =>
                             current +
-                            $"模组: '{duplicateMod.ExistingFolderName}' 已重命名为 '{duplicateMod.RenamedFolderName}' 以避免冲突.\n");
+                            string.Format(formatItem, duplicateMod.ExistingFolderName, duplicateMod.RenamedFolderName));
 
-                    _notificationService?.ShowNotification("检测到重复模组",
+                    _notificationService?.ShowNotification(title,
                         message,
                         TimeSpan.FromSeconds(10));
                 }
@@ -482,6 +488,7 @@ public partial class ModGridVM(
 
         var modEntryToToggle = _modsBackend.FirstOrDefault(x => x.Id == modVmToToggle.Id);
         if (modEntryToToggle is null) return;
+        if (_modList is null) return;
 
         var modsToDisable = SingleSelect
         ? [.. _modsBackend.Where(mod => modVmToToggle.Id != mod.Id && mod.IsEnabled)]
@@ -595,13 +602,18 @@ public partial class ModGridVM(
             if (result.HasNotification)
                 _notificationService.ShowNotification(result.Notification);
             else
-                _notificationService.ShowNotification("保存模组设置失败", result.Exception?.ToString() ?? result.ErrorMessage ?? "",
+                _notificationService.ShowNotification(
+                    _localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/SaveSettingsFailed", "Failed to save mod settings"),
+                    result.Exception?.ToString() ?? result.ErrorMessage ?? "",
                     TimeSpan.FromSeconds(6));
         }
 
         if (result.IsSuccess)
         {
-            _notificationService.ShowNotification("模组设置已保存", messageBody, TimeSpan.FromSeconds(3));
+            _notificationService.ShowNotification(
+                _localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/SettingsSaved", "Mod settings saved"),
+                messageBody,
+                TimeSpan.FromSeconds(3));
         }
 
         await UpdateModVmAsync(mod, true, CancellationToken.None);
@@ -618,6 +630,11 @@ public partial class ModGridVM(
         if (modNotification is not ModRowVM_ModNotificationVM notification)
         {
             _logger.Warning("OpenNewModsWindowAsync called with null modModel.");
+            return;
+        }
+
+        if (_modList is null)
+        {
             return;
         }
 
@@ -642,10 +659,10 @@ public partial class ModGridVM(
         }
 
 
+        var formatTitle = _localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/NewModFilesAvailable", "New mod files available: {0}");
         var modWindow = new ModUpdateAvailableWindow(notification.Id)
         {
-            Title =
-                $"有新的模组文件可用: {ModFolderHelpers.GetFolderNameWithoutDisabledPrefix(skinEntry.Mod.Name)}"
+            Title = string.Format(formatTitle, ModFolderHelpers.GetFolderNameWithoutDisabledPrefix(skinEntry.Mod.Name))
         };
         _windowManagerService.CreateWindow(modWindow, identifier: notification.Id);
         await Task.Delay(100);
@@ -659,10 +676,10 @@ public partial class ModGridVM(
 
         _dispatcherQueue?.TryEnqueue(() =>
         {
-            _notificationService?.ShowNotification(
-               $"在 {_context.ShownModObject.DisplayName} 的模组文件夹中检测到文件夹活动",
-               "角色模组文件夹中的文件/文件夹已被更改，模组已刷新.",
-               TimeSpan.FromSeconds(5));
+            var formatTitle = _localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/FolderActivityDetected", "Detected folder activity in '{0}''s mod folder");
+            var title = string.Format(formatTitle, _context.ShownModObject.DisplayName);
+            var message = _localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/FolderActivityDetectedMessage", "Files/folders in the character's mod folder have been modified; mods have been refreshed.");
+            _notificationService?.ShowNotification(title, message, TimeSpan.FromSeconds(5));
         });
 
         QueueModRefresh();
@@ -860,6 +877,49 @@ public partial class ModGridVM(
         }
 
         var handlerResult = await _modVariantHandlerService.SaveCurrentAsVariantAsync(modRowVm.Id, name, CancellationToken.None).ConfigureAwait(true);
+        if (handlerResult.IsSuccess)
+        {
+            if (handlerResult.HasNotification)
+            {
+                _notificationService.ShowNotification(handlerResult.Notification);
+            }
+            var skinEntry = _modList?.Mods?.FirstOrDefault(m => m.Id == modRowVm.Id);
+            if (skinEntry != null)
+            {
+                await UpdateModVmAsync(skinEntry, useSettingsCache: false, CancellationToken.None).ConfigureAwait(true);
+            }
+        }
+        else
+        {
+            if (handlerResult.HasNotification)
+            {
+                _notificationService.ShowNotification(handlerResult.Notification);
+            }
+        }
+    }
+
+    [RelayCommand]
+    private async Task UpdateActiveVariantAsync()
+    {
+        var modRowVm = SelectedMod;
+        if (modRowVm == null) return;
+        var variantName = modRowVm.ActiveVariant;
+        if (string.IsNullOrEmpty(variantName)) return;
+
+        var confirmDialog = new ContentDialog
+        {
+            Title = _localizer.GetLocalizedStringOrDefault("/ModVariant/UpdateConfirmTitle", "Update Variant"),
+            Content = string.Format(_localizer.GetLocalizedStringOrDefault("/ModVariant/UpdateConfirmMessage", "Are you sure you want to update the variant preset '{0}' with current settings?"), variantName),
+            PrimaryButtonText = _localizer.GetLocalizedStringOrDefault("Common_Yes", "Yes"),
+            CloseButtonText = _localizer.GetLocalizedStringOrDefault("Common_Cancel", "Cancel"),
+            DefaultButton = ContentDialogButton.Primary,
+            XamlRoot = App.MainWindow.Content.XamlRoot
+        };
+
+        var confirmResult = await _windowManagerService.ShowDialogAsync(confirmDialog);
+        if (confirmResult != ContentDialogResult.Primary) return;
+
+        var handlerResult = await _modVariantHandlerService.SaveCurrentAsVariantAsync(modRowVm.Id, variantName, CancellationToken.None).ConfigureAwait(true);
         if (handlerResult.IsSuccess)
         {
             if (handlerResult.HasNotification)

@@ -117,10 +117,10 @@ public sealed class UpdateChecker
                     await CheckForUpdatesAsync(cancellationToken);
                     await Task.Delay(TimeSpan.FromHours(6), cancellationToken);
                 }
-                catch (TaskCanceledException e)
+                catch (TaskCanceledException)
                 {
                 }
-                catch (OperationCanceledException e)
+                catch (OperationCanceledException)
                 {
                 }
                 catch (Exception e)

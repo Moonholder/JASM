@@ -1,4 +1,4 @@
-﻿using GIMI_ModManager.WinUI.ViewModels;
+using GIMI_ModManager.WinUI.ViewModels;
 using GIMI_ModManager.WinUI.Views.Controls;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -41,5 +41,20 @@ public sealed partial class SettingsPage : Page
     {
         if (ViewModel.SetCacheLimitCommand.CanExecute((int)e.NewValue))
             ViewModel.SetCacheLimitCommand.ExecuteAsync((int)e.NewValue);
+    }
+
+    private void ImageCacheSlider_OnValueChanged(object _, RangeBaseValueChangedEventArgs e)
+    {
+        if (ViewModel.SetImageCacheLimitCommand.CanExecute((int)e.NewValue))
+            ViewModel.SetImageCacheLimitCommand.ExecuteAsync((int)e.NewValue);
+    }
+
+    private async void HotkeyButton_PreviewKeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (ViewModel.IsRecordingHotkey)
+        {
+            e.Handled = true;
+            await ViewModel.HandleHotkeyKeyDown(e.Key);
+        }
     }
 }

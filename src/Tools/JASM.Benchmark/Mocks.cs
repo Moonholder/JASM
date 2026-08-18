@@ -1,4 +1,4 @@
-﻿using GIMI_ModManager.Core.Contracts.Services;
+using GIMI_ModManager.Core.Contracts.Services;
 using GIMI_ModManager.Core.GamesService;
 using GIMI_ModManager.Core.Services;
 using Serilog;
@@ -40,7 +40,11 @@ public class MockLogger : ILogger
 
 public class MockLocalizer : ILanguageLocalizer
 {
-    public event EventHandler? LanguageChanged;
+    public event EventHandler? LanguageChanged
+    {
+        add { }
+        remove { }
+    }
 
     public Task InitializeAsync()
     {

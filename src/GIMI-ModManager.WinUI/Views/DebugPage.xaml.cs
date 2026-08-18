@@ -72,6 +72,7 @@ public sealed partial class DebugPage : Page
         var character = GameService.GetCharacterByIdentifier("DebugTest");
 
         character ??= GameService.GetCharacterByIdentifier("NewName");
+        if (character is null) return;
 
         var editCharacterRequest = new EditCustomCharacterRequest()
         {
@@ -86,6 +87,7 @@ public sealed partial class DebugPage : Page
         var character = GameService.GetCharacterByIdentifier("DebugTest");
 
         character ??= GameService.GetCharacterByIdentifier("NewName");
+        if (character is null) return;
 
         await GameService.DeleteCustomCharacterAsync(character.InternalName);
         await _skinManagerService.DisableModListAsync(character);

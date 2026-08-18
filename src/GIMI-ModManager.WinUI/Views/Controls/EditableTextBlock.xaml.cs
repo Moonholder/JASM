@@ -67,10 +67,10 @@ public sealed partial class EditableTextBlock : UserControl
     }
 
 
-    public static readonly DependencyProperty StyleProperty = DependencyProperty.Register(
+    public new static readonly DependencyProperty StyleProperty = DependencyProperty.Register(
         nameof(Style), typeof(Style), typeof(EditableTextBlock), new PropertyMetadata(default(Style)));
 
-    public Style Style
+    public new Style Style
     {
         get { return (Style)GetValue(StyleProperty); }
         set { SetValue(StyleProperty, value); }

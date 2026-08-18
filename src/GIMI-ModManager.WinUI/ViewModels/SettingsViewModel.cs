@@ -54,6 +54,7 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
     private readonly UpdateChecker _updateChecker;
     private readonly GameAssetSyncService _gameAssetSyncService;
     public ElevatorService ElevatorService;
+    private readonly HotkeyService _hotkeyService;
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ResetGenshinExePathCommand))]
@@ -105,6 +106,8 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
     [ObservableProperty] private bool _characterAsSkinsCheckbox = false;
 
     [ObservableProperty] private int _maxCacheLimit;
+    [ObservableProperty] private int _maxImageCacheLimit;
+    [ObservableProperty] private string _imageCacheSizeString = string.Empty;
 
     [ObservableProperty] private Uri _archiveCacheFolderPath;
 
@@ -141,10 +144,12 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
         IGameService gameService, AutoUpdaterService autoUpdaterService, ILanguageLocalizer localizer,
         SelectedGameService selectedGameService, ModUpdateAvailableChecker modUpdateAvailableChecker,
         LifeCycleService lifeCycleService, INavigationService navigationService,
-        ModArchiveRepository modArchiveRepository, GameAssetSyncService gameAssetSyncService)
+        ModArchiveRepository modArchiveRepository, GameAssetSyncService gameAssetSyncService,
+        HotkeyService hotkeyService)
     {
         _themeSelectorService = themeSelectorService;
         _localSettingsService = localSettingsService;
+        _hotkeyService = hotkeyService;
         ElevatorService = elevatorService;
         _notificationManager = notificationManager;
         _navigationViewService = navigationViewService;
@@ -211,6 +216,10 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
         MaxCacheLimit = localSettingsService.ReadSetting<ModArchiveSettings>(ModArchiveSettings.Key)
             ?.MaxLocalArchiveCacheSizeGb ?? new ModArchiveSettings().MaxLocalArchiveCacheSizeGb;
         SetCacheString(MaxCacheLimit);
+
+        MaxImageCacheLimit = localSettingsService.ReadSetting<ImageCacheSettings>(ImageCacheSettings.Key, SettingScope.App)
+            ?.MaxImageCacheMb ?? ImageCacheSettings.DefaultMaxImageCacheMb;
+        UpdateImageCacheSizeString();
 
         var cultures = CultureInfo.GetCultures(CultureTypes.AllCultures);
         cultures = cultures.Append(new CultureInfo("zh-cn")).ToArray();
@@ -929,6 +938,10 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
         await ThreeDMigtoProcessManager.TryInitialize();
         ModCacheSizeGB = _modArchiveRepository.GetTotalCacheSizeInGB().ToString("F");
         RefreshLocalAssetVersion();
+
+        var behaviorSettings = await _localSettingsService.ReadOrCreateSettingAsync<AppBehaviorSettings>(AppBehaviorSettings.Key, SettingScope.App);
+        RestoreFocusAfterSync = behaviorSettings.RestoreFocusAfterSync;
+        HotkeyText = GetHotkeyDisplayString(behaviorSettings.HotkeyModifiers, behaviorSettings.HotkeyVirtualKey);
     }
 
     [ObservableProperty] private string _maxCacheSizeString = string.Empty;
@@ -950,6 +963,32 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
 
         MaxCacheLimit = maxValue;
         SetCacheString(maxValue);
+    }
+
+    [RelayCommand]
+    private async Task SetImageCacheLimit(int maxValue)
+    {
+        var settings = await _localSettingsService.ReadOrCreateSettingAsync<ImageCacheSettings>(
+            ImageCacheSettings.Key, SettingScope.App);
+        settings.MaxImageCacheMb = maxValue;
+        await _localSettingsService.SaveSettingAsync(ImageCacheSettings.Key, settings, SettingScope.App);
+
+        MaxImageCacheLimit = maxValue;
+    }
+
+    [RelayCommand]
+    private void ClearImageCache()
+    {
+        RemoteImageLoader.ClearDiskCache();
+        UpdateImageCacheSizeString();
+    }
+
+    private void UpdateImageCacheSizeString()
+    {
+        var bytes = RemoteImageLoader.GetDiskCacheSizeBytes();
+        ImageCacheSizeString = bytes >= 1024L * 1024 * 1024
+            ? $"{bytes / (1024.0 * 1024 * 1024):F1} GB"
+            : $"{bytes / (1024.0 * 1024):F0} MB";
     }
 
 
@@ -1082,6 +1121,153 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
         {
             LocalAssetVersion = "";
         }
+    }
+
+    [ObservableProperty] private bool _restoreFocusAfterSync = true;
+    [ObservableProperty] private string _hotkeyText = "None";
+    [ObservableProperty] private bool _isRecordingHotkey = false;
+
+    partial void OnRestoreFocusAfterSyncChanged(bool value)
+    {
+        Task.Run(async () =>
+        {
+            var settings = await _localSettingsService.ReadOrCreateSettingAsync<AppBehaviorSettings>(AppBehaviorSettings.Key, SettingScope.App);
+            settings.RestoreFocusAfterSync = value;
+            await _localSettingsService.SaveSettingAsync(AppBehaviorSettings.Key, settings, SettingScope.App);
+        });
+    }
+
+    [RelayCommand]
+    private void StartRecordHotkey()
+    {
+        IsRecordingHotkey = true;
+        HotkeyText = _localizer.GetLocalizedStringOrDefault("/Settings/HotkeyRecordingText", "Press keys...");
+    }
+
+    [RelayCommand]
+    private async Task ClearHotkey()
+    {
+        IsRecordingHotkey = false;
+        var settings = await _localSettingsService.ReadOrCreateSettingAsync<AppBehaviorSettings>(AppBehaviorSettings.Key, SettingScope.App);
+        settings.IsHotkeyConfigured = true;
+        await _localSettingsService.SaveSettingAsync(AppBehaviorSettings.Key, settings, SettingScope.App);
+
+        await _hotkeyService.UpdateHotkeyAsync(0, 0);
+        HotkeyText = "None";
+    }
+
+    public async Task HandleHotkeyKeyDown(Windows.System.VirtualKey key)
+    {
+        if (!IsRecordingHotkey) return;
+
+        if (key == Windows.System.VirtualKey.Escape)
+        {
+            IsRecordingHotkey = false;
+            var currentSettings = await _localSettingsService.ReadOrCreateSettingAsync<AppBehaviorSettings>(AppBehaviorSettings.Key, SettingScope.App);
+            HotkeyText = GetHotkeyDisplayString(currentSettings.HotkeyModifiers, currentSettings.HotkeyVirtualKey);
+            return;
+        }
+
+        if (IsModifierKey(key))
+        {
+            uint tempModifiers = GetCurrentModifiersState();
+            HotkeyText = GetHotkeyDisplayString(tempModifiers, 0) + " + ...";
+            return;
+        }
+
+        uint modifiers = GetCurrentModifiersState();
+        uint primaryKey = (uint)key;
+
+        // Save settings and mark configured
+        var settings = await _localSettingsService.ReadOrCreateSettingAsync<AppBehaviorSettings>(AppBehaviorSettings.Key, SettingScope.App);
+        settings.IsHotkeyConfigured = true;
+        await _localSettingsService.SaveSettingAsync(AppBehaviorSettings.Key, settings, SettingScope.App);
+
+        IsRecordingHotkey = false;
+        await _hotkeyService.UpdateHotkeyAsync(modifiers, primaryKey);
+        HotkeyText = GetHotkeyDisplayString(modifiers, primaryKey);
+    }
+
+    private bool IsModifierKey(Windows.System.VirtualKey key)
+    {
+        return key == Windows.System.VirtualKey.Control ||
+               key == Windows.System.VirtualKey.LeftControl ||
+               key == Windows.System.VirtualKey.RightControl ||
+               key == Windows.System.VirtualKey.Menu ||
+               key == Windows.System.VirtualKey.LeftMenu ||
+               key == Windows.System.VirtualKey.RightMenu ||
+               key == Windows.System.VirtualKey.Shift ||
+               key == Windows.System.VirtualKey.LeftShift ||
+               key == Windows.System.VirtualKey.RightShift ||
+               key == Windows.System.VirtualKey.LeftWindows ||
+               key == Windows.System.VirtualKey.RightWindows;
+    }
+
+    private uint GetCurrentModifiersState()
+    {
+        uint modifiers = 0;
+        const uint MOD_ALT = 0x0001;
+        const uint MOD_CONTROL = 0x0002;
+        const uint MOD_SHIFT = 0x0004;
+        const uint MOD_WIN = 0x0008;
+
+        if (IsKeyDown(Windows.System.VirtualKey.Control)) modifiers |= MOD_CONTROL;
+        if (IsKeyDown(Windows.System.VirtualKey.Menu)) modifiers |= MOD_ALT;
+        if (IsKeyDown(Windows.System.VirtualKey.Shift)) modifiers |= MOD_SHIFT;
+        if (IsKeyDown(Windows.System.VirtualKey.LeftWindows) || IsKeyDown(Windows.System.VirtualKey.RightWindows)) modifiers |= MOD_WIN;
+
+        return modifiers;
+    }
+
+    private bool IsKeyDown(Windows.System.VirtualKey key)
+    {
+        var state = Microsoft.UI.Input.InputKeyboardSource.GetKeyStateForCurrentThread(key);
+        return (state & Windows.UI.Core.CoreVirtualKeyStates.Down) == Windows.UI.Core.CoreVirtualKeyStates.Down;
+    }
+
+    public string GetHotkeyDisplayString(uint modifiers, uint key)
+    {
+        if (key == 0 && modifiers == 0) return _localizer.GetLocalizedStringOrDefault("/Settings/HotkeyNone", "Click to record hotkey");
+
+        var parts = new List<string>();
+        if ((modifiers & 0x0002) != 0) parts.Add("Ctrl");
+        if ((modifiers & 0x0001) != 0) parts.Add("Alt");
+        if ((modifiers & 0x0004) != 0) parts.Add("Shift");
+        if ((modifiers & 0x0008) != 0) parts.Add("Win");
+
+        if (key != 0)
+        {
+            string keyName = key switch
+            {
+                192 => "`",
+                189 => "-",
+                187 => "+",
+                219 => "[",
+                221 => "]",
+                186 => ";",
+                220 => "\\",
+                222 => "'",
+                188 => ",",
+                190 => ".",
+                191 => "/",
+                13 => "Enter",
+                27 => "Esc",
+                32 => "Space",
+                9 => "Tab",
+                8 => "Backspace",
+                46 => "Delete",
+                45 => "Insert",
+                36 => "Home",
+                35 => "End",
+                33 => "Page Up",
+                34 => "Page Down",
+                20 => "Caps Lock",
+                _ => ((Windows.System.VirtualKey)key).ToString()
+            };
+            parts.Add(keyName);
+        }
+
+        return string.Join(" + ", parts);
     }
 
     public void OnNavigatedFrom()

@@ -46,7 +46,7 @@ public partial class CharacterGalleryViewModel
                 }
             });
 
-            var shouldEnable = !modEntryToToggle.IsEnabled;
+            var shouldEnable = !modEntryToToggle!.IsEnabled;
             modsToDisable = (shouldEnable && IsSingleSelection)
                 ? modsInScope.Where(m => m.Id != modEntryToToggle.Id && m.IsEnabled).ToList()
                 : new List<CharacterSkinEntry>();

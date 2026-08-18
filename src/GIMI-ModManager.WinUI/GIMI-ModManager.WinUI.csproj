@@ -16,7 +16,7 @@
 		<WindowsPackageType>None</WindowsPackageType>
 		<BaseOutputPath></BaseOutputPath>
 		<!-- x-release-please-start-version -->
-		<VersionPrefix>2.29.1</VersionPrefix>
+		<VersionPrefix>2.29.2</VersionPrefix>
 		<!-- x-release-please-end -->
 		<Title>JASM - Just Another Skin Manager</Title>
 		<AssemblyName>JASM - Just Another Skin Manager</AssemblyName>
@@ -24,28 +24,48 @@
 		<DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
 		<JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
         <WebView2EnableCsWinRTProjection>true</WebView2EnableCsWinRTProjection>
+		<!--
+		  CS0612 仅由 XAML 编译器生成的 XamlTypeInfo.g.cs 触发：
+		  WinUIEx.WindowEx 的 XAML 元数据自动包含已过时的 Icon 类型，
+		  项目代码本身不使用过时 API，因此在此整体抑制该诊断。
+		-->
+		<NoWarn>$(NoWarn);CS0612</NoWarn>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
-		<PackageReference Include="CommunityToolkit.WinUI.Controls.Segmented" Version="8.2.250402" />
-		<PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.2.250402" />
-		<PackageReference Include="CommunityToolkit.WinUI.Animations" Version="8.2.250402" />
-		<PackageReference Include="CommunityToolkit.WinUI.Converters" Version="8.2.250402" />
+		<PackageReference Include="CommunityToolkit.WinUI.Controls.Segmented" Version="8.2.251219" />
+		<PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.2.251219" />
+		<PackageReference Include="CommunityToolkit.WinUI.Animations" Version="8.2.251219" />
+		<PackageReference Include="CommunityToolkit.WinUI.Converters" Version="8.2.251219" />
+		<PackageReference Include="CommunityToolkit.WinUI.Media" Version="8.2.251219" />
 		<PackageReference Include="CommunityToolkit.WinUI.UI.Controls.DataGrid" Version="7.1.2" />
 		<PackageReference Include="CommunityToolkit.WinUI.UI.Controls.Layout" Version="7.1.2" />
 		<PackageReference Include="CommunityToolkit.WinUI.UI.Controls.Primitives" Version="7.1.2" />
 		<PackageReference Include="FluentValidation" Version="12.1.1" />
 		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
-		<PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.4" />
-		<PackageReference Include="Microsoft.Extensions.Http" Version="9.0.4" />
-		<PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="9.4.0" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.11" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="10.0.11" />
+		<PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="10.9.0" />
+		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.11" />
 		<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.269">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.1721" />
-		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260317003" />
+		<PackageReference Include="Microsoft.WindowsAppSDK.Base" Version="2.0.4" />
+		<PackageReference Include="Microsoft.WindowsAppSDK.DWrite" Version="2.1.0" />
+		<PackageReference Include="Microsoft.WindowsAppSDK.Foundation" Version="2.3.5" />
+		<PackageReference Include="Microsoft.WindowsAppSDK.InteractiveExperiences" Version="2.1.3" />
+		<PackageReference Include="Microsoft.WindowsAppSDK.Runtime" Version="2.3.1" />
+		<PackageReference Include="Microsoft.WindowsAppSDK.WinUI" Version="2.3.0" />
+		<!--
+		  CommunityToolkit.WinUI.* / WinUI3Localizer 传递依赖 WindowsAppSDK metapackage。
+		  这里直接固定到满足其下限的最低版本并排除全部资产，
+		  避免 1.6 旧版 build 资产重复导入并破坏 CustomBeforeMicrosoftCommonTargets 链，
+		  同时确保 Widgets/AI/ML 组件不被拉入发布产物。
+		-->
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.250108002" ExcludeAssets="all" />
 		<PackageReference Include="Microsoft.Xaml.Behaviors.WinUI.Managed" Version="3.0.1" />
 		<PackageReference Include="OneOf" Version="3.0.271" />
 		<PackageReference Include="Polly" Version="8.5.2" />
@@ -341,12 +361,18 @@
 			<FilesToDelete Include="$(PublishDir)DirectML.dll;" />
 			<FilesToDelete Include="$(PublishDir)onnxruntime*.*;" />
 			<FilesToDelete Include="$(PublishDir)workloads*.json;" />
+			<!-- 调试/符号专用运行时文件：PDB 已删除，运行时无需这些文件 -->
+			<FilesToDelete Include="$(PublishDir)mscordaccore*.dll;" />
+			<FilesToDelete Include="$(PublishDir)Microsoft.DiaSymReader.Native*.dll;" />
 		</ItemGroup>
 		<Delete Files="@(FilesToDelete)" />
 		<Delete Files="$(PublishDir)aspnetcorev2_inprocess.dll" />
-		<Delete Files="$(PublishDir)DwmSceneI.dll" />
-		<Delete Files="$(PublishDir)DWriteCore.dll" />
-		<Delete Files="$(PublishDir)Microsoft.Graphics.Imaging.dll" />
+		<ItemGroup>
+			<PdbFilesToDelete Include="$(PublishDir)*.pdb" />
+		</ItemGroup>
+		<Delete Files="@(PdbFilesToDelete)" />
+
+		<!--
 		<Delete Files="$(PublishDir)Microsoft.WindowsAppRuntime.Bootstrap.dll" />
 		<Delete Files="$(PublishDir)Microsoft.WindowsAppRuntime.Bootstrap.Net.dll" />
 		<Delete Files="$(PublishDir)Microsoft.WindowsAppRuntime.Insights.Resource.dll" />
@@ -356,6 +382,7 @@
 		<Delete Files="$(PublishDir)WindowsAppRuntime.DeploymentExtensions.OneCore.dll" />
 		<Delete Files="$(PublishDir)WindowsAppSdk.AppxDeploymentExtensions.Desktop.dll" />
 		<Delete Files="$(PublishDir)WindowsAppSdk.AppxDeploymentExtensions.Desktop-EventLog-Instrumentation.dll" />
+		-->
 		<Delete Files="$(PublishDir)Microsoft.UI.Xaml\Assets\map.html" />
 
 		<ItemGroup>

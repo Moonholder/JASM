@@ -75,7 +75,7 @@ public partial class ModUpdateVM : ObservableRecipient
             await InternalInitialize();
             Initializing = "false";
         }
-        catch (OperationCanceledException e)
+        catch (OperationCanceledException)
         {
             _window.Close();
         }

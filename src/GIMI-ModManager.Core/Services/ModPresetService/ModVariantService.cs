@@ -83,7 +83,7 @@ public sealed class ModVariantService(
         if (mod == null) throw new ArgumentException($"Mod with Id {modId} not found", nameof(modId));
 
         name = name.Trim();
-        if (string.IsNullOrEmpty(name)) throw new ArgumentException("变体名称不能为空", nameof(name));
+        if (string.IsNullOrEmpty(name)) throw new ArgumentException("Variant name cannot be empty", nameof(name));
 
         // 1. Sync from d3dx_user.ini to ModSettings first
         var syncSuccess = await _userPreferencesService.SaveModPreferencesAsync(modId).ConfigureAwait(false);
@@ -96,7 +96,7 @@ public sealed class ModVariantService(
         var modSettings = await mod.Settings.TryReadSettingsAsync(useCache: false, cancellationToken).ConfigureAwait(false);
         if (modSettings == null)
         {
-            throw new InvalidOperationException("无法读取模组设置");
+            throw new InvalidOperationException("Failed to read mod settings");
         }
 
         var preferences = modSettings.Preferences.ToDictionary(kv => kv.Key, kv => kv.Value);
@@ -154,7 +154,7 @@ public sealed class ModVariantService(
 
         name = name.Trim();
         var filePath = Path.Combine(mod.FullPath, Constants.ModVariantsFileName);
-        if (!File.Exists(filePath)) throw new FileNotFoundException("未找到变体配置文件", filePath);
+        if (!File.Exists(filePath)) throw new FileNotFoundException("Variant configuration file not found", filePath);
 
         // 1. Read variants
         JsonModVariantCollection collection;
@@ -165,20 +165,20 @@ public sealed class ModVariantService(
         }
         catch (Exception e)
         {
-            throw new InvalidOperationException("无法读取变体配置文件", e);
+            throw new InvalidOperationException("Failed to read variant configuration file", e);
         }
 
         var variant = collection.Variants.FirstOrDefault(v => v.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
         if (variant == null)
         {
-            throw new ArgumentException($"未找到名为 {name} 的变体", nameof(name));
+            throw new ArgumentException($"Variant named '{name}' was not found", nameof(name));
         }
 
         // 2. Load ModSettings
         var modSettings = await mod.Settings.TryReadSettingsAsync(useCache: false, cancellationToken).ConfigureAwait(false);
         if (modSettings == null)
         {
-            throw new InvalidOperationException("无法读取模组设置");
+            throw new InvalidOperationException("Failed to read mod settings");
         }
 
         // 3. Set preferences
@@ -189,7 +189,7 @@ public sealed class ModVariantService(
         var setSuccess = await _userPreferencesService.SetModPreferencesAsync(modId, cancellationToken).ConfigureAwait(false);
         if (!setSuccess)
         {
-            throw new InvalidOperationException("应用变体到 d3dx_user.ini 失败");
+            throw new InvalidOperationException("Failed to apply variant to d3dx_user.ini");
         }
 
         // 4b. Sync preferences to local .ini files (e.g. mod.ini)
@@ -278,10 +278,10 @@ public sealed class ModVariantService(
         oldName = oldName.Trim();
         newName = newName.Trim();
 
-        if (string.IsNullOrEmpty(newName)) throw new ArgumentException("新变体名称不能为空", nameof(newName));
+        if (string.IsNullOrEmpty(newName)) throw new ArgumentException("New variant name cannot be empty", nameof(newName));
 
         var filePath = Path.Combine(mod.FullPath, Constants.ModVariantsFileName);
-        if (!File.Exists(filePath)) throw new FileNotFoundException("未找到变体配置文件", filePath);
+        if (!File.Exists(filePath)) throw new FileNotFoundException("Variant configuration file not found", filePath);
 
         JsonModVariantCollection collection;
         try
@@ -291,19 +291,19 @@ public sealed class ModVariantService(
         }
         catch (Exception e)
         {
-            throw new InvalidOperationException("无法读取变体配置文件", e);
+            throw new InvalidOperationException("Failed to read variant configuration file", e);
         }
 
         var oldVariant = collection.Variants.FirstOrDefault(v => v.Name.Equals(oldName, StringComparison.OrdinalIgnoreCase));
         if (oldVariant == null)
         {
-            throw new ArgumentException($"未找到名为 {oldName} 的变体", nameof(oldName));
+            throw new ArgumentException($"Variant named '{oldName}' was not found", nameof(oldName));
         }
 
         var newVariantExists = collection.Variants.Any(v => v != oldVariant && v.Name.Equals(newName, StringComparison.OrdinalIgnoreCase));
         if (newVariantExists)
         {
-            throw new InvalidOperationException($"已存在名为 {newName} 的变体");
+            throw new InvalidOperationException($"Variant named '{newName}' already exists");
         }
 
         oldVariant.Name = newName;

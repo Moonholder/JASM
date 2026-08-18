@@ -1,4 +1,4 @@
-﻿using GIMI_ModManager.Core.Contracts.Entities;
+using GIMI_ModManager.Core.Contracts.Entities;
 using GIMI_ModManager.Core.GamesService.Interfaces;
 using GIMI_ModManager.Core.Services;
 using GIMI_ModManager.WinUI.Contracts.Services;
@@ -95,7 +95,7 @@ public class ModDragAndDropService
 
         if (storageItem is not StorageFolder sourceFolder)
         {
-            _logger.Information("Unknown storage item type from drop: {StorageItemType}", storageItem.GetType());
+            _logger.Information("Unknown storage item type from drop: {StorageItemType}", storageItem?.GetType());
             return null;
         }
 

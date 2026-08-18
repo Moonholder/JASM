@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- English (neutral) resources -->
+  <data name="AddModFailedMessage" xml:space="preserve">
+    <value>Failed to add mod {0}: {1}</value>
+  </data>
+  <data name="AddModFailedTitle" xml:space="preserve">
+    <value>Failed to add mod</value>
+  </data>
+  <data name="AddModToPresetFailedTitle" xml:space="preserve">
+    <value>Failed to add mod to preset</value>
+  </data>
+  <data name="AndClearedLoaderConfig" xml:space="preserve">
+    <value>and the loader config file has been cleared</value>
+  </data>
+  <data name="ApplyPreferencesFailedTitle" xml:space="preserve">
+    <value>Failed to apply saved preferences</value>
+  </data>
+  <data name="ApplyPreferencesSuccessMessage" xml:space="preserve">
+    <value>Mod preferences have been written to 3DMigoto {0}</value>
+  </data>
+  <data name="ApplyPreferencesSuccessTitle" xml:space="preserve">
+    <value>Saved preferences applied</value>
+  </data>
+  <data name="ApplyPresetButton.Content" xml:space="preserve">
+    <value>Apply preset</value>
+  </data>
+  <data name="ApplyPresetButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Enable all mods in this preset and write the preset&apos;s mod preferences to the mods</value>
+  </data>
+  <data name="ApplyPresetFailedTitle" xml:space="preserve">
+    <value>Failed to apply mod preset</value>
+  </data>
+  <data name="ApplyPresetSuccessMessage" xml:space="preserve">
+    <value>Mod preset {0} has been applied</value>
+  </data>
+  <data name="ApplyPresetSuccessTitle" xml:space="preserve">
+    <value>Apply mod preset</value>
+  </data>
+  <data name="ApplySavedPreferencesButton.Content" xml:space="preserve">
+    <value>Apply saved mod preferences (KeySwaps)</value>
+  </data>
+  <data name="ApplySavedPreferencesButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Read the preferences of the currently enabled mods from .JASM_Config and write them to d3dx_user.ini for 3Dmigoto to read</value>
+  </data>
+  <data name="AutoSyncCheckBox.Content" xml:space="preserve">
+    <value>Auto-sync mod preferences when switching presets</value>
+  </data>
+  <data name="AutoSyncCheckBox.ToolTipService.ToolTip" xml:space="preserve">
+    <value>If checked, JASM will automatically sync preferences when creating presets and switching between them</value>
+  </data>
+  <data name="AutoSyncDisabledWarning.Text" xml:space="preserve">
+    <value>Auto-sync is not enabled! Remember to manually reload the 3Dmigoto (or other loader) config file with the F10 key in-game when making changes!</value>
+  </data>
+  <data name="BatchAddAllFailedMessage" xml:space="preserve">
+    <value>All {0} mod additions failed</value>
+  </data>
+  <data name="BatchAddAllFailedTitle" xml:space="preserve">
+    <value>Failed to add mods to preset</value>
+  </data>
+  <data name="BatchAddCompleteMessage" xml:space="preserve">
+    <value>Successfully added {0} mods, {1} failed</value>
+  </data>
+  <data name="BatchAddCompleteTitle" xml:space="preserve">
+    <value>Batch add mods complete</value>
+  </data>
+  <data name="BatchAddErrorMessage" xml:space="preserve">
+    <value>An error occurred during the operation: {0}</value>
+  </data>
+  <data name="BatchAddErrorTitle" xml:space="preserve">
+    <value>Failed to batch add mods to preset</value>
+  </data>
+  <data name="BatchAddSuccessMessage" xml:space="preserve">
+    <value>Successfully added {0} mods to preset {1}</value>
+  </data>
+  <data name="BatchAddSuccessTitle" xml:space="preserve">
+    <value>Batch add mods successful</value>
+  </data>
+  <data name="CloseButton" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="ConfirmApplyButton.Content" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
+  <data name="ConfirmResetButton.Content" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
+  <data name="CreatedAtLabel.Text" xml:space="preserve">
+    <value>Created at:</value>
+  </data>
+  <data name="CreateEmptyPresetCheckBox.Content" xml:space="preserve">
+    <value>Create as empty preset</value>
+  </data>
+  <data name="CreateEmptyPresetCheckBox.ToolTipService.ToolTip" xml:space="preserve">
+    <value>If checked, the new preset will be created without enabling any mods.</value>
+  </data>
+  <data name="CreatePresetButton.Content" xml:space="preserve">
+    <value>Save enabled mod preferences and create a new preset</value>
+  </data>
+  <data name="DeletePresetMenuItem.Text" xml:space="preserve">
+    <value>Delete preset</value>
+  </data>
+  <data name="DeletePresetMenuItem.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Permanently delete this preset</value>
+  </data>
+  <data name="DuplicatePresetMenuItem.Text" xml:space="preserve">
+    <value>Create a copy</value>
+  </data>
+  <data name="ElevatorStartFailedMessage" xml:space="preserve">
+    <value>Failed to start the Elevator process</value>
+  </data>
+  <data name="ElevatorStartFailedTitle" xml:space="preserve">
+    <value>Failed to start Elevator</value>
+  </data>
+  <data name="EnabledModsCountLabel.Text" xml:space="preserve">
+    <value>Number of mods enabled in this preset:</value>
+  </data>
+  <data name="HowPresetsWorkText1" xml:space="preserve">
+    <value>A preset is a list of mods to enable along with their preferences. JASM reads and stores mod preferences in the mod&apos;s own .JASM_ModConfig.json file</value>
+  </data>
+  <data name="HowPresetsWorkText2" xml:space="preserve">
+    <value>When you create a new preset, JASM generates a list of all enabled mods and their stored preferences. So when you later apply that preset, it will only enable those mods and apply the preferences stored in the preset</value>
+  </data>
+  <data name="HowPresetsWorkText3" xml:space="preserve">
+    <value>You can let JASM handle the 3Dmigoto reload by checking the auto-sync checkbox. You can also choose to handle it manually: check the show manual controls checkbox, save/load preferences manually, and refresh 3Dmigoto with the F10 key.</value>
+  </data>
+  <data name="HowPresetsWorkText4" xml:space="preserve">
+    <value>You can simply ignore the preset part of this page and use only the manual controls to save mod preferences.</value>
+  </data>
+  <data name="HowPresetsWorkTitle" xml:space="preserve">
+    <value>How presets work</value>
+  </data>
+  <data name="MissingText" xml:space="preserve">
+    <value>Missing</value>
+  </data>
+  <data name="ModAddedToPresetMessage" xml:space="preserve">
+    <value>Mod &apos;{0}&apos; has been added to preset {1}</value>
+  </data>
+  <data name="ModAddedToPresetTitle" xml:space="preserve">
+    <value>Mod added to preset</value>
+  </data>
+  <data name="ModCountFormat" xml:space="preserve">
+    <value>{0} mods</value>
+  </data>
+  <data name="ModRemovedMessage" xml:space="preserve">
+    <value>Removed {0} mod &apos;{1}&apos; from preset {2}</value>
+  </data>
+  <data name="ModRemovedTitle" xml:space="preserve">
+    <value>Mod removed from preset</value>
+  </data>
+  <data name="ModRemoveFailedTitle" xml:space="preserve">
+    <value>Failed to remove mod from preset</value>
+  </data>
+  <data name="ModSelector_ConfirmButton.Content" xml:space="preserve">
+    <value>Select mods</value>
+  </data>
+  <data name="ModSelector_DateAddedLabel.Text" xml:space="preserve">
+    <value>Date added:</value>
+  </data>
+  <data name="ModSelector_SearchBox.PlaceholderText" xml:space="preserve">
+    <value>Search mods...</value>
+  </data>
+  <data name="ModSelector_Title.Text" xml:space="preserve">
+    <value>Select mods</value>
+  </data>
+  <data name="NewPresetNameHeader.Header" xml:space="preserve">
+    <value>New preset name</value>
+  </data>
+  <data name="PageTitle.Text" xml:space="preserve">
+    <value>Mod presets and mod preferences</value>
+  </data>
+  <data name="PreferencesResetFailedTitle" xml:space="preserve">
+    <value>Failed to reset mod preferences</value>
+  </data>
+  <data name="PreferencesResetMessage" xml:space="preserve">
+    <value>Mod preferences have been removed</value>
+  </data>
+  <data name="PreferencesResetTitle" xml:space="preserve">
+    <value>Mod preferences reset</value>
+  </data>
+  <data name="PreferencesSavedMessage" xml:space="preserve">
+    <value>Preferences successfully saved for mod {0}</value>
+  </data>
+  <data name="PreferencesSavedTitle" xml:space="preserve">
+    <value>Mod preferences saved</value>
+  </data>
+  <data name="PreferencesSaveFailedTitle" xml:space="preserve">
+    <value>Failed to save mod preferences</value>
+  </data>
+  <data name="PresetAppliedMessage" xml:space="preserve">
+    <value>Preset: &apos;{0}&apos; has been applied.</value>
+  </data>
+  <data name="PresetAppliedTitle" xml:space="preserve">
+    <value>Preset applied</value>
+  </data>
+  <data name="PresetApplyFailedTitle" xml:space="preserve">
+    <value>Failed to apply preset</value>
+  </data>
+  <data name="PresetCreationFailedTitle" xml:space="preserve">
+    <value>Failed to create preset</value>
+  </data>
+  <data name="PresetDeleteFailedTitle" xml:space="preserve">
+    <value>Failed to delete preset</value>
+  </data>
+  <data name="PresetDetailsButton.Content" xml:space="preserve">
+    <value>Go to preset details</value>
+  </data>
+  <data name="PresetDetailsPage_AddedAtLabel.Text" xml:space="preserve">
+    <value>Added to preset at:</value>
+  </data>
+  <data name="PresetDetailsPage_AddModsButton.Label" xml:space="preserve">
+    <value>Add mods</value>
+  </data>
+  <data name="PresetDetailsPage_FindReplacementMenuItem.Text" xml:space="preserve">
+    <value>Find replacement mod</value>
+  </data>
+  <data name="PresetDetailsPage_ModNotFoundText.Text" xml:space="preserve">
+    <value>Could not find this mod on disk!</value>
+  </data>
+  <data name="PresetDetailsPage_RemoveModMenuItem.Text" xml:space="preserve">
+    <value>Remove mod from preset</value>
+  </data>
+  <data name="PresetDetailsPage_SavePreferencesMenuItem.Text" xml:space="preserve">
+    <value>Read and save preferences</value>
+  </data>
+  <data name="PresetDetailsPage_SavePreferencesMenuItem.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Read the current 3Dmigoto user ini file (d3dx_user.ini) and save the preferences for this preset</value>
+  </data>
+  <data name="PresetDetailsPage_SearchBox.PlaceholderText" xml:space="preserve">
+    <value>Search mods...</value>
+  </data>
+  <data name="PresetDetailsTitleFormat" xml:space="preserve">
+    <value>Preset details: {0} ({1}){2}</value>
+  </data>
+  <data name="PresetDuplicateFailedTitle" xml:space="preserve">
+    <value>Failed to duplicate preset</value>
+  </data>
+  <data name="PresetReadOnlyToggleFailedTitle" xml:space="preserve">
+    <value>Failed to toggle preset read-only</value>
+  </data>
+  <data name="PresetRenameFailedTitle" xml:space="preserve">
+    <value>Failed to rename preset</value>
+  </data>
+  <data name="PresetReorderFailedTitle" xml:space="preserve">
+    <value>Failed to save preset order</value>
+  </data>
+  <data name="RandomizeDialog_AllowNoMods" xml:space="preserve">
+    <value>Allow ending up with no mods enabled. This means a mod folder may end up with no mod enabled</value>
+  </data>
+  <data name="RandomizeDialog_CancelButton" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="RandomizeDialog_ConfirmButton" xml:space="preserve">
+    <value>Randomize</value>
+  </data>
+  <data name="RandomizeDialog_FailedTitle" xml:space="preserve">
+    <value>Mod randomization failed</value>
+  </data>
+  <data name="RandomizeDialog_NoCategoryMessage" xml:space="preserve">
+    <value>No category was selected for randomization.</value>
+  </data>
+  <data name="RandomizeDialog_NoCategoryTitle" xml:space="preserve">
+    <value>No category selected</value>
+  </data>
+  <data name="RandomizeDialog_SelectCategoryLabel" xml:space="preserve">
+    <value>Select the categories whose mods you want to randomize:</value>
+  </data>
+  <data name="RandomizeDialog_SuccessMessagePrefix" xml:space="preserve">
+    <value>Mod randomization completed for the selected categories: </value>
+  </data>
+  <data name="RandomizeDialog_SuccessTitle" xml:space="preserve">
+    <value>Mods randomly enabled</value>
+  </data>
+  <data name="RandomizeDialog_SuggestionText" xml:space="preserve">
+    <value>If you have a lot of mods enabled, I recommend creating a preset (or backup) of your mods before randomizing</value>
+  </data>
+  <data name="RandomizeDialog_Title" xml:space="preserve">
+    <value>Randomly enable mods</value>
+  </data>
+  <data name="RandomizeDialog_WarningText" xml:space="preserve">
+    <value>Note: this operation only randomizes mod folders that are designed to allow only one mod to be active. Therefore, folders like &quot;Others _&quot; will not be randomized. Also, only one mod will be enabled per character skin</value>
+  </data>
+  <data name="RandomizeModsButton.Content" xml:space="preserve">
+    <value>Randomly enable mods</value>
+  </data>
+  <data name="RandomizeModsButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Opens a dialog with more information</value>
+  </data>
+  <data name="ReadOnlyModeMenuItem.Text" xml:space="preserve">
+    <value>Read-only mode</value>
+  </data>
+  <data name="ReadOnlyText" xml:space="preserve">
+    <value>Read-only</value>
+  </data>
+  <data name="RenameText" xml:space="preserve">
+    <value>Rename</value>
+  </data>
+  <data name="ResetLoaderConfigCheckBox.Content" xml:space="preserve">
+    <value>Also reset the loader&apos;s d3dx_user.ini file</value>
+  </data>
+  <data name="ResetOnlyEnabledCheckBox.Content" xml:space="preserve">
+    <value>Only reset the currently enabled mods</value>
+  </data>
+  <data name="ResetPreferencesButton.Content" xml:space="preserve">
+    <value>Reset mod preferences</value>
+  </data>
+  <data name="ResetPreferencesButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Clear the mod preferences .JASM_ModConfig.json stored in the mod</value>
+  </data>
+  <data name="ResetPreferencesFlyoutTitle.Text" xml:space="preserve">
+    <value>Reset persisted mod preferences</value>
+  </data>
+  <data name="SaveActivePreferencesButton.Content" xml:space="preserve">
+    <value>Save active mod preferences (KeySwaps) to mods</value>
+  </data>
+  <data name="SaveActivePreferencesButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Read 3Dmigoto&apos;s mod preferences (d3dx_user.ini) and store the settings of enabled mods in each mod&apos;s .JASM_Config.json file</value>
+  </data>
+  <data name="SaveNewNameText" xml:space="preserve">
+    <value>Save new name</value>
+  </data>
+  <data name="SavePreferencesFailedTitle" xml:space="preserve">
+    <value>Failed to save active preferences</value>
+  </data>
+  <data name="SavePreferencesSuccessMessage" xml:space="preserve">
+    <value>Preferences stored in {0} have been saved for the enabled mods</value>
+  </data>
+  <data name="SavePreferencesSuccessTitle" xml:space="preserve">
+    <value>Active preferences saved</value>
+  </data>
+  <data name="SeeLogDetails" xml:space="preserve">
+    <value>See the logs for details</value>
+  </data>
+  <data name="SelectModsWindowTitle" xml:space="preserve">
+    <value>Select mods</value>
+  </data>
+  <data name="ShowManualControlsCheckBox.Content" xml:space="preserve">
+    <value>Show manual controls</value>
+  </data>
+  <data name="ShowManualControlsCheckBox.ToolTipService.ToolTip" xml:space="preserve">
+    <value>If you want to handle setting preferences manually instead of letting JASM with Elevator handle it for you</value>
+  </data>
+  <data name="StartElevatorButton.Content" xml:space="preserve">
+    <value>Start Elevator...</value>
+  </data>
+  <data name="WriteSettingsFailedTitle" xml:space="preserve">
+    <value>Could not write mod settings to the 3Dmigoto user .ini</value>
+  </data>
+</root>

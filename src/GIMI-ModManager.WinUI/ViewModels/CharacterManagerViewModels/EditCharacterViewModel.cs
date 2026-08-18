@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GIMI_ModManager.Core.Contracts.Services;
 using GIMI_ModManager.Core.GamesService;
@@ -38,7 +38,7 @@ public partial class EditCharacterViewModel : ObservableRecipient, INavigationAw
 
     [ObservableProperty] private Uri _modFolderUri = null!;
     [ObservableProperty] private string _modFolderString = "";
-    [ObservableProperty] private string _modsCount;
+    [ObservableProperty] private string _modsCount = string.Empty;
     [ObservableProperty] private string _keyToAddInput = string.Empty;
 
     [ObservableProperty]
@@ -51,7 +51,7 @@ public partial class EditCharacterViewModel : ObservableRecipient, INavigationAw
 
     public EditCharacterForm Form { get; } = new();
 
-    [ObservableProperty] private ElementItemVM _selectedElement;
+    [ObservableProperty] private ElementItemVM _selectedElement = null!;
     public ObservableCollection<ElementItemVM> Elements { get; } = [];
 
     public ObservableCollection<ModModel> Mods { get; } = new();

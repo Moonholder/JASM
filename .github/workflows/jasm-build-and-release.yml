@@ -30,7 +30,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 10.x
+        dotnet-version: 10.0.103
 
     - name: Restore dependencies
       run: dotnet restore
@@ -85,7 +85,7 @@ jobs:
     - name: Install .NET Core
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 10.x
+        dotnet-version: 10.0.103
 
     - name: Install Inno Setup
       run: |

@@ -208,6 +208,10 @@ public class ActivationService : IActivationService
         await _modUpdateAvailableChecker.InitializeAsync().ConfigureAwait(false);
         await Task.Run(() => _elevatorService.Initialize()).ConfigureAwait(false);
 
+        var hotkeyService = App.GetService<HotkeyService>();
+        var hWnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
+        await hotkeyService.InitializeAsync(hWnd);
+
         // Background check for game asset updates (fire-and-forget)
         _ = Task.Run(async () =>
         {
@@ -268,6 +272,15 @@ public class ActivationService : IActivationService
         if (App.ShutdownComplete) return;
 
         args.Handled = true;
+
+        try
+        {
+            App.GetService<HotkeyService>().Dispose();
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "Failed to dispose HotkeyService");
+        }
 
         if (App.IsShuttingDown)
         {

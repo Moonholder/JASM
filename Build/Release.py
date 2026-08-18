@@ -11,15 +11,16 @@ ELEVATOR_CSPROJ = "src\\Elevator\\Elevator.csproj"
 ELEVATOR_OUTPUT_FILE = "src\\Elevator\\bin\\Release\\Publish\\Elevator.exe"
 
 JASM_CSPROJ = "src\\GIMI-ModManager.WinUI\\GIMI-ModManager.WinUI.csproj"
-JASM_OUTPUT = "src\\GIMI-ModManager.WinUI\\bin\\Release\Publish\\"
+JASM_OUTPUT = "src\\GIMI-ModManager.WinUI\\bin\\Release\\Publish"
 
 
 
 INNO_SETUP_COMPILER = os.environ.get("ISCC_PATH", r"C:\Program Files (x86)\Inno Setup 6\ISCC.exe")
 INSTALLER_DIR = "installer"
 INSTALLER_SCRIPT = os.path.join(INSTALLER_DIR, "setup.iss")
-VC_REDIST_URL = "https://aka.ms/vs/17/release/vc_redist.x64.exe"
-VC_REDIST_PATH = os.path.join(INSTALLER_DIR, "redist", "vc_redist.x64.exe")
+
+WEBVIEW2_RUNTIME_URL = "https://go.microsoft.com/fwlink/p/?LinkId=2124703"
+WEBVIEW2_RUNTIME_PATH = os.path.join(INSTALLER_DIR, "redist", "MicrosoftEdgeWebview2Setup.exe")
 
 CHINESE_ISL_URL = "https://raw.githubusercontent.com/jrsoftware/issrc/main/Files/Languages/Unofficial/ChineseSimplified.isl"
 CHINESE_ISL_PATH = os.path.join(INSTALLER_DIR, "ChineseSimplified.isl")
@@ -70,6 +71,40 @@ checkSuccessfulExitCode(os.system(jasmPublishCommand))
 print()
 print("Finished building JASM")
 
+# Deterministic cleanup + whitelist validation (PostPublish timing can race with SDK copy targets)
+print("Cleaning publish output...")
+cleanupResult = subprocess.run(
+    ["python", os.path.join("Build", "publish_cleanup.py"), JASM_OUTPUT],
+    check=False,
+)
+checkSuccessfulExitCode(cleanupResult.returncode)
+
+# Verify trimming did not remove members used by XAML reflection bindings
+print("Verifying publish output...")
+verifyProject = "src\\Tools\\VerifyPublish\\VerifyPublish.csproj"
+verifyArgs = [
+    "GIMI_ModManager.WinUI.ViewModels.GbModDisplayItem|get_ThumbnailImage",
+    "GIMI_ModManager.WinUI.Models.PasswordEntry|get_DisplayName",
+    "GIMI_ModManager.WinUI.Models.PasswordEntry|get_Password",
+    "GIMI_ModManager.WinUI.ViewModels.CharacterDetailsViewModels.SubViewModels.ModRowVM|get_DisplayName",
+    "GIMI_ModManager.WinUI.ViewModels.CharacterDetailsViewModels.SubViewModels.ModRowVM|get_FolderName",
+    "GIMI_ModManager.WinUI.ViewModels.CharacterDetailsViewModels.SubViewModels.ModRowVM|get_Author",
+    "GIMI_ModManager.WinUI.ViewModels.CharacterDetailsViewModels.SubViewModels.ModRowVM|get_IsEnabled",
+    "GIMI_ModManager.WinUI.ViewModels.CharacterDetailsViewModels.SubViewModels.ModRowVM|get_Description",
+    "GIMI_ModManager.WinUI.ViewModels.ModPageViewModels.ModFileInfoVm|get_IsBusy",
+    "GIMI_ModManager.WinUI.ViewModels.ModPageViewModels.ModFileInfoVm|get_ShowDownloadButton",
+    "GIMI_ModManager.WinUI.ViewModels.SubVms.GameComboBoxEntryVM|get_GameName",
+    "GIMI_ModManager.WinUI.ViewModels.SubVms.GameComboBoxEntryVM|get_GameIconPath",
+]
+verifyCommand = [
+    "dotnet", "run", "--project", verifyProject, "-c", "Release", "--",
+    os.path.join(JASM_OUTPUT, "JASM - Just Another Skin Manager.dll"),
+    *verifyArgs,
+]
+print(" ".join(verifyCommand))
+verifyResult = subprocess.run(verifyCommand, check=False)
+checkSuccessfulExitCode(verifyResult.returncode)
+
 # Create release directory
 os.makedirs(RELEASE_DIR, exist_ok=True)
 os.makedirs(JASM_RELEASE_DIR, exist_ok=True)
@@ -92,10 +127,10 @@ shutil.copy("CHANGELOG.md", RELEASE_DIR + "\\CHANGELOG.txt")
 print("Finished copying text files to release directory")
 
 print("Zipping release directory...")
-print("7z a -t7z -xm4 JASM.7z " + RELEASE_DIR)
+print("7z a -t7z -mx9 -m0=LZMA2 -md=64m -mfb=273 -ms=on JASM.7z " + RELEASE_DIR)
 releaseArchiveName = "JASM_v" + versionNumber + ".7z"
 
-checkSuccessfulExitCode(os.system(f"7z a -mx4 {releaseArchiveName} .\\{RELEASE_DIR}\\*"))
+checkSuccessfulExitCode(os.system(f"7z a -t7z -mx9 -m0=LZMA2 -md=64m -mfb=273 -ms=on {releaseArchiveName} .\\{RELEASE_DIR}\\*"))
 print()
 print("Finished zipping release directory")
 
@@ -105,14 +140,14 @@ checkSuccessfulExitCode(os.system(f"7z h -scrcsha256 .\\{releaseArchiveName}"))
 print()
 print("Building Inno Setup installer...")
 
-# Download vc_redist.x64.exe if not present
+# Download WebView2 Evergreen Runtime bootstrapper if not present
 os.makedirs(os.path.join(INSTALLER_DIR, "redist"), exist_ok=True)
-if not os.path.exists(VC_REDIST_PATH):
-	print(f"Downloading VC++ Redistributable from {VC_REDIST_URL}...")
-	urllib.request.urlretrieve(VC_REDIST_URL, VC_REDIST_PATH)
+if not os.path.exists(WEBVIEW2_RUNTIME_PATH):
+	print(f"Downloading WebView2 Runtime bootstrapper from {WEBVIEW2_RUNTIME_URL}...")
+	urllib.request.urlretrieve(WEBVIEW2_RUNTIME_URL, WEBVIEW2_RUNTIME_PATH)
 	print("Download complete.")
 else:
-	print("VC++ Redistributable already exists, skipping download.")
+	print("WebView2 Runtime bootstrapper already exists, skipping download.")
 
 if not os.path.exists(CHINESE_ISL_PATH):
 	print(f"Downloading ChineseSimplified.isl from {CHINESE_ISL_URL}...")

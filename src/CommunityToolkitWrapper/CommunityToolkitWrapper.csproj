@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
@@ -14,8 +14,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-      <PackageReference Include="CommunityToolkit.WinUI.Extensions" Version="8.2.250402" />
+      <PackageReference Include="CommunityToolkit.WinUI.Extensions" Version="8.2.251219" />
       <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.1721" />
-      <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260317003" />
+      <PackageReference Include="Microsoft.WindowsAppSDK.Base" Version="2.0.4" />
+      <PackageReference Include="Microsoft.WindowsAppSDK.DWrite" Version="2.1.0" />
+      <PackageReference Include="Microsoft.WindowsAppSDK.Foundation" Version="2.3.5" />
+      <PackageReference Include="Microsoft.WindowsAppSDK.InteractiveExperiences" Version="2.1.3" />
+      <PackageReference Include="Microsoft.WindowsAppSDK.Runtime" Version="2.3.1" />
+      <PackageReference Include="Microsoft.WindowsAppSDK.WinUI" Version="2.3.0" />
+      <!-- See GIMI-ModManager.WinUI.csproj: neuter the transitive metapackage to avoid 1.6 build assets leaking in. -->
+      <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.250108002" ExcludeAssets="all" />
   </ItemGroup>
 </Project>

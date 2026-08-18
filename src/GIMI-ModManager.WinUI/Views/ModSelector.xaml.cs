@@ -23,7 +23,7 @@ public sealed partial class ModSelector : Page, IDisposable
 
         Loading += (_, _) =>
         {
-            ViewModel.InitializeAsync(options, DispatcherQueue, _taskCompletionSource,
+            _ = ViewModel.InitializeAsync(options, DispatcherQueue, _taskCompletionSource,
                 cancellationToken: _cancellationTokenSource.Token);
         };
         ViewModel.CloseRequested += (_, _) => { CloseRequested?.Invoke(this, EventArgs.Empty); };

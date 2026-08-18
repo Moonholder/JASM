@@ -9,8 +9,8 @@ namespace GIMI_ModManager.WinUI.Views.PasswordInputPages
 {
     public sealed partial class PasswordManagerDialog : ContentDialog
     {
-        public ObservableCollection<PasswordEntry> PasswordEntries { get; set; }
-        public ContentDialog ParentDialog { get; set; }
+        public ObservableCollection<PasswordEntry> PasswordEntries { get; set; } = null!;
+        public ContentDialog ParentDialog { get; set; } = null!;
         public PasswordManagerDialog()
         {
             InitializeComponent();

@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- English (neutral) resources -->
+  <data name="AddModArchiveMenuItem.Text" xml:space="preserve">
+    <value>Add mod (archive)...</value>
+  </data>
+  <data name="AddModArchiveMenuItem.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Add a mod from an archive</value>
+  </data>
+  <data name="AddModClipboardMenuItem.Text" xml:space="preserve">
+    <value>Add mod (clipboard)...</value>
+  </data>
+  <data name="AddModClipboardMenuItem.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Add a mod from a GB link/folder/archive in the clipboard</value>
+  </data>
+  <data name="AddModMenuItem.Text" xml:space="preserve">
+    <value>Add mod...</value>
+  </data>
+  <data name="AddModMenuItem.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Add a mod folder</value>
+  </data>
+  <data name="AuthorColumnHeader" xml:space="preserve">
+    <value>Author</value>
+  </data>
+  <data name="AutoSyncButton.Content" xml:space="preserve">
+    <value>Auto-sync</value>
+  </data>
+  <data name="AutoSyncButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>When enabled, mods are automatically refreshed to the game when switching, and mod toggles are synced to the d3dx_user.ini file</value>
+  </data>
+  <data name="BackwardHotkeyLabel.Text" xml:space="preserve">
+    <value>Backward hotkey</value>
+  </data>
+  <data name="ConfigFileLabel.Text" xml:space="preserve">
+    <value>Config file</value>
+  </data>
+  <data name="ContextMenu_MoveMods_ErrorBody" xml:space="preserve">
+    <value>Unable to move mods</value>
+  </data>
+  <data name="ContextMenu_MoveMods_InvalidOperationTitle" xml:space="preserve">
+    <value>Move failed</value>
+  </data>
+  <data name="ContextMenu_MoveMods_SuccessBody" xml:space="preserve">
+    <value>Successfully moved mod {0} to {1}</value>
+  </data>
+  <data name="ContextMenu_MoveMods_SuccessTitle" xml:space="preserve">
+    <value>Moved {0} mods</value>
+  </data>
+  <data name="ContextMenu_MoveMods_TargetNotFoundBody" xml:space="preserve">
+    <value>Could not find the mod list of the selected character.</value>
+  </data>
+  <data name="ContextMenu_MoveMods_TargetNotFoundTitle" xml:space="preserve">
+    <value>Target mod list not found</value>
+  </data>
+  <data name="ContextMenu_SkinOverride_CheckLogsSuffix" xml:space="preserve">
+    <value>{0}</value>
+  </data>
+  <data name="ContextMenu_SkinOverride_FailMultipleBody" xml:space="preserve">
+    <value>Failed to set the skin for {0} mods</value>
+  </data>
+  <data name="ContextMenu_SkinOverride_FailSingleBody" xml:space="preserve">
+    <value>Failed to set the skin for mod &apos;{0}&apos;</value>
+  </data>
+  <data name="ContextMenu_SkinOverride_PartialFailTitle" xml:space="preserve">
+    <value>Some operations failed</value>
+  </data>
+  <data name="ContextMenu_SkinOverride_SuccessMultipleBody" xml:space="preserve">
+    <value>Successfully set the skin for {0} mods: {1}</value>
+  </data>
+  <data name="ContextMenu_SkinOverride_SuccessSingleBody" xml:space="preserve">
+    <value>Successfully set the skin for mod &apos;{0}&apos;: {1}</value>
+  </data>
+  <data name="ContextMenu_SkinOverride_SuccessTitle" xml:space="preserve">
+    <value>Skin set complete</value>
+  </data>
+  <data name="CurrentSkinLabel.Text" xml:space="preserve">
+    <value>Current character skin:</value>
+  </data>
+  <data name="CurrentSkinSettingLabel.Text" xml:space="preserve">
+    <value>Current skin setting: </value>
+  </data>
+  <data name="DateAddedColumnHeader" xml:space="preserve">
+    <value>Date added</value>
+  </data>
+  <data name="DefaultSkinName" xml:space="preserve">
+    <value>Default</value>
+  </data>
+  <data name="DeleteDialog_CancelButton" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="DeleteDialog_DeleteButton" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="DeleteDialog_MoveToRecycleBin.Content" xml:space="preserve">
+    <value>Move to recycle bin?</value>
+  </data>
+  <data name="DeleteDialog_RemoveFromPresets.Content" xml:space="preserve">
+    <value>Remove from presets?</value>
+  </data>
+  <data name="DeleteDialog_Title" xml:space="preserve">
+    <value>Delete these {0} mods?</value>
+  </data>
+  <data name="DeleteError_DeleteHeader" xml:space="preserve">
+    <value>Error deleting mods:</value>
+  </data>
+  <data name="DeleteError_Header" xml:space="preserve">
+    <value>An error occurred while deleting mods:</value>
+  </data>
+  <data name="DeleteError_PresetHeader" xml:space="preserve">
+    <value>Preset error mods:</value>
+  </data>
+  <data name="DeleteModsButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Delete selected mods</value>
+  </data>
+  <data name="DeleteNotification_FailureTitle" xml:space="preserve">
+    <value>Failed to delete mods</value>
+  </data>
+  <data name="DeleteNotification_SuccessMessage" xml:space="preserve">
+    <value>Successfully deleted {1} mod of {0}</value>
+  </data>
+  <data name="DeleteNotification_SuccessTitle" xml:space="preserve">
+    <value>{0} mods deleted</value>
+  </data>
+  <data name="DescriptionColumnHeader" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="DisableAllModsButton.Content" xml:space="preserve">
+    <value>Disable all mods</value>
+  </data>
+  <data name="DragDropFailedTitle" xml:space="preserve">
+    <value>Drag and drop failed</value>
+  </data>
+  <data name="DropModsHereText" xml:space="preserve">
+    <value>Drop mod folders/archives here</value>
+  </data>
+  <data name="EditCharacterButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Edit character</value>
+  </data>
+  <data name="EditSectionNameButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Edit section name</value>
+  </data>
+  <data name="EnabledColumnHeader" xml:space="preserve">
+    <value>Enabled</value>
+  </data>
+  <data name="ErrorAddingStorageItemFormat" xml:space="preserve">
+    <value>An error occurred while adding the storage item. Reason:
+{0}</value>
+  </data>
+  <data name="FolderNameColumnHeader" xml:space="preserve">
+    <value>Mod folder name</value>
+  </data>
+  <data name="FoldersMenuTitle.Title" xml:space="preserve">
+    <value>Folders</value>
+  </data>
+  <data name="ForwardHotkeyLabel.Text" xml:space="preserve">
+    <value>Forward hotkey</value>
+  </data>
+  <data name="GoToModsOverviewButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Go to the mods overview page</value>
+  </data>
+  <data name="HelpLink.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Click to open the documentation</value>
+  </data>
+  <data name="HelpLinkText.Text" xml:space="preserve">
+    <value>Hotkey binding help</value>
+  </data>
+  <data name="HelpText1.Text" xml:space="preserve">
+    <value>Combine keys with spaces, e.g.: VK_CTRL VK_UP</value>
+  </data>
+  <data name="HelpText2.Text" xml:space="preserve">
+    <value>Multiple keys are supported, separated by commas. E.g.: Alt UP,XB_A</value>
+  </data>
+  <data name="HelpText3.Text" xml:space="preserve">
+    <value>These are automatically parsed into multiple Key/Back lines</value>
+  </data>
+  <data name="HelpText4.Text" xml:space="preserve">
+    <value>The NO_ prefix is supported to indicate a key not being pressed, e.g.: NO_VK_CTRL ALT UP</value>
+  </data>
+  <data name="HelpTextLinkPrefix.Text" xml:space="preserve">
+    <value>For details, see:</value>
+  </data>
+  <data name="HideDisabledIniFiles" xml:space="preserve">
+    <value>Hide DISABLED files</value>
+  </data>
+  <data name="InvalidModUrlError" xml:space="preserve">
+    <value>The operation failed because the selected item is not a valid GameBanana mod link.</value>
+  </data>
+  <data name="InvalidStorageItemError" xml:space="preserve">
+    <value>The operation failed because the selected item is not a valid mod file or folder.</value>
+  </data>
+  <data name="KeyBindingsHelpTitle.Text" xml:space="preserve">
+    <value>Hotkey binding tips</value>
+  </data>
+  <data name="LightboxCloseTip.Text" xml:space="preserve">
+    <value>Click anywhere to close</value>
+  </data>
+  <data name="LoadingPrefix.Text" xml:space="preserve">
+    <value>Loading</value>
+  </data>
+  <data name="ModCountLabel.Text" xml:space="preserve">
+    <value>Mod count:</value>
+  </data>
+  <data name="ModEnabledLabel.Text" xml:space="preserve">
+    <value>Mod enabled</value>
+  </data>
+  <data name="ModLinkTextBox.Header" xml:space="preserve">
+    <value>Mod link:</value>
+  </data>
+  <data name="ModNameColumnHeader" xml:space="preserve">
+    <value>Mod name</value>
+  </data>
+  <data name="ModNameEditableBlock.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Change the mod display name</value>
+  </data>
+  <data name="ModsMenuTitle.Title" xml:space="preserve">
+    <value>Mods</value>
+  </data>
+  <data name="MoveButtonText.Text" xml:space="preserve">
+    <value>Move</value>
+  </data>
+  <data name="MoveModsButton.Content" xml:space="preserve">
+    <value>Move</value>
+  </data>
+  <data name="MoveModsSearchBox.PlaceholderText" xml:space="preserve">
+    <value>Search...</value>
+  </data>
+  <data name="MoveModsToCharacterLabel.Text" xml:space="preserve">
+    <value>Move mods to another character: </value>
+  </data>
+  <data name="MoveModsToSkinExpander.Header" xml:space="preserve">
+    <value>Move mods to another skin</value>
+  </data>
+  <data name="MultipleModsWarning.Message" xml:space="preserve">
+    <value>Multiple mods are enabled</value>
+  </data>
+  <data name="NewVersionAvailableToolTip.ToolTipService.ToolTip" xml:space="preserve">
+    <value>A new version is available</value>
+  </data>
+  <data name="NoModsFoundText" xml:space="preserve">
+    <value>No mods found for this character 😖</value>
+  </data>
+  <data name="OpenCharacterFolderMenuItem.Text" xml:space="preserve">
+    <value>Open character folder...</value>
+  </data>
+  <data name="OpenConfigFileButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Open the config file</value>
+  </data>
+  <data name="OpenLoaderRootMenuItem.Text" xml:space="preserve">
+    <value>Open loader root folder...</value>
+  </data>
+  <data name="OpenModFolderButton.Content" xml:space="preserve">
+    <value>Open mod folder...</value>
+  </data>
+  <data name="OpenModFolderMenuItem.Text" xml:space="preserve">
+    <value>Open mod folder...</value>
+  </data>
+  <data name="OperationFailed" xml:space="preserve">
+    <value>Operation failed</value>
+  </data>
+  <data name="PresetsColumnHeader" xml:space="preserve">
+    <value>Presets</value>
+  </data>
+  <data name="RefreshModsMenuItem.Text" xml:space="preserve">
+    <value>Refresh mods</value>
+  </data>
+  <data name="SaveButton.Text" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="SearchModsTextBox.PlaceholderText" xml:space="preserve">
+    <value>Search mods...</value>
+  </data>
+  <data name="SectionNameTextBox.PlaceholderText" xml:space="preserve">
+    <value>Enter section name</value>
+  </data>
+  <data name="SelectedModsLabel.Text" xml:space="preserve">
+    <value>Selected mods:</value>
+  </data>
+  <data name="SelectSkinButton.Content" xml:space="preserve">
+    <value>Select skin</value>
+  </data>
+  <data name="ShowDisabledIniFiles" xml:space="preserve">
+    <value>Show DISABLED files</value>
+  </data>
+  <data name="ShowDisabledIniFilesMenuItem.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Show or hide .ini files prefixed with DISABLED</value>
+  </data>
+  <data name="ShowModFolderColumnMenuItem.Text" xml:space="preserve">
+    <value>Show the &apos;Mod folder name&apos; column</value>
+  </data>
+  <data name="SingleSelectModeMenuItem.Text" xml:space="preserve">
+    <value>Single select mode</value>
+  </data>
+  <data name="SingleSelectModeMenuItem.ToolTipService.ToolTip" xml:space="preserve">
+    <value>When selected, only one mod can be enabled at a time and multi-select mode is disabled</value>
+  </data>
+  <data name="SingleSkinTooltip" xml:space="preserve">
+    <value>This character only has one default in-game skin, so you cannot change it.</value>
+  </data>
+  <data name="ToggleEditViewButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Toggle edit/view</value>
+  </data>
+  <data name="ToggleModFailed" xml:space="preserve">
+    <value>Could not toggle the mod state; the target file is being used by another program.</value>
+  </data>
+  <data name="VariationsLabel.Text" xml:space="preserve">
+    <value>Variations: </value>
+  </data>
+  <data name="ViewMenuTitle.Title" xml:space="preserve">
+    <value>View</value>
+  </data>
+  <data name="ViewToggleSwitch.OffContent" xml:space="preserve">
+    <value>Detail view</value>
+  </data>
+  <data name="ViewToggleSwitch.OnContent" xml:space="preserve">
+    <value>Gallery view</value>
+  </data>
+</root>

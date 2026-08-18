@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
 namespace GIMI_ModManager.Core.GamesService.Interfaces;
 
@@ -12,7 +12,7 @@ public interface ICharacter : IRarity, IDateSupport, IModdableObject, IEquatable
     /// </summary>
     [Newtonsoft.Json.JsonIgnore]
     [JsonIgnore]
-    public ICharacter DefaultCharacter { get; }
+    public new ICharacter DefaultCharacter { get; }
 
     public IGameClass Class { get; }
     public IGameElement Element { get; internal set; }

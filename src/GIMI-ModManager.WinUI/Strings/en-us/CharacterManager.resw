@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- English (neutral) resources -->
+  <data name="AddKeywordButton.Content" xml:space="preserve">
+    <value>Add keyword</value>
+  </data>
+  <data name="CharacterImageLabel.Text" xml:space="preserve">
+    <value>Character image</value>
+  </data>
+  <data name="CreateButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Create a new character</value>
+  </data>
+  <data name="CreatePage_CreateFailedTitle" xml:space="preserve">
+    <value>Failed to create character</value>
+  </data>
+  <data name="CreatePage_CreateSuccessMessage" xml:space="preserve">
+    <value>Character &apos;{0}&apos; was created successfully</value>
+  </data>
+  <data name="CreatePage_CreateSuccessTitle" xml:space="preserve">
+    <value>Character created</value>
+  </data>
+  <data name="CreatePage_EnableModListFailed" xml:space="preserve">
+    <value>The character was created, but the mod list could not be enabled for it.</value>
+  </data>
+  <data name="CreatePage_ExportDialogCloseButton" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="CreatePage_ExportDialogCopyButton" xml:space="preserve">
+    <value>Copy to clipboard and close</value>
+  </data>
+  <data name="CreatePage_ExportDialogTitle" xml:space="preserve">
+    <value>Character model JSON (format) export</value>
+  </data>
+  <data name="CreatePage_ExportFailedTitle" xml:space="preserve">
+    <value>Could not create the JSON export file</value>
+  </data>
+  <data name="CreatePage_JsonCopiedTitle" xml:space="preserve">
+    <value>The character JSON (data) has been copied to the clipboard</value>
+  </data>
+  <data name="CreatePage_NoImageInClipboard" xml:space="preserve">
+    <value>No image found in the clipboard</value>
+  </data>
+  <data name="CreatePage_PasteImageFailedTitle" xml:space="preserve">
+    <value>Failed to paste image</value>
+  </data>
+  <data name="CreatePageTitle.Text" xml:space="preserve">
+    <value>Create Character</value>
+  </data>
+  <data name="DisplayNameInput.Header" xml:space="preserve">
+    <value>Display name</value>
+  </data>
+  <data name="EditPage_CancelButton" xml:space="preserve">
+    <value>No, cancel</value>
+  </data>
+  <data name="EditPage_CloseButton" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="EditPage_ConfirmResetButton.Content" xml:space="preserve">
+    <value>Reset character settings</value>
+  </data>
+  <data name="EditPage_ConfirmSaveButton.Content" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="EditPage_CustomDeletedMessage" xml:space="preserve">
+    <value>Custom character &apos;{0}&apos; was deleted successfully</value>
+  </data>
+  <data name="EditPage_CustomDeletedTitle" xml:space="preserve">
+    <value>Custom character deleted</value>
+  </data>
+  <data name="EditPage_DateAddedTooltip.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Date added to JASM</value>
+  </data>
+  <data name="EditPage_DeleteCustomCharacterButton.Content" xml:space="preserve">
+    <value>Delete custom character</value>
+  </data>
+  <data name="EditPage_DeleteCustomCharacterButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Opens a popup with more information first</value>
+  </data>
+  <data name="EditPage_DeleteCustomConfirmButton" xml:space="preserve">
+    <value>Yes, delete this character</value>
+  </data>
+  <data name="EditPage_DeleteCustomDialogText.Text" xml:space="preserve">
+    <value>Are you sure you want to delete this custom character? This will remove the character and JASM will no longer recognize it. This will happen immediately after pressing &quot;Yes&quot;.</value>
+  </data>
+  <data name="EditPage_DeleteCustomDialogTitle.Title" xml:space="preserve">
+    <value>Delete custom character</value>
+  </data>
+  <data name="EditPage_DeleteCustomFolderCheckBox.Content" xml:space="preserve">
+    <value>Delete the custom character folder and its contents/mods?</value>
+  </data>
+  <data name="EditPage_DeleteFolderCheckBox.Content" xml:space="preserve">
+    <value>Delete the character folder and its contents/mods?</value>
+  </data>
+  <data name="EditPage_DisableCharacterButton.Content" xml:space="preserve">
+    <value>Disable character</value>
+  </data>
+  <data name="EditPage_DisableCharacterButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Opens a popup with more information first</value>
+  </data>
+  <data name="EditPage_DisableCharacterConfirmButton" xml:space="preserve">
+    <value>Yes, disable this character</value>
+  </data>
+  <data name="EditPage_DisableCharacterDialogText.Text" xml:space="preserve">
+    <value>Are you sure you want to disable this character? This will not remove the character, but JASM will no longer recognize it. The character can be reactivated later. This will happen immediately after pressing &quot;Yes&quot;.</value>
+  </data>
+  <data name="EditPage_DisableCharacterDialogTitle.Title" xml:space="preserve">
+    <value>Disable character</value>
+  </data>
+  <data name="EditPage_EnableCharacterButton.Content" xml:space="preserve">
+    <value>Enable character</value>
+  </data>
+  <data name="EditPage_EnableCharacterButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Opens a popup with more information first</value>
+  </data>
+  <data name="EditPage_EnableCharacterConfirmButton" xml:space="preserve">
+    <value>Yes, enable this character</value>
+  </data>
+  <data name="EditPage_EnableCharacterDialogText.Text" xml:space="preserve">
+    <value>Are you sure you want to enable this character? This will happen immediately after pressing &quot;Yes&quot;.</value>
+  </data>
+  <data name="EditPage_EnableCharacterDialogTitle.Title" xml:space="preserve">
+    <value>Enable character</value>
+  </data>
+  <data name="EditPage_GoToCharacterButton.Content" xml:space="preserve">
+    <value>Go to character</value>
+  </data>
+  <data name="EditPage_InternalNameLabel.Text" xml:space="preserve">
+    <value>Internal name (Id): </value>
+  </data>
+  <data name="EditPage_ModCountLabel.Text" xml:space="preserve">
+    <value>Mod count:</value>
+  </data>
+  <data name="EditPage_ModelDialogTitle.Title" xml:space="preserve">
+    <value>Character model</value>
+  </data>
+  <data name="EditPage_ModFolderLabel.Text" xml:space="preserve">
+    <value>Character mod folder:</value>
+  </data>
+  <data name="EditPage_OpenFolderTooltip.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Open the character&apos;s mod folder</value>
+  </data>
+  <data name="EditPage_ResetCharacterButton.Content" xml:space="preserve">
+    <value>Reset character</value>
+  </data>
+  <data name="EditPage_ResetCharacterButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Reset the character&apos;s values to their defaults</value>
+  </data>
+  <data name="EditPage_RevertChangesButton.Content" xml:space="preserve">
+    <value>Revert changes</value>
+  </data>
+  <data name="EditPage_RevertChangesButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Revert unsaved changes</value>
+  </data>
+  <data name="EditPage_SaveChangesButton.Content" xml:space="preserve">
+    <value>Save changes</value>
+  </data>
+  <data name="EditPage_SaveChangesButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Save changes to disk</value>
+  </data>
+  <data name="EditPage_SaveFailedTitle" xml:space="preserve">
+    <value>Could not save changes to the character</value>
+  </data>
+  <data name="EditPage_ShowModelButton.Text" xml:space="preserve">
+    <value>Show character data model...</value>
+  </data>
+  <data name="ElementComboBox.Header" xml:space="preserve">
+    <value>Element</value>
+  </data>
+  <data name="ExportJsonButton.Content" xml:space="preserve">
+    <value>Export the character&apos;s JSON file</value>
+  </data>
+  <data name="InternalNameHelp.Text" xml:space="preserve">
+    <value>The internal name is used by JASM to identify character/mod objects. It is also used as the name of the mod folder. It must be unique.</value>
+  </data>
+  <data name="InternalNameInput.Header" xml:space="preserve">
+    <value>Internal name (required)</value>
+  </data>
+  <data name="IsMultiModCheckBox.Content" xml:space="preserve">
+    <value>Allow enabling multiple mods</value>
+  </data>
+  <data name="IsMultiModHelp.Text" xml:space="preserve">
+    <value>If checked, JASM will not show a warning when multiple mods are enabled for this mod object.</value>
+  </data>
+  <data name="KeywordHelpText.Text" xml:space="preserve">
+    <value>JASM uses keywords to help improve search. Some characters may have multiple names, so you can add extra names or search terms as keywords.</value>
+  </data>
+  <data name="KeywordInput.PlaceholderText" xml:space="preserve">
+    <value>Search keywords...</value>
+  </data>
+  <data name="ModFilesNameHelp.Text" xml:space="preserve">
+    <value>In some cases, JASM is able to try to determine which character a mod belongs to. When doing so, it uses the &quot;ModFilesName&quot; text to try to find mod files with the same name. For example, if &quot;ModFilesName&quot; is &quot;paimon&quot;, it will match files like &quot;PaimonHeadLightMap.dds&quot;.</value>
+  </data>
+  <data name="ModFilesNameInput.Header" xml:space="preserve">
+    <value>Mod file name</value>
+  </data>
+  <data name="OpenJsonFileButton.Content" xml:space="preserve">
+    <value>Open the custom character&apos;s JSON file</value>
+  </data>
+  <data name="PageTitle.Text" xml:space="preserve">
+    <value>Character Manager</value>
+  </data>
+  <data name="RaritySlider.Header" xml:space="preserve">
+    <value>Rarity</value>
+  </data>
+  <data name="ReleaseDateInput.Header" xml:space="preserve">
+    <value>Release date</value>
+  </data>
+  <data name="RemoveKeywordButton.Content" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="SaveCharacterButton.Content" xml:space="preserve">
+    <value>Create character</value>
+  </data>
+  <data name="SearchBox.Header" xml:space="preserve">
+    <value>Search for a character to edit</value>
+  </data>
+  <data name="SearchBox.PlaceholderText" xml:space="preserve">
+    <value>Start typing to search...</value>
+  </data>
+  <data name="SearchKeywordsLabel.Text" xml:space="preserve">
+    <value>Search keywords</value>
+  </data>
+  <data name="Validation_DisplayNameEmpty" xml:space="preserve">
+    <value>Display name cannot be empty</value>
+  </data>
+  <data name="Validation_DisplayNameTakenWarning" xml:space="preserve">
+    <value>Another mod object ({0}) already uses this display name, which may cause unusual search results</value>
+  </data>
+  <data name="Validation_ElementInvalid" xml:space="preserve">
+    <value>Element {0} does not exist. Valid values are {1}</value>
+  </data>
+  <data name="Validation_ImageEmpty" xml:space="preserve">
+    <value>The image cannot be empty</value>
+  </data>
+  <data name="Validation_ImageExtensionNotSupported" xml:space="preserve">
+    <value>The image must be one of the following types: {0}. The extension {1} is not supported.</value>
+  </data>
+  <data name="Validation_ImageInvalid" xml:space="preserve">
+    <value>The image must be a valid existing image</value>
+  </data>
+  <data name="Validation_InternalNameEmpty" xml:space="preserve">
+    <value>Internal name cannot be empty</value>
+  </data>
+  <data name="Validation_InternalNameInvalidChar" xml:space="preserve">
+    <value>The internal name contains an invalid file system character &apos;{0}&apos;</value>
+  </data>
+  <data name="Validation_InternalNameTaken" xml:space="preserve">
+    <value>Internal name &apos;{0}&apos; is already used by {1}</value>
+  </data>
+  <data name="Validation_KeyTaken" xml:space="preserve">
+    <value>Key &apos;{0}&apos; is already used by {1}</value>
+  </data>
+  <data name="Validation_ModFilesNameTaken" xml:space="preserve">
+    <value>The mod file name is already used by {0}</value>
+  </data>
+  <data name="Validation_RarityTooHigh" xml:space="preserve">
+    <value>Rarity must be less than 11</value>
+  </data>
+  <data name="Validation_RarityTooLow" xml:space="preserve">
+    <value>Rarity must be greater than -1</value>
+  </data>
+</root>

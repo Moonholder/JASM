@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- English (neutral) resources -->
+  <data name="AddModButton.Content" xml:space="preserve">
+    <value>Add mod</value>
+  </data>
+  <data name="AddModHint.Text" xml:space="preserve">
+    <value>Usually pressing &apos;Add Mod&apos; is all you need</value>
+  </data>
+  <data name="AddRenameText" xml:space="preserve">
+    <value>Rename and add mod</value>
+  </data>
+  <data name="AddReplaceText" xml:space="preserve">
+    <value>Overwrite old mod</value>
+  </data>
+  <data name="AlwaysOnTopButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Keep the window always on top</value>
+  </data>
+  <data name="AuthorInput.Header" xml:space="preserve">
+    <value>Author</value>
+  </data>
+  <data name="CannotDetermineSkinMessage" xml:space="preserve">
+    <value>JASM could not determine which in-game skin this mod belongs to, so it cannot determine which mods need to be disabled.</value>
+  </data>
+  <data name="CannotDetermineSkinTitle" xml:space="preserve">
+    <value>Could not determine the new mod&apos;s skin</value>
+  </data>
+  <data name="CustomNameInput.Header" xml:space="preserve">
+    <value>Custom mod name</value>
+  </data>
+  <data name="CustomNameInput.PlaceholderText" xml:space="preserve">
+    <value>The custom name displayed throughout JASM</value>
+  </data>
+  <data name="DescriptionInput.Header" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="DescriptionInput.PlaceholderText" xml:space="preserve">
+    <value>Custom free-text notes displayed in the table on the character details page</value>
+  </data>
+  <data name="DuplicateModDialog.CloseButtonText" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="DuplicateModDialog.Title" xml:space="preserve">
+    <value>A folder with the same name already exists</value>
+  </data>
+  <data name="DuplicateModWarning.Message" xml:space="preserve">
+    <value>1. You can choose to overwrite the old mod, which deletes it.
+Or
+2. You can rename either the new mod or the old mod</value>
+  </data>
+  <data name="EnableOnlyCheckBox.ToolTipService.ToolTip" xml:space="preserve">
+    <value>This will enable this mod and disable the character&apos;s other mods.</value>
+  </data>
+  <data name="EnableOnlyText.Text" xml:space="preserve">
+    <value>Enable this mod and disable the others?</value>
+  </data>
+  <data name="ErrorOccurredMessage" xml:space="preserve">
+    <value>An error occurred while adding the mod. Please check the logs for more details</value>
+  </data>
+  <data name="ErrorOccurredTitle" xml:space="preserve">
+    <value>An error occurred</value>
+  </data>
+  <data name="ExistingModLabel.Text" xml:space="preserve">
+    <value>Other mods:</value>
+  </data>
+  <data name="ExtractDirLabel.Text" xml:space="preserve">
+    <value>Extraction directory:</value>
+  </data>
+  <data name="GetPresetFailedTitle" xml:space="preserve">
+    <value>Failed to get presets; could not automatically update the mod entries in presets</value>
+  </data>
+  <data name="ImageSourceAuto" xml:space="preserve">
+    <value>Automatic</value>
+  </data>
+  <data name="ImageSourceExistingMod" xml:space="preserve">
+    <value>Image from an existing mod</value>
+  </data>
+  <data name="ImageSourceGB" xml:space="preserve">
+    <value>GB mod thumbnail</value>
+  </data>
+  <data name="ImageSourceLabel.Text" xml:space="preserve">
+    <value>Preview image source:</value>
+  </data>
+  <data name="ImageSourceLocalFound" xml:space="preserve">
+    <value>Local image found in the new mod</value>
+  </data>
+  <data name="ImageSourceLocalSelected" xml:space="preserve">
+    <value>Local image selected from the new mod</value>
+  </data>
+  <data name="ImageSourceManual" xml:space="preserve">
+    <value>Manual</value>
+  </data>
+  <data name="ModAddedSuccess" xml:space="preserve">
+    <value>Mod added successfully</value>
+  </data>
+  <data name="ModInstalledMessage" xml:space="preserve">
+    <value>Mod &apos;{0}&apos; ({1}) was successfully added to the {2} mod list</value>
+  </data>
+  <data name="ModInstalledTitle" xml:space="preserve">
+    <value>Mod &apos;{0}&apos; installed</value>
+  </data>
+  <data name="ModNotUpdatedAnyPreset" xml:space="preserve">
+    <value>The mod did not update any presets</value>
+  </data>
+  <data name="ModUpdatedInPresets" xml:space="preserve">
+    <value>The mod was updated in the following presets: </value>
+  </data>
+  <data name="ModUpdatedToPresets" xml:space="preserve">
+    <value>The mod was updated in presets</value>
+  </data>
+  <data name="ModUrlInput.Header" xml:space="preserve">
+    <value>Mod page URL</value>
+  </data>
+  <data name="ModUrlInput.PlaceholderText" xml:space="preserve">
+    <value>Paste a URL to auto-fill the mod preview image and other info (GameBanana only)</value>
+  </data>
+  <data name="NewModLabel.Text" xml:space="preserve">
+    <value>New mod:</value>
+  </data>
+  <data name="OpenExistingFolderLink.Text" xml:space="preserve">
+    <value>Open the existing mod folder...</value>
+  </data>
+  <data name="OverwriteCheckBox.Content" xml:space="preserve">
+    <value>Overwrite existing mod</value>
+  </data>
+  <data name="PasteImageHint.Text" xml:space="preserve">
+    <value>You can set the preview image by copying and pasting an image file</value>
+  </data>
+  <data name="PresetsReadOnlyNotUpdated" xml:space="preserve">
+    <value>The following presets were not updated because they are read-only: </value>
+  </data>
+  <data name="RenameExistingFolderInput.Header" xml:space="preserve">
+    <value>Rename folder</value>
+  </data>
+  <data name="RenameExistingFolderInput.PlaceholderText" xml:space="preserve">
+    <value>Folder name</value>
+  </data>
+  <data name="RenameExistingModInput.Header" xml:space="preserve">
+    <value>Rename</value>
+  </data>
+  <data name="RenameExistingModInput.PlaceholderText" xml:space="preserve">
+    <value>Custom name</value>
+  </data>
+  <data name="RenameNewFolderInput.Header" xml:space="preserve">
+    <value>Rename folder</value>
+  </data>
+  <data name="RenameNewFolderInput.PlaceholderText" xml:space="preserve">
+    <value>Folder name</value>
+  </data>
+  <data name="RenameNewModInput.Header" xml:space="preserve">
+    <value>Rename</value>
+  </data>
+  <data name="RenameNewModInput.PlaceholderText" xml:space="preserve">
+    <value>Custom name</value>
+  </data>
+  <data name="ReplaceDuplicateInPresetCheckBox.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Duplicate mods will be replaced in presets by the newly installed mod. This option is mutually exclusive with the &apos;Replace old mod in presets&apos; checkbox.</value>
+  </data>
+  <data name="ReplaceDuplicateInPresetText.Text" xml:space="preserve">
+    <value>Replace duplicate mods in presets with the new mod</value>
+  </data>
+  <data name="ReplaceInPresetCheckBox.Content" xml:space="preserve">
+    <value>Replace the mod to be updated with the new mod in presets</value>
+  </data>
+  <data name="ReplaceInPresetCheckBox.ToolTipService.ToolTip" xml:space="preserve">
+    <value>This will update the old mod with the newly installed one in all presets. This checkbox is separate from the one shown when a duplicate mod is detected</value>
+  </data>
+  <data name="RetrieveInfoButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Retrieve detailed info from the mod page</value>
+  </data>
+  <data name="RightClickRootHint.Text" xml:space="preserve">
+    <value>You can set the mod folder&apos;s root directory with a right click</value>
+  </data>
+  <data name="SelectImageHint.Text" xml:space="preserve">
+    <value>You can also manually select a preview image file in the mod folder on the right</value>
+  </data>
+  <data name="SetPreviewImageItem.Text" xml:space="preserve">
+    <value>Set mod preview image</value>
+  </data>
+  <data name="SetRootFolderItem.Text" xml:space="preserve">
+    <value>Set mod root directory</value>
+  </data>
+  <data name="SetShaderFixesFolderItem.Text" xml:space="preserve">
+    <value>Set ShaderFixes folder</value>
+  </data>
+  <data name="UpdatePresetFailedTitle" xml:space="preserve">
+    <value>Failed to update preset {0}; could not automatically update the mod entries in presets. Please check your presets manually</value>
+  </data>
+</root>

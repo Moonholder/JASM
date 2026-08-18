@@ -1,4 +1,4 @@
-﻿using GIMI_ModManager.Core.Contracts.Services;
+using GIMI_ModManager.Core.Contracts.Services;
 using GIMI_ModManager.Core.Services;
 using GIMI_ModManager.WinUI.Contracts.Services;
 using GIMI_ModManager.WinUI.Models;
@@ -9,7 +9,7 @@ namespace GIMI_ModManager.WinUI.Views.PasswordInputPages
 {
     public sealed partial class PasswordInputDialog : ContentDialog
     {
-        public CommonPasswordOptions ViewModel { get; set; }
+        public CommonPasswordOptions ViewModel { get; set; } = null!;
         private TaskCompletionSource<DragAndDropScanResult> Tcs { get; }
         private DragAndDropScanner Scanner { get; }
 
@@ -66,13 +66,20 @@ namespace GIMI_ModManager.WinUI.Views.PasswordInputPages
                         TimeSpan.FromSeconds(5));
                 return;
             }
+
+            if (extractResult is null)
+            {
+                args.Cancel = true;
+                return;
+            }
+
             Tcs.SetResult(extractResult);
             SaveCommonPasswordOptions();
         }
 
         private void PasswordInputDialog_SecondaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
-            Tcs.SetResult(null);
+            Tcs.SetResult(null!);
             SaveCommonPasswordOptions();
         }
 
@@ -83,7 +90,7 @@ namespace GIMI_ModManager.WinUI.Views.PasswordInputPages
             {
                 XamlRoot = XamlRoot,
                 ParentDialog = this,
-                PasswordEntries = ViewModel.PasswordEntries,
+                PasswordEntries = ViewModel.PasswordEntries!,
                 RequestedTheme = RequestedTheme,
             };
 

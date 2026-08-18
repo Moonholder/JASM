@@ -72,7 +72,7 @@ public partial class CharactersViewModel : ObservableRecipient, INavigationAware
 
     public ObservableCollection<GridItemSortingMethod> SortingMethods { get; } = new();
 
-    [ObservableProperty] private GridItemSortingMethod _selectedSortingMethod;
+    [ObservableProperty] private GridItemSortingMethod _selectedSortingMethod = null!;
     [ObservableProperty] private bool _sortByDescending;
 
     [ObservableProperty] private bool _canCheckForUpdates = false;
@@ -765,9 +765,9 @@ public partial class CharactersViewModel : ObservableRecipient, INavigationAware
     }
 
 
-    [ObservableProperty] private string _pinText;
+    [ObservableProperty] private string _pinText = string.Empty;
 
-    [ObservableProperty] private string _pinGlyph;
+    [ObservableProperty] private string _pinGlyph = string.Empty;
 
     const string DefaultPinGlyph = "\uE718";
     const string DefaultUnpinGlyph = "\uE77A";

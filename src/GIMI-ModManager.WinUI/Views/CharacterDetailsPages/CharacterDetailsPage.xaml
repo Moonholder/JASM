@@ -170,6 +170,12 @@
                         </Grid>
 
                          <StackPanel Orientation="Horizontal" Spacing="8" Visibility="{x:Bind ViewModel.ModGridVM.SelectedMod.HasVariants, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                             <Button 
+                                 Content="Update" 
+                                 Command="{x:Bind ViewModel.ModGridVM.UpdateActiveVariantCommand}"
+                                 IsEnabled="{x:Bind ViewModel.ModGridVM.SelectedMod.HasActiveVariant, Mode=OneWay}"
+                                 ToolTipService.ToolTip="Update active variant with current settings"
+                                 l:Uids.Uid="/ModVariant/UpdateButton"/>
                             <Button 
                                 Content="Rename" 
                                 Click="RenameVariant_OnClick"

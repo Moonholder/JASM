@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- English (neutral) resources -->
+  <data name="CustomImage_CopyItem.Text" xml:space="preserve">
+    <value>Copy image</value>
+  </data>
+  <data name="CustomImage_EditButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Choose image</value>
+  </data>
+  <data name="CustomImage_PasteItem.Text" xml:space="preserve">
+    <value>Paste image</value>
+  </data>
+  <data name="CustomImage_RemoveItem.Text" xml:space="preserve">
+    <value>Remove image</value>
+  </data>
+</root>

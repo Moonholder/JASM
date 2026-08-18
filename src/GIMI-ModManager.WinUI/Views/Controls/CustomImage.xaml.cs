@@ -135,20 +135,20 @@ public sealed partial class CustomImage : UserControl
     }
 
     // MaxWidth property
-    public static readonly DependencyProperty MaxWidthProperty = DependencyProperty.Register(
+    public new static readonly DependencyProperty MaxWidthProperty = DependencyProperty.Register(
         nameof(MaxWidth), typeof(double), typeof(CustomImage), new PropertyMetadata(double.PositiveInfinity));
 
-    public double MaxWidth
+    public new double MaxWidth
     {
         get => (double)GetValue(MaxWidthProperty);
         set => SetValue(MaxWidthProperty, value);
     }
 
     // MaxHeight property
-    public static readonly DependencyProperty MaxHeightProperty = DependencyProperty.Register(
+    public new static readonly DependencyProperty MaxHeightProperty = DependencyProperty.Register(
         nameof(MaxHeight), typeof(double), typeof(CustomImage), new PropertyMetadata(double.PositiveInfinity));
 
-    public double MaxHeight
+    public new double MaxHeight
     {
         get => (double)GetValue(MaxHeightProperty);
         set => SetValue(MaxHeightProperty, value);

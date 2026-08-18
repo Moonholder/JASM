@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- English (neutral) resources -->
+  <data name="AdminWarning_ConfirmButton" xml:space="preserve">
+    <value>Got it</value>
+  </data>
+  <data name="AdminWarning_DoNotShowAgain.Content" xml:space="preserve">
+    <value>Don&apos;t show this warning again</value>
+  </data>
+  <data name="AdminWarning_ExitButton" xml:space="preserve">
+    <value>Exit</value>
+  </data>
+  <data name="AdminWarning_Text" xml:space="preserve">
+    <value>You are running JASM as an administrator. This is not recommended.
+JASM is not designed to run with administrator privileges.
+While unlikely, simple bugs could potentially cause serious damage to your file system.
+
+Drag and drop functionality is unavailable under administrator privileges due to UIPI isolation.
+Please consider running JASM without administrator privileges.
+
+Use at your own risk, you have been warned</value>
+  </data>
+  <data name="AdminWarning_Title" xml:space="preserve">
+    <value>Administrator Warning</value>
+  </data>
+  <data name="AlphaWarningMessage" xml:space="preserve">
+    <value>There will be bugs, and things may go wrong. Regardless, we hope you enjoy using JASM!</value>
+  </data>
+  <data name="AlphaWarningTitle" xml:space="preserve">
+    <value>JASM is still in alpha</value>
+  </data>
+  <data name="BackupWarning.Text" xml:space="preserve">
+    <value>Before using applications that interact with your files, it is always a good idea to back up your files/mods.</value>
+  </data>
+  <data name="Body1.Text" xml:space="preserve">
+    <value>As part of the initial setup, you will need to select the Mod Loader folder (3dmigoto/gimi/wwmi/zzmi/srmi/efmi) and the folder containing your mods. The 3dmigoto folder contains 3DMigoto Loader.exe or 3DMigotoLoader.exe as well as a Mods folder. If you haven&apos;t set up a model importer yet, do so now, see the link below. I usually find most mods on Gamebanana, but Nexusmods also has some.</value>
+  </data>
+  <data name="Body2.Text" xml:space="preserve">
+    <value>After saving your settings, the application will create a folder for each character in the &quot;Mods&quot; folder. Mod folders located outside of these character folders will be ignored. This application enables and disables mods by prefixing mod folders with &quot;DISABLED_&quot;. JASM also supports exporting the mods it manages, if you wish to use them with other applications.</value>
+  </data>
+  <data name="DisableModsCheckBox.Content" xml:space="preserve">
+    <value>Also disable all mods</value>
+  </data>
+  <data name="DisableModsTooltip.Text" xml:space="preserve">
+    <value>Prefix all mods with &quot;DISABLED_&quot; to disable them</value>
+  </data>
+  <data name="GameSelectorBox.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Select the game you wish to manage mods for. You can change this option at any time on the settings page</value>
+  </data>
+  <data name="NewFolderStructure_CancelButton" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="NewFolderStructure_ManualButton" xml:space="preserve">
+    <value>I&apos;ll do it myself</value>
+  </data>
+  <data name="NewFolderStructure_ReorganizeButton" xml:space="preserve">
+    <value>Reorganize my mods</value>
+  </data>
+  <data name="NewFolderStructure_ReorganizeFailedTitle" xml:space="preserve">
+    <value>Mod reorganization failed.</value>
+  </data>
+  <data name="NewFolderStructure_ReorganizeSuccessMessage" xml:space="preserve">
+    <value>Moved {0} mods to their new character folders</value>
+  </data>
+  <data name="NewFolderStructure_ReorganizeSuccessTitle" xml:space="preserve">
+    <value>Mods reorganized.</value>
+  </data>
+  <data name="NewFolderStructure_SeeLogs" xml:space="preserve">
+    <value>See the logs for more details.</value>
+  </data>
+  <data name="NewFolderStructure_Text1" xml:space="preserve">
+    <value>This version of JASM uses a new folder structure.
+
+Characters are now organized by category, and each category has its own folder. So the new format is as follows:
+Mods/Category/Character/&lt;mod folder&gt;
+So, until you reorganize your mods, JASM will not recognize any of them.
+This is a one-time operation, and you can do it manually if you prefer.
+
+Additionally, character folders are now created on demand, and empty folders can be cleaned up on the settings page.</value>
+  </data>
+  <data name="NewFolderStructure_Text2" xml:space="preserve">
+    <value>If you are unsure about this, then back up your mods first. I have tested it on my own mods.</value>
+  </data>
+  <data name="NewFolderStructure_Text3" xml:space="preserve">
+    <value>This popup will keep showing until you choose one of the options below. You can also use the &quot;Reorganize&quot; button on the settings page.
+If you want to know what&apos;s going on, check the logs.</value>
+  </data>
+  <data name="NewFolderStructure_Title" xml:space="preserve">
+    <value>New Folder Structure</value>
+  </data>
+  <data name="ReorganizeModsCheckBox.Content" xml:space="preserve">
+    <value>Reorganize mod folders</value>
+  </data>
+  <data name="ReorganizeTooltip1.Text" xml:space="preserve">
+    <value>Enabling this option will prompt the application to reorganize your existing mods into folders assigned to their respective characters. Any mods that cannot be reasonably matched will be placed in an &quot;Other&quot; folder.</value>
+  </data>
+  <data name="ReorganizeTooltip2.Text" xml:space="preserve">
+    <value>A mod folder containing multiple character names may be incorrectly moved into one character&apos;s directory. This assumes a flat mod structure where skin folders are loosely stored in the mod folder. If you have a custom folder structure, JASM may misidentify your skins. This also applies to nested folders containing skins.</value>
+  </data>
+  <data name="ReorganizeTooltip3.Text" xml:space="preserve">
+    <value>This can be activated later on the settings page</value>
+  </data>
+  <data name="SaveButton.Content" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="SettingsSavedMessage" xml:space="preserve">
+    <value>Startup settings saved to &apos;{0}&apos;</value>
+  </data>
+  <data name="SettingsSavedTitle" xml:space="preserve">
+    <value>Save Startup Settings</value>
+  </data>
+  <data name="Startup_Header.Text" xml:space="preserve">
+    <value>Settings can be configured on first launch</value>
+  </data>
+</root>

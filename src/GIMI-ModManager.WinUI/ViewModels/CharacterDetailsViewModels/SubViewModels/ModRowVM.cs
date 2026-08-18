@@ -6,6 +6,7 @@ using GIMI_ModManager.WinUI.Helpers;
 using GIMI_ModManager.WinUI.Services.Notifications;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace GIMI_ModManager.WinUI.ViewModels.CharacterDetailsViewModels.SubViewModels;
 
@@ -55,10 +56,17 @@ public partial class ModRowVM : ObservableObject
         Presets = presetNames as string[] ?? presetNames.ToArray();
         InPresets = string.Join(',', Presets);
 
-        Variants = variantNames as string[] ?? variantNames.ToArray();
+        var newVariants = variantNames as string[] ?? variantNames.ToArray();
+        if (Variants == null || !Variants.SequenceEqual(newVariants))
+        {
+            Variants = newVariants;
+        }
+
         ActiveVariant = activeVariant ?? string.Empty;
         HasVariants = Variants.Length > 0;
         HasActiveVariant = !string.IsNullOrEmpty(ActiveVariant);
+
+        TriggerPropertyChanged(nameof(ActiveVariant));
 
         ModNotifications.Clear();
 

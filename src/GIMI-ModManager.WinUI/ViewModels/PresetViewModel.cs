@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -218,7 +218,7 @@ public partial class PresetViewModel(
                 }
             });
 
-            notificationManager.ShowNotification(
+            _notificationManager.ShowNotification(
                 _localizer.GetLocalizedStringOrDefault("/PresetPage/PresetAppliedTitle", "Preset applied"),
                 string.Format(_localizer.GetLocalizedStringOrDefault("/PresetPage/PresetAppliedMessage", "Preset: '{0}' applied."), preset.Name),
                 TimeSpan.FromSeconds(5));

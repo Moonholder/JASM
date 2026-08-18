@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using CommunityToolkitWrapper;
 using GIMI_ModManager.Core.Contracts.Entities;
 using GIMI_ModManager.Core.Contracts.Services;
@@ -142,10 +142,8 @@ public sealed class ModInstallation : IDisposable
 
     private FileInfo? _jasmConfigFile;
     public DirectoryInfo ModFolder { get; private set; }
-    private DirectoryInfo? _shaderFixesFolder;
-
     // TODO: Enable later
-    private List<FileInfo> _shaderFixesFiles = new();
+    private DirectoryInfo? _shaderFixesFolder = null!;
 
 
     private ModInstallation(DirectoryInfo originalModFolder, ICharacterModList destinationModList)
@@ -187,17 +185,6 @@ public sealed class ModInstallation : IDisposable
     public void SetShaderFixesFolder(DirectoryInfo shaderFixesFolder)
     {
         // TODO: Enable later
-        return;
-
-        if (shaderFixesFolder.FullName == ModFolder.FullName)
-            throw new ArgumentException("The new shader fixes folder is the same as the current root folder");
-
-        if (!shaderFixesFolder.Exists)
-            throw new DirectoryNotFoundException($"The folder {shaderFixesFolder.FullName} does not exist");
-
-        _shaderFixesFiles.Clear();
-        _shaderFixesFiles.AddRange(shaderFixesFolder.GetFiles("*.txt", SearchOption.TopDirectoryOnly));
-        _shaderFixesFolder = shaderFixesFolder;
     }
 
 
