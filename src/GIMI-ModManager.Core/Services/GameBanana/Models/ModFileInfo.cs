@@ -11,7 +11,7 @@ public partial class ModFileInfo : INotifyPropertyChanged
         ModId = modId;
         FileId = apiModFileInfo.FileId.ToString();
         FileName = apiModFileInfo.FileName;
-        Description = apiModFileInfo.Description;
+        Description = apiModFileInfo.Description ?? string.Empty;
         DateAdded = DateTimeOffset.FromUnixTimeSeconds(apiModFileInfo.DateAdded).DateTime;
         Md5Checksum = apiModFileInfo.Md5Checksum;
         DownloadCount = apiModFileInfo.DownloadCount;

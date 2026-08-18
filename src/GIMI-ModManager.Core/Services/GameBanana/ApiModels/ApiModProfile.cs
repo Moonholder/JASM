@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
 namespace GIMI_ModManager.Core.Services.GameBanana.ApiModels;
 
@@ -9,11 +9,15 @@ public class ApiModProfile
     [JsonPropertyName("_sText")] public string? Description { get; init; }
 
     [JsonPropertyName("_aSubmitter")] public ApiAuthor? Author { get; init; }
-    [JsonPropertyName("_aPreviewMedia")] public ApiImagesRoot? PreviewMedia { get; init; }
+    [JsonPropertyName("_aPreviewContent")]
+    public Dictionary<string, List<ApiPreviewImage>?>? PreviewContent { get; init; }
     [JsonPropertyName("_aCategory")] public ApiModCategory? Category { get; init; }
 
     [JsonPropertyName("_sProfileUrl")] public string? ModPageUrl { get; init; }
     [JsonPropertyName("_nViewCount")] public int ViewCount { get; init; }
+    [JsonPropertyName("_nDownloadCount")] public int DownloadCount { get; init; }
+    [JsonPropertyName("_sVersion")] public string? Version { get; init; }
+    [JsonPropertyName("_bHasContentRatings")] public bool HasContentRatings { get; init; }
 
     [JsonPropertyName("_aFiles")] public ICollection<ApiModFileInfo>? Files { get; init; }
 }
@@ -32,13 +36,3 @@ public sealed class ApiAuthor
     [JsonPropertyName("_sProfileUrl")] public string? ProfileUrl { get; init; }
 }
 
-public sealed class ApiImagesRoot
-{
-    [JsonPropertyName("_aImages")] public ApiImageUrl[] Images { get; init; } = [];
-}
-
-public sealed class ApiImageUrl
-{
-    [JsonPropertyName("_sFile")] public string? ImageId { get; init; }
-    [JsonPropertyName("_sBaseUrl")] public string? BaseUrl { get; init; }
-}

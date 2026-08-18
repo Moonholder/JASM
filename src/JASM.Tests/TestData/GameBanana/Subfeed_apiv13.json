@@ -1,0 +1,113 @@
+{
+    "_aMetadata": {
+        "_nRecordCount": 1063,
+        "_nPerpage": 15,
+        "_bIsComplete": false
+    },
+    "_aRecords": [
+        {
+            "_idRow": 702798,
+            "_sModelName": "Mod",
+            "_sSingularTitle": "Mod",
+            "_sIconClasses": "SubmissionType Mod",
+            "_sName": "Liino Modular Menu Mod!",
+            "_sProfileUrl": "https://gamebanana.com/mods/702798",
+            "_tsDateAdded": 1786413074,
+            "_tsDateModified": 1786606393,
+            "_bHasFiles": true,
+            "_sPayType": "freemium",
+            "_aTags": [],
+            "_aPreviewContent": {
+                "screenshot": {
+                    "_sFile220": "sgi_common_thumbs_6a7a7c96288a8_220.webp",
+                    "_hFile220": 124,
+                    "_sFile220Sfw": "sgi_common_thumbs_6a7a7c96288a8_220_sfw.webp",
+                    "_hFile220Sfw": 124,
+                    "_sFile530": "sgi_common_thumbs_6a7a7c96288a8_530.webp",
+                    "_hFile530": 298,
+                    "_sBaseUrl": "https://images.gamebanana.com/img/ss/mods",
+                    "_sFile": "6a7a7c96288a8.jpg"
+                }
+            },
+            "_aSubmitter": {
+                "_idRow": 2651223,
+                "_sName": "Snaccubus",
+                "_bIsOnline": false,
+                "_bHasRipe": false,
+                "_sProfileUrl": "https://gamebanana.com/members/2651223",
+                "_sAvatarUrl": "https://images.gamebanana.com/img/av/6468632d2c8a7.png"
+            },
+            "_aRootCategory": {
+                "_sName": "Skins",
+                "_sProfileUrl": "https://gamebanana.com/mods/cats/35464",
+                "_sIconUrl": ""
+            },
+            "_aSubCategory": {
+                "_sName": "Liino",
+                "_sProfileUrl": "https://gamebanana.com/mods/cats/48075",
+                "_sIconUrl": "https://images.gamebanana.com/img/ico/ModCategory/6a78f835ef5a9.png"
+            },
+            "_sVersion": "",
+            "_tsDateUpdated": 1786606437,
+            "_bIsObsolete": false,
+            "_sInitialVisibility": "warn",
+            "_bHasContentRatings": true,
+            "_nLikeCount": 305,
+            "_nPostCount": 24,
+            "_bWasFeatured": false,
+            "_nViewCount": 9910,
+            "_bIsOwnedByAccessor": false
+        },
+        {
+            "_idRow": 691126,
+            "_sModelName": "Mod",
+            "_sSingularTitle": "Mod",
+            "_sIconClasses": "SubmissionType Mod",
+            "_sName": "Detective Gilberta",
+            "_sProfileUrl": "https://gamebanana.com/mods/691126",
+            "_tsDateAdded": 1783054056,
+            "_tsDateModified": 1786549507,
+            "_bHasFiles": true,
+            "_sPayType": "free",
+            "_aTags": [],
+            "_aPreviewContent": {
+                "screenshot": {
+                    "_sFile220": "sgi_common_thumbs_6a473d1400d4f_220.webp",
+                    "_hFile220": 176,
+                    "_sFile530": "sgi_common_thumbs_6a473d1400d4f_530.webp",
+                    "_hFile530": 424,
+                    "_sBaseUrl": "https://images.gamebanana.com/img/ss/mods",
+                    "_sFile": "6a473d1400d4f.jpg"
+                }
+            },
+            "_aSubmitter": {
+                "_idRow": 4473230,
+                "_sName": "Farewell in a Dream",
+                "_bIsOnline": false,
+                "_bHasRipe": false,
+                "_sProfileUrl": "https://gamebanana.com/members/4473230",
+                "_sAvatarUrl": "https://images.gamebanana.com/img/av/69fc66ef65ab9.jpg"
+            },
+            "_aRootCategory": {
+                "_sName": "Skins",
+                "_sProfileUrl": "https://gamebanana.com/mods/cats/35464",
+                "_sIconUrl": ""
+            },
+            "_aSubCategory": {
+                "_sName": "Gilberta",
+                "_sProfileUrl": "https://gamebanana.com/mods/cats/42733",
+                "_sIconUrl": "https://images.gamebanana.com/img/ico/ModCategory/69764efb8e3f0.png"
+            },
+            "_sVersion": "1.2",
+            "_tsDateUpdated": 1786549640,
+            "_bIsObsolete": false,
+            "_sInitialVisibility": "show",
+            "_bHasContentRatings": false,
+            "_nLikeCount": 329,
+            "_nPostCount": 14,
+            "_bWasFeatured": true,
+            "_nViewCount": 24151,
+            "_bIsOwnedByAccessor": false
+        }
+    ]
+}

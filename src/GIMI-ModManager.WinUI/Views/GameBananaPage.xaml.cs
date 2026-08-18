@@ -13,6 +13,13 @@ public sealed partial class GameBananaPage : Page
 {
     public GameBananaVM ViewModel { get; } = App.GetService<GameBananaVM>();
 
+    // Cached per-card border brushes: allocating on every hover event causes
+    // avoidable UI-thread garbage.
+    private static readonly SolidColorBrush HoverCardBorderBrush =
+        new(Microsoft.UI.ColorHelper.FromArgb(0x60, 0x60, 0xCD, 0xFF));
+    private static readonly SolidColorBrush DefaultCardBorderBrush =
+        new(Microsoft.UI.ColorHelper.FromArgb(0x25, 0xFF, 0xFF, 0xFF));
+
     public GameBananaPage()
     {
         InitializeComponent();
@@ -28,6 +35,7 @@ public sealed partial class GameBananaPage : Page
 
         _viewportFillTimer?.Stop();
         _scrollThrottleTimer?.Stop();
+        ModsGridView.SizeChanged -= ModsGridView_SizeChanged;
 
         if (_gridScrollViewer != null)
         {
@@ -36,13 +44,7 @@ public sealed partial class GameBananaPage : Page
 
         try
         {
-            DescriptionWebView?.Close();
-        }
-        catch { }
-
-        try
-        {
-            UpdateLogWebView?.Close();
+            _detailWebView?.Close();
         }
         catch { }
 
@@ -57,14 +59,22 @@ public sealed partial class GameBananaPage : Page
         {
             // Debounce: wait for layout to settle, then check if viewport needs more content
             _viewportFillTimer?.Stop();
-            _viewportFillTimer ??= new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(150) };
-            _viewportFillTimer.Tick += (_, _) =>
-            {
-                _viewportFillTimer.Stop();
-                ProcessScrollPosition();
-            };
+            _viewportFillTimer ??= CreateViewportFillTimer();
             _viewportFillTimer.Start();
         }
+    }
+
+    private DispatcherTimer CreateViewportFillTimer()
+    {
+        var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(150) };
+        timer.Tick += ViewportFill_Tick;
+        return timer;
+    }
+
+    private void ViewportFill_Tick(object? sender, object e)
+    {
+        _viewportFillTimer?.Stop();
+        ProcessScrollPosition();
     }
 
     private async void ViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -72,15 +82,28 @@ public sealed partial class GameBananaPage : Page
         if (e.PropertyName == nameof(ViewModel.SelectedModDescription))
         {
             if (DetailSegmented != null) DetailSegmented.SelectedIndex = 0;
-            await NavigateWebView(DescriptionWebView, ViewModel.SelectedModDescription);
         }
         else if (e.PropertyName == nameof(ViewModel.SelectedModUpdateLog))
         {
-            await NavigateWebView(UpdateLogWebView, ViewModel.SelectedModUpdateLog);
+            // The webview is created lazily; if the Updates tab is already
+            // visible, refresh it in place.
+            if (DetailSegmented?.SelectedIndex == 2)
+            {
+                await ShowDetailWebViewAsync(TabUpdateLog, ViewModel.SelectedModUpdateLog);
+            }
+        }
+        else if (e.PropertyName == nameof(ViewModel.IsDetailPaneOpen) && !ViewModel.IsDetailPaneOpen)
+        {
+            try
+            {
+                _detailWebView?.NavigateToString("");
+                _lastRenderedHtml = "";
+            }
+            catch { }
         }
     }
 
-    private void DetailSegmented_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private async void DetailSegmented_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (TabOverview == null || TabDescription == null || TabUpdateLog == null) return;
 
@@ -88,31 +111,76 @@ public sealed partial class GameBananaPage : Page
         TabDescription.Visibility = Visibility.Collapsed;
         TabUpdateLog.Visibility = Visibility.Collapsed;
 
-        // Also explicitly collapse WebViews to prevent WinUI 3 visual overlapping bugs
-        DescriptionWebView?.Visibility = Visibility.Collapsed;
-        if (UpdateLogWebView != null) UpdateLogWebView.Visibility = Visibility.Collapsed;
-
         switch (DetailSegmented.SelectedIndex)
         {
             case 0:
                 TabOverview.Visibility = Visibility.Visible;
+                DetachDetailWebView();
                 break;
             case 1:
                 TabDescription.Visibility = Visibility.Visible;
-                if (DescriptionWebView != null) DescriptionWebView.Visibility = Visibility.Visible;
+                await ShowDetailWebViewAsync(TabDescription, ViewModel.SelectedModDescription);
                 break;
             case 2:
                 TabUpdateLog.Visibility = Visibility.Visible;
-                if (UpdateLogWebView != null) UpdateLogWebView.Visibility = Visibility.Visible;
+                await ShowDetailWebViewAsync(TabUpdateLog, ViewModel.SelectedModUpdateLog);
                 break;
         }
     }
 
-    private static async Task NavigateWebView(WebView2 webView, string? htmlContent)
+    private WebView2? _detailWebView;
+    private Border? _webViewHost;
+    private int _webViewRequestVersion;
+    private string? _lastRenderedHtml;
+
+    private void DetachDetailWebView()
     {
+        _webViewRequestVersion++;
+        _webViewHost?.Child = null;
+        _webViewHost = null;
+    }
+
+    /// <summary>
+    /// Attaches the single shared WebView2 to the given tab host (creating it
+    /// on first use) and renders the content. Scripts are disabled because the
+    /// HTML comes from third-party mod authors.
+    /// </summary>
+    private async Task ShowDetailWebViewAsync(Border host, string? htmlContent)
+    {
+        var version = ++_webViewRequestVersion;
+
         try
         {
-            await webView.EnsureCoreWebView2Async();
+            if (_detailWebView == null)
+            {
+                _detailWebView = new WebView2
+                {
+                    DefaultBackgroundColor = Microsoft.UI.Colors.Transparent
+                };
+                _detailWebView.NavigationStarting += WebView_NavigationStarting;
+            }
+
+            if (!ReferenceEquals(_webViewHost, host))
+            {
+                _webViewHost?.Child = null;
+                host.Child = _detailWebView;
+                _webViewHost = host;
+            }
+
+            await _detailWebView.EnsureCoreWebView2Async();
+
+            // A newer tab switch happened while we were initializing; abort so a
+            // stale request cannot re-attach the webview to an inactive tab.
+            if (version != _webViewRequestVersion)
+                return;
+
+            if (_detailWebView.CoreWebView2 is { } core)
+            {
+                core.Settings.IsScriptEnabled = false;
+                core.Settings.AreDefaultScriptDialogsEnabled = false;
+                core.Settings.IsWebMessageEnabled = false;
+            }
+
             var themeService = App.GetService<Contracts.Services.IThemeSelectorService>();
             bool isDark = themeService.Theme == ElementTheme.Dark;
             if (themeService.Theme == ElementTheme.Default)
@@ -120,14 +188,13 @@ public sealed partial class GameBananaPage : Page
                 isDark = Application.Current.RequestedTheme == ApplicationTheme.Dark;
             }
 
-            webView.DefaultBackgroundColor = Microsoft.UI.Colors.Transparent;
+            _detailWebView.DefaultBackgroundColor = Microsoft.UI.Colors.Transparent;
 
             var textColor = isDark ? "#ffffff" : "#000000";
             var linkColor = isDark ? "#60CDFF" : "#005FB8";
             var codeBg = isDark ? "#2d2d2d" : "#f5f5f5";
             var quoteColor = isDark ? "#aaaaaa" : "#666666";
             var quoteBorder = isDark ? "#555555" : "#cccccc";
-
 
             var wrappedHtml = $$"""
                 <!DOCTYPE html>
@@ -188,7 +255,13 @@ public sealed partial class GameBananaPage : Page
                 </html>
                 """;
 
-            webView.NavigateToString(wrappedHtml);
+            // Skip re-navigating when the same content is already rendered
+            // (e.g. switching back to the tab that was just shown).
+            if (!string.Equals(_lastRenderedHtml, wrappedHtml, StringComparison.Ordinal))
+            {
+                _detailWebView.NavigateToString(wrappedHtml);
+                _lastRenderedHtml = wrappedHtml;
+            }
         }
         catch
         {
@@ -212,6 +285,64 @@ public sealed partial class GameBananaPage : Page
         if (e.ClickedItem is GbModDisplayItem mod)
         {
             ViewModel.OpenModDetailCommand.Execute(mod);
+        }
+    }
+
+    private void ModsGridView_ContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)
+    {
+        if (args.InRecycleQueue)
+        {
+            // A recycled container is far off-screen: drop its bitmaps so the
+            // collection does not keep decoded images alive indefinitely.
+            if (args.ItemContainer is GridViewItem recycledContainer)
+            {
+                recycledContainer.SizeChanged -= CardContainer_SizeChanged;
+            }
+            if (args.Item is GbModDisplayItem recycled)
+            {
+                recycled.ReleaseImages();
+            }
+            return;
+        }
+
+        // Lazy-load the thumbnail only when the card is actually realized.
+        if (args.Item is GbModDisplayItem { ThumbnailImage: null } item)
+        {
+            item.LoadThumbnail();
+        }
+
+        // Size the cover area to the exact 16:9 aspect of the realized card
+        // width, so UniformToFill shows the whole image without cropping the
+        // top/bottom (GameBanana renders covers in a precise 16:9 box).
+        if (args.ItemContainer is GridViewItem container)
+        {
+            container.SizeChanged -= CardContainer_SizeChanged;
+            container.SizeChanged += CardContainer_SizeChanged;
+        }
+    }
+
+    private void CardContainer_SizeChanged(object? sender, SizeChangedEventArgs e)
+    {
+        if (sender is not GridViewItem container || e.NewSize.Width <= 0)
+            return;
+
+        if (FindChildByName<Grid>(container, "CardCoverArea") is { } coverArea)
+        {
+            const double coverAspect = 16.0 / 9.0;
+            coverArea.Height = Math.Max(120, Math.Round((e.NewSize.Width - 14) / coverAspect));
+        }
+    }
+
+    private void ModsGridView_KeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key != Windows.System.VirtualKey.Enter && e.Key != Windows.System.VirtualKey.Space)
+            return;
+
+        if (FocusManager.GetFocusedElement() is GridViewItem item &&
+            item.Content is GbModDisplayItem mod)
+        {
+            ViewModel.OpenModDetailCommand.Execute(mod);
+            e.Handled = true;
         }
     }
 
@@ -329,50 +460,77 @@ public sealed partial class GameBananaPage : Page
         }
     }
 
-    private void PreviewImage_PointerEntered(object sender, PointerRoutedEventArgs e)
+    private void PreviewThumb_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
-        if (sender is Grid grid && grid.Children.Count > 1 && grid.Children[1] is Border overlay)
-        {
-            overlay.Opacity = 1;
-        }
+        if (sender is Grid grid) grid.Opacity = 1.0;
     }
 
-    private void PreviewImage_PointerExited(object sender, PointerRoutedEventArgs e)
+    private void PreviewThumb_PointerExited(object sender, PointerRoutedEventArgs e)
     {
-        if (sender is Grid grid && grid.Children.Count > 1 && grid.Children[1] is Border overlay)
-        {
-            overlay.Opacity = 0;
-        }
+        if (sender is Grid grid) grid.Opacity = 0.7;
     }
 
-    private void PreviewImage_ItemClick(object sender, ItemClickEventArgs e)
+    private void MainPreviewOverlay_PointerEntered(object sender, PointerRoutedEventArgs e)
+    {
+        if (MainPreviewHoverOverlay != null) MainPreviewHoverOverlay.Opacity = 1;
+    }
+
+    private void MainPreviewOverlay_PointerExited(object sender, PointerRoutedEventArgs e)
+    {
+        if (MainPreviewHoverOverlay != null) MainPreviewHoverOverlay.Opacity = 0;
+    }
+
+    private void PreviewThumbnail_ItemClick(object sender, ItemClickEventArgs e)
     {
         if (e.ClickedItem is GbPreviewImageItem imageItem)
         {
-            LightBoxOverlay.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
-            LightBoxLoading.IsActive = true;
-            LightBoxLoading.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
-            LightBoxImage.Source = null;
+            var index = ViewModel.PreviewImages.IndexOf(imageItem);
+            ViewModel.SelectPreviewImage(index);
 
-            // Load high res image
-            Helpers.RemoteImageLoader.LoadInto(imageItem.Url, 1920, img =>
+            // 直接全屏预览
+            if (ViewModel.LightBoxSelectedIndex == index)
+                ViewModel.ForceLoadLightBoxImages(index);
+            else
+                ViewModel.LightBoxSelectedIndex = index;
+
+            LightBoxOverlay.Visibility = Visibility.Visible;
+            LightBoxFlipView.Focus(FocusState.Programmatic);
+        }
+    }
+
+    private void MainPreview_PointerPressed(object sender, PointerRoutedEventArgs e)
+    {
+        if (ViewModel.PreviewImages.Count > 0)
+        {
+            // 如果索引已经是该值，绑定不会触发 setter 里的加载逻辑，需要手动强制触发
+            if (ViewModel.LightBoxSelectedIndex == ViewModel.SelectedPreviewIndex)
             {
-                if (LightBoxOverlay.Visibility == Microsoft.UI.Xaml.Visibility.Visible)
-                {
-                    LightBoxImage.Source = img;
-                    LightBoxLoading.IsActive = false;
-                    LightBoxLoading.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-                }
-            }, "_1920");
+                ViewModel.ForceLoadLightBoxImages(ViewModel.LightBoxSelectedIndex);
+            }
+            else
+            {
+                ViewModel.LightBoxSelectedIndex = ViewModel.SelectedPreviewIndex;
+            }
+
+            LightBoxOverlay.Visibility = Visibility.Visible;
+            LightBoxFlipView.Focus(FocusState.Programmatic);
         }
     }
 
     private void LightBoxOverlay_PointerPressed(object sender, PointerRoutedEventArgs e)
     {
-        if (e.OriginalSource == LightBoxOverlay)
+        // 只有点击了最外层半透明背景才关闭（内部 Grid 的点击交由 LightBoxItem_Tapped 处理）
+        if (ReferenceEquals(e.OriginalSource, LightBoxOverlay))
         {
             CloseLightBox();
         }
+    }
+
+    private void LightBoxItem_Tapped(object sender, TappedRoutedEventArgs e)
+    {
+        // 如果点击的是图片本身则不关闭，如果是周边透明区域则关闭
+        if (e.OriginalSource is Image) return;
+        CloseLightBox();
     }
 
     private void LightBoxClose_Click(object sender, RoutedEventArgs e)
@@ -382,43 +540,60 @@ public sealed partial class GameBananaPage : Page
 
     private void CloseLightBox()
     {
-        LightBoxOverlay.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-        LightBoxImage.Source = null;
-        LightBoxLoading.IsActive = false;
-        LightBoxLoading.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+        LightBoxOverlay.Visibility = Visibility.Collapsed;
     }
 
     private void ModCard_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
-        if (sender is Grid grid)
+        if (sender is UIElement element)
         {
-            // Set the center point to the true center of the card so it scales symmetrically 
-            // instead of expanding from the top-left corner.
-            grid.CenterPoint = new System.Numerics.Vector3((float)(grid.ActualWidth / 2), (float)(grid.ActualHeight / 2), 0f);
-
-            if (grid.ScaleTransition == null)
-            {
-                var transition = new Vector3Transition();
-                transition.Duration = TimeSpan.FromMilliseconds(150);
-                grid.ScaleTransition = transition;
-            }
-
-            grid.Scale = new System.Numerics.Vector3(1.02f, 1.02f, 1f);
-
-            // Bring element to front to avoid overlapping clipping from adjacent smaller cards
-            Canvas.SetZIndex(grid, 50);
+            element.TranslationTransition ??= new Vector3Transition { Duration = TimeSpan.FromMilliseconds(120) };
+            element.Translation = new System.Numerics.Vector3(0f, -3f, 0f);
+        }
+        if (sender is Border border)
+        {
+            border.BorderBrush = HoverCardBorderBrush;
         }
     }
 
     private void ModCard_PointerExited(object sender, PointerRoutedEventArgs e)
     {
-        if (sender is Grid grid)
+        if (sender is UIElement element)
         {
-            grid.CenterPoint = new System.Numerics.Vector3((float)(grid.ActualWidth / 2), (float)(grid.ActualHeight / 2), 0f);
-            grid.Scale = new System.Numerics.Vector3(1f, 1f, 1f);
+            element.Translation = new System.Numerics.Vector3(0f, 0f, 0f);
+        }
+        if (sender is Border border)
+        {
+            border.BorderBrush = DefaultCardBorderBrush;
+        }
+    }
 
-            // Restore original Z-Index
-            Canvas.SetZIndex(grid, 0);
+    private void ModCard_PointerPressed(object sender, PointerRoutedEventArgs e)
+    {
+        if (sender is UIElement element)
+        {
+            element.CenterPoint = new System.Numerics.Vector3((float)(element.RenderSize.Width / 2), (float)(element.RenderSize.Height / 2), 0f);
+            element.ScaleTransition ??= new Vector3Transition { Duration = TimeSpan.FromMilliseconds(100) };
+            element.Scale = new System.Numerics.Vector3(0.98f, 0.98f, 1f);
+            element.Translation = new System.Numerics.Vector3(0f, 0f, 0f);
+        }
+    }
+
+    private void ModCard_PointerReleased(object sender, PointerRoutedEventArgs e)
+    {
+        if (sender is UIElement element)
+        {
+            element.Scale = new System.Numerics.Vector3(1f, 1f, 1f);
+            element.Translation = new System.Numerics.Vector3(0f, -3f, 0f);
+        }
+    }
+
+    private void ModCard_PointerCanceled(object sender, PointerRoutedEventArgs e)
+    {
+        if (sender is UIElement element)
+        {
+            element.Scale = new System.Numerics.Vector3(1f, 1f, 1f);
+            element.Translation = new System.Numerics.Vector3(0f, 0f, 0f);
         }
     }
 
@@ -466,6 +641,24 @@ public sealed partial class GameBananaPage : Page
             if (child is T typed)
                 return typed;
             var found = FindChild<T>(child);
+            if (found != null)
+                return found;
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Recursively find a named child element of the specified type in the visual tree.
+    /// </summary>
+    private static T? FindChildByName<T>(DependencyObject parent, string name) where T : FrameworkElement
+    {
+        var count = VisualTreeHelper.GetChildrenCount(parent);
+        for (var i = 0; i < count; i++)
+        {
+            var child = VisualTreeHelper.GetChild(parent, i);
+            if (child is T typed && typed.Name == name)
+                return typed;
+            var found = FindChildByName<T>(child, name);
             if (found != null)
                 return found;
         }

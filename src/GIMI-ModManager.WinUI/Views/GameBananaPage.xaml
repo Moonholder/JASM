@@ -5,12 +5,11 @@
     xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:helpers="using:GIMI_ModManager.WinUI.Helpers.Xaml"
+    xmlns:l="using:WinUI3Localizer"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="using:GIMI_ModManager.Core.Services.GameBanana.Models"
-    xmlns:vm="using:GIMI_ModManager.WinUI.ViewModels"
     xmlns:tkcontrols="using:CommunityToolkit.WinUI.Controls"
-    xmlns:l="using:WinUI3Localizer"
-    x:Name="PageRoot"
+    xmlns:vm="using:GIMI_ModManager.WinUI.ViewModels"
     NavigationCacheMode="Disabled"
     mc:Ignorable="d">
 
@@ -19,917 +18,1355 @@
             <ResourceDictionary.ThemeDictionaries>
                 <ResourceDictionary x:Key="Dark">
                     <SolidColorBrush x:Key="GbCardBackground" Color="#15FFFFFF" />
-                    <!-- Opaque fallback for WebView to stop DirectComposition hole punch -->
+                    <!--  Opaque fallback for WebView to stop DirectComposition hole punch  -->
                     <SolidColorBrush x:Key="GbWebViewBackground" Color="#282828" />
+                    <SolidColorBrush x:Key="GbModCardBackground" Color="#202023" />
+                    <SolidColorBrush x:Key="GbModCardBorder" Color="#20FFFFFF" />
+                    <SolidColorBrush x:Key="GbModPillBackground" Color="#20FFFFFF" />
                 </ResourceDictionary>
                 <ResourceDictionary x:Key="Light">
                     <SolidColorBrush x:Key="GbCardBackground" Color="#80FFFFFF" />
                     <SolidColorBrush x:Key="GbWebViewBackground" Color="#F3F3F3" />
+                    <SolidColorBrush x:Key="GbModCardBackground" Color="#FFFFFF" />
+                    <SolidColorBrush x:Key="GbModCardBorder" Color="#18000000" />
+                    <SolidColorBrush x:Key="GbModPillBackground" Color="#0D000000" />
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
 
             <helpers:IntToVisibilityInverter x:Key="IntToVisibilityInverter" />
             <helpers:BoolInverterConverter x:Key="BoolInverterConverter" />
-            <DataTemplate x:Key="ModCardTemplate" x:DataType="vm:GbModDisplayItem">
-                <Grid
-                    Height="240"
-                    Margin="6"
-                    Padding="0"
-                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                    BorderThickness="1"
-                    CornerRadius="8"
-                    PointerEntered="ModCard_PointerEntered"
-                    PointerExited="ModCard_PointerExited">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="130" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
 
-                    <!--  Thumbnail  -->
-                    <Grid Grid.Row="0" CornerRadius="8,8,0,0">
-                        <!-- Fallback icon -->
-                        <FontIcon
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            FontSize="36"
-                            Foreground="{ThemeResource TextFillColorTertiaryBrush}"
-                            Glyph="&#xE8B9;" />
-                        <Image
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            Source="{x:Bind ThumbnailImage, Mode=OneWay}"
-                            Stretch="UniformToFill" />
-                        
-                        <!--  NSFW blur overlay  -->
-                        <Grid CornerRadius="8,8,0,0" Visibility="{x:Bind NsfwLabelVisibility, Mode=OneWay}">
-                            <Image
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Source="{x:Bind BlurredThumbnailImage, Mode=OneWay}"
-                                Stretch="UniformToFill" />
-                            <Border Background="#601A1A2E" />
-                            <StackPanel
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Spacing="4">
-                                <FontIcon
-                                    HorizontalAlignment="Center"
-                                    FontSize="24"
-                                    Foreground="#AAFFFFFF"
-                                    Glyph="&#xE72E;" />
-                                <Border
-                                    Padding="8,3,8,3"
-                                    HorizontalAlignment="Center"
-                                    Background="#CCFF4444"
-                                    CornerRadius="4">
-                                    <TextBlock
-                                        FontSize="11"
-                                        FontWeight="Bold"
-                                        Foreground="White"
-                                        Text="BLURRED" />
-                                </Border>
-                            </StackPanel>
-                        </Grid>
-                        
-                        <!-- Top-Right Badges -->
-                        <StackPanel
-                            Margin="8"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Top"
-                            Orientation="Horizontal"
-                            Spacing="6">
-                            <!-- NSFW Tag (Always visible if IsNsfw is true) -->
-                            <Border
-                                Padding="5,2"
-                                Background="#D0E81123"
-                                CornerRadius="4"
-                                Visibility="{x:Bind IsNsfwVisible, Mode=OneWay}">
-                                <TextBlock
-                                    FontSize="10"
-                                    FontWeight="Bold"
-                                    Foreground="White"
-                                    Text="NSFW" />
-                            </Border>
-
-                            <!-- Type Badge Overlay (Tool, WIP, Request, etc.) -->
-                            <Border
-                                Padding="5,2"
-                                Background="#D0101010"
-                                CornerRadius="4"
-                                Visibility="{x:Bind TypeLabelVisibility, Mode=OneWay}">
-                                <TextBlock
-                                    FontSize="10"
-                                    FontWeight="SemiBold"
-                                    Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
-                                    Text="{x:Bind TypeLabel, Mode=OneWay}" />
-                            </Border>
-                        </StackPanel>
-                    </Grid>
-
-                    <!--  Info Layout  -->
-                    <Grid Grid.Row="1" Padding="12,12,12,12">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" /> <!-- Title max 2 lines -->
-                            <RowDefinition Height="*" />    <!-- Flexible spacer -->
-                            <RowDefinition Height="Auto" /> <!-- Meta info -->
-                        </Grid.RowDefinitions>
-
-                        <!-- Title -->
-                        <TextBlock
-                            Grid.Row="0"
-                            FontSize="13"
-                            LineHeight="18"
-                            FontWeight="SemiBold"
-                            Foreground="{ThemeResource TextFillColorPrimaryBrush}"
-                            MaxLines="2"
-                            Text="{x:Bind Name}"
-                            TextTrimming="CharacterEllipsis"
-                            TextWrapping="Wrap" />
-
-                        <!-- Bottom container for Author + Stats -->
-                        <Grid Grid.Row="2" VerticalAlignment="Bottom">
+            <!--  Skeleton Card Template for Fluid Loading Transition  -->
+            <DataTemplate x:Key="SkeletonCardTemplate">
+                <Grid Margin="6">
+                    <Border
+                        Background="{ThemeResource GbModCardBackground}"
+                        BorderBrush="{ThemeResource GbModCardBorder}"
+                        BorderThickness="1"
+                        CornerRadius="12">
+                        <Grid CornerRadius="12">
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" /> <!-- Author & Date -->
-                                <RowDefinition Height="8" />    <!-- Spacing -->
-                                <RowDefinition Height="Auto" /> <!-- Stats -->
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
 
-                            <!-- Author & Date -->
-                            <Grid Grid.Row="0" VerticalAlignment="Center">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-
-                                <PersonPicture
-                                    Grid.Column="0"
-                                    Width="16"
-                                    Height="16"
-                                    Margin="0,0,6,0"
-                                    DisplayName="{x:Bind AuthorName}"
-                                    ProfilePicture="{x:Bind AuthorAvatarImage, Mode=OneWay}" />
-                                
-                                <TextBlock
-                                    Grid.Column="1"
-                                    VerticalAlignment="Center"
-                                    FontSize="11"
-                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                    Text="{x:Bind AuthorName}"
-                                    TextTrimming="CharacterEllipsis" />
-                                    
-                                <TextBlock
-                                    Grid.Column="2"
-                                    VerticalAlignment="Center"
-                                    FontSize="10"
-                                    Foreground="{ThemeResource TextFillColorTertiaryBrush}"
-                                    Text="{x:Bind FormattedDate}" />
+                            <!--  16:9 Cover Placeholder matching real cards  -->
+                            <Grid
+                                x:Name="CardCoverArea"
+                                Grid.Row="0"
+                                MinHeight="120">
+                                <Rectangle
+                                    Fill="{ThemeResource SubtleFillColorSecondaryBrush}"
+                                    RadiusX="12"
+                                    RadiusY="12" />
                             </Grid>
 
-                            <!-- Statistics -->
-                            <StackPanel
-                                Grid.Row="2"
-                                Orientation="Horizontal"
-                                Spacing="14"
-                                Opacity="0.8">
-                                <!-- Likes -->
-                                <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
-                                    <FontIcon FontSize="10" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" Glyph="&#xE006;" />
-                                    <TextBlock FontSize="10" FontWeight="Medium" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind FormattedLikes}" />
+                            <!--  Info Area Placeholder  -->
+                            <Border
+                                Grid.Row="1"
+                                Padding="14,12,14,12"
+                                Background="{ThemeResource GbModCardBackground}"
+                                CornerRadius="0,0,12,12">
+                                <StackPanel Spacing="10">
+                                    <!--  Title Placeholder  -->
+                                    <Border
+                                        Height="16"
+                                        HorizontalAlignment="Stretch"
+                                        Background="{ThemeResource SubtleFillColorTertiaryBrush}"
+                                        CornerRadius="4" />
+
+                                    <!--  Author & Date Placeholder  -->
+                                    <Grid VerticalAlignment="Center">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Ellipse
+                                            Grid.Column="0"
+                                            Width="18"
+                                            Height="18"
+                                            Margin="0,0,8,0"
+                                            Fill="{ThemeResource SubtleFillColorTertiaryBrush}" />
+                                        <Border
+                                            Grid.Column="1"
+                                            Width="90"
+                                            Height="12"
+                                            HorizontalAlignment="Left"
+                                            Background="{ThemeResource SubtleFillColorSecondaryBrush}"
+                                            CornerRadius="3" />
+                                    </Grid>
+
+                                    <!--  Pill Badges Placeholder  -->
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <Border
+                                            Width="46"
+                                            Height="20"
+                                            Background="{ThemeResource GbModPillBackground}"
+                                            CornerRadius="8" />
+                                        <Border
+                                            Width="52"
+                                            Height="20"
+                                            Background="{ThemeResource GbModPillBackground}"
+                                            CornerRadius="8" />
+                                        <Border
+                                            Width="42"
+                                            Height="20"
+                                            Background="{ThemeResource GbModPillBackground}"
+                                            CornerRadius="8" />
+                                    </StackPanel>
                                 </StackPanel>
-                                <!-- Downloads -->
-                                <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
-                                    <FontIcon FontSize="10" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" Glyph="&#xE7B3;" />
-                                    <TextBlock FontSize="10" FontWeight="Medium" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind FormattedDownloads}" />
-                                </StackPanel>
-                                <!-- Comments -->
-                                <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
-                                    <FontIcon FontSize="10" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" Glyph="&#xE8F2;" />
-                                    <TextBlock FontSize="10" FontWeight="Medium" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind FormattedComments}" />
-                                </StackPanel>
-                            </StackPanel>
+                            </Border>
                         </Grid>
-                    </Grid>
+                    </Border>
                 </Grid>
             </DataTemplate>
+
+            <DataTemplate x:Key="ModCardTemplate" x:DataType="vm:GbModDisplayItem">
+                <Grid Margin="6">
+                    <Border
+                        AutomationProperties.Name="{x:Bind Name}"
+                        Background="{ThemeResource GbModCardBackground}"
+                        BorderBrush="{ThemeResource GbModCardBorder}"
+                        BorderThickness="1"
+                        CornerRadius="12"
+                        PointerCanceled="ModCard_PointerCanceled"
+                        PointerEntered="ModCard_PointerEntered"
+                        PointerExited="ModCard_PointerExited"
+                        PointerPressed="ModCard_PointerPressed"
+                        PointerReleased="ModCard_PointerReleased">
+
+                        <Grid CornerRadius="12">
+                            <Grid.RowDefinitions>
+                                <!--
+                                    16:9 cover area: exact height is set in code
+                                    from the realized card width, so UniformToFill
+                                    shows the full image with zero crop.
+                                -->
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <!--
+                                Cover: fills the 16:9 area; for non-16:9 sources a
+                                small bottom crop is acceptable (same as GB).
+                            -->
+                            <Grid
+                                x:Name="CardCoverArea"
+                                Grid.Row="0"
+                                MinHeight="120">
+                                <!--
+                                    Neutral loading placeholder: always behind the
+                                    cover, so a one-frame ImageBrush gap never
+                                    flashes an icon - the image just covers it.
+                                -->
+                                <Rectangle Fill="{ThemeResource SubtleFillColorSecondaryBrush}" RadiusX="12" />
+
+                                <Rectangle RadiusX="12">
+                                    <Rectangle.Fill>
+                                        <ImageBrush
+                                            AlignmentY="Top"
+                                            ImageSource="{x:Bind ThumbnailImage, Mode=OneWay}"
+                                            Stretch="UniformToFill" />
+                                    </Rectangle.Fill>
+                                </Rectangle>
+
+                                <!--  Top-right contrast protection gradient for light cover images  -->
+                                <Rectangle Height="48" VerticalAlignment="Top">
+                                    <Rectangle.Fill>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Offset="0.0" Color="#45000000" />
+                                            <GradientStop Offset="1.0" Color="#00000000" />
+                                        </LinearGradientBrush>
+                                    </Rectangle.Fill>
+                                </Rectangle>
+
+                                <!--  Top-right badges (NSFW blur / NSFW show / type)  -->
+                                <StackPanel
+                                    Margin="10"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Top"
+                                    Orientation="Horizontal"
+                                    Spacing="6">
+                                    <Border
+                                        Padding="7,2"
+                                        Background="#B3121216"
+                                        BorderBrush="#30FFFFFF"
+                                        BorderThickness="1"
+                                        CornerRadius="6"
+                                        Visibility="{x:Bind NsfwBlurBadgeVisible, Mode=OneWay}">
+                                        <TextBlock
+                                            FontSize="10"
+                                            FontWeight="SemiBold"
+                                            Foreground="#E6FFFFFF"
+                                            Text="NSFW" />
+                                    </Border>
+                                    <Border
+                                        Padding="7,2"
+                                        Background="#E0ED4245"
+                                        CornerRadius="6"
+                                        Visibility="{x:Bind IsNsfwBadgeVisible, Mode=OneWay}">
+                                        <TextBlock
+                                            FontSize="10"
+                                            FontWeight="Bold"
+                                            Foreground="White"
+                                            Text="NSFW" />
+                                    </Border>
+                                    <Border
+                                        Padding="7,2"
+                                        Background="#D0121216"
+                                        BorderBrush="#30FFFFFF"
+                                        BorderThickness="1"
+                                        CornerRadius="6"
+                                        Visibility="{x:Bind TypeLabelVisibility, Mode=OneWay}">
+                                        <TextBlock
+                                            FontSize="10"
+                                            FontWeight="Bold"
+                                            Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                            Text="{x:Bind TypeLabel, Mode=OneWay}" />
+                                    </Border>
+                                </StackPanel>
+                            </Grid>
+
+                            <!--  Info row below the cover (Unibody Frosted Flow)  -->
+                            <Border
+                                Grid.Row="1"
+                                Padding="14,12,14,12"
+                                Background="{ThemeResource GbModCardBackground}"
+                                CornerRadius="0,0,12,12">
+                                <StackPanel Spacing="8">
+                                    <!--  Two-line title with uniform min height  -->
+                                    <TextBlock
+                                        MinHeight="38"
+                                        FontSize="14"
+                                        FontWeight="SemiBold"
+                                        Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                        LineHeight="19"
+                                        MaxLines="2"
+                                        Text="{x:Bind Name}"
+                                        TextTrimming="CharacterEllipsis"
+                                        TextWrapping="Wrap"
+                                        ToolTipService.ToolTip="{x:Bind Name}" />
+
+                                    <Grid Margin="0,0,0,2" VerticalAlignment="Center">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <PersonPicture
+                                            Grid.Column="0"
+                                            Width="18"
+                                            Height="18"
+                                            Margin="0,0,8,0"
+                                            ProfilePicture="{x:Bind AuthorAvatarImage, Mode=OneWay}" />
+
+                                        <TextBlock
+                                            Grid.Column="1"
+                                            VerticalAlignment="Center"
+                                            FontSize="12"
+                                            FontWeight="Medium"
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            Text="{x:Bind AuthorName}"
+                                            TextTrimming="CharacterEllipsis" />
+
+                                        <TextBlock
+                                            Grid.Column="2"
+                                            VerticalAlignment="Center"
+                                            FontSize="11"
+                                            Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                            Text="{x:Bind FormattedDate}" />
+                                    </Grid>
+
+                                    <!--  Pill Badges: Compact Left-Aligned Fluent Capsules  -->
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <Border
+                                            Padding="8,3"
+                                            Background="{ThemeResource GbModPillBackground}"
+                                            CornerRadius="8">
+                                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                                <FontIcon
+                                                    FontSize="11"
+                                                    Foreground="#E6FF6B8B"
+                                                    Glyph="&#xE006;" />
+                                                <TextBlock
+                                                    FontSize="11"
+                                                    FontWeight="SemiBold"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Text="{x:Bind FormattedLikes}" />
+                                            </StackPanel>
+                                        </Border>
+
+                                        <Border
+                                            Padding="8,3"
+                                            Background="{ThemeResource GbModPillBackground}"
+                                            CornerRadius="8">
+                                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                                <FontIcon
+                                                    FontSize="11"
+                                                    Foreground="#E640D3B0"
+                                                    Glyph="&#xE7B3;" />
+                                                <TextBlock
+                                                    FontSize="11"
+                                                    FontWeight="SemiBold"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Text="{x:Bind FormattedDownloads}" />
+                                            </StackPanel>
+                                        </Border>
+
+                                        <Border
+                                            Padding="8,3"
+                                            Background="{ThemeResource GbModPillBackground}"
+                                            CornerRadius="8">
+                                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                                <FontIcon
+                                                    FontSize="11"
+                                                    Foreground="#E67B88FF"
+                                                    Glyph="&#xE8F2;" />
+                                                <TextBlock
+                                                    FontSize="11"
+                                                    FontWeight="SemiBold"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Text="{x:Bind FormattedComments}" />
+                                            </StackPanel>
+                                        </Border>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </DataTemplate>
+
         </ResourceDictionary>
     </Page.Resources>
 
     <Grid>
         <SplitView
-        x:Name="DetailSplitView"
-        DisplayMode="Overlay"
-        IsPaneOpen="{x:Bind ViewModel.IsDetailPaneOpen, Mode=TwoWay}"
-        OpenPaneLength="420"
-        PaneBackground="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
-        PanePlacement="Right">
+            x:Name="DetailSplitView"
+            DisplayMode="Overlay"
+            IsPaneOpen="{x:Bind ViewModel.IsDetailPaneOpen, Mode=TwoWay}"
+            OpenPaneLength="500"
+            PaneBackground="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
+            PanePlacement="Right">
 
-        <!--  Detail Pane  -->
-        <SplitView.Pane>
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-
-                <!--  Header with close button  -->
-                <Grid
-                    Grid.Row="0"
-                    Margin="0,0,0,8"
-                    Padding="20,16,20,0">
-                    <TextBlock
-                        Margin="0,0,40,0"
-                        MaxLines="2"
-                        Style="{ThemeResource SubtitleTextBlockStyle}"
-                        Text="{x:Bind ViewModel.SelectedModName, Mode=OneWay}"
-                        TextTrimming="CharacterEllipsis"
-                        TextWrapping="Wrap" />
-                    <Button
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Top"
-                        Command="{x:Bind ViewModel.CloseDetailPaneCommand}">
-                        <FontIcon FontSize="12" Glyph="&#xE711;" />
-                    </Button>
-                </Grid>
-
-                <!--  Loading  -->
-                <ProgressRing
-                    Grid.Row="1"
-                    Width="36"
-                    Height="36"
-                    Margin="0,0,12,0"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    IsActive="{x:Bind ViewModel.IsDetailLoading, Mode=OneWay}"
-                    Visibility="{x:Bind ViewModel.IsDetailLoading, Mode=OneWay}" />
-
-                <!--  Detail content  -->
-                <Grid
-                    Grid.Row="1"
-                    Padding="20,0,8,12"
-                    Visibility="{x:Bind ViewModel.HasModDetail, Mode=OneWay}">
+            <!--  Detail Pane  -->
+            <SplitView.Pane>
+                <Grid BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1,0,0,0">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
-                    <!--  Author + Stats card  -->
+                    <!--  Header with close button  -->
                     <Grid
                         Grid.Row="0"
-                        Margin="0,0,12,12"
-                        Padding="14,12"
-                        Background="{ThemeResource GbCardBackground}"
-                        CornerRadius="8">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
-                                </Grid.RowDefinitions>
+                        Margin="0,0,0,8"
+                        Padding="20,16,20,0">
+                        <TextBlock
+                            Margin="0,0,40,0"
+                            MaxLines="2"
+                            Style="{ThemeResource SubtitleTextBlockStyle}"
+                            Text="{x:Bind ViewModel.SelectedModName, Mode=OneWay}"
+                            TextTrimming="CharacterEllipsis"
+                            TextWrapping="Wrap" />
+                        <Button
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Top"
+                            AutomationProperties.Name="Close"
+                            Command="{x:Bind ViewModel.CloseDetailPaneCommand}">
+                            <FontIcon FontSize="12" Glyph="&#xE711;" />
+                        </Button>
+                    </Grid>
 
-                                <!--  Author  -->
-                                <StackPanel
-                                    Grid.Row="0"
-                                    Orientation="Horizontal"
-                                    Spacing="10">
-                                    <PersonPicture
-                                        Width="36"
-                                        Height="36"
-                                        DisplayName="{x:Bind ViewModel.SelectedModAuthor, Mode=OneWay}"
-                                        ProfilePicture="{x:Bind ViewModel.SelectedModAuthorAvatar, Mode=OneWay}" />
-                                    <StackPanel VerticalAlignment="Center">
-                                        <TextBlock
-                                            FontSize="14"
-                                            FontWeight="SemiBold"
-                                            Text="{x:Bind ViewModel.SelectedModAuthor, Mode=OneWay}" />
-                                        <TextBlock
-                                            FontSize="11"
-                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                            Text="{x:Bind ViewModel.SelectedModDate, Mode=OneWay}" />
-                                    </StackPanel>
-                                </StackPanel>
-
-                                <!--  Stats row  -->
-                                <Grid
-                                    Grid.Row="1"
-                                    Margin="0,10,0,0"
-                                    ColumnSpacing="0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel
-                                        Grid.Column="0"
-                                        HorizontalAlignment="Center"
-                                        Orientation="Horizontal"
-                                        Spacing="6">
-                                        <FontIcon
-                                            FontSize="14"
-                                            Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
-                                            Glyph="&#xE006;" />
-                                        <TextBlock
-                                            FontSize="13"
-                                            FontWeight="SemiBold"
-                                            Text="{x:Bind ViewModel.SelectedModLikes, Mode=OneWay}" />
-                                        <TextBlock
-                                            FontSize="12"
-                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                            Text="Likes"
-                                            l:Uids.Uid="/GameBananaPage/LikesLabel" />
-                                    </StackPanel>
-                                    <StackPanel
-                                        Grid.Column="1"
-                                        HorizontalAlignment="Center"
-                                        Orientation="Horizontal"
-                                        Spacing="6">
-                                        <FontIcon
-                                            FontSize="14"
-                                            Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
-                                            Glyph="&#xE7B3;" />
-                                        <TextBlock
-                                            FontSize="13"
-                                            FontWeight="SemiBold"
-                                            Text="{x:Bind ViewModel.SelectedModViews, Mode=OneWay}" />
-                                        <TextBlock
-                                            FontSize="12"
-                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                            Text="Views"
-                                            l:Uids.Uid="/GameBananaPage/ViewsLabel" />
-                                    </StackPanel>
-                                </Grid>
-                            </Grid>
-
-                    <!-- Tabs Segmented -->
-                    <tkcontrols:Segmented
-                        x:Name="DetailSegmented"
+                    <!--  Loading  -->
+                    <ProgressRing
                         Grid.Row="1"
-                        Margin="0,0,12,12"
-                        HorizontalAlignment="Stretch"
-                        SelectedIndex="0"
-                        SelectionChanged="DetailSegmented_SelectionChanged">
-                        <tkcontrols:SegmentedItem Content="Overview" l:Uids.Uid="/GameBananaPage/TabOverviewItem" />
-                        <tkcontrols:SegmentedItem Content="Description" Visibility="{x:Bind ViewModel.HasDescription, Mode=OneWay}" l:Uids.Uid="/GameBananaPage/TabDescriptionItem" />
-                        <tkcontrols:SegmentedItem Content="Updates" Visibility="{x:Bind ViewModel.HasUpdateLog, Mode=OneWay}" l:Uids.Uid="/GameBananaPage/TabUpdateLogItem" />
-                    </tkcontrols:Segmented>
+                        Width="36"
+                        Height="36"
+                        Margin="0,0,12,0"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        IsActive="{x:Bind ViewModel.IsDetailLoading, Mode=OneWay}"
+                        Visibility="{x:Bind ViewModel.IsDetailLoading, Mode=OneWay}" />
 
-                    <!-- Tab 0: Overview -->
-                    <ScrollViewer x:Name="TabOverview" Grid.Row="2" Padding="0,0,12,0" VerticalScrollBarVisibility="Auto">
-                        <StackPanel Spacing="12" Padding="0,0,0,20">
-                            <!--  Preview images  -->
-                            <!--  Preview images  -->
-                            <ListView
-                                x:Name="PreviewListView"
-                                Height="200"
-                                Margin="0,0,-12,0"
-                                ContainerContentChanging="PreviewListView_ContainerContentChanging"
-                                IsItemClickEnabled="True"
-                                ItemClick="PreviewImage_ItemClick"
-                                ItemsSource="{x:Bind ViewModel.PreviewImages, Mode=OneWay}"
-                                ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                                ScrollViewer.HorizontalScrollMode="Enabled"
-                                ScrollViewer.VerticalScrollBarVisibility="Disabled"
-                                ScrollViewer.VerticalScrollMode="Disabled"
-                                SelectionMode="None"
-                                Visibility="{x:Bind ViewModel.HasPreviewImages, Mode=OneWay}">
-                                <ListView.ItemContainerStyle>
-                                    <Style TargetType="ListViewItem">
-                                        <Setter Property="Padding" Value="0" />
-                                        <Setter Property="Margin" Value="0,0,12,0" />
-                                        <Setter Property="MinHeight" Value="0" />
-                                        <Setter Property="MinWidth" Value="0" />
-                                        <Setter Property="Background" Value="Transparent" />
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate TargetType="ListViewItem">
-                                                    <ListViewItemPresenter
-                                                        ContentMargin="0"
-                                                        PointerOverBackground="Transparent"
-                                                        PressedBackground="Transparent"
-                                                        SelectedBackground="Transparent" />
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </Style>
-                                </ListView.ItemContainerStyle>
-                                <ListView.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <ItemsStackPanel Orientation="Horizontal" />
-                                    </ItemsPanelTemplate>
-                                </ListView.ItemsPanel>
-                                <ListView.ItemTemplate>
-                                    <DataTemplate x:DataType="vm:GbPreviewImageItem">
-                                        <Grid
-                                            Width="300"
-                                            Height="200"
-                                            Background="#20808080"
-                                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                                            BorderThickness="1"
-                                            CornerRadius="8"
-                                            PointerEntered="PreviewImage_PointerEntered"
-                                            PointerExited="PreviewImage_PointerExited">
-                                            <Image Source="{x:Bind ImageSource, Mode=OneWay}" Stretch="UniformToFill" />
-                                            <Border Background="#40000000" Opacity="0">
+                    <!--  Detail error + retry  -->
+                    <StackPanel
+                        Grid.Row="1"
+                        Margin="0,0,12,0"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Spacing="12"
+                        Visibility="{x:Bind ViewModel.HasDetailError, Mode=OneWay}">
+                        <FontIcon
+                            HorizontalAlignment="Center"
+                            FontSize="36"
+                            Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                            Glyph="&#xE783;" />
+                        <TextBlock
+                            MaxWidth="360"
+                            HorizontalAlignment="Center"
+                            FontSize="13"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Text="{x:Bind ViewModel.DetailErrorMessage, Mode=OneWay}"
+                            TextAlignment="Center"
+                            TextTrimming="CharacterEllipsis"
+                            TextWrapping="Wrap" />
+                        <Button
+                            HorizontalAlignment="Center"
+                            Command="{x:Bind ViewModel.RetryLoadDetailCommand}"
+                            Content="Retry"
+                            l:Uids.Uid="/GameBananaPage/RetryDetailBtn" />
+                    </StackPanel>
+
+                    <!--  Detail content  -->
+                    <Grid
+                        Grid.Row="1"
+                        Padding="20,0,8,12"
+                        Visibility="{x:Bind ViewModel.HasModDetail, Mode=OneWay}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <!--  Author + Stats card  -->
+                        <Grid
+                            Grid.Row="0"
+                            Margin="0,0,12,12"
+                            Padding="14,12"
+                            Background="{ThemeResource GbCardBackground}"
+                            CornerRadius="8">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <!--  Author  -->
+                            <StackPanel
+                                Grid.Row="0"
+                                Orientation="Horizontal"
+                                Spacing="10">
+                                <PersonPicture
+                                    Width="36"
+                                    Height="36"
+                                    DisplayName="{x:Bind ViewModel.SelectedModAuthor, Mode=OneWay}"
+                                    ProfilePicture="{x:Bind ViewModel.SelectedModAuthorAvatar, Mode=OneWay}" />
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock
+                                        FontSize="14"
+                                        FontWeight="SemiBold"
+                                        Text="{x:Bind ViewModel.SelectedModAuthor, Mode=OneWay}" />
+                                    <TextBlock
+                                        FontSize="11"
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Text="{x:Bind ViewModel.SelectedModDate, Mode=OneWay}" />
+                                </StackPanel>
+                            </StackPanel>
+
+                            <!--  Stats row  -->
+                            <Grid
+                                Grid.Row="1"
+                                Margin="0,10,0,0"
+                                ColumnSpacing="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel
+                                    Grid.Column="0"
+                                    HorizontalAlignment="Center"
+                                    Orientation="Horizontal"
+                                    Spacing="6">
+                                    <FontIcon
+                                        FontSize="14"
+                                        Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                        Glyph="&#xE006;" />
+                                    <TextBlock
+                                        FontSize="13"
+                                        FontWeight="SemiBold"
+                                        Text="{x:Bind ViewModel.SelectedModLikes, Mode=OneWay}" />
+                                    <TextBlock
+                                        FontSize="12"
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Text="Likes"
+                                        l:Uids.Uid="/GameBananaPage/LikesLabel" />
+                                </StackPanel>
+                                <StackPanel
+                                    Grid.Column="1"
+                                    HorizontalAlignment="Center"
+                                    Orientation="Horizontal"
+                                    Spacing="6">
+                                    <FontIcon
+                                        FontSize="14"
+                                        Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                        Glyph="&#xE7B3;" />
+                                    <TextBlock
+                                        FontSize="13"
+                                        FontWeight="SemiBold"
+                                        Text="{x:Bind ViewModel.SelectedModViews, Mode=OneWay}" />
+                                    <TextBlock
+                                        FontSize="12"
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Text="Views"
+                                        l:Uids.Uid="/GameBananaPage/ViewsLabel" />
+                                </StackPanel>
+                            </Grid>
+                        </Grid>
+
+                        <!--  Tabs Segmented  -->
+                        <tkcontrols:Segmented
+                            x:Name="DetailSegmented"
+                            Grid.Row="1"
+                            Margin="0,0,12,12"
+                            HorizontalAlignment="Stretch"
+                            SelectedIndex="0"
+                            SelectionChanged="DetailSegmented_SelectionChanged">
+                            <tkcontrols:SegmentedItem Content="Overview" l:Uids.Uid="/GameBananaPage/TabOverviewItem" />
+                            <tkcontrols:SegmentedItem
+                                Content="Description"
+                                Visibility="{x:Bind ViewModel.HasDescription, Mode=OneWay}"
+                                l:Uids.Uid="/GameBananaPage/TabDescriptionItem" />
+                            <tkcontrols:SegmentedItem
+                                Content="Updates"
+                                Visibility="{x:Bind ViewModel.HasUpdateLog, Mode=OneWay}"
+                                l:Uids.Uid="/GameBananaPage/TabUpdateLogItem" />
+                        </tkcontrols:Segmented>
+
+                        <!--  Tab 0: Overview  -->
+                        <ScrollViewer
+                            x:Name="TabOverview"
+                            Grid.Row="2"
+                            Padding="0,0,12,0"
+                            VerticalScrollBarVisibility="Auto">
+                            <StackPanel Padding="0,0,0,20" Spacing="12">
+                                <!--  预览图区域：首图大展示 + 缩略图导航条  -->
+                                <StackPanel Spacing="8" Visibility="{x:Bind ViewModel.HasPreviewImages, Mode=OneWay}">
+                                    <!--  大图展示区域（点击打开 LightBox）  -->
+                                    <Border
+                                        Height="260"
+                                        Background="#20808080"
+                                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="8">
+                                        <Grid CornerRadius="8" PointerPressed="MainPreview_PointerPressed">
+                                            <FontIcon
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                FontSize="36"
+                                                Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                                Glyph="&#xE8B9;" />
+                                            <Image Source="{x:Bind ViewModel.SelectedPreviewFullImage, Mode=OneWay}" Stretch="Uniform" />
+                                            <!--  悬停放大提示  -->
+                                            <Border
+                                                x:Name="MainPreviewHoverOverlay"
+                                                Background="#30000000"
+                                                CornerRadius="7"
+                                                Opacity="0"
+                                                PointerEntered="MainPreviewOverlay_PointerEntered"
+                                                PointerExited="MainPreviewOverlay_PointerExited">
                                                 <FontIcon
                                                     FontSize="32"
                                                     Foreground="White"
                                                     Glyph="&#xE8A3;" />
                                             </Border>
                                         </Grid>
-                                    </DataTemplate>
-                                </ListView.ItemTemplate>
-                            </ListView>
+                                    </Border>
 
-                            <!--  Actions  -->
-                            <Grid ColumnSpacing="8">
+                                    <!--  缩略图导航条  -->
+                                    <ListView
+                                        x:Name="PreviewListView"
+                                        Height="64"
+                                        Margin="0,0,-12,0"
+                                        ContainerContentChanging="PreviewListView_ContainerContentChanging"
+                                        IsItemClickEnabled="True"
+                                        ItemClick="PreviewThumbnail_ItemClick"
+                                        ItemsSource="{x:Bind ViewModel.PreviewImages, Mode=OneWay}"
+                                        ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                        ScrollViewer.HorizontalScrollMode="Enabled"
+                                        ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                                        ScrollViewer.VerticalScrollMode="Disabled"
+                                        SelectionMode="None">
+                                        <ListView.ItemContainerStyle>
+                                            <Style TargetType="ListViewItem">
+                                                <Setter Property="Padding" Value="0" />
+                                                <Setter Property="Margin" Value="0,0,6,0" />
+                                                <Setter Property="MinHeight" Value="0" />
+                                                <Setter Property="MinWidth" Value="0" />
+                                                <Setter Property="Background" Value="Transparent" />
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="ListViewItem">
+                                                            <ListViewItemPresenter
+                                                                ContentMargin="0"
+                                                                PointerOverBackground="Transparent"
+                                                                PressedBackground="Transparent"
+                                                                SelectedBackground="Transparent" />
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </ListView.ItemContainerStyle>
+                                        <ListView.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <ItemsStackPanel Orientation="Horizontal" />
+                                            </ItemsPanelTemplate>
+                                        </ListView.ItemsPanel>
+                                        <ListView.ItemTemplate>
+                                            <DataTemplate x:DataType="vm:GbPreviewImageItem">
+                                                <Grid
+                                                    Height="60"
+                                                    Background="#20808080"
+                                                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                                    BorderThickness="1"
+                                                    CornerRadius="4"
+                                                    Opacity="0.7"
+                                                    PointerEntered="PreviewThumb_PointerEntered"
+                                                    PointerExited="PreviewThumb_PointerExited">
+                                                    <Image Source="{x:Bind ImageSource, Mode=OneWay}" Stretch="Uniform" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ListView.ItemTemplate>
+                                    </ListView>
+                                </StackPanel>
+
+                                <!--  Actions  -->
+                                <Grid ColumnSpacing="8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Button
+                                        Grid.Column="0"
+                                        HorizontalAlignment="Stretch"
+                                        Command="{x:Bind ViewModel.OpenInBrowserCommand}"
+                                        Content="Open in Browser"
+                                        l:Uids.Uid="/GameBananaPage/OpenInBrowserBtn" />
+                                </Grid>
+
+                                <!--  Files list  -->
+                                <StackPanel Spacing="6" Visibility="{x:Bind ViewModel.HasFiles, Mode=OneWay}">
+                                    <TextBlock
+                                        Margin="0,4,0,2"
+                                        Style="{ThemeResource BodyStrongTextBlockStyle}"
+                                        Text="Downloadable Files"
+                                        l:Uids.Uid="/GameBananaPage/DownloadableFilesHdr" />
+                                    <ItemsRepeater ItemsSource="{x:Bind ViewModel.ModFiles, Mode=OneWay}">
+                                        <ItemsRepeater.ItemTemplate>
+                                            <DataTemplate x:DataType="models:ModFileInfo">
+                                                <Grid
+                                                    Margin="0,0,0,4"
+                                                    Padding="12,10"
+                                                    Background="{ThemeResource GbCardBackground}"
+                                                    CornerRadius="6">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel
+                                                        Grid.Column="0"
+                                                        Margin="0,0,8,0"
+                                                        Spacing="2">
+                                                        <StackPanel
+                                                            VerticalAlignment="Center"
+                                                            Orientation="Horizontal"
+                                                            Spacing="6">
+                                                            <TextBlock
+                                                                FontSize="13"
+                                                                FontWeight="SemiBold"
+                                                                Text="{x:Bind FileName}"
+                                                                TextTrimming="CharacterEllipsis" />
+                                                            <TextBlock
+                                                                Margin="0,0,0,1"
+                                                                VerticalAlignment="Bottom"
+                                                                FontSize="11"
+                                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                                Text="{x:Bind Version}" />
+                                                        </StackPanel>
+                                                        <TextBlock
+                                                            FontSize="11"
+                                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                            MaxLines="2"
+                                                            Text="{x:Bind Description}"
+                                                            TextTrimming="CharacterEllipsis"
+                                                            TextWrapping="Wrap" />
+                                                        <StackPanel
+                                                            Margin="0,2,0,0"
+                                                            Orientation="Horizontal"
+                                                            Spacing="12">
+                                                            <TextBlock
+                                                                FontSize="10"
+                                                                Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                                                Text="{x:Bind FormattedFileSize}" />
+                                                            <StackPanel Orientation="Horizontal" Spacing="3">
+                                                                <FontIcon
+                                                                    FontSize="10"
+                                                                    Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                                                    Glyph="&#xE896;" />
+                                                                <TextBlock
+                                                                    FontSize="10"
+                                                                    Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                                                    Text="{x:Bind FormattedDownloadCount}" />
+                                                            </StackPanel>
+                                                        </StackPanel>
+                                                    </StackPanel>
+                                                    <Button
+                                                        Grid.Column="1"
+                                                        VerticalAlignment="Center"
+                                                        AutomationProperties.Name="Download &amp; Install"
+                                                        Click="DownloadButton_Click"
+                                                        IsEnabled="{x:Bind IsDownloading, Mode=OneWay, Converter={StaticResource BoolInverterConverter}}"
+                                                        Style="{ThemeResource AccentButtonStyle}"
+                                                        Tag="{x:Bind}"
+                                                        ToolTipService.ToolTip="Download &amp; Install"
+                                                        l:Uids.Uid="/GameBananaPage/DownloadBtn">
+                                                        <FontIcon FontSize="14" Glyph="&#xE896;" />
+                                                    </Button>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsRepeater.ItemTemplate>
+                                    </ItemsRepeater>
+                                </StackPanel>
+                            </StackPanel>
+                        </ScrollViewer>
+
+                        <!--  Tab 1: Description  -->
+                        <Border
+                            x:Name="TabDescription"
+                            Grid.Row="2"
+                            Margin="0,0,12,0"
+                            Padding="2"
+                            Background="{ThemeResource GbWebViewBackground}"
+                            CornerRadius="8"
+                            Visibility="Collapsed" />
+
+                        <!--  Tab 2: Update Log  -->
+                        <Border
+                            x:Name="TabUpdateLog"
+                            Grid.Row="2"
+                            Margin="0,0,12,0"
+                            Padding="2"
+                            Background="{ThemeResource GbWebViewBackground}"
+                            CornerRadius="8"
+                            Visibility="Collapsed" />
+                    </Grid>
+                </Grid>
+            </SplitView.Pane>
+
+            <!--  Main content  -->
+            <SplitView.Content>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition x:Name="CategoryColumn" Width="220" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!--  Left: Categories  -->
+                    <Grid Grid.Column="0" Padding="0,0,8,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <!--  Header & Compact Inline Search: Aligned with TopBar height and margin  -->
+                        <Grid
+                            Grid.Row="0"
+                            Height="36"
+                            Margin="12,0,8,16"
+                            VerticalAlignment="Center">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Style="{ThemeResource SubtitleTextBlockStyle}"
+                                Text="Categories"
+                                l:Uids.Uid="/GameBananaPage/CategoriesHdr" />
+
+                            <!--  Category Quick Filter Box: Compact Inline  -->
+                            <AutoSuggestBox
+                                x:Name="CategoryFilterBox"
+                                Grid.Column="1"
+                                Margin="8,0,0,0"
+                                VerticalAlignment="Center"
+                                PlaceholderText="Search categories..."
+                                QueryIcon="Find"
+                                Text="{x:Bind ViewModel.CategorySearchQuery, Mode=TwoWay}"
+                                l:Uids.Uid="/GameBananaPage/CategorySearchBox" />
+                        </Grid>
+
+                        <ProgressRing
+                            Grid.Row="1"
+                            Width="24"
+                            Height="24"
+                            Margin="0,20,0,0"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Top"
+                            IsActive="{x:Bind ViewModel.IsCategoriesLoading, Mode=OneWay}"
+                            Visibility="{x:Bind ViewModel.IsCategoriesLoading, Mode=OneWay}" />
+
+                        <ListView
+                            Grid.Row="1"
+                            ContainerContentChanging="CategoryList_ContainerContentChanging"
+                            ItemsSource="{x:Bind ViewModel.Categories}"
+                            SelectedItem="{x:Bind ViewModel.SelectedCategory, Mode=TwoWay}"
+                            SelectionChanged="CategoryList_SelectionChanged"
+                            SelectionMode="Single">
+                            <ListView.ItemTemplate>
+                                <DataTemplate x:DataType="vm:GbCategoryDisplayItem">
+                                    <Grid Padding="4,6" ColumnSpacing="8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="28" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <!--  Icon Container  -->
+                                        <Grid
+                                            Grid.Column="0"
+                                            Width="24"
+                                            Height="24"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center">
+                                            <FontIcon
+                                                FontSize="16"
+                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                Glyph="{x:Bind IconGlyph}" />
+                                            <Image Source="{x:Bind IconImage, Mode=OneWay}" Stretch="UniformToFill" />
+                                        </Grid>
+
+                                        <TextBlock
+                                            Grid.Column="1"
+                                            VerticalAlignment="Center"
+                                            FontSize="13"
+                                            FontWeight="{x:Bind SectionFontWeight}"
+                                            Text="{x:Bind Name}"
+                                            TextTrimming="CharacterEllipsis" />
+
+                                        <!--  Play count badge: Concentric CornerRadius 8  -->
+                                        <Border
+                                            Grid.Column="2"
+                                            Padding="6,2"
+                                            VerticalAlignment="Center"
+                                            Background="{ThemeResource ControlFillColorSecondaryBrush}"
+                                            CornerRadius="8"
+                                            Visibility="{x:Bind HasItemCountText}">
+                                            <TextBlock
+                                                FontSize="10"
+                                                FontWeight="SemiBold"
+                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                Text="{x:Bind ItemCountText}" />
+                                        </Border>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </Grid>
+
+                    <!--  Right: Mod list  -->
+                    <Grid Grid.Column="1" Margin="16,0,0,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <!--  Top bar: Search and Sort and Filters  -->
+                        <Grid
+                            x:Name="TopBarGrid"
+                            Grid.Row="0"
+                            Margin="0,0,0,16">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition x:Name="TopBarSecondRow" Height="0" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition x:Name="TopBarSearchCol" Width="Auto" />
+                                <ColumnDefinition x:Name="TopBarFilterCol" Width="Auto" />
+                                <ColumnDefinition x:Name="TopBarSpacerCol" Width="*" />
+                                <ColumnDefinition x:Name="TopBarDownloadCol" Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <AutoSuggestBox
+                                x:Name="SearchBox"
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                Width="220"
+                                Margin="0,0,8,0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                PlaceholderText="Search mods..."
+                                QueryIcon="Find"
+                                QuerySubmitted="{x:Bind ViewModel.OnSearchSubmitted}"
+                                Text="{x:Bind ViewModel.SearchQuery, Mode=TwoWay}"
+                                l:Uids.Uid="/GameBananaPage/SearchModBox" />
+
+                            <Grid
+                                x:Name="FilterControlsContainer"
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                ColumnSpacing="8">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-                                <Button
+
+                                <ComboBox
+                                    x:Name="ModelFilterComboBox"
                                     Grid.Column="0"
+                                    MinWidth="105"
                                     HorizontalAlignment="Stretch"
-                                    Command="{x:Bind ViewModel.OpenInBrowserCommand}"
-                                    Content="Open in Browser"
-                                    l:Uids.Uid="/GameBananaPage/OpenInBrowserBtn" />
+                                    VerticalAlignment="Center"
+                                    DisplayMemberPath="DisplayName"
+                                    ItemsSource="{x:Bind ViewModel.ModelFilterOptions}"
+                                    SelectedItem="{x:Bind ViewModel.SelectedModelFilterOption, Mode=TwoWay}" />
+
+                                <ComboBox
+                                    x:Name="NsfwPolicyComboBox"
+                                    Grid.Column="1"
+                                    MinWidth="115"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Center"
+                                    DisplayMemberPath="DisplayName"
+                                    ItemsSource="{x:Bind ViewModel.NsfwPolicyOptions}"
+                                    SelectedItem="{x:Bind ViewModel.SelectedNsfwPolicyOption, Mode=TwoWay}" />
+
+                                <ComboBox
+                                    x:Name="SortComboBox"
+                                    Grid.Column="2"
+                                    MinWidth="105"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Center"
+                                    DisplayMemberPath="DisplayName"
+                                    ItemsSource="{x:Bind ViewModel.SortOptions}"
+                                    SelectedItem="{x:Bind ViewModel.SelectedSortOption, Mode=TwoWay}" />
                             </Grid>
 
-                            <!--  Files list  -->
-                            <StackPanel Spacing="6" Visibility="{x:Bind ViewModel.HasFiles, Mode=OneWay}">
-                                <TextBlock
-                                    Margin="0,4,0,2"
-                                    Style="{ThemeResource BodyStrongTextBlockStyle}"
-                                    Text="Downloadable Files"
-                                    l:Uids.Uid="/GameBananaPage/DownloadableFilesHdr" />
-                                <ItemsRepeater ItemsSource="{x:Bind ViewModel.ModFiles, Mode=OneWay}">
-                                    <ItemsRepeater.ItemTemplate>
-                                        <DataTemplate x:DataType="models:ModFileInfo">
-                                            <Grid
-                                                Margin="0,0,0,4"
-                                                Padding="12,10"
-                                                Background="{ThemeResource GbCardBackground}"
-                                                CornerRadius="6">
+                            <Button
+                                x:Name="DownloadManagerButton"
+                                Grid.Row="0"
+                                Grid.Column="3"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
+                                Style="{ThemeResource DefaultButtonStyle}"
+                                ToolTipService.ToolTip="Download Manager"
+                                l:Uids.Uid="/GameBananaPage/DownloadManagerBtn">
+                                <Grid>
+                                    <FontIcon FontSize="16" Glyph="&#xE896;" />
+                                    <InfoBadge
+                                        Margin="0,-8,-12,0"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Top"
+                                        Visibility="{x:Bind ViewModel.HasActiveDownloads, Mode=OneWay}"
+                                        Value="{x:Bind ViewModel.ActiveDownloadCount, Mode=OneWay}" />
+                                </Grid>
+                                <Button.Flyout>
+                                    <Flyout Placement="BottomEdgeAlignedRight">
+                                        <Grid Width="350">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="*" />
+                                            </Grid.RowDefinitions>
+                                            <Grid Margin="0,0,0,12">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="*" />
                                                     <ColumnDefinition Width="Auto" />
                                                 </Grid.ColumnDefinitions>
-                                                <StackPanel
-                                                    Grid.Column="0"
-                                                    Margin="0,0,8,0"
-                                                    Spacing="2">
-                                                    <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-                                                        <TextBlock
-                                                            FontSize="13"
-                                                            FontWeight="SemiBold"
-                                                            Text="{x:Bind FileName}"
-                                                            TextTrimming="CharacterEllipsis" />
-                                                        <TextBlock
-                                                            FontSize="11"
-                                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                            Text="{x:Bind FormattedVersion}"
-                                                            VerticalAlignment="Bottom"
-                                                            Margin="0,0,0,1" />
-                                                    </StackPanel>
-                                                    <TextBlock
-                                                        FontSize="11"
-                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                        MaxLines="2"
-                                                        Text="{x:Bind Description}"
-                                                        TextTrimming="CharacterEllipsis"
-                                                        TextWrapping="Wrap" />
-                                                    <StackPanel
-                                                        Margin="0,2,0,0"
-                                                        Orientation="Horizontal"
-                                                        Spacing="12">
-                                                        <TextBlock
-                                                            FontSize="10"
-                                                            Foreground="{ThemeResource TextFillColorTertiaryBrush}"
-                                                            Text="{x:Bind FormattedFileSize}" />
-                                                        <StackPanel Orientation="Horizontal" Spacing="3">
-                                                            <FontIcon
-                                                                FontSize="10"
-                                                                Foreground="{ThemeResource TextFillColorTertiaryBrush}"
-                                                                Glyph="&#xE896;" />
-                                                            <TextBlock
-                                                                FontSize="10"
-                                                                Foreground="{ThemeResource TextFillColorTertiaryBrush}"
-                                                                Text="{x:Bind FormattedDownloadCount}" />
-                                                        </StackPanel>
-                                                    </StackPanel>
-                                                </StackPanel>
+                                                <TextBlock
+                                                    VerticalAlignment="Center"
+                                                    Style="{ThemeResource SubtitleTextBlockStyle}"
+                                                    Text="Download Queue"
+                                                    l:Uids.Uid="/GameBananaPage/DownloadQueueHdr" />
                                                 <Button
                                                     Grid.Column="1"
+                                                    Padding="8,4"
                                                     VerticalAlignment="Center"
-                                                    Click="DownloadButton_Click"
-                                                    IsEnabled="{x:Bind IsDownloading, Mode=OneWay, Converter={StaticResource BoolInverterConverter}}"
-                                                    Style="{ThemeResource AccentButtonStyle}"
-                                                    Tag="{x:Bind}"
-                                                    ToolTipService.ToolTip="Download &amp; Install"
-                                                    l:Uids.Uid="/GameBananaPage/DownloadBtn">
-                                                    <FontIcon FontSize="14" Glyph="&#xE896;" />
-                                                </Button>
+                                                    Command="{x:Bind ViewModel.ClearAllCompletedTasksCommand}"
+                                                    Content="Clear Completed"
+                                                    FontSize="12"
+                                                    l:Uids.Uid="/GameBananaPage/ClearCompletedBtn" />
                                             </Grid>
-                                        </DataTemplate>
-                                    </ItemsRepeater.ItemTemplate>
-                                </ItemsRepeater>
+
+                                            <ListView
+                                                Grid.Row="1"
+                                                MaxHeight="400"
+                                                ItemsSource="{x:Bind ViewModel.DownloadQueue}"
+                                                SelectionMode="None">
+                                                <ListView.ItemTemplate>
+                                                    <DataTemplate x:DataType="vm:GbDownloadTask">
+                                                        <Grid Margin="0,4,0,12">
+                                                            <Grid.RowDefinitions>
+                                                                <RowDefinition Height="Auto" />
+                                                                <RowDefinition Height="Auto" />
+                                                                <RowDefinition Height="Auto" />
+                                                                <RowDefinition Height="Auto" />
+                                                            </Grid.RowDefinitions>
+
+                                                            <Grid>
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="*" />
+                                                                    <ColumnDefinition Width="Auto" />
+                                                                </Grid.ColumnDefinitions>
+                                                                <TextBlock
+                                                                    Margin="0,0,8,4"
+                                                                    FontWeight="SemiBold"
+                                                                    Text="{x:Bind FileInfo.FileName}"
+                                                                    TextTrimming="CharacterEllipsis" />
+                                                                <StackPanel
+                                                                    Grid.Column="1"
+                                                                    VerticalAlignment="Top"
+                                                                    Orientation="Horizontal"
+                                                                    Spacing="4">
+                                                                    <!--  Retry button  -->
+                                                                    <Button
+                                                                        Padding="4"
+                                                                        AutomationProperties.Name="Retry Installation"
+                                                                        Click="RetryDownloadTask_Click"
+                                                                        ToolTipService.ToolTip="Retry Installation"
+                                                                        Visibility="{x:Bind RetryVisibility, Mode=OneWay}"
+                                                                        l:Uids.Uid="/GameBananaPage/RetryBtn">
+                                                                        <FontIcon FontSize="10" Glyph="&#xE72C;" />
+                                                                    </Button>
+                                                                    <!--  Cancel button (visible during download)  -->
+                                                                    <Button
+                                                                        Padding="4"
+                                                                        AutomationProperties.Name="Cancel"
+                                                                        Click="CancelDownloadTask_Click"
+                                                                        ToolTipService.ToolTip="Cancel"
+                                                                        Visibility="{x:Bind CancelVisibility, Mode=OneWay}"
+                                                                        l:Uids.Uid="/GameBananaPage/CancelBtn">
+                                                                        <FontIcon FontSize="10" Glyph="&#xE711;" />
+                                                                    </Button>
+                                                                    <!--  Remove button (visible after completion)  -->
+                                                                    <Button
+                                                                        Padding="4"
+                                                                        AutomationProperties.Name="Remove"
+                                                                        Click="RemoveDownloadTask_Click"
+                                                                        ToolTipService.ToolTip="Remove"
+                                                                        Visibility="{x:Bind RemoveVisibility, Mode=OneWay}"
+                                                                        l:Uids.Uid="/GameBananaPage/RemoveBtn">
+                                                                        <FontIcon FontSize="10" Glyph="&#xE74D;" />
+                                                                    </Button>
+                                                                </StackPanel>
+                                                            </Grid>
+
+                                                            <ProgressBar
+                                                                Grid.Row="1"
+                                                                Margin="0,0,0,4"
+                                                                IsIndeterminate="{x:Bind IsCompleted, Mode=OneWay, Converter={StaticResource BoolInverterConverter}}"
+                                                                Maximum="100"
+                                                                ShowError="{x:Bind IsError, Mode=OneWay}"
+                                                                Value="{x:Bind ProgressPercentage, Mode=OneWay}" />
+
+                                                            <TextBlock
+                                                                Grid.Row="2"
+                                                                FontSize="12"
+                                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                                Text="{x:Bind StatusMessage, Mode=OneWay}" />
+                                                        </Grid>
+                                                    </DataTemplate>
+                                                </ListView.ItemTemplate>
+
+                                                <!--  Empty state indicator  -->
+                                                <ListView.Header>
+                                                    <TextBlock
+                                                        Margin="0,8,0,0"
+                                                        FontStyle="Italic"
+                                                        Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                                        Text="No active tasks"
+                                                        Visibility="{x:Bind ViewModel.DownloadQueueCount, Mode=OneWay, Converter={StaticResource IntToVisibilityInverter}}"
+                                                        l:Uids.Uid="/GameBananaPage/EmptyQueueHdr" />
+                                                </ListView.Header>
+                                            </ListView>
+                                        </Grid>
+                                    </Flyout>
+                                </Button.Flyout>
+                            </Button>
+                        </Grid>
+
+                        <!--  Error message  -->
+                        <InfoBar
+                            Grid.Row="1"
+                            Margin="8,0,8,0"
+                            VerticalAlignment="Top"
+                            IsOpen="{x:Bind ViewModel.HasError, Mode=TwoWay}"
+                            Message="{x:Bind ViewModel.ErrorMessage, Mode=OneWay}"
+                            Severity="Error" />
+
+                        <!--  Skeleton Loading Grid: 1:1 Responsive Skeleton Cards  -->
+                        <controls:AdaptiveGridView
+                            x:Name="SkeletonGridView"
+                            Grid.Row="1"
+                            Padding="4"
+                            ContainerContentChanging="ModsGridView_ContainerContentChanging"
+                            DesiredWidth="{x:Bind ModsGridView.DesiredWidth, Mode=OneWay}"
+                            IsItemClickEnabled="False"
+                            ItemTemplate="{StaticResource SkeletonCardTemplate}"
+                            ItemsSource="{x:Bind ViewModel.SkeletonPlaceholders}"
+                            SelectionMode="None"
+                            StretchContentForSingleRow="False"
+                            Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay}">
+                            <controls:AdaptiveGridView.ItemContainerStyle>
+                                <Style TargetType="GridViewItem">
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                    <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                                    <Setter Property="IsHitTestVisible" Value="False" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="GridViewItem">
+                                                <ListViewItemPresenter
+                                                    Background="Transparent"
+                                                    ContentMargin="0"
+                                                    CornerRadius="12"
+                                                    PointerOverBackground="Transparent"
+                                                    PressedBackground="Transparent"
+                                                    SelectedBackground="Transparent" />
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </controls:AdaptiveGridView.ItemContainerStyle>
+                        </controls:AdaptiveGridView>
+
+                        <!--  空状态艺术提示  -->
+                        <StackPanel
+                            Grid.Row="1"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Spacing="12"
+                            Visibility="{x:Bind ViewModel.HasNoResults, Mode=OneWay}">
+                            <Border
+                                Width="72"
+                                Height="72"
+                                HorizontalAlignment="Center"
+                                Background="{ThemeResource ControlFillColorSecondaryBrush}"
+                                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                BorderThickness="1"
+                                CornerRadius="36">
+                                <FontIcon
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    FontSize="28"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    Glyph="&#xE721;" />
+                            </Border>
+                            <StackPanel Spacing="4">
+                                <TextBlock
+                                    HorizontalAlignment="Center"
+                                    FontSize="16"
+                                    FontWeight="SemiBold"
+                                    Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                    Text="No mods found"
+                                    l:Uids.Uid="/GameBananaPage/NoModsFoundHdr" />
+                                <TextBlock
+                                    HorizontalAlignment="Center"
+                                    FontSize="13"
+                                    Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                    Text="Try different keywords or browse categories"
+                                    l:Uids.Uid="/GameBananaPage/NoModsFoundTip" />
                             </StackPanel>
                         </StackPanel>
-                    </ScrollViewer>
 
-                    <!-- Tab 1: Description -->
-                    <Border
-                        x:Name="TabDescription"
-                        Grid.Row="2"
-                        Margin="0,0,12,0"
-                        Padding="2"
-                        Background="{ThemeResource GbWebViewBackground}"
-                        CornerRadius="8"
-                        Visibility="Collapsed">
-                        <WebView2
-                            x:Name="DescriptionWebView"
-                            DefaultBackgroundColor="Transparent"
-                            NavigationStarting="WebView_NavigationStarting" />
-                    </Border>
-
-                    <!-- Tab 2: Update Log -->
-                    <Border
-                        x:Name="TabUpdateLog"
-                        Grid.Row="2"
-                        Margin="0,0,12,0"
-                        Padding="2"
-                        Background="{ThemeResource GbWebViewBackground}"
-                        CornerRadius="8"
-                        Visibility="Collapsed">
-                        <WebView2
-                            x:Name="UpdateLogWebView"
-                            DefaultBackgroundColor="Transparent"
-                            NavigationStarting="WebView_NavigationStarting" />
-                    </Border>
-                </Grid>
-            </Grid>
-        </SplitView.Pane>
-
-        <!--  Main content  -->
-        <SplitView.Content>
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition x:Name="CategoryColumn" Width="220" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-
-                <!--  Left: Categories  -->
-                <Grid Grid.Column="0" Padding="0,0,8,0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
-
-                    <TextBlock
-                        Grid.Row="0"
-                        Margin="12,8,0,8"
-                        Style="{ThemeResource SubtitleTextBlockStyle}"
-                        Text="分类"
-                        l:Uids.Uid="/GameBananaPage/CategoriesHdr" />
-
-                    <ProgressRing
-                        Grid.Row="1"
-                        Width="24"
-                        Height="24"
-                        Margin="0,20,0,0"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Top"
-                        IsActive="{x:Bind ViewModel.IsCategoriesLoading, Mode=OneWay}"
-                        Visibility="{x:Bind ViewModel.IsCategoriesLoading, Mode=OneWay}" />
-
-                    <ListView
-                        Grid.Row="1"
-                        ItemsSource="{x:Bind ViewModel.Categories}"
-                        SelectedItem="{x:Bind ViewModel.SelectedCategory, Mode=TwoWay}"
-                        SelectionChanged="CategoryList_SelectionChanged"
-                        ContainerContentChanging="CategoryList_ContainerContentChanging"
-                        SelectionMode="Single">
-                        <ListView.ItemTemplate>
-                            <DataTemplate x:DataType="vm:GbCategoryDisplayItem">
-                                <Grid Padding="4,6" ColumnSpacing="8">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="28" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    
-                                    <!--  Icon fallback to FontIcon  -->
-                                    <FontIcon
-                                        Grid.Column="0"
-                                        VerticalAlignment="Center"
-                                        FontSize="16"
-                                        Glyph="{x:Bind IconGlyph}" />
-                                    <!--  Real Image  -->
-                                    <Image
-                                        Grid.Column="0"
-                                        Width="24"
-                                        Height="24"
-                                        VerticalAlignment="Center"
-                                        Source="{x:Bind IconImage, Mode=OneWay}"
-                                        Stretch="UniformToFill" />
-                                        
-                                    <TextBlock
-                                        Grid.Column="1"
-                                        VerticalAlignment="Center"
-                                        FontSize="13"
-                                        FontWeight="{x:Bind SectionFontWeight}"
-                                        Text="{x:Bind Name}"
-                                        TextTrimming="CharacterEllipsis" />
-                                        
-                                    <!-- Play count badge -->
-                                    <Border
-                                        Grid.Column="2"
-                                        VerticalAlignment="Center"
-                                        Padding="6,2"
-                                        Background="#15FFFFFF"
-                                        CornerRadius="4"
-                                        Visibility="{x:Bind HasItemCountText}">
-                                        <TextBlock
-                                            FontSize="10"
-                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                            Text="{x:Bind ItemCountText}" />
-                                    </Border>
-                                </Grid>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
-                </Grid>
-
-                <!--  Right: Mod list  -->
-                <Grid Grid.Column="1" Margin="16,0,0,0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
-
-                    <!--  Top bar: Search and Sort and Filters  -->
-                    <Grid
-                        Grid.Row="0"
-                        Margin="0,0,0,16"
-                        ColumnSpacing="8">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-
-                        <AutoSuggestBox
-                            Grid.Column="0"
-                            VerticalAlignment="Center"
-                            PlaceholderText="Search mods..."
-                            QueryIcon="Find"
-                            Text="{x:Bind ViewModel.SearchQuery, Mode=TwoWay}"
-                            QuerySubmitted="{x:Bind ViewModel.OnSearchSubmitted}"
-                            l:Uids.Uid="/GameBananaPage/SearchModBox" />
-
-                        <ComboBox
-                            Grid.Column="1"
-                            Width="120"
-                            VerticalAlignment="Center"
-                            DisplayMemberPath="DisplayName"
-                            ItemsSource="{x:Bind ViewModel.ModelFilterOptions}"
-                            SelectedItem="{x:Bind ViewModel.SelectedModelFilterOption, Mode=TwoWay}" />
-
-                        <ComboBox
-                            Grid.Column="2"
-                            Width="130"
-                            VerticalAlignment="Center"
-                            DisplayMemberPath="DisplayName"
-                            ItemsSource="{x:Bind ViewModel.NsfwPolicyOptions}"
-                            SelectedItem="{x:Bind ViewModel.SelectedNsfwPolicyOption, Mode=TwoWay}" />
-
-                        <ComboBox
-                            Grid.Column="3"
-                            Width="130"
-                            VerticalAlignment="Center"
-                            DisplayMemberPath="DisplayName"
-                            ItemsSource="{x:Bind ViewModel.SortOptions}"
-                            SelectedItem="{x:Bind ViewModel.SelectedSortOption, Mode=TwoWay}" />
-
-                        <Button
-                            Grid.Column="4"
-                            VerticalAlignment="Center"
-                            Style="{ThemeResource DefaultButtonStyle}"
-                            ToolTipService.ToolTip="Download Manager"
-                            l:Uids.Uid="/GameBananaPage/DownloadManagerBtn">
-                            <Grid>
-                                <FontIcon FontSize="16" Glyph="&#xE896;" />
-                                <InfoBadge 
-                                    Value="{x:Bind ViewModel.ActiveDownloadCount, Mode=OneWay}"
-                                    Visibility="{x:Bind ViewModel.HasActiveDownloads, Mode=OneWay}"
-                                    HorizontalAlignment="Right"
-                                    VerticalAlignment="Top"
-                                    Margin="0,-8,-12,0"/>
-                            </Grid>
-                            <Button.Flyout>
-                                <Flyout Placement="BottomEdgeAlignedRight">
-                                    <Grid Width="350">
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="*" />
-                                        </Grid.RowDefinitions>
-                                        <Grid Margin="0,0,0,12">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock
-                                                VerticalAlignment="Center"
-                                                Style="{ThemeResource SubtitleTextBlockStyle}"
-                                                Text="Download Queue"
-                                                l:Uids.Uid="/GameBananaPage/DownloadQueueHdr" />
-                                            <Button
-                                                Grid.Column="1"
-                                                Padding="8,4"
-                                                VerticalAlignment="Center"
-                                                Command="{x:Bind ViewModel.ClearAllCompletedTasksCommand}"
-                                                Content="Clear Completed"
-                                                FontSize="12"
-                                                l:Uids.Uid="/GameBananaPage/ClearCompletedBtn" />
-                                        </Grid>
-
-                                        <ListView
-                                            Grid.Row="1"
-                                            MaxHeight="400"
-                                            ItemsSource="{x:Bind ViewModel.DownloadQueue}"
-                                            SelectionMode="None">
-                                            <ListView.ItemTemplate>
-                                                <DataTemplate x:DataType="vm:GbDownloadTask">
-                                                    <Grid Margin="0,4,0,12">
-                                                        <Grid.RowDefinitions>
-                                                            <RowDefinition Height="Auto" />
-                                                            <RowDefinition Height="Auto" />
-                                                            <RowDefinition Height="Auto" />
-                                                            <RowDefinition Height="Auto" />
-                                                        </Grid.RowDefinitions>
-
-                                                        <Grid>
-                                                            <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition Width="*" />
-                                                                <ColumnDefinition Width="Auto" />
-                                                            </Grid.ColumnDefinitions>
-                                                            <TextBlock
-                                                                Margin="0,0,8,4"
-                                                                FontWeight="SemiBold"
-                                                                Text="{x:Bind FileInfo.FileName}"
-                                                                TextTrimming="CharacterEllipsis" />
-                                                            <StackPanel
-                                                                Grid.Column="1"
-                                                                VerticalAlignment="Top"
-                                                                Orientation="Horizontal"
-                                                                Spacing="4">
-                                                                <!--  Retry button  -->
-                                                                <Button
-                                                                    Padding="4"
-                                                                    Click="RetryDownloadTask_Click"
-                                                                    ToolTipService.ToolTip="Retry Installation"
-                                                                    Visibility="{x:Bind RetryVisibility, Mode=OneWay}"
-                                                                    l:Uids.Uid="/GameBananaPage/RetryBtn">
-                                                                    <FontIcon FontSize="10" Glyph="&#xE72C;" />
-                                                                </Button>
-                                                                <!--  Cancel button (visible during download)  -->
-                                                                <Button
-                                                                    Padding="4"
-                                                                    Click="CancelDownloadTask_Click"
-                                                                    ToolTipService.ToolTip="Cancel"
-                                                                    Visibility="{x:Bind CancelVisibility, Mode=OneWay}"
-                                                                    l:Uids.Uid="/GameBananaPage/CancelBtn">
-                                                                    <FontIcon FontSize="10" Glyph="&#xE711;" />
-                                                                </Button>
-                                                                <!--  Remove button (visible after completion)  -->
-                                                                <Button
-                                                                    Padding="4"
-                                                                    Click="RemoveDownloadTask_Click"
-                                                                    ToolTipService.ToolTip="Remove"
-                                                                    Visibility="{x:Bind RemoveVisibility, Mode=OneWay}"
-                                                                    l:Uids.Uid="/GameBananaPage/RemoveBtn">
-                                                                    <FontIcon FontSize="10" Glyph="&#xE74D;" />
-                                                                </Button>
-                                                            </StackPanel>
-                                                        </Grid>
-
-                                                        <ProgressBar
-                                                            Grid.Row="1"
-                                                            Margin="0,0,0,4"
-                                                            IsIndeterminate="{x:Bind IsCompleted, Mode=OneWay, Converter={StaticResource BoolInverterConverter}}"
-                                                            Maximum="100"
-                                                            ShowError="{x:Bind IsError, Mode=OneWay}"
-                                                            Value="{x:Bind ProgressPercentage, Mode=OneWay}" />
-
-                                                        <TextBlock
-                                                            Grid.Row="2"
-                                                            FontSize="12"
-                                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                            Text="{x:Bind StatusMessage, Mode=OneWay}" />
-                                                    </Grid>
-                                                </DataTemplate>
-                                            </ListView.ItemTemplate>
-
-                                            <!--  Empty state indicator  -->
-                                            <ListView.Header>
-                                                <TextBlock
-                                                    Margin="0,8,0,0"
-                                                    FontStyle="Italic"
-                                                    Foreground="{ThemeResource TextFillColorTertiaryBrush}"
-                                                    Text="No active tasks"
-                                                    Visibility="{x:Bind ViewModel.DownloadQueue.Count, Mode=OneWay, Converter={StaticResource IntToVisibilityInverter}}"
-                                                    l:Uids.Uid="/GameBananaPage/EmptyQueueHdr" />
-                                            </ListView.Header>
-                                        </ListView>
-                                    </Grid>
-                                </Flyout>
-                            </Button.Flyout>
-                        </Button>
+                        <!--  Mod GridView  -->
+                        <controls:AdaptiveGridView
+                            x:Name="ModsGridView"
+                            Grid.Row="1"
+                            Padding="4"
+                            ContainerContentChanging="ModsGridView_ContainerContentChanging"
+                            DesiredWidth="260"
+                            IsItemClickEnabled="True"
+                            ItemClick="ModsGridView_ItemClick"
+                            ItemTemplate="{StaticResource ModCardTemplate}"
+                            ItemsSource="{x:Bind ViewModel.Mods}"
+                            KeyDown="ModsGridView_KeyDown"
+                            Loaded="ModsGridView_Loaded"
+                            SelectionMode="None"
+                            StretchContentForSingleRow="False"
+                            Visibility="{x:Bind ViewModel.IsNotLoading, Mode=OneWay}">
+                            <!--
+                                The cards have their own hover effect (border + scale),
+                                so keep the item container from painting its default
+                                rectangular hover/pressed background that clashes with
+                                the rounded card.
+                            -->
+                            <controls:AdaptiveGridView.ItemContainerStyle>
+                                <Style TargetType="GridViewItem">
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                    <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                                    <Setter Property="UseSystemFocusVisuals" Value="True" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="GridViewItem">
+                                                <ListViewItemPresenter
+                                                    Background="Transparent"
+                                                    ContentMargin="0"
+                                                    CornerRadius="12"
+                                                    PointerOverBackground="Transparent"
+                                                    PointerOverBorderBrush="Transparent"
+                                                    PressedBackground="Transparent"
+                                                    SelectedBackground="Transparent"
+                                                    SelectedBorderBrush="Transparent"
+                                                    SelectedPointerOverBackground="Transparent" />
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </controls:AdaptiveGridView.ItemContainerStyle>
+                            <controls:AdaptiveGridView.Footer>
+                                <ProgressRing
+                                    Width="28"
+                                    Height="28"
+                                    Margin="0,12,0,24"
+                                    HorizontalAlignment="Center"
+                                    IsActive="{x:Bind ViewModel.IsLoadingMore, Mode=OneWay}"
+                                    Visibility="{x:Bind ViewModel.IsLoadingMore, Mode=OneWay}" />
+                            </controls:AdaptiveGridView.Footer>
+                        </controls:AdaptiveGridView>
                     </Grid>
-
-                    <!--  Error message  -->
-                    <InfoBar
-                        Grid.Row="1"
-                        Margin="8,0,8,0"
-                        VerticalAlignment="Top"
-                        IsOpen="{x:Bind ViewModel.HasError, Mode=TwoWay}"
-                        Message="{x:Bind ViewModel.ErrorMessage, Mode=OneWay}"
-                        Severity="Error" />
-
-                    <!--  Loading  -->
-                    <ProgressRing
-                        Grid.Row="1"
-                        Width="48"
-                        Height="48"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        IsActive="{x:Bind ViewModel.IsLoading, Mode=OneWay}"
-                        Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay}" />
-
-                    <!--  Mod GridView: AdaptiveGridView fills width cleanly  -->
-                    <controls:AdaptiveGridView
-                        x:Name="ModsGridView"
-                        Grid.Row="1"
-                        Padding="4"
-                        DesiredWidth="210"
-                        IsItemClickEnabled="True"
-                        ItemClick="ModsGridView_ItemClick"
-                        ItemHeight="270"
-                        ItemTemplate="{StaticResource ModCardTemplate}"
-                        ItemsSource="{x:Bind ViewModel.Mods}"
-                        Loaded="ModsGridView_Loaded"
-                        SelectionMode="None"
-                        StretchContentForSingleRow="False"
-                        Visibility="{x:Bind ViewModel.IsNotLoading, Mode=OneWay}">
-                        <controls:AdaptiveGridView.Footer>
-                            <ProgressRing
-                                Width="28"
-                                Height="28"
-                                Margin="0,12,0,24"
-                                HorizontalAlignment="Center"
-                                IsActive="{x:Bind ViewModel.IsLoadingMore, Mode=OneWay}"
-                                Visibility="{x:Bind ViewModel.IsLoadingMore, Mode=OneWay}" />
-                        </controls:AdaptiveGridView.Footer>
-                    </controls:AdaptiveGridView>
                 </Grid>
-            </Grid>
-        </SplitView.Content>
-    </SplitView>
+            </SplitView.Content>
+        </SplitView>
 
-    <!--  LightBox Overlay  -->
-    <Grid
-        x:Name="LightBoxOverlay"
-        Canvas.ZIndex="100"
-        Background="#E0000000"
-        PointerPressed="LightBoxOverlay_PointerPressed"
-        Visibility="Collapsed">
-        <Button
-            x:Name="LightBoxCloseButton"
-            Width="48"
-            Height="48"
-            Margin="24"
-            HorizontalAlignment="Right"
-            VerticalAlignment="Top"
-            Background="#30FFFFFF"
-            BorderThickness="0"
-            Click="LightBoxClose_Click"
-            CornerRadius="24">
-            <FontIcon
-                FontSize="20"
-                Foreground="White"
-                Glyph="&#xE711;" />
-        </Button>
-        <ProgressRing
-            x:Name="LightBoxLoading"
-            Width="64"
-            Height="64"
-            Foreground="White"
-            IsActive="False"
-            Visibility="Collapsed" />
-        <Image
-            x:Name="LightBoxImage"
-            Margin="60"
-            Stretch="Uniform" />
-    </Grid>
+        <!--  LightBox Overlay — 影院级景深高斯磨砂图片轮播  -->
+        <Grid
+            x:Name="LightBoxOverlay"
+            Background="#F2060609"
+            Canvas.ZIndex="100"
+            PointerPressed="LightBoxOverlay_PointerPressed"
+            Visibility="Collapsed">
+
+            <!--  关闭按钮: 圆润 Acrylic 玻璃胶囊  -->
+            <Button
+                x:Name="LightBoxCloseButton"
+                Width="44"
+                Height="44"
+                Margin="28"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                AutomationProperties.Name="Close"
+                Background="#40000000"
+                BorderBrush="#30FFFFFF"
+                BorderThickness="1"
+                Canvas.ZIndex="101"
+                Click="LightBoxClose_Click"
+                CornerRadius="22">
+                <Button.KeyboardAccelerators>
+                    <KeyboardAccelerator Key="Escape" />
+                </Button.KeyboardAccelerators>
+                <FontIcon
+                    FontSize="16"
+                    Foreground="#F0F0F0"
+                    Glyph="&#xE711;" />
+            </Button>
+
+            <!--  图片轮播 FlipView  -->
+            <FlipView
+                x:Name="LightBoxFlipView"
+                Margin="40"
+                Background="Transparent"
+                ItemsSource="{x:Bind ViewModel.PreviewImages, Mode=OneWay}"
+                SelectedIndex="{x:Bind ViewModel.LightBoxSelectedIndex, Mode=TwoWay}">
+                <FlipView.ItemTemplate>
+                    <DataTemplate x:DataType="vm:GbPreviewImageItem">
+                        <Grid Background="Transparent" Tapped="LightBoxItem_Tapped">
+                            <ProgressRing
+                                Width="36"
+                                Height="36"
+                                Foreground="White"
+                                IsActive="{x:Bind IsFullImageLoading, Mode=OneWay}" />
+                            <Image
+                                Margin="20"
+                                Source="{x:Bind FullImageSource, Mode=OneWay}"
+                                Stretch="Uniform" />
+
+                        </Grid>
+                    </DataTemplate>
+                </FlipView.ItemTemplate>
+            </FlipView>
+
+            <!--  图片计数指示器  -->
+            <Border
+                Margin="0,0,0,24"
+                Padding="12,6"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Bottom"
+                Background="#80000000"
+                CornerRadius="12">
+                <TextBlock
+                    FontSize="13"
+                    Foreground="#CCFFFFFF"
+                    Text="{x:Bind ViewModel.LightBoxCounter, Mode=OneWay}" />
+            </Border>
+        </Grid>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="AdaptiveLayoutStates">
+                <!--  Compact state: 小窗口 / 半屏分屏 (< 840px)  -->
+                <VisualState x:Name="CompactState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="CategoryColumn.Width" Value="170" />
+                        <Setter Target="DetailSplitView.DisplayMode" Value="Overlay" />
+                        <Setter Target="DetailSplitView.OpenPaneLength" Value="400" />
+                        <Setter Target="ModsGridView.DesiredWidth" Value="230" />
+                        <Setter Target="TopBarSecondRow.Height" Value="Auto" />
+                        <Setter Target="TopBarSearchCol.Width" Value="*" />
+                        <Setter Target="SearchBox.Width" Value="NaN" />
+                        <Setter Target="SearchBox.HorizontalAlignment" Value="Stretch" />
+                        <Setter Target="SearchBox.(Grid.ColumnSpan)" Value="3" />
+                        <Setter Target="FilterControlsContainer.(Grid.Row)" Value="1" />
+                        <Setter Target="FilterControlsContainer.(Grid.Column)" Value="0" />
+                        <Setter Target="FilterControlsContainer.(Grid.ColumnSpan)" Value="4" />
+                        <Setter Target="FilterControlsContainer.Margin" Value="0,8,0,0" />
+                    </VisualState.Setters>
+                </VisualState>
+
+                <!--  Normal state: 1080P 标准窗口 / 适中尺寸 (840px ~ 1440px)  -->
+                <VisualState x:Name="NormalState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="840" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="CategoryColumn.Width" Value="200" />
+                        <Setter Target="DetailSplitView.DisplayMode" Value="Inline" />
+                        <Setter Target="DetailSplitView.OpenPaneLength" Value="460" />
+                        <Setter Target="ModsGridView.DesiredWidth" Value="280" />
+                        <Setter Target="SearchBox.Width" Value="220" />
+                    </VisualState.Setters>
+                </VisualState>
+
+                <!--  Expanded state: 2K 屏 / 宽窗口 (1440px ~ 2000px)  -->
+                <VisualState x:Name="ExpandedState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="1440" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="CategoryColumn.Width" Value="220" />
+                        <Setter Target="DetailSplitView.DisplayMode" Value="Inline" />
+                        <Setter Target="DetailSplitView.OpenPaneLength" Value="480" />
+                        <Setter Target="ModsGridView.DesiredWidth" Value="340" />
+                        <Setter Target="SearchBox.Width" Value="260" />
+                    </VisualState.Setters>
+                </VisualState>
+
+                <!--  UltraWide state: 4K / 超宽屏 (> 2000px)  -->
+                <VisualState x:Name="UltraWideState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="2000" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="CategoryColumn.Width" Value="240" />
+                        <Setter Target="DetailSplitView.DisplayMode" Value="Inline" />
+                        <Setter Target="DetailSplitView.OpenPaneLength" Value="520" />
+                        <Setter Target="ModsGridView.DesiredWidth" Value="380" />
+                        <Setter Target="SearchBox.Width" Value="300" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
     </Grid>
 </Page>

@@ -56,8 +56,14 @@ public record ApiModRecord
     [JsonPropertyName("_aSubmitter")]
     public ApiModSubmitter? Submitter { get; init; }
 
-    [JsonPropertyName("_aPreviewMedia")]
-    public ApiPreviewMedia? PreviewMedia { get; init; }
+    [JsonPropertyName("_aPreviewContent")]
+    public Dictionary<string, ApiPreviewImage?>? PreviewContent { get; init; }
+
+    [JsonPropertyName("_bHasContentRatings")]
+    public bool HasContentRatings { get; init; }
+
+    [JsonPropertyName("_aTags")]
+    public List<string> Tags { get; init; } = new();
 
     [JsonPropertyName("_nLikeCount")]
     public int LikeCount { get; init; }
@@ -75,16 +81,51 @@ public record ApiModRecord
     public ApiRootCategory? RootCategory { get; init; }
 
     /// <summary>
-    /// Computed thumbnail URL from the first preview image.
+    /// 从第一张预览图计算缩略图 URL。优先使用 530px 变体以提升清晰度。
     /// </summary>
     public string? ThumbnailUrl
     {
         get
         {
-            var img = PreviewMedia?.Images?.FirstOrDefault();
-            if (img == null) return null;
-            var file = img.File220 ?? img.File;
+            if (PreviewContent == null || !PreviewContent.TryGetValue("screenshot", out var img) || img == null)
+                return null;
+            var file = img.File530 ?? img.File220 ?? img.File;
             return string.IsNullOrEmpty(file) ? null : $"{img.BaseUrl}/{file}";
+        }
+    }
+
+    /// <summary>
+    /// 预览图数量（从 _aImages 数组长度获取）。
+    /// </summary>
+    /// <summary>
+    /// Safe-for-work (blurred) thumbnail URL provided by GameBanana for content
+    /// rated submissions with initial visibility "warn".
+    /// </summary>
+    public string? SfwThumbnailUrl
+    {
+        get
+        {
+            if (PreviewContent == null || !PreviewContent.TryGetValue("screenshot", out var img) || img == null)
+                return null;
+            var file = img.File220Sfw;
+            return string.IsNullOrEmpty(file) ? null : $"{img.BaseUrl}/{file}";
+        }
+    }
+
+    /// <summary>
+    /// Approximate thumbnail aspect ratio (width / height) derived from the v13
+    /// height hints; the widths are encoded in the field names (220/530).
+    /// </summary>
+    public double ThumbnailAspectRatio
+    {
+        get
+        {
+            var img = PreviewContent?.GetValueOrDefault("screenshot");
+            if (img is not null && !string.IsNullOrEmpty(img.File530) && img.Height530 > 0)
+                return 530.0 / img.Height530;
+            if (img is not null && !string.IsNullOrEmpty(img.File220) && img.Height220 > 0)
+                return 220.0 / img.Height220;
+            return 16.0 / 9.0;
         }
     }
 }
@@ -104,12 +145,6 @@ public record ApiModSubmitter
     public string? AvatarUrl { get; init; }
 }
 
-public record ApiPreviewMedia
-{
-    [JsonPropertyName("_aImages")]
-    public List<ApiPreviewImage>? Images { get; init; }
-}
-
 public record ApiPreviewImage
 {
     [JsonPropertyName("_sBaseUrl")]
@@ -126,6 +161,24 @@ public record ApiPreviewImage
 
     [JsonPropertyName("_sFile100")]
     public string? File100 { get; init; }
+
+    [JsonPropertyName("_sFile530Sfw")]
+    public string? File530Sfw { get; init; }
+
+    [JsonPropertyName("_sFile220Sfw")]
+    public string? File220Sfw { get; init; }
+
+    [JsonPropertyName("_hFile100")]
+    public int Height100 { get; init; }
+
+    [JsonPropertyName("_hFile220")]
+    public int Height220 { get; init; }
+
+    [JsonPropertyName("_hFile530")]
+    public int Height530 { get; init; }
+
+    [JsonPropertyName("_sCaption")]
+    public string? Caption { get; init; }
 }
 
 public record ApiRootCategory

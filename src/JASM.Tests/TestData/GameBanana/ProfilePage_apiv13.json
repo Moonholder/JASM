@@ -1,0 +1,339 @@
+{
+    "_idRow": 691126,
+    "_nStatus": "0",
+    "_bIsPrivate": false,
+    "_bAccessorIsSubmitter": false,
+    "_bIsTrashed": false,
+    "_bIsWithheld": false,
+    "_sName": "Detective Gilberta",
+    "_sCommentsMode": "open",
+    "_tsDateModified": 1786549507,
+    "_tsDateAdded": 1783054056,
+    "_sProfileUrl": "https://gamebanana.com/mods/691126",
+    "_aPreviewContent": {
+        "screenshots": [
+            {
+                "_sFile220": "sgi_common_thumbs_6a473d1400d4f_220.webp",
+                "_hFile220": 176,
+                "_sFile530": "sgi_common_thumbs_6a473d1400d4f_530.webp",
+                "_hFile530": 424,
+                "_sBaseUrl": "https://images.gamebanana.com/img/ss/mods",
+                "_sFile": "6a473d1400d4f.jpg"
+            },
+            {
+                "_sFile100": "sgi_common_thumbs_6a473d056bbe8_100.webp",
+                "_hFile100": 56,
+                "_sBaseUrl": "https://images.gamebanana.com/img/ss/mods",
+                "_sFile": "6a473d056bbe8.jpg"
+            },
+            {
+                "_sFile100": "sgi_common_thumbs_6a473d073af1a_100.webp",
+                "_hFile100": 57,
+                "_sBaseUrl": "https://images.gamebanana.com/img/ss/mods",
+                "_sFile": "6a473d073af1a.jpg"
+            }
+        ]
+    },
+    "_nUpdatesCount": 2,
+    "_bHasUpdates": true,
+    "_tsDateUpdated": 1786549640,
+    "_nAllTodosCount": 0,
+    "_bHasTodos": false,
+    "_nPostCount": 14,
+    "_aTags": [],
+    "_bCreatedBySubmitter": true,
+    "_bIsPorted": false,
+    "_nThanksCount": 2,
+    "_sInitialVisibility": "show",
+    "_sDownloadUrl": "https://gamebanana.com/mods/download/691126",
+    "_nDownloadCount": 5173,
+    "_sPayType": "free",
+    "_aFiles": [
+        {
+            "_idRow": 1744127,
+            "_sFile": "4b50d2c9fbef4e427704d423d036ece0.rar",
+            "_nFilesize": 51219367,
+            "_tsDateAdded": 1783053773,
+            "_nDownloadCount": 2543,
+            "_sDownloadUrl": "https://gamebanana.com/dl/1744127",
+            "_sMd5Checksum": "77aec5703569092b4e16aa5a03e94f52",
+            "_sAnalysisState": "done",
+            "_sAnalysisResult": "ok",
+            "_sAnalysisResultVerbose": "File passed preliminary analysis",
+            "_sAvState": "done",
+            "_sAvResult": "clean",
+            "_bIsArchived": false,
+            "_bHasContents": true
+        },
+        {
+            "_idRow": 1756348,
+            "_sFile": "gilberta11.rar",
+            "_nFilesize": 51226380,
+            "_tsDateAdded": 1784242244,
+            "_nDownloadCount": 2399,
+            "_sDownloadUrl": "https://gamebanana.com/dl/1756348",
+            "_sMd5Checksum": "a3b7cb074ab4ed8bb32e443e5d548a54",
+            "_sAnalysisState": "done",
+            "_sAnalysisResult": "ok",
+            "_sAnalysisResultVerbose": "File passed preliminary analysis",
+            "_sAvState": "done",
+            "_sAvResult": "clean",
+            "_bIsArchived": false,
+            "_bHasContents": true
+        },
+        {
+            "_idRow": 1781995,
+            "_sFile": "gilberta_12.rar",
+            "_nFilesize": 60526277,
+            "_tsDateAdded": 1786549440,
+            "_nDownloadCount": 245,
+            "_sDownloadUrl": "https://gamebanana.com/dl/1781995",
+            "_sMd5Checksum": "557a826d8c190d7635a0f4103f068d24",
+            "_sAnalysisState": "done",
+            "_sAnalysisResult": "ok",
+            "_sAnalysisResultVerbose": "File passed preliminary analysis",
+            "_sAvState": "done",
+            "_sAvResult": "clean",
+            "_bIsArchived": false,
+            "_bHasContents": true
+        }
+    ],
+    "_nSubscriberCount": 67,
+    "_aContributingStudios": [],
+    "_sLicense": "<a rel=\"license\" href=\"http://creativecommons.org/licenses/by-nc-nd/4.0/\"><img alt=\"Creative Commons License\" style=\"border-width:0\" src=\"https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png\" /></a><br />This work is licensed under a <a rel=\"license\" href=\"http://creativecommons.org/licenses/by-nc-nd/4.0/\">Creative Commons Attribution-NonCommercial-NoDerivs 4.0 Unported License</a>.",
+    "_aLicenseChecklist": {
+        "yes": [
+            "Download and install this Mod"
+        ],
+        "ask": [
+            "Redistribute this Mod on other sites",
+            "Modify this Mod and distribute the modified Mod on GameBanana",
+            "Modify this Mod and distribute the modified Mod on another site",
+            "Use parts of this Mod in another Mod and distribute the Mod on GameBanana",
+            "Use parts of this Mod in another Mod and distribute the Mod on another site",
+            "Use this Mod or components of this Mod in adult/NSFW content"
+        ],
+        "no": [
+            "Use this Mod or components of this Mod commercially"
+        ]
+    },
+    "_sDescription": "Detective Gilberta",
+    "_bGenerateTableOfContents": false,
+    "_sText": "需要<a href=\"https://gamebanana.com/mods/651557\">RabbitFx</a>，完整版请访问<a href=\"https://www.patreon.com/Farewell_in_Dream/posts/gilberta-panel-162766595?utm_medium=clipboard_copy&amp;utm_source=copyLink&amp;utm_campaign=postshare_creator&amp;utm_content=join_link\" target=\"_blank\">Patreon</a>，完整版本配备切换面板，形态键面板以及其他颜色的贴图<br><br>1.2发布去除玩具版本，按/呼出面板<br><br>Requires <a href=\"https://gamebanana.com/mods/651557\">RabbitFx</a>，For the full version, please visit <a href=\"https://www.patreon.com/Farewell_in_Dream/posts/gilberta-panel-162766595?utm_medium=clipboard_copy&amp;utm_source=copyLink&amp;utm_campaign=postshare_creator&amp;utm_content=join_link\" target=\"_blank\">Patreon</a>.，The full version comes with a complete switching panel, a shape key panel, and textures in other colors.<br><br>1.2 released the version without toys. Press / to bring up the panel.<br><br>",
+    "_bIsObsolete": false,
+    "_nLikeCount": 329,
+    "_bAccessorHasUnliked": false,
+    "_bAccessorHasLiked": false,
+    "_nViewCount": 24151,
+    "_sVersion": "1.2",
+    "_bAcceptsDonations": false,
+    "_bShowRipePromo": true,
+    "_aEmbeddables": {
+        "_sEmbeddableImageBaseUrl": "https://gamebanana.com/mods/embeddables/691126",
+        "_aVariants": [
+            "small",
+            "small_square",
+            "medium",
+            "medium_square",
+            "medium_square_minimal",
+            "large",
+            "large_minimal",
+            "large_square",
+            "large_minimal_square",
+            "thumbnail"
+        ]
+    },
+    "_aSubmitter": {
+        "_idRow": 4473230,
+        "_sName": "Farewell in a Dream",
+        "_sUserTitle": "Bananite",
+        "_sHonoraryTitle": "",
+        "_tsJoinDate": 1746946623,
+        "_sAvatarUrl": "https://images.gamebanana.com/img/av/69fc66ef65ab9.jpg",
+        "_sSigUrl": "",
+        "_sProfileUrl": "https://gamebanana.com/members/4473230",
+        "_sPointsUrl": "https://gamebanana.com/members/logs/pointslog/4473230",
+        "_sMedalsUrl": "https://gamebanana.com/members/stats/medals/4473230",
+        "_bIsOnline": false,
+        "_sLocation": "<a href=\"https://gamebanana.com\">Home</a> > <a href=\"https://gamebanana.com/games/21842\"><img src=\"https://images.gamebanana.com/img/ico/games/69725f15986b1.png\"/><span>Arknights: Endfield</span></a> > <a href=\"https://gamebanana.com/mods/games/21842\">Mods</a> > <a href=\"https://gamebanana.com/mods/cats/35464\">Skins</a> > <a href=\"https://gamebanana.com/mods/cats/42770\">Operators</a> > <a href=\"https://gamebanana.com/mods/cats/42733\">Gilberta</a> > <a href=\"https://gamebanana.com/mods/691126\">Detective Gilberta</a>",
+        "_sOnlineTitle": "",
+        "_sOfflineTitle": "",
+        "_nPoints": 41421,
+        "_nPointsRank": 604,
+        "_aNormalMedals": [
+            [
+                "m_age_1.png",
+                "One month a member",
+                "normal",
+                3280481
+            ],
+            [
+                "m_age_2.png",
+                "6 months a member",
+                "normal",
+                3943991
+            ],
+            [
+                "m_pr_1.png",
+                "Reached 1,000 Points",
+                "normal",
+                4780784
+            ],
+            [
+                "subscribers_1.png",
+                "Reached 10 subscribers",
+                "normal",
+                4782425
+            ],
+            [
+                "m_pr_2.png",
+                "Reached 2,500 Points",
+                "normal",
+                4785881
+            ],
+            [
+                "thanks_recvd_1.png",
+                "Received thanks 5 times",
+                "normal",
+                4788870
+            ],
+            [
+                "m_age_3.png",
+                "1 year a member",
+                "normal",
+                4802610
+            ],
+            [
+                "m_pr_3.png",
+                "Reached 7,500 Points",
+                "normal",
+                4854047
+            ],
+            [
+                "mods1.png",
+                "Submitted 5 Mods",
+                "normal",
+                4901222
+            ],
+            [
+                "features_1.png",
+                "Submission featured",
+                "normal",
+                4999259
+            ],
+            [
+                "m_pr_4.png",
+                "Reached 25,000 Points",
+                "normal",
+                5047563
+            ],
+            [
+                "mods2.png",
+                "Submitted 10 Mods",
+                "normal",
+                5073347
+            ]
+        ],
+        "_aRareMedals": [
+            [
+                "subscribers_2.png",
+                "Reached 50 subscribers",
+                "rare",
+                4850132
+            ],
+            [
+                "features_2.png",
+                "10 submissions featured",
+                "rare",
+                5083271
+            ]
+        ],
+        "_aLegendaryMedals": [
+            [
+                "subscribers_3.png",
+                "Reached 100 subscribers",
+                "legendary",
+                4984184
+            ]
+        ],
+        "_bHasRipe": false,
+        "_nBuddyCount": 0,
+        "_nSubscriberCount": 258,
+        "_aDonationMethods": [],
+        "_bAccessorIsBuddy": false,
+        "_bBuddyRequestExistsWithAccessor": false,
+        "_bAccessorIsSubscribed": false,
+        "_aDefaultLicenseChecklist": [
+            "yes",
+            "ask",
+            "ask",
+            "ask",
+            "ask",
+            "ask",
+            "no",
+            "ask"
+        ],
+        "_sDefaultLicense": ""
+    },
+    "_bFollowLinks": true,
+    "_aGame": {
+        "_idRow": 21842,
+        "_sName": "Arknights: Endfield",
+        "_sAbbreviation": "Endfield",
+        "_sProfileUrl": "https://gamebanana.com/games/21842",
+        "_sIconUrl": "https://images.gamebanana.com/img/ico/games/69725f15986b1.png",
+        "_sBannerUrl": "https://images.gamebanana.com/img/ico/games/69725f15986b1.png",
+        "_nSubscriberCount": 33525,
+        "_bHasSubmissionQueue": false,
+        "_bAccessorIsSubscribed": true,
+        "_idAccessorSubscriptionRow": 4960944
+    },
+    "_aCategory": {
+        "_idRow": 42733,
+        "_sName": "Gilberta",
+        "_sModelName": "ModCategory",
+        "_sProfileUrl": "https://gamebanana.com/mods/cats/42733",
+        "_sIconUrl": "https://images.gamebanana.com/img/ico/ModCategory/69764efb8e3f0.png",
+        "_bIsObsolete": false
+    },
+    "_aSuperCategory": {
+        "_idRow": 42770,
+        "_sName": "Operators",
+        "_sModelName": "ModCategory",
+        "_sProfileUrl": "https://gamebanana.com/mods/cats/42770",
+        "_sIconUrl": "https://images.gamebanana.com/img/ico/ModCategory/697792019f0d9.png"
+    },
+    "_aFeaturings": {
+        "3day": {
+            "_sFeatureGroup": "3day",
+            "_sTitle": "Best of the Banana",
+            "_sIconClasses": "MiscIcon FeaturedBestOfTheBananaIcon",
+            "_tsDate": 1783310401
+        },
+        "yesterday": {
+            "_sFeatureGroup": "yesterday",
+            "_sTitle": "Best of Yesterday",
+            "_sIconClasses": "MiscIcon FeaturedYesterdayIcon",
+            "_tsDate": 1783224001
+        },
+        "today": {
+            "_sFeatureGroup": "today",
+            "_sTitle": "Today's Pick",
+            "_sIconClasses": "MiscIcon FeaturedTodayIcon",
+            "_tsDate": 1783137601
+        }
+    },
+    "_aCredits": [
+        {
+            "_sGroupName": "Farewell in a Dream",
+            "_aAuthors": [
+                {
+                    "_sName": "Farewell in a Dream"
+                }
+            ]
+        }
+    ],
+    "_idAccessorSubscriptionRow": 0,
+    "_bAccessorIsSubscribed": false,
+    "_bAccessorHasThanked": false
+}

@@ -243,6 +243,7 @@ public class GameBananaDownloadSessionService : IGameBananaDownloadSessionServic
 
     private async Task ProcessDownloadTaskAsync(GbDownloadTask task)
     {
+        var cts = task.Cts;
         bool lockAcquired = false;
         try
         {
@@ -260,14 +261,14 @@ public class GameBananaDownloadSessionService : IGameBananaDownloadSessionServic
             if (!string.IsNullOrWhiteSpace(task.FileInfo.DownloadUrl))
             {
                 archivePath = await Task.Run(
-                    () => _gbService.DownloadModByDirectUrlAsync(task.FileInfo, progress, task.Cts?.Token ?? CancellationToken.None));
+                    () => _gbService.DownloadModByDirectUrlAsync(task.FileInfo, progress, cts?.Token ?? CancellationToken.None));
             }
             else
             {
                 var identifier = new GbModFileIdentifier(
                     new GbModId(task.FileInfo.ModId), new GbModFileId(task.FileInfo.FileId));
                 archivePath = await Task.Run(
-                    () => _gbService.DownloadModAsync(identifier, task.Mod?.ModelName ?? "Mod", progress, task.Cts?.Token ?? CancellationToken.None));
+                    () => _gbService.DownloadModAsync(identifier, task.Mod?.ModelName ?? "Mod", progress, cts?.Token ?? CancellationToken.None));
             }
 
             task.ArchivePath = archivePath;
@@ -359,7 +360,7 @@ public class GameBananaDownloadSessionService : IGameBananaDownloadSessionServic
             _dispatcherQueue.TryEnqueue(() => task.StatusMessage = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/StatusWaitingForInstall", "Waiting for other installs to complete..."));
 
             // Acquire the installation lock only when we actually begin data extraction & copying
-            await _downloadQueueLock.WaitAsync(task.Cts?.Token ?? CancellationToken.None);
+            await _downloadQueueLock.WaitAsync(cts?.Token ?? CancellationToken.None);
             lockAcquired = true;
 
             _dispatcherQueue.TryEnqueue(() => task.StatusMessage = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/StatusInstalling2", "Installing..."));
@@ -433,6 +434,14 @@ public class GameBananaDownloadSessionService : IGameBananaDownloadSessionServic
             if (lockAcquired)
             {
                 _downloadQueueLock.Release();
+            }
+
+            // Dispose the cancellation source once the task is finished; retries
+            // allocate a fresh one.
+            if (cts != null && ReferenceEquals(task.Cts, cts))
+            {
+                task.Cts = null;
+                cts.Dispose();
             }
         }
     }

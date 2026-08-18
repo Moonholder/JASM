@@ -1,5 +1,7 @@
 using System.Diagnostics;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text.Json;
 using GIMI_ModManager.Core.Services.GameBanana.ApiModels;
 using GIMI_ModManager.Core.Services.GameBanana.Models;
@@ -22,9 +24,9 @@ public sealed class ApiGameBananaClient(
     public const string HttpClientName = nameof(IApiGameBananaClient);
 
     private const string DownloadUrl = "https://gamebanana.com/dl/";
-    private const string BaseApiUrl = "https://gamebanana.com/apiv11/";
+    private const string BaseApiUrl = "https://gamebanana.com/apiv13/";
     private const string ApiUrl = BaseApiUrl + "Mod/";
-    private const string HealthCheckUrl = "https://gamebanana.com/apiv11";
+    private const string HealthCheckUrl = "https://gamebanana.com/apiv13";
 
     public async Task<bool> HealthCheckAsync(CancellationToken cancellationToken = default)
     {
@@ -155,55 +157,99 @@ public sealed class ApiGameBananaClient(
     private async Task DownloadFromUrlAsync(string downloadUrl, FileStream destinationFile, IProgress<int>? progress,
         CancellationToken cancellationToken)
     {
-        using var response = await _httpClient
-            .GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+        long totalRead = 0;
+        long? totalSizeBytes = null;
+        int lastPercent = -1;
+        int maxRetries = 5;
+        int attempt = 0;
 
-        if (response.StatusCode == HttpStatusCode.NotFound)
-            throw new InvalidOperationException("Mod not found.");
-
-        if (response.StatusCode != HttpStatusCode.OK)
-            throw new HttpRequestException(
-                $"Failed to download mod from GameBanana. Reason: {response?.ReasonPhrase}");
-
-        var totalSizeBytes = response.Content.Headers.ContentLength;
-
-        await using var downloadStream =
-            await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
-
-        if (totalSizeBytes.HasValue && totalSizeBytes.Value > 0 && progress != null)
+        while (true)
         {
-            // Rent a 128KB buffer for blazing-fast network-to-disk throughput
-            var buffer = System.Buffers.ArrayPool<byte>.Shared.Rent(131072);
+            attempt++;
             try
             {
-                long totalRead = 0;
-                int bytesRead;
-                int lastPercent = -1;
-
-                // Read directly from the network stream in chunks and report progress naturally
-                while ((bytesRead = await downloadStream.ReadAsync(buffer, cancellationToken).ConfigureAwait(false)) > 0)
+                using var request = new HttpRequestMessage(HttpMethod.Get, downloadUrl);
+                if (totalRead > 0)
                 {
-                    await destinationFile.WriteAsync(buffer.AsMemory(0, bytesRead), cancellationToken).ConfigureAwait(false);
-                    totalRead += bytesRead;
+                    request.Headers.Range = new RangeHeaderValue(totalRead, null);
+                }
 
-                    var percent = (int)((double)totalRead / totalSizeBytes.Value * 100);
-                    // De-duplicate progress reports
-                    if (percent != lastPercent)
+                using var response = await _httpClient
+                    .SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                    throw new InvalidOperationException("Mod not found.");
+
+                bool isPartial = response.StatusCode == HttpStatusCode.PartialContent;
+                if (!isPartial && totalRead > 0)
+                {
+                    destinationFile.Position = 0;
+                    destinationFile.SetLength(0);
+                    totalRead = 0;
+                    lastPercent = -1;
+                }
+
+                if (response.StatusCode != HttpStatusCode.OK && response.StatusCode != HttpStatusCode.PartialContent)
+                {
+                    throw new HttpRequestException(
+                        $"Failed to download mod from GameBanana. Reason: {response.ReasonPhrase}");
+                }
+
+                if (totalSizeBytes == null || !isPartial)
+                {
+                    if (isPartial && response.Content.Headers.ContentRange?.Length.HasValue == true)
                     {
-                        progress.Report(percent);
-                        lastPercent = percent;
+                        totalSizeBytes = response.Content.Headers.ContentRange.Length.Value;
+                    }
+                    else
+                    {
+                        totalSizeBytes = response.Content.Headers.ContentLength;
                     }
                 }
+
+                await using var downloadStream =
+                    await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+
+                // Rent a 128KB buffer for blazing-fast network-to-disk throughput
+                var buffer = System.Buffers.ArrayPool<byte>.Shared.Rent(131072);
+                try
+                {
+                    int bytesRead;
+                    // Read directly from the network stream in chunks and report progress naturally
+                    while ((bytesRead = await downloadStream.ReadAsync(buffer, cancellationToken).ConfigureAwait(false)) > 0)
+                    {
+                        await destinationFile.WriteAsync(buffer.AsMemory(0, bytesRead), cancellationToken).ConfigureAwait(false);
+                        totalRead += bytesRead;
+
+                        if (totalSizeBytes.HasValue && totalSizeBytes.Value > 0 && progress != null)
+                        {
+                            var percent = (int)((double)totalRead / totalSizeBytes.Value * 100);
+                            // De-duplicate progress reports
+                            if (percent != lastPercent)
+                            {
+                                progress.Report(percent);
+                                lastPercent = percent;
+                            }
+                        }
+                    }
+                }
+                finally
+                {
+                    System.Buffers.ArrayPool<byte>.Shared.Return(buffer);
+                }
+
+                break;
             }
-            finally
+            catch (Exception ex) when (attempt < maxRetries &&
+                                      (ex is System.IO.IOException ||
+                                       ex is HttpRequestException ||
+                                       ex is System.Net.Sockets.SocketException ||
+                                       ex is TimeoutException ||
+                                       (ex is TaskCanceledException && !cancellationToken.IsCancellationRequested)))
             {
-                System.Buffers.ArrayPool<byte>.Shared.Return(buffer);
+                _logger.Warning(ex, "Download attempt {Attempt} failed for {Url}. Retrying in 2 seconds...", attempt, downloadUrl);
+                await Task.Delay(2000, cancellationToken).ConfigureAwait(false);
             }
-        }
-        else
-        {
-            // Fallback for chunked transfers without content length
-            await downloadStream.CopyToAsync(destinationFile, cancellationToken).ConfigureAwait(false);
         }
 
         await destinationFile.FlushAsync(cancellationToken).ConfigureAwait(false);
@@ -277,7 +323,7 @@ public sealed class ApiGameBananaClient(
 
     public async Task<List<ApiCategoryItem>> GetCategoriesForGameAsync(string gameId, CancellationToken cancellationToken = default)
     {
-        var url = new Uri($"https://gamebanana.com/apiv11/Mod/Categories?_idGameRow={gameId}&_sSort=a_to_z&_nPerpage=50");
+        var url = new Uri($"https://gamebanana.com/apiv13/Mod/Categories?_idGameRow={gameId}&_sSort=a_to_z&_nPerpage=50");
 
         using var response = await SendRequest(url, cancellationToken).ConfigureAwait(false);
         await using var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
@@ -292,7 +338,7 @@ public sealed class ApiGameBananaClient(
         CancellationToken cancellationToken = default)
     {
         var sortParam = sort == "default" ? "" : $"&_sSort={sort}";
-        var url = new Uri($"https://gamebanana.com/apiv11/Game/{gameId}/Subfeed?_nPage={page}{sortParam}");
+        var url = new Uri($"https://gamebanana.com/apiv13/Game/{gameId}/Subfeed?_nPage={page}{sortParam}");
 
         using var response = await SendRequest(url, cancellationToken).ConfigureAwait(false);
         await using var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
@@ -307,7 +353,7 @@ public sealed class ApiGameBananaClient(
         int page = 1, int perPage = 15, CancellationToken cancellationToken = default)
     {
         var url = new Uri(
-            $"https://gamebanana.com/apiv11/Mod/Index?_nPerpage={perPage}&_aFilters%5BGeneric_Category%5D={categoryId}&_nPage={page}");
+            $"https://gamebanana.com/apiv13/Mod/Index?_nPerpage={perPage}&_aFilters%5BGeneric_Category%5D={categoryId}&_nPage={page}");
 
         using var response = await SendRequest(url, cancellationToken).ConfigureAwait(false);
         await using var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
@@ -324,7 +370,7 @@ public sealed class ApiGameBananaClient(
         var encodedQuery = Uri.EscapeDataString(query);
         var modelParam = string.IsNullOrWhiteSpace(modelName) ? "" : $"&_sModelName={modelName}";
         var url = new Uri(
-            $"https://gamebanana.com/apiv11/Util/Search/Results?_sOrder=best_match&_idGameRow={gameId}&_sSearchString={encodedQuery}&_nPage={page}{modelParam}");
+            $"https://gamebanana.com/apiv13/Util/Search/Results?_sOrder=best_match&_idGameRow={gameId}&_sSearchString={encodedQuery}&_nPage={page}{modelParam}");
 
         using var response = await SendRequest(url, cancellationToken).ConfigureAwait(false);
         await using var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);

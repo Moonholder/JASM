@@ -1,4 +1,3 @@
-using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace GIMI_ModManager.Core.Services.GameBanana.ApiModels;
@@ -15,9 +14,15 @@ public sealed class ApiModUpdate
     [JsonPropertyName("_tsDateAdded")] public long DateAdded { get; init; }
     [JsonPropertyName("_bIsSignificant")] public bool IsSignificant { get; init; }
 
-    [JsonPropertyName("_aChangeLog")] public JsonElement ChangeLog { get; init; }
+    [JsonPropertyName("_aChangeLog")] public List<ApiModUpdateChange>? ChangeLog { get; init; }
     [JsonPropertyName("_bHasFiles")] public bool HasFiles { get; init; }
-    [JsonPropertyName("_aFiles")] public JsonElement Files { get; init; }
+    [JsonPropertyName("_aFiles")] public List<ApiModFileInfo>? Files { get; init; }
+}
+
+public sealed class ApiModUpdateChange
+{
+    [JsonPropertyName("text")] public string? Text { get; init; }
+    [JsonPropertyName("cat")] public string? Category { get; init; }
 }
 
 /// <summary>

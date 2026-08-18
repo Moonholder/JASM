@@ -49,7 +49,7 @@ public sealed class GameBananaCoreService(
         var apiGameBananaClient = CreateApiGameBananaClient();
 
         var profileTask = apiGameBananaClient.GetModProfileAsync(modId, modelName, ct);
-        Task<List<ApiModUpdate>?> updatesTask = Task.FromResult<List<ApiModUpdate>?>(null);
+        Task<List<ApiModUpdate>> updatesTask = Task.FromResult(new List<ApiModUpdate>());
 
         if (modelName is "Mod" or "Wip" or "Tool")
         {

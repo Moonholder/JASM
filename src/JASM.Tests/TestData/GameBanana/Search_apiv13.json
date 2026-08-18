@@ -1,0 +1,135 @@
+{
+    "_aMetadata": {
+        "_nRecordCount": 10,
+        "_nPerpage": 15,
+        "_bIsComplete": true
+    },
+    "_aRecords": [
+        {
+            "_idRow": 702316,
+            "_sModelName": "Mod",
+            "_sSingularTitle": "Mod",
+            "_sIconClasses": "SubmissionType Mod",
+            "_sName": "Larger Liino",
+            "_sProfileUrl": "https:\/\/gamebanana.com\/mods\/702316",
+            "_tsDateAdded": 1786310017,
+            "_tsDateModified": 1786329473,
+            "_bHasFiles": true,
+            "_sPayType": "free",
+            "_aTags": [
+                "Software Used: Blender",
+                "Software Used: Photoshop",
+                "Software Used: XXMI"
+            ],
+            "_aPreviewContent": {
+                "screenshot": {
+                    "_sFile220": "sgi_common_thumbs_6a78ecfc47705_220.webp",
+                    "_hFile220": 124,
+                    "_sFile220Sfw": "sgi_common_thumbs_6a78ecfc47705_220_sfw.webp",
+                    "_hFile220Sfw": 124,
+                    "_sFile530": "sgi_common_thumbs_6a78ecfc47705_530.webp",
+                    "_hFile530": 298,
+                    "_sBaseUrl": "https:\/\/images.gamebanana.com\/img\/ss\/mods",
+                    "_sFile": "6a78ecfc47705.jpg",
+                    "_sCaption": "Larger_Liino_01"
+                }
+            },
+            "_aSubmitter": {
+                "_idRow": 2403817,
+                "_sName": "waterweightmate",
+                "_bIsOnline": false,
+                "_bHasRipe": false,
+                "_sProfileUrl": "https:\/\/gamebanana.com\/members\/2403817",
+                "_sAvatarUrl": "https:\/\/images.gamebanana.com\/img\/av\/63aa7f785057a.png"
+            },
+            "_aGame": {
+                "_idRow": 21842,
+                "_sName": "Arknights: Endfield",
+                "_sProfileUrl": "https:\/\/gamebanana.com\/games\/21842",
+                "_sIconUrl": "https:\/\/images.gamebanana.com\/img\/ico\/games\/69725f15986b1.png"
+            },
+            "_aRootCategory": {
+                "_sName": "Skins",
+                "_sProfileUrl": "https:\/\/gamebanana.com\/mods\/cats\/35464",
+                "_sIconUrl": ""
+            },
+            "_aSubCategory": {
+                "_sName": "Liino",
+                "_sProfileUrl": "https:\/\/gamebanana.com\/mods\/cats\/48075",
+                "_sIconUrl": "https:\/\/images.gamebanana.com\/img\/ico\/ModCategory\/6a78f835ef5a9.png"
+            },
+            "_sVersion": "1.1",
+            "_tsDateUpdated": 1786316612,
+            "_bIsObsolete": false,
+            "_sInitialVisibility": "show",
+            "_bHasContentRatings": true,
+            "_nLikeCount": 12,
+            "_nPostCount": 3,
+            "_bWasFeatured": false,
+            "_nViewCount": 2370,
+            "_bIsOwnedByAccessor": false
+        },
+        {
+            "_idRow": 702423,
+            "_sModelName": "Mod",
+            "_sSingularTitle": "Mod",
+            "_sIconClasses": "SubmissionType Mod",
+            "_sName": "Simplified Liino",
+            "_sProfileUrl": "https:\/\/gamebanana.com\/mods\/702423",
+            "_tsDateAdded": 1786330755,
+            "_tsDateModified": 1786554737,
+            "_bHasFiles": true,
+            "_sPayType": "free",
+            "_aTags": [
+                "Software Used: Blender",
+                "Software Used: Photoshop",
+                "Software Used: XXMI"
+            ],
+            "_aPreviewContent": {
+                "screenshot": {
+                    "_sFile220": "sgi_common_thumbs_6a793e29b5ff3_220.webp",
+                    "_hFile220": 124,
+                    "_sFile530": "sgi_common_thumbs_6a793e29b5ff3_530.webp",
+                    "_hFile530": 298,
+                    "_sBaseUrl": "https:\/\/images.gamebanana.com\/img\/ss\/mods",
+                    "_sFile": "6a793e29b5ff3.jpg",
+                    "_sCaption": "Simplified_Liino_01"
+                }
+            },
+            "_aSubmitter": {
+                "_idRow": 2403817,
+                "_sName": "waterweightmate",
+                "_bIsOnline": false,
+                "_bHasRipe": false,
+                "_sProfileUrl": "https:\/\/gamebanana.com\/members\/2403817",
+                "_sAvatarUrl": "https:\/\/images.gamebanana.com\/img\/av\/63aa7f785057a.png"
+            },
+            "_aGame": {
+                "_idRow": 21842,
+                "_sName": "Arknights: Endfield",
+                "_sProfileUrl": "https:\/\/gamebanana.com\/games\/21842",
+                "_sIconUrl": "https:\/\/images.gamebanana.com\/img\/ico\/games\/69725f15986b1.png"
+            },
+            "_aRootCategory": {
+                "_sName": "Skins",
+                "_sProfileUrl": "https:\/\/gamebanana.com\/mods\/cats\/35464",
+                "_sIconUrl": ""
+            },
+            "_aSubCategory": {
+                "_sName": "Liino",
+                "_sProfileUrl": "https:\/\/gamebanana.com\/mods\/cats\/48075",
+                "_sIconUrl": "https:\/\/images.gamebanana.com\/img\/ico\/ModCategory\/6a78f835ef5a9.png"
+            },
+            "_sVersion": "1",
+            "_tsDateUpdated": 1786554755,
+            "_bIsObsolete": false,
+            "_sInitialVisibility": "show",
+            "_bHasContentRatings": false,
+            "_nLikeCount": 24,
+            "_nPostCount": 9,
+            "_bWasFeatured": true,
+            "_nViewCount": 4921,
+            "_bIsOwnedByAccessor": false
+        }
+    ]
+}

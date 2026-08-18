@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- English (neutral) resources -->
+  <data name="AllCategories" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="CancelBtn.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="CategoriesHdr.Text" xml:space="preserve">
+    <value>Categories</value>
+  </data>
+  <data name="CategorySearchBox.PlaceholderText" xml:space="preserve">
+    <value>Search categories...</value>
+  </data>
+  <data name="ClearCompletedBtn.Content" xml:space="preserve">
+    <value>Clear completed</value>
+  </data>
+  <data name="DialogCancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="DialogOk" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="DownloadableFilesHdr.Text" xml:space="preserve">
+    <value>Downloadable files</value>
+  </data>
+  <data name="DownloadBtn.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Download and install</value>
+  </data>
+  <data name="DownloadCompletedCachedMessage" xml:space="preserve">
+    <value>Mod downloaded to cache: {0}</value>
+  </data>
+  <data name="DownloadCompletedTitle" xml:space="preserve">
+    <value>Download complete</value>
+  </data>
+  <data name="DownloadFailedTitle" xml:space="preserve">
+    <value>Download failed</value>
+  </data>
+  <data name="DownloadManagerBtn.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Download manager</value>
+  </data>
+  <data name="DownloadQueueHdr.Text" xml:space="preserve">
+    <value>Download queue</value>
+  </data>
+  <data name="EmptyQueueHdr.Text" xml:space="preserve">
+    <value>No download tasks right now</value>
+  </data>
+  <data name="ErrorGameId" xml:space="preserve">
+    <value>Could not get the GameBanana game ID</value>
+  </data>
+  <data name="ErrorLoadModDetail" xml:space="preserve">
+    <value>Failed to load mod details</value>
+  </data>
+  <data name="ErrorLoadMods" xml:space="preserve">
+    <value>Failed to load mods, please check your network connection</value>
+  </data>
+  <data name="FilterAll" xml:space="preserve">
+    <value>All categories</value>
+  </data>
+  <data name="FilterModsOnly" xml:space="preserve">
+    <value>Mods only</value>
+  </data>
+  <data name="InQueueMessage" xml:space="preserve">
+    <value>&quot;{0}&quot; is already in the download queue</value>
+  </data>
+  <data name="InQueueTitle" xml:space="preserve">
+    <value>Already in queue</value>
+  </data>
+  <data name="InstallFailedNoCharacters" xml:space="preserve">
+    <value>Could not find the character list, please make sure the game has been initialized correctly</value>
+  </data>
+  <data name="InstallFailedTitle" xml:space="preserve">
+    <value>Installation failed</value>
+  </data>
+  <data name="LikesLabel.Text" xml:space="preserve">
+    <value>Likes</value>
+  </data>
+  <data name="MatchCategoryPrompt" xml:space="preserve">
+    <value>Could not automatically match the target category for &quot;{0}&quot;, please select manually:</value>
+  </data>
+  <data name="ModDetailTitle" xml:space="preserve">
+    <value>Mod details</value>
+  </data>
+  <data name="NoDownloadableFiles" xml:space="preserve">
+    <value>No files are available for download.</value>
+  </data>
+  <data name="NoModsFoundHdr.Text" xml:space="preserve">
+    <value>No mods found</value>
+  </data>
+  <data name="NoModsFoundTip.Text" xml:space="preserve">
+    <value>Try different keywords or browse categories</value>
+  </data>
+  <data name="NotificationTaskAddedMessage" xml:space="preserve">
+    <value>The target file is about to be downloaded and installed</value>
+  </data>
+  <data name="NotificationTaskAddedTitle" xml:space="preserve">
+    <value>A GameBanana task was added</value>
+  </data>
+  <data name="NsfwBlur" xml:space="preserve">
+    <value>Blur NSFW</value>
+  </data>
+  <data name="NsfwRemove" xml:space="preserve">
+    <value>Hide NSFW</value>
+  </data>
+  <data name="NsfwShow" xml:space="preserve">
+    <value>Show NSFW</value>
+  </data>
+  <data name="OpenInBrowserBtn.Content" xml:space="preserve">
+    <value>View in browser</value>
+  </data>
+  <data name="RawFileDownloadedMsg" xml:space="preserve">
+    <value>This item is a standalone file or tool rather than a standard mod archive, and has been saved to the cache staging area. You can open the source directory directly to work with it.</value>
+  </data>
+  <data name="RawFileDownloadedTitle" xml:space="preserve">
+    <value>Standalone file downloaded</value>
+  </data>
+  <data name="RawFileOpenDir" xml:space="preserve">
+    <value>Show in Explorer</value>
+  </data>
+  <data name="RemoveBtn.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="RetryBtn.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Retry installation</value>
+  </data>
+  <data name="SearchCategoryPlaceholder" xml:space="preserve">
+    <value>Search categories or names...</value>
+  </data>
+  <data name="SearchModBox.PlaceholderText" xml:space="preserve">
+    <value>Search mods...</value>
+  </data>
+  <data name="SelectInstallTarget" xml:space="preserve">
+    <value>Select installation target</value>
+  </data>
+  <data name="SortDefault" xml:space="preserve">
+    <value>Default</value>
+  </data>
+  <data name="SortNew" xml:space="preserve">
+    <value>Newest</value>
+  </data>
+  <data name="SortUpdated" xml:space="preserve">
+    <value>Recently updated</value>
+  </data>
+  <data name="StatusAllocating" xml:space="preserve">
+    <value>Allocating...</value>
+  </data>
+  <data name="StatusCancelled" xml:space="preserve">
+    <value>Cancelled</value>
+  </data>
+  <data name="StatusCompleted" xml:space="preserve">
+    <value>Completed</value>
+  </data>
+  <data name="StatusDownloading" xml:space="preserve">
+    <value>Downloading {0}%</value>
+  </data>
+  <data name="StatusDownloadToCache" xml:space="preserve">
+    <value>Downloading to cache</value>
+  </data>
+  <data name="StatusErrorPrefix" xml:space="preserve">
+    <value>An error occurred: </value>
+  </data>
+  <data name="StatusHistoryFail" xml:space="preserve">
+    <value>Failed to save download history</value>
+  </data>
+  <data name="StatusInitDownload" xml:space="preserve">
+    <value>Initializing download...</value>
+  </data>
+  <data name="StatusInstallCancelled" xml:space="preserve">
+    <value>Installation cancelled</value>
+  </data>
+  <data name="StatusInstallCancelledCached" xml:space="preserve">
+    <value>Installation cancelled (kept in cache)</value>
+  </data>
+  <data name="StatusInstalling" xml:space="preserve">
+    <value>Extracting and installing...</value>
+  </data>
+  <data name="StatusInstalling2" xml:space="preserve">
+    <value>Installing...</value>
+  </data>
+  <data name="StatusInstallSuccess" xml:space="preserve">
+    <value>Installation successful</value>
+  </data>
+  <data name="StatusMatching" xml:space="preserve">
+    <value>Matching category...</value>
+  </data>
+  <data name="StatusParsing" xml:space="preserve">
+    <value>Parsing file information...</value>
+  </data>
+  <data name="StatusPreparing" xml:space="preserve">
+    <value>Preparing...</value>
+  </data>
+  <data name="StatusPromptCategory" xml:space="preserve">
+    <value>Please select the target for {0}</value>
+  </data>
+  <data name="StatusWaiting" xml:space="preserve">
+    <value>Waiting...</value>
+  </data>
+  <data name="StatusWaitingCategory" xml:space="preserve">
+    <value>Waiting for category selection...</value>
+  </data>
+  <data name="StatusWaitingForInstall" xml:space="preserve">
+    <value>Waiting for other installations to finish...</value>
+  </data>
+  <data name="StrongMatchBtn" xml:space="preserve">
+    <value>Can&apos;t find it? Try matching based on file name</value>
+  </data>
+  <data name="TabDescriptionItem.Content" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="TabOverviewItem.Content" xml:space="preserve">
+    <value>Overview &amp; files</value>
+  </data>
+  <data name="TabUpdateLogItem.Content" xml:space="preserve">
+    <value>Update log</value>
+  </data>
+  <data name="TaskAddedMessage" xml:space="preserve">
+    <value>Downloading {0} in the background...</value>
+  </data>
+  <data name="TaskAddedTitle" xml:space="preserve">
+    <value>Added to download queue</value>
+  </data>
+  <data name="ViewsLabel.Text" xml:space="preserve">
+    <value>Views</value>
+  </data>
+  <data name="RetryDetailBtn" xml:space="preserve">
+    <value>Retry</value>
+  </data>
+</root>

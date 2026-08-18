@@ -1,0 +1,403 @@
+{
+    "_aMetadata": {
+        "_nRecordCount": 2,
+        "_nPerpage": 5,
+        "_bIsComplete": true
+    },
+    "_aRecords": [
+        {
+            "_idRow": 446313,
+            "_nStatus": "0",
+            "_bIsPrivate": false,
+            "_bAccessorIsSubmitter": false,
+            "_bIsTrashed": false,
+            "_sName": "Gilberta",
+            "_tsDateModified": 0,
+            "_tsDateAdded": 1786549640,
+            "_sProfileUrl": "https://gamebanana.com/updates/446313",
+            "_aPreviewContent": {
+                "screenshot": {
+                    "_sBaseUrl": "https://images.gamebanana.com/static/img/DefaultEmbeddables",
+                    "_sFile": "Update.jpg",
+                    "_hFile": 350,
+                    "_sFile220": "Update_220.jpg",
+                    "_hFile220": 171
+                }
+            },
+            "_nPostCount": 0,
+            "_sInitialVisibility": "show",
+            "_bHasFiles": false,
+            "_sText": "",
+            "_bShowRipePromo": false,
+            "_aSubmitter": {
+                "_idRow": 4473230,
+                "_sName": "Farewell in a Dream",
+                "_sUserTitle": "Bananite",
+                "_sHonoraryTitle": "",
+                "_tsJoinDate": 1746946623,
+                "_sAvatarUrl": "https://images.gamebanana.com/img/av/69fc66ef65ab9.jpg",
+                "_sSigUrl": "",
+                "_sProfileUrl": "https://gamebanana.com/members/4473230",
+                "_sPointsUrl": "https://gamebanana.com/members/logs/pointslog/4473230",
+                "_sMedalsUrl": "https://gamebanana.com/members/stats/medals/4473230",
+                "_bIsOnline": false,
+                "_sLocation": "<a href=\"https://gamebanana.com\">Home</a> > <a href=\"https://gamebanana.com/games/21842\"><img src=\"https://images.gamebanana.com/img/ico/games/69725f15986b1.png\"/><span>Arknights: Endfield</span></a> > <a href=\"https://gamebanana.com/mods/games/21842\">Mods</a> > <a href=\"https://gamebanana.com/mods/cats/35464\">Skins</a> > <a href=\"https://gamebanana.com/mods/cats/42770\">Operators</a> > <a href=\"https://gamebanana.com/mods/cats/42733\">Gilberta</a> > <a href=\"https://gamebanana.com/mods/691126\">Detective Gilberta</a>",
+                "_sOnlineTitle": "",
+                "_sOfflineTitle": "",
+                "_nPoints": 41421,
+                "_nPointsRank": 604,
+                "_aNormalMedals": [
+                    [
+                        "m_age_1.png",
+                        "One month a member",
+                        "normal",
+                        3280481
+                    ],
+                    [
+                        "m_age_2.png",
+                        "6 months a member",
+                        "normal",
+                        3943991
+                    ],
+                    [
+                        "m_pr_1.png",
+                        "Reached 1,000 Points",
+                        "normal",
+                        4780784
+                    ],
+                    [
+                        "subscribers_1.png",
+                        "Reached 10 subscribers",
+                        "normal",
+                        4782425
+                    ],
+                    [
+                        "m_pr_2.png",
+                        "Reached 2,500 Points",
+                        "normal",
+                        4785881
+                    ],
+                    [
+                        "thanks_recvd_1.png",
+                        "Received thanks 5 times",
+                        "normal",
+                        4788870
+                    ],
+                    [
+                        "m_age_3.png",
+                        "1 year a member",
+                        "normal",
+                        4802610
+                    ],
+                    [
+                        "m_pr_3.png",
+                        "Reached 7,500 Points",
+                        "normal",
+                        4854047
+                    ],
+                    [
+                        "mods1.png",
+                        "Submitted 5 Mods",
+                        "normal",
+                        4901222
+                    ],
+                    [
+                        "features_1.png",
+                        "Submission featured",
+                        "normal",
+                        4999259
+                    ],
+                    [
+                        "m_pr_4.png",
+                        "Reached 25,000 Points",
+                        "normal",
+                        5047563
+                    ],
+                    [
+                        "mods2.png",
+                        "Submitted 10 Mods",
+                        "normal",
+                        5073347
+                    ]
+                ],
+                "_aRareMedals": [
+                    [
+                        "subscribers_2.png",
+                        "Reached 50 subscribers",
+                        "rare",
+                        4850132
+                    ],
+                    [
+                        "features_2.png",
+                        "10 submissions featured",
+                        "rare",
+                        5083271
+                    ]
+                ],
+                "_aLegendaryMedals": [
+                    [
+                        "subscribers_3.png",
+                        "Reached 100 subscribers",
+                        "legendary",
+                        4984184
+                    ]
+                ],
+                "_bHasRipe": false,
+                "_nBuddyCount": 0,
+                "_nSubscriberCount": 258,
+                "_aDonationMethods": [],
+                "_bAccessorIsBuddy": false,
+                "_bBuddyRequestExistsWithAccessor": false,
+                "_bAccessorIsSubscribed": false,
+                "_aDefaultLicenseChecklist": [
+                    "yes",
+                    "ask",
+                    "ask",
+                    "ask",
+                    "ask",
+                    "ask",
+                    "no",
+                    "ask"
+                ],
+                "_sDefaultLicense": ""
+            },
+            "_bFollowLinks": true,
+            "_bIsSignificant": true,
+            "_sVersion": "1.2",
+            "_aChangeLog": [
+                {
+                    "text": "1.2发布去除玩具版本，按/呼出面板  /      1.2 released the version without toys. Press / to bring up the panel.",
+                    "cat": ""
+                }
+            ],
+            "_aSubmission": {
+                "_sName": "Detective Gilberta",
+                "_sProfileUrl": "https://gamebanana.com/mods/691126",
+                "_sModelName": "Mod",
+                "_sDownloadUrl": "https://gamebanana.com/mods/download/691126"
+            },
+            "_aFileRowIds": [
+                1781995
+            ],
+            "_aFiles": [
+                {
+                    "_idRow": 1781995,
+                    "_sFile": "gilberta_12.rar",
+                    "_nFilesize": 60526277,
+                    "_tsDateAdded": 1786549440,
+                    "_nDownloadCount": 245,
+                    "_sDownloadUrl": "https://gamebanana.com/dl/1781995",
+                    "_sMd5Checksum": "557a826d8c190d7635a0f4103f068d24",
+                    "_sAnalysisState": "done",
+                    "_sAnalysisResult": "ok",
+                    "_sAnalysisResultVerbose": "File passed preliminary analysis",
+                    "_sAvState": "done",
+                    "_sAvResult": "clean",
+                    "_bIsArchived": false,
+                    "_bHasContents": true
+                }
+            ],
+            "_aAccess": {
+                "Update_Edit": false,
+                "Update_Trash": false
+            }
+        },
+        {
+            "_idRow": 438589,
+            "_nStatus": "0",
+            "_bIsPrivate": false,
+            "_bAccessorIsSubmitter": false,
+            "_bIsTrashed": false,
+            "_sName": "Gilberta",
+            "_tsDateModified": 0,
+            "_tsDateAdded": 1784242286,
+            "_sProfileUrl": "https://gamebanana.com/updates/438589",
+            "_aPreviewContent": {
+                "screenshot": {
+                    "_sBaseUrl": "https://images.gamebanana.com/static/img/DefaultEmbeddables",
+                    "_sFile": "Update.jpg",
+                    "_hFile": 350,
+                    "_sFile220": "Update_220.jpg",
+                    "_hFile220": 171
+                }
+            },
+            "_nPostCount": 0,
+            "_sInitialVisibility": "show",
+            "_bHasFiles": false,
+            "_sText": "",
+            "_bShowRipePromo": false,
+            "_aSubmitter": {
+                "_idRow": 4473230,
+                "_sName": "Farewell in a Dream",
+                "_sUserTitle": "Bananite",
+                "_sHonoraryTitle": "",
+                "_tsJoinDate": 1746946623,
+                "_sAvatarUrl": "https://images.gamebanana.com/img/av/69fc66ef65ab9.jpg",
+                "_sSigUrl": "",
+                "_sProfileUrl": "https://gamebanana.com/members/4473230",
+                "_sPointsUrl": "https://gamebanana.com/members/logs/pointslog/4473230",
+                "_sMedalsUrl": "https://gamebanana.com/members/stats/medals/4473230",
+                "_bIsOnline": false,
+                "_sLocation": "<a href=\"https://gamebanana.com\">Home</a> > <a href=\"https://gamebanana.com/games/21842\"><img src=\"https://images.gamebanana.com/img/ico/games/69725f15986b1.png\"/><span>Arknights: Endfield</span></a> > <a href=\"https://gamebanana.com/mods/games/21842\">Mods</a> > <a href=\"https://gamebanana.com/mods/cats/35464\">Skins</a> > <a href=\"https://gamebanana.com/mods/cats/42770\">Operators</a> > <a href=\"https://gamebanana.com/mods/cats/42733\">Gilberta</a> > <a href=\"https://gamebanana.com/mods/691126\">Detective Gilberta</a>",
+                "_sOnlineTitle": "",
+                "_sOfflineTitle": "",
+                "_nPoints": 41421,
+                "_nPointsRank": 604,
+                "_aNormalMedals": [
+                    [
+                        "m_age_1.png",
+                        "One month a member",
+                        "normal",
+                        3280481
+                    ],
+                    [
+                        "m_age_2.png",
+                        "6 months a member",
+                        "normal",
+                        3943991
+                    ],
+                    [
+                        "m_pr_1.png",
+                        "Reached 1,000 Points",
+                        "normal",
+                        4780784
+                    ],
+                    [
+                        "subscribers_1.png",
+                        "Reached 10 subscribers",
+                        "normal",
+                        4782425
+                    ],
+                    [
+                        "m_pr_2.png",
+                        "Reached 2,500 Points",
+                        "normal",
+                        4785881
+                    ],
+                    [
+                        "thanks_recvd_1.png",
+                        "Received thanks 5 times",
+                        "normal",
+                        4788870
+                    ],
+                    [
+                        "m_age_3.png",
+                        "1 year a member",
+                        "normal",
+                        4802610
+                    ],
+                    [
+                        "m_pr_3.png",
+                        "Reached 7,500 Points",
+                        "normal",
+                        4854047
+                    ],
+                    [
+                        "mods1.png",
+                        "Submitted 5 Mods",
+                        "normal",
+                        4901222
+                    ],
+                    [
+                        "features_1.png",
+                        "Submission featured",
+                        "normal",
+                        4999259
+                    ],
+                    [
+                        "m_pr_4.png",
+                        "Reached 25,000 Points",
+                        "normal",
+                        5047563
+                    ],
+                    [
+                        "mods2.png",
+                        "Submitted 10 Mods",
+                        "normal",
+                        5073347
+                    ]
+                ],
+                "_aRareMedals": [
+                    [
+                        "subscribers_2.png",
+                        "Reached 50 subscribers",
+                        "rare",
+                        4850132
+                    ],
+                    [
+                        "features_2.png",
+                        "10 submissions featured",
+                        "rare",
+                        5083271
+                    ]
+                ],
+                "_aLegendaryMedals": [
+                    [
+                        "subscribers_3.png",
+                        "Reached 100 subscribers",
+                        "legendary",
+                        4984184
+                    ]
+                ],
+                "_bHasRipe": false,
+                "_nBuddyCount": 0,
+                "_nSubscriberCount": 258,
+                "_aDonationMethods": [],
+                "_bAccessorIsBuddy": false,
+                "_bBuddyRequestExistsWithAccessor": false,
+                "_bAccessorIsSubscribed": false,
+                "_aDefaultLicenseChecklist": [
+                    "yes",
+                    "ask",
+                    "ask",
+                    "ask",
+                    "ask",
+                    "ask",
+                    "no",
+                    "ask"
+                ],
+                "_sDefaultLicense": ""
+            },
+            "_bFollowLinks": true,
+            "_bIsSignificant": true,
+            "_sVersion": "1.1",
+            "_aChangeLog": [
+                {
+                    "text": "1.1修复了1.4版本导致的问题/1.1 Fixed the issues caused by version 1.4",
+                    "cat": ""
+                }
+            ],
+            "_aSubmission": {
+                "_sName": "Detective Gilberta",
+                "_sProfileUrl": "https://gamebanana.com/mods/691126",
+                "_sModelName": "Mod",
+                "_sDownloadUrl": "https://gamebanana.com/mods/download/691126"
+            },
+            "_aFileRowIds": [
+                1756348
+            ],
+            "_aFiles": [
+                {
+                    "_idRow": 1756348,
+                    "_sFile": "gilberta11.rar",
+                    "_nFilesize": 51226380,
+                    "_tsDateAdded": 1784242244,
+                    "_nDownloadCount": 2399,
+                    "_sDownloadUrl": "https://gamebanana.com/dl/1756348",
+                    "_sMd5Checksum": "a3b7cb074ab4ed8bb32e443e5d548a54",
+                    "_sAnalysisState": "done",
+                    "_sAnalysisResult": "ok",
+                    "_sAnalysisResultVerbose": "File passed preliminary analysis",
+                    "_sAvState": "done",
+                    "_sAvResult": "clean",
+                    "_bIsArchived": false,
+                    "_bHasContents": true
+                }
+            ],
+            "_aAccess": {
+                "Update_Edit": false,
+                "Update_Trash": false
+            }
+        }
+    ]
+}
