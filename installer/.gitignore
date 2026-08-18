@@ -2,4 +2,4 @@
 output/
 
 # VC++ Redistributable (download manually)
-redist/vc_redist.x64.exe
+redist/
