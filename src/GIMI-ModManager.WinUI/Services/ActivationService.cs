@@ -1,4 +1,3 @@
-using System.Security.Principal;
 using Windows.Graphics;
 using Windows.Win32;
 using Windows.Win32.Foundation;
@@ -441,10 +440,10 @@ public class ActivationService : IActivationService
 
     private async Task AdminWarningPopup()
     {
-        var identity = WindowsIdentity.GetCurrent();
-        var principal = new WindowsPrincipal(identity);
-
-        if (!principal.IsInRole(WindowsBuiltInRole.Administrator)) return;
+        // 仅当进程真的经过 UAC 提权时才警告。UAC 被关闭或使用内置
+        // Administrator 账户时，IsInRole(Administrator) 会误报 true，
+        // 而用户并未勾选任何“以管理员身份运行”选项（GitHub Issue #65）。
+        if (!WindowsElevationService.IsElevatedViaUac()) return;
 
         var ignoreWarning = await _localSettingsService.ReadSettingAsync<bool>(IgnoreAdminWarningKey);
 

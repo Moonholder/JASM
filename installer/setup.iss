@@ -69,9 +69,9 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: de
 ; 安装 WebView2 Evergreen Runtime（仅在未检测到运行时，失败不影响主程序安装）
 Filename: "{tmp}\MicrosoftEdgeWebview2Setup.exe"; Parameters: "/silent /install"; StatusMsg: "正在安装 WebView2 运行时..."; Check: not WebView2RuntimeInstalled; Flags: waituntilterminated
 ; 手动安装模式下提供启动复选框
-Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; WorkingDir: "{app}"; Flags: nowait postinstall skipifsilent shellexec runasoriginaluser
+Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; WorkingDir: "{app}"; Flags: nowait postinstall skipifsilent shellexec runasoriginaluser; Check: ShouldLaunchApp
 ; 静默安装完成后的强制自启动
-Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{app}"; Flags: nowait shellexec runasoriginaluser; Check: IsAutoRun
+Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{app}"; Flags: nowait shellexec runasoriginaluser; Check: IsAutoRun and ShouldLaunchApp
 
 [UninstallDelete]
 ; 卸载时清理可能生成的运行时文件，但不删除用户数据（%LOCALAPPDATA%\JASM 中的设置）
@@ -131,6 +131,15 @@ begin
       Break;
     end;
   end;
+end;
+
+// 安装程序以管理员权限运行时，[Run] 中启动的 JASM 会继承提权令牌，
+// 导致其启动后误报“以管理员身份运行警告”（GitHub Issue #65，
+// Inno Setup 的 runasoriginaluser 在安装程序被“以管理员身份运行”启动时无效）。
+// 此时跳过自动启动，让用户从开始菜单/桌面快捷方式以普通权限打开 JASM。
+function ShouldLaunchApp: Boolean;
+begin
+  Result := not IsAdmin;
 end;
 
 // 安装程序启动时，智能等待主进程完全退出
