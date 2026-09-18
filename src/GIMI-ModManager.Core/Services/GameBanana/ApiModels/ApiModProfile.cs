@@ -35,4 +35,3 @@ public sealed class ApiAuthor
     [JsonPropertyName("_sAvatarUrl")] public string? AvatarImageUrl { get; init; }
     [JsonPropertyName("_sProfileUrl")] public string? ProfileUrl { get; init; }
 }
-
