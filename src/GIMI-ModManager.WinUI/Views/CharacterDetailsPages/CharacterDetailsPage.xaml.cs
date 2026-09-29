@@ -107,19 +107,19 @@ public sealed partial class CharacterDetailsPage : Page
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
-        if (CharacterCard?.ItemHero != null) // Trying to fix an argument null exception
-            this.RegisterElementForConnectedAnimation("animationKeyContentGrid", CharacterCard.ItemHero);
     }
 
     protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
     {
         base.OnNavigatingFrom(e);
+        try { Bindings.StopTracking(); } catch { }
         if (ViewModel != null)
         {
             ViewModel.OnModObjectLoaded -= OnModObjectLoaded;
             ViewModel.OnModsLoaded -= OnModsLoaded;
             ViewModel.OnInitializingFinished -= OnInitializingFinished;
             ViewModel.ContextMenuVM.CloseFlyout -= ContextMenuVM_CloseFlyout;
+            ViewModel.GridLoadedAwaiter = null;
         }
 
         if (ModGrid?.ViewModel is not null)
@@ -127,10 +127,9 @@ public sealed partial class CharacterDetailsPage : Page
             ModGrid.ViewModel.OnModsReloaded -= OnModsReloaded;
         }
 
-        if (e.NavigationMode == NavigationMode.Back && ViewModel?.ShownModObject != null)
+        if (ModGrid?.DataGrid != null)
         {
-            var navigationService = App.GetService<INavigationService>();
-            navigationService.SetListDataItemForNextConnectedAnimation(ViewModel.ShownModObject);
+            ModGrid.DataGrid.ContextFlyout = null;
         }
 
         ModGrid!.ViewModel = null!;

@@ -23,6 +23,7 @@ public sealed partial class CharacterCard : UserControl
     private void CharacterCard_Unloaded(object sender, RoutedEventArgs e)
     {
         Bindings.StopTracking();
+        HeroImage.Source = null;
     }
 
 

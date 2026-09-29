@@ -81,12 +81,16 @@ public partial class ModRowVM : ObservableObject
     [DynamicDependency(DynamicallyAccessedMemberTypes.PublicProperties, typeof(ModRowVM))]
     public void TriggerPropertyChanged(string? propertyName) => OnPropertyChanged(propertyName ?? string.Empty);
 
-    public required IAsyncRelayCommand ToggleEnabledCommand { get; init; }
-    public required IAsyncRelayCommand UpdateModSettingsCommand { get; set; }
+    public IAsyncRelayCommand? ToggleEnabledCommand { get; set; }
+    public IAsyncRelayCommand? UpdateModSettingsCommand { get; set; }
 
     public void Cleanup()
     {
         ModNotifications.Clear();
+        Presets = [];
+        Variants = [];
+        ToggleEnabledCommand = null;
+        UpdateModSettingsCommand = null;
     }
 }
 

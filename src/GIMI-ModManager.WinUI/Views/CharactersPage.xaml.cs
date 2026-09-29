@@ -50,13 +50,14 @@ public sealed partial class CharactersPage : Page
     {
         base.OnNavigatedFrom(e);
 
-        ViewModel.OnScrollToCharacter -= ViewModel_OnScrollToCharacter;
-
-        ViewModel.SimpleSelectProcessDialogVM.Dialog = null!;
-
-        if (CharactersGridView != null)
+        if (ViewModel != null)
         {
-            CharactersGridView.ItemsSource = null;
+            ViewModel.OnScrollToCharacter -= ViewModel_OnScrollToCharacter;
+
+            if (ViewModel.SimpleSelectProcessDialogVM != null)
+            {
+                ViewModel.SimpleSelectProcessDialogVM.Dialog = null!;
+            }
         }
     }
 

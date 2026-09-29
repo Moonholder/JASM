@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -164,18 +164,12 @@ public partial class CharacterDetailsViewModel
         var modsToDisable = gridMods.Where(mod => mod.IsEnabled).ToArray();
         if (modsToDisable.Length == 0)
             return;
-        var canDisableAllMods = modsToDisable.All(mod => mod.ToggleEnabledCommand.CanExecute(mod));
-        if (!canDisableAllMods)
-        {
-            _notificationService.ShowNotification("禁用模组时出错", "无法禁用所有模组.",
-                TimeSpan.FromSeconds(5));
-            return;
-        }
+
         await CommandWrapperAsync(true, async () =>
         {
             foreach (var mod in modsToDisable)
             {
-                await mod.ToggleEnabledCommand.ExecuteAsync(mod);
+                await ModGridVM.ToggleModAsync(mod);
             }
         }).ConfigureAwait(false);
     }

@@ -6,57 +6,25 @@ using GIMI_ModManager.WinUI.ViewModels.CharacterDetailsViewModels.SubViewModels;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
-using ModRowVM = GIMI_ModManager.WinUI.ViewModels.CharacterDetailsViewModels.SubViewModels.ModRowVM;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
+using Windows.ApplicationModel.DataTransfer;
+using Windows.Storage;
 
 namespace GIMI_ModManager.WinUI.Views.CharacterDetailsPages;
 
 public sealed partial class ModGrid : UserControl
 {
-    public DataGrid DataGrid { get; }
+    public DataGrid DataGrid => ModListGrid;
 
     public ModGrid()
     {
         InitializeComponent();
-        Loaded += OnLoaded;
         Unloaded += OnUnloaded;
-        DataGrid = ModListGrid;
     }
-
-    private void OnLoaded(object sender, RoutedEventArgs e)
-    {
-        if (ViewModel != null)
-        {
-            UnsubscribeEvents(ViewModel);
-            SubscribeEvents(ViewModel);
-        }
-    }
-
 
     public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register(
-        nameof(ViewModel), typeof(ModGridVM), typeof(ModGrid), new PropertyMetadata(null, OnViewModelChanged));
-
-    private static void OnViewModelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-    {
-        var control = (ModGrid)d;
-        var oldVm = e.OldValue as ModGridVM;
-        var newVm = e.NewValue as ModGridVM;
-
-        if (oldVm != null)
-        {
-            control.UnsubscribeEvents(oldVm);
-        }
-
-        if (newVm != null)
-        {
-            control.SubscribeEvents(newVm);
-        }
-
-        control.OnViewModelSetHandler(newVm);
-    }
+        nameof(ViewModel), typeof(ModGridVM), typeof(ModGrid), new PropertyMetadata(default(ModGridVM), OnViewModelPropertyChanged));
 
     public ModGridVM ViewModel
     {
@@ -64,51 +32,37 @@ public sealed partial class ModGrid : UserControl
         set => SetValue(ViewModelProperty, value);
     }
 
+    private static void OnViewModelPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is ModGrid grid)
+        {
+            if (e.OldValue is ModGridVM oldVm)
+            {
+                grid.UnsubscribeEvents(oldVm);
+            }
+            if (e.NewValue is ModGridVM newVm)
+            {
+                grid.SubscribeEvents(newVm);
+            }
+        }
+    }
+
     private void SubscribeEvents(ModGridVM vm)
     {
-        if (vm == null) return;
         vm.SelectModEvent += ViewModelOnSelectModEvent;
         vm.SortEvent += SetSortUiEventHandler;
         vm.OnInitialized += ViewModel_OnInitialized;
+        if (vm.IsInitialized)
+        {
+            ViewModel_OnInitialized(vm, EventArgs.Empty);
+        }
     }
 
     private void UnsubscribeEvents(ModGridVM vm)
     {
-        if (vm == null) return;
         vm.SelectModEvent -= ViewModelOnSelectModEvent;
         vm.SortEvent -= SetSortUiEventHandler;
         vm.OnInitialized -= ViewModel_OnInitialized;
-    }
-
-    private async void ModListGrid_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        var vm = ViewModel;
-        if (vm is null) return;
-
-        try
-        {
-            await vm.ToggleLock.LockAsync();
-            vm.ToggleLock.Release();
-
-            if (ViewModel == null) return;
-
-            ViewModel.SelectionChanged_EventHandler(
-                e.AddedItems.OfType<ModRowVM>().ToArray(),
-                e.RemovedItems.OfType<ModRowVM>().ToArray());
-        }
-        catch (Exception)
-        {
-        }
-    }
-
-    private void OnViewModelSetHandler(ModGridVM? viewModel)
-    {
-        if (viewModel is null) return;
-
-        if (viewModel.IsInitialized)
-        {
-            ViewModel_OnInitialized(viewModel, EventArgs.Empty);
-        }
     }
 
     private void ViewModel_OnInitialized(object? sender, EventArgs e)
@@ -121,34 +75,85 @@ public sealed partial class ModGrid : UserControl
 
     private void ViewModelOnSelectModEvent(object? sender, ModGridVM.SelectModRowEventArgs e)
     {
-        if (ModListGrid is null) return;
-        if (e.Index >= 0 && e.Index < ModListGrid.ItemsSource?.OfType<object>().Count())
+        var count = ViewModel?.GridMods.Count ?? 0;
+        if (e.Index < 0 || e.Index >= count)
         {
-            DataGrid.SelectedIndex = e.Index;
+            ModListGrid.SelectedIndex = -1;
+            return;
+        }
+
+        if (ModListGrid.SelectedIndex == e.Index)
+        {
+            var primary = ModListGrid.SelectedItem as ModRowVM;
+            var allSelected = ModListGrid.SelectedItems.OfType<ModRowVM>().ToList();
+            if (primary == null && allSelected.Count > 0)
+            {
+                primary = allSelected[0];
+            }
+            ViewModel?.SetSelection(allSelected, primary);
         }
         else
         {
-            DataGrid.SelectedIndex = -1;
+            ModListGrid.SelectedIndex = e.Index;
         }
     }
 
-    private void OnUnloaded(object sender, RoutedEventArgs e)
+    private void ModNameCell_Tapped(object sender, TappedRoutedEventArgs e)
     {
+        if (sender is FrameworkElement { DataContext: ModRowVM row })
+        {
+            if (ModListGrid.SelectionMode == DataGridSelectionMode.Single)
+            {
+                ModListGrid.SelectedItem = row;
+            }
+            else
+            {
+                var ctrlState = InputKeyboardSource.GetKeyStateForCurrentThread(Windows.System.VirtualKey.Control);
+                var isCtrl = (ctrlState & Windows.UI.Core.CoreVirtualKeyStates.Down) == Windows.UI.Core.CoreVirtualKeyStates.Down;
+                var shiftState = InputKeyboardSource.GetKeyStateForCurrentThread(Windows.System.VirtualKey.Shift);
+                var isShift = (shiftState & Windows.UI.Core.CoreVirtualKeyStates.Down) == Windows.UI.Core.CoreVirtualKeyStates.Down;
+
+                if (!isCtrl && !isShift)
+                {
+                    if (ModListGrid.SelectedItem != row || ModListGrid.SelectedItems.Count != 1)
+                    {
+                        ModListGrid.SelectedItem = row;
+                    }
+                    else
+                    {
+                        ViewModel?.SetSelection(ModListGrid.SelectedItems.OfType<ModRowVM>().ToList(), row);
+                    }
+                }
+                else if (isCtrl)
+                {
+                    if (ModListGrid.SelectedItems.Contains(row))
+                        ModListGrid.SelectedItems.Remove(row);
+                    else
+                        ModListGrid.SelectedItems.Add(row);
+                }
+            }
+        }
+    }
+
+    private void ModListGrid_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        var vm = ViewModel;
+        if (vm is null) return;
+
         try
         {
-            if (ViewModel is not null)
+            var primary = ModListGrid.SelectedItem as ModRowVM;
+            var allSelected = ModListGrid.SelectedItems.OfType<ModRowVM>().ToList();
+            if (primary == null && allSelected.Count > 0)
             {
-                UnsubscribeEvents(ViewModel);
+                primary = allSelected[0];
             }
 
-            DataGrid.ItemsSource = null;
-            DataGrid.DataContext = null;
-
-            Bindings.StopTracking();
+            vm.SetSelection(allSelected, primary);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            // ignored
+            Serilog.Log.ForContext<ModGrid>().Error(ex, "Error in ModListGrid_OnSelectionChanged");
         }
     }
 
@@ -160,8 +165,10 @@ public sealed partial class ModGrid : UserControl
         column.SortDirection = sortEvent.IsDescending ? DataGridSortDirection.Descending : DataGridSortDirection.Ascending;
 
         foreach (var dgColumn in ModListGrid.Columns)
+        {
             if (dgColumn.Tag?.ToString() != sortEvent.SortColumn)
                 dgColumn.SortDirection = null;
+        }
     }
 
     private void OnColumnSort(object? sender, DataGridColumnEventArgs e)
@@ -173,8 +180,10 @@ public sealed partial class ModGrid : UserControl
         ViewModel?.SetModSorting(sortColumn, isDescending, true);
 
         foreach (var dgColumn in ModListGrid.Columns)
+        {
             if (dgColumn.Tag?.ToString() != sortColumn)
                 dgColumn.SortDirection = null;
+        }
     }
 
     private async void ModListGrid_OnKeyDown(object sender, KeyRoutedEventArgs e)
@@ -189,7 +198,6 @@ public sealed partial class ModGrid : UserControl
         if (button.DataContext is not ModRowVM_ModNotificationVM modNotification) return;
         if (modNotification.AttentionType != AttentionType.UpdateAvailable) return;
 
-
         ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Hand);
     }
 
@@ -198,75 +206,41 @@ public sealed partial class ModGrid : UserControl
         ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
     }
 
-    private void ModListGrid_OnCellEditEnding(object? sender, DataGridCellEditEndingEventArgs e)
+    private void Notification_OnClick(object sender, RoutedEventArgs e)
     {
-        if (e.EditAction == DataGridEditAction.Cancel)
-            return;
+        if (sender is not Button button) return;
+        if (button.DataContext is not ModRowVM_ModNotificationVM modNotification) return;
+        if (modNotification.AttentionType != AttentionType.UpdateAvailable) return;
 
-        var mod = (ModRowVM)e.Row.DataContext;
-
-
-        if (e.Column.Tag.ToString() == nameof(ModRowVM.Author))
-        {
-            if (IsValueUpdated(mod.Author, out var newValue))
-                _ = UpdateModSettingsAsync(new UpdateSettingsRequest { SetAuthor = newValue });
-        }
-        else if (e.Column.Tag.ToString() == nameof(ModRowVM.DisplayName))
-        {
-            if (IsValueUpdated(mod.DisplayName, out var newValue))
-                _ = UpdateModSettingsAsync(new UpdateSettingsRequest { SetCustomName = newValue });
-        }
-        else if (e.Column.Tag.ToString() == nameof(ModRowVM.Description))
-        {
-            if (IsValueUpdated(mod.Description, out var newValue))
-                _ = UpdateModSettingsAsync(new UpdateSettingsRequest { SetDescription = newValue });
-        }
-
-        return;
-
-        bool IsValueUpdated(string oldValue, out string newValue)
-        {
-            var textBox = (TextBox)e.EditingElement;
-            newValue = textBox.Text.Trim();
-            return newValue != oldValue;
-        }
-
-        async Task UpdateModSettingsAsync(UpdateSettingsRequest updateRequest)
-        {
-            var arg = new ModGridVM.UpdateModSettingsArgument(mod, updateRequest);
-            if (mod.UpdateModSettingsCommand.CanExecute(arg))
-                await mod.UpdateModSettingsCommand.ExecuteAsync(arg).ConfigureAwait(false);
-        }
+        if (ViewModel != null && ViewModel.OpenNewModsWindowCommand.CanExecute(modNotification))
+            ViewModel.OpenNewModsWindowCommand.ExecuteAsync(modNotification);
     }
 
     private async void ModRow_DragStarting(UIElement sender, DragStartingEventArgs args)
     {
-        if (sender is not FrameworkElement element || element.DataContext is not ModRowVM row)
+        if (sender is not FrameworkElement { DataContext: ModRowVM row })
         {
             args.Cancel = true;
             return;
         }
 
         var selectedRows = ModListGrid.SelectedItems.OfType<ModRowVM>().ToList();
-
         if (!selectedRows.Contains(row))
         {
-            selectedRows = new List<ModRowVM> { row };
+            selectedRows = [row];
         }
 
         var deferral = args.GetDeferral();
-
         try
         {
-            var storageItems = new List<Windows.Storage.IStorageItem>();
-
+            var storageItems = new List<IStorageItem>();
             foreach (var r in selectedRows)
             {
                 if (!string.IsNullOrEmpty(r.AbsFolderPath))
                 {
                     try
                     {
-                        var folder = await Windows.Storage.StorageFolder.GetFolderFromPathAsync(r.AbsFolderPath);
+                        var folder = await StorageFolder.GetFolderFromPathAsync(r.AbsFolderPath);
                         storageItems.Add(folder);
                     }
                     catch
@@ -278,7 +252,7 @@ public sealed partial class ModGrid : UserControl
             if (storageItems.Count > 0)
             {
                 args.Data.SetStorageItems(storageItems);
-                args.Data.RequestedOperation = Windows.ApplicationModel.DataTransfer.DataPackageOperation.Copy | Windows.ApplicationModel.DataTransfer.DataPackageOperation.Link;
+                args.Data.RequestedOperation = DataPackageOperation.Copy | DataPackageOperation.Link;
                 args.Data.Properties.Add("IsModManagerDragOut", true);
             }
             else
@@ -286,13 +260,49 @@ public sealed partial class ModGrid : UserControl
                 args.Cancel = true;
             }
         }
-        catch
-        {
-            args.Cancel = true;
-        }
         finally
         {
             deferral.Complete();
+        }
+    }
+
+    private void ModListGrid_OnCellEditEnding(object? sender, DataGridCellEditEndingEventArgs e)
+    {
+        if (e.EditAction == DataGridEditAction.Cancel)
+            return;
+
+        var mod = (ModRowVM)e.Row.DataContext;
+
+        if (e.Column.Tag?.ToString() == nameof(ModRowVM.Author))
+        {
+            if (IsValueUpdated(mod.Author, out var newValue))
+                _ = UpdateSettingsAsync(new UpdateSettingsRequest { SetAuthor = newValue });
+        }
+        else if (e.Column.Tag?.ToString() == nameof(ModRowVM.DisplayName))
+        {
+            if (IsValueUpdated(mod.DisplayName, out var newValue))
+                _ = UpdateSettingsAsync(new UpdateSettingsRequest { SetCustomName = newValue });
+        }
+        else if (e.Column.Tag?.ToString() == nameof(ModRowVM.Description))
+        {
+            if (IsValueUpdated(mod.Description, out var newValue))
+                _ = UpdateSettingsAsync(new UpdateSettingsRequest { SetDescription = newValue });
+        }
+
+        bool IsValueUpdated(string oldValue, out string newValue)
+        {
+            var textBox = (TextBox)e.EditingElement;
+            newValue = textBox.Text.Trim();
+            return newValue != oldValue;
+        }
+
+        async Task UpdateSettingsAsync(UpdateSettingsRequest updateRequest)
+        {
+            if (ViewModel != null)
+            {
+                var arg = new ModGridVM.UpdateModSettingsArgument(mod, updateRequest);
+                await ViewModel.UpdateModSettingsAsync(arg).ConfigureAwait(false);
+            }
         }
     }
 
@@ -302,13 +312,20 @@ public sealed partial class ModGrid : UserControl
         if (e.Row.DataContext is ModRowVM mod) mod.TriggerPropertyChanged(string.Empty);
     }
 
-    private void Notification_OnClick(object sender, RoutedEventArgs e)
+    private void OnUnloaded(object sender, RoutedEventArgs e)
     {
-        if (sender is not Button button) return;
-        if (button.DataContext is not ModRowVM_ModNotificationVM modNotification) return;
-        if (modNotification.AttentionType != AttentionType.UpdateAvailable) return;
+        try
+        {
+            if (ViewModel != null)
+            {
+                UnsubscribeEvents(ViewModel);
+            }
 
-        if (ViewModel != null && ViewModel.OpenNewModsWindowCommand.CanExecute(modNotification))
-            ViewModel.OpenNewModsWindowCommand.ExecuteAsync(modNotification);
+            ModListGrid.ItemsSource = null;
+            Bindings.StopTracking();
+        }
+        catch (Exception)
+        {
+        }
     }
 }

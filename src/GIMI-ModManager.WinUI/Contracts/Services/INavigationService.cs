@@ -1,4 +1,4 @@
-﻿using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 
@@ -22,6 +22,7 @@ public interface INavigationService
     void SetListDataItemForNextConnectedAnimation(object item);
 
     void ClearBackStack(int amountToClear = -1, bool clearFromMostRecent = true);
+    void ClearForwardStack();
 
     public ICollection<PageStackEntry> GetBackStackItems();
     public IReadOnlyCollection<NavigationHistoryItem> GetNavigationHistory();

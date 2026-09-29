@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -88,7 +88,6 @@ public partial class CharacterDetailsViewModel : ObservableObject, INavigationAw
     {
         _busySetter = new BusySetter(this);
     }
-
 
     public ModGridVM ModGridVM { get; private set; } = App.GetService<ModGridVM>();
     public ModPaneVM ModPaneVM { get; private set; } = App.GetService<ModPaneVM>();
@@ -252,9 +251,9 @@ public partial class CharacterDetailsViewModel : ObservableObject, INavigationAw
         ContextMenuVM.SetSelectedMods(args.Mods.Select(m => m.Id));
         IsSingleModSelected = args.Mods.Count == 1;
         DeleteModsCommand.NotifyCanExecuteChanged();
-        var selectedMod = args.Mods.FirstOrDefault();
+        var selectedMod = args.PrimarySelected ?? args.Mods.FirstOrDefault();
 
-        ModPaneVM.QueueLoadMod(selectedMod?.Id);
+        ModPaneVM.QueueLoadMod(selectedMod?.Id, force: true);
 
         if (selectedMod is null)
             return;
@@ -306,10 +305,10 @@ public partial class CharacterDetailsViewModel : ObservableObject, INavigationAw
             ContextMenuVM.ModCharactersSkinOverriden -= ContextMenuVM_ModsMoved;
             ModGridVM.DeleteModKeyTriggered -= ModGridVM_DeleteModKeyTriggered;
 
-            if (ModGridVM.IsInitialized)
-                ModGridVM.OnNavigateFrom();
-            if (ModPaneVM.IsInitialized)
-                ModPaneVM.OnNavigatedFrom();
+            // 无条件释放子VM，即便加载尚未完成也必须停止Channel和事件监听
+            ModGridVM.OnNavigateFrom();
+            ModPaneVM.OnNavigatedFrom();
+            GridLoadedAwaiter = null;
 
             var sortingMethod = ModGridVM.CurrentSortingMethod.SortingMethodType;
             var isDescending = ModGridVM.IsDescendingSort;

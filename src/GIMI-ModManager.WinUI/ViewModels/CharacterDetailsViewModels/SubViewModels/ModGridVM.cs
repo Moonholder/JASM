@@ -480,7 +480,7 @@ public partial class ModGridVM(
 
     public readonly AsyncLock ToggleLock = new();
 
-    private async Task ToggleModAsync(ModRowVM? modVmToToggle)
+    public async Task ToggleModAsync(ModRowVM? modVmToToggle)
     {
         if (modVmToToggle is null || _isDisposed) return;
 
@@ -550,7 +550,6 @@ public partial class ModGridVM(
                 }
 
                 await UpdateModVmAsync(modEntryToToggle, false, CancellationToken.None);
-                Messenger.Send(new ModChangedMessage(this, modEntryToToggle, null));
 
                 foreach (var otherModEntry in modsToDisable)
                 {
@@ -560,6 +559,14 @@ public partial class ModGridVM(
 
                 RefreshMultipleModsActiveWarning();
                 Messenger.Send(new ModChangedMessage(this, modEntryToToggle, null));
+
+                if (SingleSelect && modEntryToToggle.IsEnabled)
+                {
+                    _dispatcherQueue?.TryEnqueue(() =>
+                    {
+                        SetSelectedMod(modEntryToToggle.Id);
+                    });
+                }
             }
         }
         catch (Exception e)
@@ -579,7 +586,7 @@ public partial class ModGridVM(
         }
     }
 
-    private async Task UpdateModSettingsAsync(UpdateModSettingsArgument? arg)
+    public async Task UpdateModSettingsAsync(UpdateModSettingsArgument? arg)
     {
         if (arg is null)
             return;
@@ -689,39 +696,42 @@ public partial class ModGridVM(
     // Only to be used by code behind
     // Contrary to my attempt at MVVM, this is the only way to get the selected mods from the view
     // DataGrid is quite limited in this regard, so it is in charge of the selection and the view model just listens
+    public void SetSelection(IReadOnlyList<ModRowVM> allSelected, ModRowVM? primarySelected)
+    {
+        SelectedMods.Clear();
+
+        if (primarySelected != null)
+        {
+            SelectedMods.Add(primarySelected);
+        }
+
+        foreach (var mod in allSelected)
+        {
+            if (primarySelected == null || mod.Id != primarySelected.Id)
+            {
+                SelectedMods.Add(mod);
+            }
+        }
+
+        OnPropertyChanged(nameof(IsSingleModSelected));
+        OnPropertyChanged(nameof(SelectedMod));
+        OnModsSelected?.Invoke(this, new ModRowSelectedEventArgs(SelectedMods, primarySelected ?? SelectedMods.FirstOrDefault()));
+    }
+
     public void SelectionChanged_EventHandler(ICollection<ModRowVM> selectedMods, ICollection<ModRowVM> removedMods)
     {
-        var anyChanges = false;
-        if (selectedMods.Any())
+        var primary = selectedMods.LastOrDefault();
+        var current = SelectedMods.ToList();
+        foreach (var mod in selectedMods)
         {
-            foreach (var mod in selectedMods)
-            {
-                if (!SelectedMods.Contains(mod))
-                {
-                    SelectedMods.Add(mod);
-                    anyChanges = true;
-                }
-            }
+            if (!current.Contains(mod))
+                current.Add(mod);
         }
-
-        if (removedMods.Any())
+        foreach (var mod in removedMods)
         {
-            foreach (var mod in removedMods)
-            {
-                if (SelectedMods.Contains(mod))
-                {
-                    SelectedMods.Remove(mod);
-                    anyChanges = true;
-                }
-            }
+            current.Remove(mod);
         }
-
-        if (anyChanges)
-        {
-            OnPropertyChanged(nameof(IsSingleModSelected));
-            OnPropertyChanged(nameof(SelectedMod));
-            OnModsSelected?.Invoke(this, new ModRowSelectedEventArgs(SelectedMods));
-        }
+        SetSelection(current, primary ?? current.FirstOrDefault());
     }
 
     // Only to be used by code behind
@@ -734,12 +744,6 @@ public partial class ModGridVM(
         if (selectedMods.Length == 0)
             return;
 
-        if (SingleSelect && selectedMods.Length > 1)
-        {
-            selectedMods = selectedMods.Take(1).ToArray();
-            Debugger.Break(); // TODO Handle
-        }
-
         if (key == VirtualKey.Delete)
         {
             DeleteModKeyTriggered?.Invoke(this, EventArgs.Empty);
@@ -749,12 +753,20 @@ public partial class ModGridVM(
         if (key == VirtualKey.Space)
         {
             using var _ = BusySetter.StartSoftBusy();
-            if (selectedMods.Any(m => !m.ToggleEnabledCommand.CanExecute(null)))
-                return;
-
-            foreach (var mod in selectedMods)
+            if (SingleSelect)
             {
-                await mod.ToggleEnabledCommand.ExecuteAsync(mod);
+                var mod = selectedMods.FirstOrDefault();
+                if (mod != null)
+                {
+                    await ToggleModAsync(mod);
+                }
+            }
+            else
+            {
+                foreach (var mod in selectedMods)
+                {
+                    await ToggleModAsync(mod);
+                }
             }
         }
     }
@@ -773,9 +785,10 @@ public partial class ModGridVM(
 
     public event EventHandler? OnInitialized;
 
-    public class ModRowSelectedEventArgs(IEnumerable<ModRowVM> mods) : EventArgs
+    public class ModRowSelectedEventArgs(IEnumerable<ModRowVM> mods, ModRowVM? primarySelected = null) : EventArgs
     {
         public ICollection<ModRowVM> Mods { get; } = mods.ToArray();
+        public ModRowVM? PrimarySelected { get; } = primarySelected;
     }
 
     public class SelectModRowEventArgs(int index) : EventArgs

@@ -6,6 +6,7 @@ using GIMI_ModManager.Core.Contracts.Services;
 using GIMI_ModManager.Core.Entities;
 using GIMI_ModManager.Core.Entities.Mods.Contract;
 using GIMI_ModManager.Core.Entities.Mods.FileModels;
+using GIMI_ModManager.Core.Entities.Mods.Helpers;
 using GIMI_ModManager.Core.Helpers;
 using GIMI_ModManager.WinUI.Services;
 using GIMI_ModManager.WinUI.Services.ModHandling;
@@ -84,7 +85,7 @@ public sealed partial class ModPaneVM(
     public bool QueueLoadMod(Guid? modId, bool force = false) => _channel.Writer.TryWrite(new LoadModMessage { ModId = modId, Force = force });
 
     private readonly Channel<LoadModMessage> _channel = Channel.CreateBounded<LoadModMessage>(
-        new BoundedChannelOptions(1)
+        new BoundedChannelOptions(4)
         {
             AllowSynchronousContinuations = false,
             FullMode = BoundedChannelFullMode.DropOldest,
@@ -94,34 +95,53 @@ public sealed partial class ModPaneVM(
 
     private async Task ModLoaderLoopAsync()
     {
-        // Runs on the UI thread
         await foreach (var loadModMessage in _channel.Reader.ReadAllAsync(CancellationToken.None))
         {
             if (_cancellationToken.IsCancellationRequested)
                 break;
-            using var _ = await LockAsync().ConfigureAwait(false);
-            IsReadOnly = true;
-            IsEditingModName = false;
+
             try
             {
+                using var _ = await LockAsync().ConfigureAwait(false);
+
+                await _dispatcherQueue.EnqueueAsync(() =>
+                {
+                    IsReadOnly = true;
+                    IsEditingModName = false;
+                });
+
                 if (loadModMessage.ModId is null)
                 {
-                    await UnloadModAsync();
-                    NotifyAllCommands();
-                    OnPropertyChanged(nameof(IsModLoaded));
+                    await _dispatcherQueue.EnqueueAsync(() =>
+                    {
+                        UnloadMod();
+                        NotifyAllCommands();
+                        OnPropertyChanged(nameof(IsModLoaded));
+                    });
                     continue;
                 }
 
                 await LoadModAsync(loadModMessage.ModId.Value, loadModMessage.Force);
-                NotifyAllCommands();
-                OnPropertyChanged(nameof(IsModLoaded));
             }
             catch (OperationCanceledException)
             {
             }
             catch (Exception e)
             {
-                _notificationService.ShowNotification("加载模组失败", e.Message, null);
+                _logger.Error(e, "Error loading mod in ModLoaderLoopAsync");
+                _dispatcherQueue.TryEnqueue(() =>
+                {
+                    _notificationService.ShowNotification("加载模组失败", e.Message, null);
+                });
+            }
+            finally
+            {
+                await _dispatcherQueue.EnqueueAsync(() =>
+                {
+                    IsReadOnly = false;
+                    NotifyAllCommands();
+                    OnPropertyChanged(nameof(IsModLoaded));
+                });
             }
         }
     }
@@ -139,8 +159,22 @@ public sealed partial class ModPaneVM(
 
             var mod = modEntry.Mod;
             var modSettings = await mod.Settings.TryReadSettingsAsync(useCache: false, cancellationToken: _cancellationToken);
+
             if (modSettings is null)
-                return null;
+            {
+                await Task.Delay(60, _cancellationToken).ConfigureAwait(false);
+                modSettings = await mod.Settings.TryReadSettingsAsync(useCache: false, cancellationToken: _cancellationToken);
+            }
+
+            if (modSettings is null)
+            {
+                var previewImages = SkinModHelpers.DetectModPreviewImages(mod.FullPath);
+                modSettings = new ModSettings(
+                    modEntry.Id,
+                    customName: mod.GetDisplayName(),
+                    imagePath: previewImages.FirstOrDefault()
+                );
+            }
 
             var keySwapResult = await keySwapService.GetAllKeySwapsAsync(modId, ShowDisabledIniFiles);
 
@@ -173,16 +207,34 @@ public sealed partial class ModPaneVM(
         }, _cancellationToken);
 
         if (modPaneData is null)
+        {
+            await _dispatcherQueue.EnqueueAsync(() =>
+            {
+                UnloadMod();
+                NotifyAllCommands();
+                OnPropertyChanged(nameof(IsModLoaded));
+            });
             return;
+        }
 
-        _loadedMod = modPaneData.modEntry;
-        ModModel = ModPaneFieldsVm.FromModEntry(modPaneData.modEntry, modPaneData.modSettings, []);
-        ModModel.PropertyChanged += ModModel_PropertyChanged;
-        _loadedModId = modId;
-        IsReadOnly = false;
-        IsKeySwapsEditMode = false; // 默认进入紧凑展示模式
-        //填充 ini keyswaps 分组
-        UpdateIniKeySwapGroups(modPaneData.allKeySwaps);
+        await _dispatcherQueue.EnqueueAsync(() =>
+        {
+            if (ModModel.IsLoaded)
+            {
+                ModModel.PropertyChanged -= ModModel_PropertyChanged;
+            }
+
+            _loadedMod = modPaneData.modEntry;
+            ModModel = ModPaneFieldsVm.FromModEntry(modPaneData.modEntry, modPaneData.modSettings, []);
+            ModModel.PropertyChanged += ModModel_PropertyChanged;
+            _loadedModId = modId;
+            IsReadOnly = false;
+            IsKeySwapsEditMode = false; // 默认进入紧凑展示模式
+            UpdateIniKeySwapGroups(modPaneData.allKeySwaps);
+            NotifyAllCommands();
+            OnPropertyChanged(nameof(ModModel));
+            OnPropertyChanged(nameof(IsModLoaded));
+        });
     }
 
     private void UpdateIniKeySwapGroups(Dictionary<string, List<KeySwapSection>>? allKeySwaps)
@@ -285,7 +337,7 @@ public sealed partial class ModPaneVM(
         OnPropertyChanged(nameof(CanSaveModSettings));
     }
 
-    private Task UnloadModAsync()
+    private void UnloadMod()
     {
         _loadedModId = null;
         _loadedMod = null;
@@ -295,7 +347,9 @@ public sealed partial class ModPaneVM(
         IniKeySwapGroups.CollectionChanged -= (s, _) => OnPropertyChanged(nameof(HasAnyKeySwap));
 
         ModModel = new ModPaneFieldsVm();
-        return Task.CompletedTask;
+        IniKeySwapGroups.Clear();
+        OnPropertyChanged(nameof(ModModel));
+        OnPropertyChanged(nameof(HasAnyKeySwap));
     }
 
     private readonly record struct LoadModMessage
@@ -306,16 +360,13 @@ public sealed partial class ModPaneVM(
 
     public void Receive(ModChangedMessage message)
     {
-        if (!IsModLoaded)
-            return;
-
-        if (message.SkinEntry.Id != _loadedModId)
-            return;
-
         if (message.sender == this)
             return;
 
-        QueueLoadMod(message.SkinEntry.Id, true);
+        if (_loadedModId == null || _loadedModId == message.SkinEntry.Id || message.SkinEntry.IsEnabled)
+        {
+            QueueLoadMod(message.SkinEntry.Id, true);
+        }
     }
 
     public Task OnNavigatedToAsync(DispatcherQueue dispatcherQueue, CancellationToken navigationCt)
@@ -339,6 +390,11 @@ public sealed partial class ModPaneVM(
         {
             ModModel.PropertyChanged -= ModModel_PropertyChanged;
         }
+
+        _loadedModId = null;
+        _loadedMod = null;
+        IniKeySwapGroups.Clear();
+        ModModel = new ModPaneFieldsVm();
 
         try
         {

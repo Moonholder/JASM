@@ -650,7 +650,6 @@ public partial class CharactersViewModel : ObservableRecipient, INavigationAware
     {
         if (characterModel is not null)
         {
-            _navigationService.SetListDataItemForNextConnectedAnimation(characterModel);
             _navigationService.NavigateToCharacterDetails(characterModel.Character.InternalName);
         }
 

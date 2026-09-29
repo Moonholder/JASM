@@ -10,12 +10,16 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 
+using System.Runtime.InteropServices;
+
 namespace GIMI_ModManager.WinUI.Services;
 
 // For more information on navigation between pages see
 // https://github.com/microsoft/TemplateStudio/blob/main/docs/WinUI/navigation.md
-public class NavigationService : INavigationService
+public partial class NavigationService : INavigationService
 {
+    [LibraryImport("psapi.dll")]
+    private static partial int EmptyWorkingSet(IntPtr hwProc);
     private readonly ILocalSettingsService _localSettingsService;
     private readonly IPageService _pageService;
     private object? _lastParameterUsed;
@@ -105,6 +109,7 @@ public class NavigationService : INavigationService
                 navigationAware.OnNavigatedFrom();
             }
 
+            _frame.ForwardStack.Clear();
             _navigationHistory.Add(new NavigationHistoryItem(pageStackEntry));
             return true;
         }
@@ -147,15 +152,16 @@ public class NavigationService : INavigationService
     public bool NavigateToCharacterDetails(string internalName, bool clearNavigation = false)
     {
         var settings = _localSettingsService.ReadSetting<CharacterDetailsSettings>(CharacterDetailsSettings.Key, SettingScope.App);
+        var transitionInfo = new SlideNavigationTransitionInfo { Effect = SlideNavigationTransitionEffect.FromRight };
 
         if (settings?.GalleryView == true)
         {
-            return NavigateTo(typeof(CharacterGalleryViewModel).FullName!, internalName, clearNavigation: clearNavigation);
+            return NavigateTo(typeof(CharacterGalleryViewModel).FullName!, internalName, clearNavigation: clearNavigation, transitionInfo: transitionInfo);
         }
 
         var pageKey = typeof(CharacterDetailsViewModel).FullName;
 
-        return NavigateTo(pageKey!, internalName, clearNavigation);
+        return NavigateTo(pageKey!, internalName, clearNavigation, transitionInfo: transitionInfo);
     }
 
     private void OnNavigated(object sender, NavigationEventArgs e)
@@ -184,13 +190,42 @@ public class NavigationService : INavigationService
                 _navigationHistory.RemoveRange(0, maxBackStackEntries - 1);
             }
 
+            if (e.SourcePageType?.Name == "CharactersPage")
+            {
+                frame.ForwardStack.Clear();
+            }
+
             if (frame.GetPageViewModel() is INavigationAware navigationAware)
             {
                 navigationAware.OnNavigatedTo(e.Parameter);
             }
 
             Navigated?.Invoke(sender, e);
+
+            // 延迟异步触发深度 GC 与工作集修剪，释放废弃 DirectUI 节点与 GPU 位图镜像
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(400);
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                GC.Collect();
+
+                try
+                {
+                    using var process = System.Diagnostics.Process.GetCurrentProcess();
+                    EmptyWorkingSet(process.Handle);
+                }
+                catch { }
+            });
         }
+    }
+
+    public void ClearForwardStack()
+    {
+        if (Frame == null)
+            return;
+
+        Frame.ForwardStack.Clear();
     }
 
     public void SetListDataItemForNextConnectedAnimation(object item)

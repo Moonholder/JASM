@@ -76,12 +76,10 @@
                 HorizontalAlignment="Center"
                 VerticalAlignment="Top"
                 CornerRadius="10">
-                <Image HorizontalAlignment="Center" VerticalAlignment="Center">
-
+                <Image x:Name="HeroImage" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <Image.Source>
                         <BitmapImage DecodePixelHeight="300" UriSource="{x:Bind ViewModel.ShownModImageUri, Mode=OneWay}" />
                     </Image.Source>
-
                 </Image>
             </Grid>
             <TextBlock

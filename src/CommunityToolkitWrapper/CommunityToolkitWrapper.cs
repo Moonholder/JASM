@@ -9,6 +9,12 @@ namespace CommunityToolkitWrapper;
 // This causes an ambiguous reference error.
 public static class CommunityToolkitWrapper
 {
+    public static Task EnqueueAsync(this DispatcherQueue dispatcher, Action action,
+        DispatcherQueuePriority priority = DispatcherQueuePriority.Normal)
+    {
+        return DispatcherQueueExtensions.EnqueueAsync(dispatcher, action, priority);
+    }
+
     public static Task EnqueueAsync(this DispatcherQueue dispatcher, Func<Task> function,
         DispatcherQueuePriority priority = DispatcherQueuePriority.Normal)
     {

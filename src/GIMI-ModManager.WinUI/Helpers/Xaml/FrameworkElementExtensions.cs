@@ -56,4 +56,14 @@ public static class FrameworkElementExtensions
             await Task.Delay(PollingTime, cancellationToken);
         } while (dataGrid.ItemsSource is null);
     }
+
+    public static async Task AwaitItemsSourceLoaded(this Microsoft.UI.Xaml.Controls.ItemsControl itemsControl, CancellationToken cancellationToken)
+    {
+        if (itemsControl.ItemsSource is not null)
+            return;
+        do
+        {
+            await Task.Delay(PollingTime, cancellationToken);
+        } while (itemsControl.ItemsSource is null);
+    }
 }
