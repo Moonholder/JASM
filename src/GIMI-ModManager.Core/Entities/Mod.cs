@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System.Security.Cryptography;
 using System.Text;
 using GIMI_ModManager.Core.Contracts.Entities;
@@ -61,12 +61,15 @@ public class Mod : IMod
         return new Mod(newModDirectory);
     }
 
-    public void Rename(string newName)
+    public virtual void Rename(string newName)
     {
         _modDirectory.Refresh();
         if (newName.Equals(_modDirectory.Name, StringComparison.CurrentCultureIgnoreCase))
             return;
-        _modDirectory.MoveTo(Path.Combine(OnlyPath, newName));
+        var targetPath = Path.Combine(OnlyPath, newName);
+        _modDirectory.MoveTo(targetPath);
+        _modDirectory = new DirectoryInfo(targetPath);
+        folderSizeInBytes = null;
     }
 
     public void Delete(bool moveToRecycleBin = true)

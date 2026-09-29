@@ -134,6 +134,9 @@ public partial class UserPreferencesService(ILogger logger, ISkinManagerService 
         }
 
         var modFolderPath = skinEntry.Mod.FullPath;
+        if (!Directory.Exists(modFolderPath))
+            return false;
+
         var validIniFiles = Directory.GetFiles(modFolderPath, "*.ini", SearchOption.AllDirectories)
             .Where(f => !IsPathDisabled(f, modFolderPath));
 

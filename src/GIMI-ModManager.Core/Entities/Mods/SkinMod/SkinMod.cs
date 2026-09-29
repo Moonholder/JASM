@@ -30,6 +30,13 @@ public class SkinMod : Mod, ISkinMod
         KeySwaps?.ClearKeySwaps();
     }
 
+    public override void Rename(string newName)
+    {
+        base.Rename(newName);
+        _configFilePath = Path.Combine(FullPath, _configFileName);
+        ClearCache();
+    }
+
 
     private SkinMod(DirectoryInfo modDirectory) : base(modDirectory)
     {

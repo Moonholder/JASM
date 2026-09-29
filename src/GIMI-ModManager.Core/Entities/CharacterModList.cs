@@ -274,59 +274,65 @@ public sealed class CharacterModList : ICharacterModList
 
     public void EnableMod(Guid modId)
     {
-        try
+        lock (_modsLock)
         {
-            _watcher?.EnableRaisingEvents = false;
+            try
+            {
+                _watcher?.EnableRaisingEvents = false;
 
-            var mod = _mods.First(m => m.Id == modId).Mod;
+                var mod = _mods.First(m => m.Id == modId).Mod;
 
-            if (!ModAlreadyAdded(mod))
-                throw new InvalidOperationException("Mod not added");
+                if (!ModAlreadyAdded(mod))
+                    throw new InvalidOperationException("Mod not added");
 
-            if (!ModFolderHelpers.FolderHasDisabledPrefix(mod.Name))
-                throw new InvalidOperationException("Cannot enable a enabled mod");
+                if (!ModFolderHelpers.FolderHasDisabledPrefix(mod.Name))
+                    throw new InvalidOperationException("Cannot enable a enabled mod");
 
-            var newName = ModFolderHelpers.GetFolderNameWithoutDisabledPrefix(mod.Name);
+                var newName = ModFolderHelpers.GetFolderNameWithoutDisabledPrefix(mod.Name);
 
-            if (Directory.Exists(Path.Combine(AbsModsFolderPath, newName)))
-                throw new InvalidOperationException("Cannot disable a mod with the same name as a disabled mod");
+                if (Directory.Exists(Path.Combine(AbsModsFolderPath, newName)))
+                    throw new InvalidOperationException("Cannot disable a mod with the same name as a disabled mod");
 
-            mod.Rename(newName);
+                mod.Rename(newName);
 
 
-            _mods.First(m => m.Mod.Equals(mod)).IsEnabled = true;
-        }
-        finally
-        {
-            _watcher?.EnableRaisingEvents = true;
+                _mods.First(m => m.Mod.Equals(mod)).IsEnabled = true;
+            }
+            finally
+            {
+                _watcher?.EnableRaisingEvents = true;
+            }
         }
     }
 
     public void DisableMod(Guid modId)
     {
-        try
+        lock (_modsLock)
         {
-            _watcher?.EnableRaisingEvents = false;
-            var modEntry = _mods.First(m => m.Id == modId);
-            var mod = modEntry.Mod;
+            try
+            {
+                _watcher?.EnableRaisingEvents = false;
+                var modEntry = _mods.First(m => m.Id == modId);
+                var mod = modEntry.Mod;
 
-            if (!ModAlreadyAdded(mod))
-                throw new InvalidOperationException("Mod not added");
+                if (!ModAlreadyAdded(mod))
+                    throw new InvalidOperationException("Mod not added");
 
-            if (ModFolderHelpers.FolderHasDisabledPrefix(mod.Name))
-                throw new InvalidOperationException("Cannot disable a disabled mod");
+                if (ModFolderHelpers.FolderHasDisabledPrefix(mod.Name))
+                    throw new InvalidOperationException("Cannot disable a disabled mod");
 
-            var newName = ModFolderHelpers.GetFolderNameWithDisabledPrefix(mod.Name);
+                var newName = ModFolderHelpers.GetFolderNameWithDisabledPrefix(mod.Name);
 
-            if (Directory.Exists(Path.Combine(AbsModsFolderPath, newName)))
-                throw new InvalidOperationException("Cannot disable a mod with the same name as a disabled mod");
+                if (Directory.Exists(Path.Combine(AbsModsFolderPath, newName)))
+                    throw new InvalidOperationException("Cannot disable a mod with the same name as a disabled mod");
 
-            mod.Rename(newName);
-            modEntry.IsEnabled = false;
-        }
-        finally
-        {
-            _watcher?.EnableRaisingEvents = true;
+                mod.Rename(newName);
+                modEntry.IsEnabled = false;
+            }
+            finally
+            {
+                _watcher?.EnableRaisingEvents = true;
+            }
         }
     }
 

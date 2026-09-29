@@ -1,4 +1,4 @@
-﻿using GIMI_ModManager.Core.Contracts.Services;
+using GIMI_ModManager.Core.Contracts.Services;
 using GIMI_ModManager.Core.Entities.Mods.Contract;
 using GIMI_ModManager.WinUI.Services.Notifications;
 using Serilog;
@@ -51,6 +51,11 @@ public class KeySwapService : IKeySwapService
 
             var keySwaps = await mod.KeySwaps.ReadAllKeySwapConfigurations(showDisabledIniFiles).ConfigureAwait(false);
             return Result<Dictionary<string, List<KeySwapSection>>>.Success(keySwaps);
+        }
+        catch (DirectoryNotFoundException dnfEx)
+        {
+            _logger.Warning(dnfEx, "Mod directory not found during key swap load (transient rename or removed): {ModId}", modId);
+            return Result<Dictionary<string, List<KeySwapSection>>>.Success([]);
         }
         catch (Exception ex)
         {

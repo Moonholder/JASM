@@ -1,4 +1,4 @@
-﻿using GIMI_ModManager.Core.Contracts.Entities;
+using GIMI_ModManager.Core.Contracts.Entities;
 using GIMI_ModManager.Core.Entities.Mods.Contract;
 using GIMI_ModManager.Core.Entities.Mods.FileModels;
 using GIMI_ModManager.Core.Helpers;
@@ -20,6 +20,34 @@ public partial class SkinModKeySwapManager(ISkinMod skinMod)
     {
         var result = new Dictionary<string, List<KeySwapSection>>();
         var modDir = new DirectoryInfo(skinMod.FullPath);
+        if (!modDir.Exists)
+        {
+            await Task.Delay(50, cancellationToken).ConfigureAwait(false);
+            modDir.Refresh();
+
+            if (!modDir.Exists)
+            {
+                var parent = modDir.Parent?.FullName;
+                if (parent != null)
+                {
+                    var name = modDir.Name;
+                    var altName = ModFolderHelpers.FolderHasDisabledPrefix(name)
+                        ? ModFolderHelpers.GetFolderNameWithoutDisabledPrefix(name)
+                        : ModFolderHelpers.GetFolderNameWithDisabledPrefix(name);
+                    var altPath = Path.Combine(parent, altName);
+                    if (Directory.Exists(altPath))
+                    {
+                        modDir = new DirectoryInfo(altPath);
+                    }
+                }
+            }
+
+            if (!modDir.Exists)
+            {
+                return result;
+            }
+        }
+
         var iniFiles = modDir.GetFiles("*.ini", SearchOption.AllDirectories)
             .Where(f => showDisabledIniFiles || !IsFileOrDirectoryDisabled(f, modDir))
             .ToArray();

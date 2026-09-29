@@ -669,4 +669,11 @@ Testing_ZZZ/
 output/
 *.7z
 testcsharp/
+# Local staging and installer artifacts
+JASM-GameAssets-staging/
+*.exe
+docs/
+AGENTS.md
+CONTEXT.md
+.vscode/
 # End of https://www.toptal.com/developers/gitignore/api/visualstudio,csharp,rider
