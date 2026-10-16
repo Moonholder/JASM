@@ -1,5 +1,37 @@
 # Changelog
 
+## [2.30.0](https://github.com/Moonholder/JASM/compare/v2.29.1...v2.30.0) (2026-10-16)
+
+
+### Features
+
+* GameBanana API v13 迁移与在线商店 UI 重设计 ([a5c2a3d](https://github.com/Moonholder/JASM/commit/a5c2a3d96c3447c7582af566567dc07bc164765c))
+* 单个 Mod 变体预设（多配置预设切换）功能实现 ([6f26645](https://github.com/Moonholder/JASM/commit/6f2664598c019f1c3710f9306550f30b93d9afc1))
+
+
+### Bug Fixes
+
+* **core:** 修复模组重命名并发同步与配置读取容错 ([6c801f7](https://github.com/Moonholder/JASM/commit/6c801f71136f6f0e7243bf6ae0ac152c656c4855))
+* **perf:** 根治角色详情页导航内存泄漏、崩溃与模组面板同步失效 ([91d7122](https://github.com/Moonholder/JASM/commit/91d7122306a2d41e7c688c3b6d8f34e7aca2ab45))
+* 修复UAC关闭或安装器提权启动时误弹管理员运行警告 ([3560e1b](https://github.com/Moonholder/JASM/commit/3560e1bc49f0df06512fc5a22159dc77dfa90956))
+* 修复在某些系统版本下误自动提升应用权限的问题 ([eb93890](https://github.com/Moonholder/JASM/commit/eb938903778073e2463a80d91f6eb2de897c5e48))
+* 修复角色关键词增删在发布裁剪下失效及自定义角色无法切换单选模式的问题 ([b3969dd](https://github.com/Moonholder/JASM/commit/b3969dd8d12c038e088a9c6ddedb2da031da7463))
+
+
+### Miscellaneous
+
+* 忽略安装器 redist 目录（WebView2 bootstrapper 由 Release.py 自动下载） ([c201638](https://github.com/Moonholder/JASM/commit/c201638428404ffe523ffd81fd79caa2f7682578))
+
+
+### Continuous Integration
+
+* 重构现代化 CI/CD 流水线并规范 Release-Please v4 配置 ([28ddb27](https://github.com/Moonholder/JASM/commit/28ddb27021294329c7a08a6e80f1effb83cb9003))
+
+
+### Code Refactoring
+
+* Windows App SDK 2.3.1 升级、构建发布工程化与警告清零 ([24ff8c4](https://github.com/Moonholder/JASM/commit/24ff8c45e57f0702bda290069055fd0a3e05fb29))
+
 ## [2.29.1](https://github.com/Moonholder/JASM/compare/v2.29.0...v2.29.1) (2026-04-04)
 
 
