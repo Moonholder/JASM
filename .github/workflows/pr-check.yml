@@ -1,0 +1,82 @@
+name: PR Verification
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'src/**'
+      - 'Build/**'
+      - 'installer/**'
+      - '.github/workflows/pr-check.yml'
+
+jobs:
+  lint-pr-title:
+    name: Validate PR Title
+    runs-on: ubuntu-latest
+    steps:
+      - uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            perf
+            style
+            tweak
+            chore
+            docs
+            ci
+            test
+            build
+            refactor
+            revert
+
+  format-check:
+    name: Code Format Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.103
+
+      - name: Verify Formatting
+        run: dotnet format ./src --verify-no-changes
+
+  build-and-test:
+    name: Build & Test (Windows)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.103
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Restore dependencies
+        run: dotnet restore ./src
+
+      - name: Build Solution
+        run: dotnet build ./src -c Release --no-restore
+
+      - name: Run Tests
+        run: dotnet test ./src -c Release --no-build --logger "trx;LogFileName=test_results.trx"
+
+      - name: Run Trimming Reflection Safety Check
+        run: |
+          dotnet publish ./src/GIMI-ModManager.WinUI/GIMI-ModManager.WinUI.csproj -c Release /p:PublishProfile=FolderProfile.pubxml
+          python Build/publish_cleanup.py ./src/GIMI-ModManager.WinUI/bin/Release/Publish
+          python Build/verify_trimming.py
