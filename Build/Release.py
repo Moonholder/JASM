@@ -81,29 +81,12 @@ checkSuccessfulExitCode(cleanupResult.returncode)
 
 # Verify trimming did not remove members used by XAML reflection bindings
 print("Verifying publish output...")
-verifyProject = "src\\Tools\\VerifyPublish\\VerifyPublish.csproj"
-verifyArgs = [
-    "GIMI_ModManager.WinUI.ViewModels.GbModDisplayItem|get_ThumbnailImage",
-    "GIMI_ModManager.WinUI.Models.PasswordEntry|get_DisplayName",
-    "GIMI_ModManager.WinUI.Models.PasswordEntry|get_Password",
-    "GIMI_ModManager.WinUI.ViewModels.CharacterDetailsViewModels.SubViewModels.ModRowVM|get_DisplayName",
-    "GIMI_ModManager.WinUI.ViewModels.CharacterDetailsViewModels.SubViewModels.ModRowVM|get_FolderName",
-    "GIMI_ModManager.WinUI.ViewModels.CharacterDetailsViewModels.SubViewModels.ModRowVM|get_Author",
-    "GIMI_ModManager.WinUI.ViewModels.CharacterDetailsViewModels.SubViewModels.ModRowVM|get_IsEnabled",
-    "GIMI_ModManager.WinUI.ViewModels.CharacterDetailsViewModels.SubViewModels.ModRowVM|get_Description",
-    "GIMI_ModManager.WinUI.ViewModels.ModPageViewModels.ModFileInfoVm|get_IsBusy",
-    "GIMI_ModManager.WinUI.ViewModels.ModPageViewModels.ModFileInfoVm|get_ShowDownloadButton",
-    "GIMI_ModManager.WinUI.ViewModels.SubVms.GameComboBoxEntryVM|get_GameName",
-    "GIMI_ModManager.WinUI.ViewModels.SubVms.GameComboBoxEntryVM|get_GameIconPath",
-]
-verifyCommand = [
-    "dotnet", "run", "--project", verifyProject, "-c", "Release", "--",
-    os.path.join(JASM_OUTPUT, "JASM - Just Another Skin Manager.dll"),
-    *verifyArgs,
-]
-print(" ".join(verifyCommand))
-verifyResult = subprocess.run(verifyCommand, check=False)
+verifyResult = subprocess.run(
+    ["python", os.path.join("Build", "verify_trimming.py")],
+    check=False,
+)
 checkSuccessfulExitCode(verifyResult.returncode)
+
 
 # Create release directory
 os.makedirs(RELEASE_DIR, exist_ok=True)

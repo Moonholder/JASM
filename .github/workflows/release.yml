@@ -1,0 +1,80 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    name: Release Please (v4)
+    runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - uses: google-github-actions/release-please-action@v4
+        id: release
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          config-file: .github/release-please-config.json
+          manifest-file: .github/.release-please-manifest.json
+
+  build-and-publish:
+    name: Build & Publish Release Assets
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.103
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install Inno Setup
+        run: |
+          $innoUrl = "https://jrsoftware.org/download.php/is.exe"
+          $innoInstaller = "$env:TEMP\innosetup.exe"
+          Invoke-WebRequest -Uri $innoUrl -OutFile $innoInstaller
+          Start-Process -FilePath $innoInstaller -ArgumentList "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-" -Wait
+          echo "ISCC_PATH=C:\Program Files (x86)\Inno Setup 6\ISCC.exe" >> $env:GITHUB_ENV
+
+      - name: Run Tests
+        run: dotnet test ${{ github.workspace }}\src -c Release
+
+      - name: Build, publish and package
+        run: python ${{ github.workspace }}\Build\Release.py SelfContained
+
+      - name: Upload Release Assets via GitHub CLI
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $tag = "${{ needs.release-please.outputs.tag_name }}"
+          Write-Host "Uploading release assets for tag $tag..."
+          $assets = @()
+          $zip = Get-Item JASM_*.7z -ErrorAction SilentlyContinue
+          if ($zip) { $assets += $zip.FullName }
+          $setup = Get-Item JASM_*_Setup.exe -ErrorAction SilentlyContinue
+          if ($setup) { $assets += $setup.FullName }
+          
+          if ($assets.Count -gt 0) {
+              gh release upload $tag $assets --clobber
+          } else {
+              Write-Error "No release artifacts found to upload!"
+              exit 1
+          }
