@@ -317,6 +317,12 @@
                                         IsChecked="{x:Bind ViewModel.IsModFolderNameColumnVisible, Mode=OneWay}"
                                         Text="Show 'Mod Folder Name' Column"
                                         l:Uids.Uid="/CharacterDetailsPage/ShowModFolderColumnMenuItem" />
+                                    <ToggleMenuFlyoutItem
+                                        Command="{x:Bind ViewModel.ToggleShowHoverPreviewCommand}"
+                                        IsChecked="{x:Bind ViewModel.IsShowHoverPreviewEnabled, Mode=OneWay}"
+                                        Text="Show Hover Preview"
+                                        ToolTipService.ToolTip="Display a floating preview image when hovering over a mod row"
+                                        l:Uids.Uid="/CharacterDetailsPage/ShowHoverPreviewMenuItem" />
                                 </MenuBarItem>
                             </MenuBar>
                             <ToggleButton

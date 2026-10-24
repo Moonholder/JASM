@@ -449,32 +449,6 @@
         </Grid>
         </Grid>
         
-        <Popup x:Name="ImagePopup" IsOpen="False">
-            <Grid
-                x:Name="PopupGrid"
-                Background="#D9000000"
-                Tapped="ImageLightbox_Tapped">
-                <Image
-                    Margin="40"
-                    Stretch="Uniform">
-                    <Image.Source>
-                        <BitmapImage CreateOptions="IgnoreImageCache" UriSource="{x:Bind ViewModel.ModModel.ImageUri, Mode=OneWay}" />
-                    </Image.Source>
-                </Image>
-                
-                <StackPanel
-                    Margin="0,0,0,40"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Bottom"
-                    Background="{ThemeResource SystemControlBackgroundAltMediumBrush}"
-                    CornerRadius="8"
-                    Orientation="Horizontal"
-                    Padding="16,10"
-                    Spacing="8">
-                    <FontIcon FontSize="14" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Glyph="&#xE711;" />
-                    <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="Click anywhere to close" l:Uids.Uid="/CharacterDetailsPage/LightboxCloseTip" />
-                </StackPanel>
-            </Grid>
-        </Popup>
+        <controls:ImageLightboxOverlay x:Name="ImageLightbox" />
     </Grid>
 </UserControl>

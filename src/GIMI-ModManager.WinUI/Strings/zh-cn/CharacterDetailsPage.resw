@@ -82,6 +82,12 @@
   <data name="ShowModFolderColumnMenuItem.Text" xml:space="preserve">
     <value>显示 '模组文件夹名' 列</value>
   </data>
+  <data name="ShowHoverPreviewMenuItem.Text" xml:space="preserve">
+    <value>显示悬停预览</value>
+  </data>
+  <data name="ShowHoverPreviewMenuItem.ToolTipService.ToolTip" xml:space="preserve">
+    <value>光标悬停在模组列表行上时显示浮动预览图</value>
+  </data>
 
   <!-- Toolbar -->
   <data name="AutoSyncButton.Content" xml:space="preserve">

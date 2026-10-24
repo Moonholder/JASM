@@ -385,6 +385,12 @@
   <data name="ShowModFolderColumnMenuItem.Text" xml:space="preserve">
     <value>Show the &apos;Mod folder name&apos; column</value>
   </data>
+  <data name="ShowHoverPreviewMenuItem.Text" xml:space="preserve">
+    <value>Show hover preview</value>
+  </data>
+  <data name="ShowHoverPreviewMenuItem.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Display a floating preview image when hovering over a mod row</value>
+  </data>
   <data name="SingleSelectModeMenuItem.Text" xml:space="preserve">
     <value>Single select mode</value>
   </data>

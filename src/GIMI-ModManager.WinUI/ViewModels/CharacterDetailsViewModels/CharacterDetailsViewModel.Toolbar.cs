@@ -23,6 +23,7 @@ public partial class CharacterDetailsViewModel
     [ObservableProperty] private bool _isModFolderNameColumnVisible;
     [ObservableProperty] private bool _isSingleModSelected;
     [ObservableProperty] private bool _autoSync3DMigotoConfig;
+    [ObservableProperty] private bool _isShowHoverPreviewEnabled = true;
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(AddModArchiveCommand), nameof(AddModFolderCommand))]
@@ -38,6 +39,8 @@ public partial class CharacterDetailsViewModel
         IsSingleSelectEnabled = !_modList.Character.IsMultiMod;
         ModGridVM.GridSelectionMode = IsSingleSelectEnabled ? DataGridSelectionMode.Single : DataGridSelectionMode.Extended;
         IsModFolderNameColumnVisible = settings.ModFolderNameColumnVisible;
+        IsShowHoverPreviewEnabled = settings.ShowHoverPreview;
+        ModGridVM.IsShowHoverPreviewEnabled = settings.ShowHoverPreview;
         var modPresetSettings = await _localSettingsService.ReadOrCreateSettingAsync<ModPresetSettings>(ModPresetSettings.Key);
         ModGridVM.AutoSync3DMigotoConfig = AutoSync3DMigotoConfig = modPresetSettings.AutoSyncMods & _elevatorService.ElevatorStatus == Services.ElevatorStatus.Running;
     }
@@ -148,6 +151,20 @@ public partial class CharacterDetailsViewModel
         }).ConfigureAwait(false);
     }
 
+
+    [RelayCommand]
+    private async Task ToggleShowHoverPreviewAsync()
+    {
+        await CommandWrapperAsync(false, async () =>
+        {
+            var settings = await ReadSettingsAsync();
+            settings.ShowHoverPreview = !IsShowHoverPreviewEnabled;
+            await SaveSettingsAsync(settings);
+
+            IsShowHoverPreviewEnabled = settings.ShowHoverPreview;
+            ModGridVM.IsShowHoverPreviewEnabled = settings.ShowHoverPreview;
+        }).ConfigureAwait(false);
+    }
 
     [RelayCommand]
     private async Task ToggleHideModFolderColumnAsync()

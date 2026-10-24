@@ -28,21 +28,23 @@ public partial class ModRowVM : ObservableObject
     [ObservableProperty] private string _activeVariant = string.Empty;
     [ObservableProperty] private bool _hasVariants;
     [ObservableProperty] private bool _hasActiveVariant;
+    [ObservableProperty] private Uri? _previewImageUri;
 
     public ObservableCollection<ModRowVM_ModNotificationVM> ModNotifications { get; } = new();
 
     public string SearchableText { get; private set; } = string.Empty;
 
     public ModRowVM(CharacterSkinEntry characterSkinEntry, ModSettings? modSettings, IEnumerable<string> presetNames,
-        IEnumerable<ModNotification> modNotifications, IEnumerable<string> variantNames, string activeVariant)
+        IEnumerable<ModNotification> modNotifications, IEnumerable<string> variantNames, string activeVariant,
+        Uri? previewImageUri = null)
     {
         Id = characterSkinEntry.Mod.Id;
-        UpdateModel(characterSkinEntry, modSettings, presetNames, modNotifications, variantNames, activeVariant);
+        UpdateModel(characterSkinEntry, modSettings, presetNames, modNotifications, variantNames, activeVariant, previewImageUri);
     }
 
     public void UpdateModel(CharacterSkinEntry characterSkinEntry, ModSettings? modSettings,
         IEnumerable<string> presetNames, IEnumerable<ModNotification> modNotifications,
-        IEnumerable<string> variantNames, string activeVariant)
+        IEnumerable<string> variantNames, string activeVariant, Uri? previewImageUri = null)
     {
         IsEnabled = characterSkinEntry.IsEnabled;
         DisplayName = characterSkinEntry.Mod.GetDisplayName();
@@ -52,6 +54,7 @@ public partial class ModRowVM : ObservableObject
         DateAddedFormated = DateAdded.ToString("d");
         Author = modSettings?.Author ?? string.Empty;
         Description = modSettings?.Description ?? string.Empty;
+        PreviewImageUri = previewImageUri;
 
         Presets = presetNames as string[] ?? presetNames.ToArray();
         InPresets = string.Join(',', Presets);
@@ -89,6 +92,7 @@ public partial class ModRowVM : ObservableObject
         ModNotifications.Clear();
         Presets = [];
         Variants = [];
+        PreviewImageUri = null;
         ToggleEnabledCommand = null;
         UpdateModSettingsCommand = null;
     }

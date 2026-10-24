@@ -157,73 +157,14 @@ public sealed partial class CharacterGalleryPage : Page
 
     private void CharacterGalleryPage_Unloaded(object sender, RoutedEventArgs e)
     {
-        if (this.XamlRoot != null)
-        {
-            this.XamlRoot.Changed -= XamlRoot_Changed;
-        }
+        // Resources cleaned up automatically
     }
 
     private void CustomImage_Tapped(object sender, TappedRoutedEventArgs e)
     {
-        if (e.OriginalSource is not Image)
-            return;
-
-        if ((sender as FrameworkElement)?.DataContext is ModGridItemVm vm)
+        if (e.OriginalSource is Image && (sender as FrameworkElement)?.DataContext is ModGridItemVm vm && vm.ImagePath != null)
         {
-            try
-            {
-                var bitmapImage = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage
-                {
-                    CreateOptions = Microsoft.UI.Xaml.Media.Imaging.BitmapCreateOptions.IgnoreImageCache,
-                    UriSource = vm.ImagePath
-                };
-                ImagePopupSource.Source = bitmapImage;
-            }
-            catch { }
-
-            if (this.XamlRoot != null && this.XamlRoot.Content != null)
-            {
-                PopupGrid.Width = this.XamlRoot.Size.Width;
-                PopupGrid.Height = this.XamlRoot.Size.Height;
-                try
-                {
-                    var t = this.TransformToVisual(this.XamlRoot.Content);
-                    var bounds = t.TransformPoint(new Windows.Foundation.Point(0, 0));
-                    ImagePopup.HorizontalOffset = -bounds.X;
-                    ImagePopup.VerticalOffset = -bounds.Y;
-                }
-                catch { }
-
-                this.XamlRoot.Changed -= XamlRoot_Changed;
-                this.XamlRoot.Changed += XamlRoot_Changed;
-            }
-            ImagePopup.IsOpen = true;
-        }
-    }
-
-    private void ImageLightbox_Tapped(object sender, TappedRoutedEventArgs e)
-    {
-        ImagePopup.IsOpen = false;
-        if (this.XamlRoot != null)
-        {
-            this.XamlRoot.Changed -= XamlRoot_Changed;
-        }
-    }
-
-    private void XamlRoot_Changed(XamlRoot sender, XamlRootChangedEventArgs args)
-    {
-        if (ImagePopup.IsOpen && sender.Content != null)
-        {
-            PopupGrid.Width = sender.Size.Width;
-            PopupGrid.Height = sender.Size.Height;
-            try
-            {
-                var t = this.TransformToVisual(sender.Content);
-                var bounds = t.TransformPoint(new Windows.Foundation.Point(0, 0));
-                ImagePopup.HorizontalOffset = -bounds.X;
-                ImagePopup.VerticalOffset = -bounds.Y;
-            }
-            catch { }
+            ImageLightbox.Show(vm.ImagePath);
         }
     }
 }

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<UserControl
+    x:Class="GIMI_ModManager.WinUI.Views.Controls.ImageLightboxOverlay"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:l="using:WinUI3Localizer"
+    mc:Ignorable="d">
+
+    <Popup x:Name="LightboxPopup" IsOpen="False">
+        <Grid
+            x:Name="LightboxGrid"
+            Background="#E6000000"
+            IsHitTestVisible="True"
+            Tapped="OnOverlayTapped"
+            KeyDown="OnGridKeyDown">
+
+            <!-- Main Preview Image -->
+            <Image
+                x:Name="LightboxImage"
+                Margin="48"
+                Stretch="Uniform"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center" />
+
+            <!-- Bottom Close Tip Badge -->
+            <StackPanel
+                Margin="0,0,0,36"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Bottom"
+                Background="{ThemeResource SystemControlBackgroundAltMediumBrush}"
+                CornerRadius="8"
+                Orientation="Horizontal"
+                Padding="16,10"
+                Spacing="8"
+                IsHitTestVisible="False">
+                <FontIcon FontSize="14" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Glyph="&#xE711;" />
+                <TextBlock
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    Text="Click anywhere to close"
+                    l:Uids.Uid="/CharacterDetailsPage/LightboxCloseTip" />
+            </StackPanel>
+        </Grid>
+    </Popup>
+</UserControl>
