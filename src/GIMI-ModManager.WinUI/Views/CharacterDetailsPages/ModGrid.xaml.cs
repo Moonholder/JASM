@@ -142,12 +142,11 @@ public sealed partial class ModGrid : UserControl
 
         try
         {
-            var primary = ModListGrid.SelectedItem as ModRowVM;
             var allSelected = ModListGrid.SelectedItems.OfType<ModRowVM>().ToList();
-            if (primary == null && allSelected.Count > 0)
-            {
-                primary = allSelected[0];
-            }
+            var newlyAdded = e.AddedItems.OfType<ModRowVM>().LastOrDefault();
+            var primary = (newlyAdded != null && allSelected.Contains(newlyAdded))
+                ? newlyAdded
+                : (ModListGrid.SelectedItem as ModRowVM ?? allSelected.FirstOrDefault());
 
             vm.SetSelection(allSelected, primary);
         }

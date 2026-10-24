@@ -436,11 +436,11 @@
                             Height="40"
                             HorizontalAlignment="Left"
                             ResizeBehavior="BasedOnAlignment"
-                            ResizeDirection="Auto">
-                            <controls:GridSplitter.RenderTransform>
-                                <TranslateTransform X="-10" />
-                            </controls:GridSplitter.RenderTransform>
-                        </controls:GridSplitter>
+                            ResizeDirection="Auto" />
+
+
+
+
                     </Grid>
                 </Grid>
             </Grid>

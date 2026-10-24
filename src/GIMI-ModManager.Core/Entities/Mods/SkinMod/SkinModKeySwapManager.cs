@@ -288,8 +288,20 @@ public partial class SkinModKeySwapManager(ISkinMod skinMod)
         if (sectionLines.Count == 0)
             return;
 
-        // 更新节名
-        sectionLines[0] = keySwap.SectionName;
+        // Update section name; preserve original indentation and comments where possible.
+        var originalHeader = sectionLines[0];
+        var commentIndex = originalHeader.IndexOf(';');
+        var originalComment = commentIndex >= 0 ? originalHeader[commentIndex..] : null;
+        var cleanOriginalSection = commentIndex >= 0
+            ? originalHeader[..commentIndex].Trim()
+            : originalHeader.Trim();
+
+        if (!string.Equals(cleanOriginalSection, keySwap.SectionName, StringComparison.OrdinalIgnoreCase))
+        {
+            sectionLines[0] = originalComment != null
+                ? $"{keySwap.SectionName} {originalComment}"
+                : keySwap.SectionName;
+        }
 
         // 找到原有key/back行的位置范围
         var (firstKeyIndex, lastKeyIndex) = FindKeyLinesRange(sectionLines);

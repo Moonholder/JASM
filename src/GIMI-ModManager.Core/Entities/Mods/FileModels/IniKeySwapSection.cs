@@ -1,4 +1,4 @@
-﻿namespace GIMI_ModManager.Core.Entities.Mods.FileModels;
+namespace GIMI_ModManager.Core.Entities.Mods.FileModels;
 
 public class IniKeySwapSection
 {
@@ -9,7 +9,9 @@ public class IniKeySwapSection
 
     public const string KeySwapIniSection = "KeySwap";
 
-    public const string CommandListSection = "KeyCommndList";
+    public const string CommandListSection = "KeyCommandList";
+    [Obsolete("Use CommandListSection instead.")]
+    public const string CommandListSectionTypo = "KeyCommndList";
     public string SectionKey { get; set; } = KeySwapIniSection;
 
     public const string ForwardIniKey = "key";

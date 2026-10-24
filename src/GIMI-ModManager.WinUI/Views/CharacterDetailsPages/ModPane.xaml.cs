@@ -1,6 +1,7 @@
-using GIMI_ModManager.WinUI.ViewModels.CharacterDetailsViewModels.SubViewModels;
+﻿using GIMI_ModManager.WinUI.ViewModels.CharacterDetailsViewModels.SubViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using Windows.ApplicationModel.DataTransfer;
@@ -594,22 +595,129 @@ public sealed partial class ModPane : UserControl
     {
         ImagePopup.IsOpen = false;
     }
-
-    private bool _isHelpExpanded = false;
-
-    private void OnKeyswapHelpToggleClicked(object sender, RoutedEventArgs e)
+    private void OnKeyItemRecorded(object? sender, string newKey)
     {
-        _isHelpExpanded = !_isHelpExpanded;
+        if (sender is FrameworkElement fe && fe.DataContext is KeyItemVm item && item.Parent is { } vm)
+        {
+            vm.ApplyKeyItemChange(item, newKey, item.IsForward);
+        }
+    }
 
-        if (_isHelpExpanded)
+    private void OnKeyItemDeleteRequested(object? sender, EventArgs e)
+    {
+        if (sender is FrameworkElement fe && fe.DataContext is KeyItemVm item && item.Parent is { } vm)
         {
-            HelpDetails.Height = double.NaN;
-            ExpandIconTransform.Angle = 180;
+            vm.DeleteKeyItem(item, item.IsForward);
         }
-        else
+    }
+
+    private void OnKeyItemAddAlternativeRequested(object? sender, EventArgs e)
+    {
+        if (sender is FrameworkElement fe && fe.DataContext is KeyItemVm item && item.Parent is { } vm)
         {
-            HelpDetails.Height = 0;
-            ExpandIconTransform.Angle = 0;
+            vm.AddAlternativeKey(item, item.IsForward);
         }
+    }
+
+    private void OnReverseKeyRequested(object? sender, EventArgs e)
+    {
+        if (sender is FrameworkElement fe && fe.DataContext is KeyItemVm item && item.Parent is { } vm)
+        {
+            vm.ExpandBackwardKeyForRecording();
+        }
+    }
+
+    private void OnRenameSectionFlyoutOpening(object? sender, object e)
+    {
+        if (sender is Flyout flyout)
+        {
+            if (flyout.Target is FrameworkElement fe && fe.DataContext is ModPaneFieldsKeySwapVm vm)
+            {
+                vm.BeginEditSection();
+            }
+
+            if (flyout.Content is FrameworkElement root)
+            {
+                DispatcherQueue?.TryEnqueue(() =>
+                {
+                    var tb = FindChildOfType<TextBox>(root);
+                    if (tb != null)
+                    {
+                        tb.Focus(FocusState.Programmatic);
+                        tb.SelectAll();
+                    }
+                });
+            }
+        }
+    }
+
+    private void OnRenameSectionTextBoxKeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
+        {
+            e.Handled = true;
+            if (sender is FrameworkElement fe)
+            {
+                if (fe.DataContext is ModPaneFieldsKeySwapVm vm)
+                {
+                    vm.CommitEditSection();
+                }
+                CloseFlyoutForElement(fe);
+            }
+        }
+    }
+
+    private void OnRenameSectionFlyoutConfirmClicked(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement fe)
+        {
+            if (fe.DataContext is ModPaneFieldsKeySwapVm vm)
+            {
+                vm.CommitEditSection();
+            }
+            CloseFlyoutForElement(fe);
+        }
+    }
+
+    private void OnRenameSectionFlyoutCancelClicked(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement fe)
+        {
+            if (fe.DataContext is ModPaneFieldsKeySwapVm vm)
+            {
+                vm.CancelEditSection();
+            }
+            CloseFlyoutForElement(fe);
+        }
+    }
+
+    private static void CloseFlyoutForElement(FrameworkElement fe)
+    {
+        DependencyObject? current = fe;
+        while (current != null)
+        {
+            if (current is FlyoutPresenter fp)
+            {
+                if (fp.Parent is Microsoft.UI.Xaml.Controls.Primitives.Popup popup)
+                {
+                    popup.IsOpen = false;
+                    return;
+                }
+            }
+            current = Microsoft.UI.Xaml.Media.VisualTreeHelper.GetParent(current);
+        }
+    }
+
+    private static T? FindChildOfType<T>(DependencyObject parent) where T : DependencyObject
+    {
+        var count = Microsoft.UI.Xaml.Media.VisualTreeHelper.GetChildrenCount(parent);
+        for (int i = 0; i < count; i++)
+        {
+            var child = Microsoft.UI.Xaml.Media.VisualTreeHelper.GetChild(parent, i);
+            if (child is T typed) return typed;
+            var nested = FindChildOfType<T>(child);
+            if (nested != null) return nested;
+        }
+        return null;
     }
 }
