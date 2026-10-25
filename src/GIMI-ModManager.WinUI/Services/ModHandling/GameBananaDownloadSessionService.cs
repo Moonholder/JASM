@@ -8,6 +8,7 @@ using GIMI_ModManager.WinUI.Contracts.Services;
 using GIMI_ModManager.WinUI.Models.Settings;
 using GIMI_ModManager.WinUI.Services.AppManagement;
 using GIMI_ModManager.WinUI.Services.Notifications;
+using GIMI_ModManager.WinUI.Models.GameBanana;
 using GIMI_ModManager.WinUI.ViewModels;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;

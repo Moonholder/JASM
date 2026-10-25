@@ -1,0 +1,43 @@
+# Set default behavior to automatically normalize line endings
+* text=auto
+
+# Source code and UI markup: Enforce CRLF to match src/.editorconfig and Windows App SDK requirements
+*.cs text eol=crlf
+*.xaml text eol=crlf
+*.xamlx text eol=crlf
+*.xoml text eol=crlf
+*.resw text eol=crlf
+*.resx text eol=crlf
+*.csproj text eol=crlf
+*.sln text eol=crlf
+*.props text eol=crlf
+*.targets text eol=crlf
+*.config text eol=crlf
+*.xml text eol=crlf
+*.editorconfig text eol=crlf
+
+# Scripting
+*.ps1 text eol=crlf
+*.cmd text eol=crlf
+*.bat text eol=crlf
+*.sh text eol=lf
+
+# Data assets and documentation: Enforce LF to strictly align with JASM-GameAssets
+*.json text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+
+# Binary assets
+*.dll binary
+*.exe binary
+*.7z binary
+*.zip binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.gif binary
+*.ico binary
+*.ttf binary
+*.woff binary
+*.woff2 binary

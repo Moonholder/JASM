@@ -9,6 +9,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="using:GIMI_ModManager.Core.Services.GameBanana.Models"
     xmlns:tkcontrols="using:CommunityToolkit.WinUI.Controls"
+    xmlns:gbmodels="using:GIMI_ModManager.WinUI.Models.GameBanana"
     xmlns:vm="using:GIMI_ModManager.WinUI.ViewModels"
     NavigationCacheMode="Disabled"
     mc:Ignorable="d">
@@ -121,7 +122,7 @@
                 </Grid>
             </DataTemplate>
 
-            <DataTemplate x:Key="ModCardTemplate" x:DataType="vm:GbModDisplayItem">
+            <DataTemplate x:Key="ModCardTemplate" x:DataType="gbmodels:GbModDisplayItem">
                 <Grid Margin="6">
                     <Border
                         AutomationProperties.Name="{x:Bind Name}"
@@ -613,7 +614,7 @@
                                             </ItemsPanelTemplate>
                                         </ListView.ItemsPanel>
                                         <ListView.ItemTemplate>
-                                            <DataTemplate x:DataType="vm:GbPreviewImageItem">
+                                            <DataTemplate x:DataType="gbmodels:GbPreviewImageItem">
                                                 <Grid
                                                     Height="60"
                                                     Background="#20808080"
@@ -816,7 +817,7 @@
                             SelectionChanged="CategoryList_SelectionChanged"
                             SelectionMode="Single">
                             <ListView.ItemTemplate>
-                                <DataTemplate x:DataType="vm:GbCategoryDisplayItem">
+                                <DataTemplate x:DataType="gbmodels:GbCategoryDisplayItem">
                                     <Grid Padding="4,6" ColumnSpacing="8">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="28" />
@@ -996,7 +997,7 @@
                                                 ItemsSource="{x:Bind ViewModel.DownloadQueue}"
                                                 SelectionMode="None">
                                                 <ListView.ItemTemplate>
-                                                    <DataTemplate x:DataType="vm:GbDownloadTask">
+                                                    <DataTemplate x:DataType="gbmodels:GbDownloadTask">
                                                         <Grid Margin="0,4,0,12">
                                                             <Grid.RowDefinitions>
                                                                 <RowDefinition Height="Auto" />
@@ -1270,7 +1271,7 @@
                 ItemsSource="{x:Bind ViewModel.PreviewImages, Mode=OneWay}"
                 SelectedIndex="{x:Bind ViewModel.LightBoxSelectedIndex, Mode=TwoWay}">
                 <FlipView.ItemTemplate>
-                    <DataTemplate x:DataType="vm:GbPreviewImageItem">
+                    <DataTemplate x:DataType="gbmodels:GbPreviewImageItem">
                         <Grid Background="Transparent" Tapped="LightBoxItem_Tapped">
                             <ProgressRing
                                 Width="36"
