@@ -26,7 +26,7 @@ public sealed class ApiGameBananaClient(
     private const string DownloadUrl = "https://gamebanana.com/dl/";
     private const string BaseApiUrl = "https://gamebanana.com/apiv13/";
     private const string ApiUrl = BaseApiUrl + "Mod/";
-    private const string HealthCheckUrl = "https://gamebanana.com/apiv13";
+    private const string HealthCheckUrl = "https://api.gamebanana.com/Core/Item/Data/AllowedItemTypes";
 
     public async Task<bool> HealthCheckAsync(CancellationToken cancellationToken = default)
     {
@@ -52,7 +52,10 @@ public sealed class ApiGameBananaClient(
 
         var modPageApiUrl = GetModelUrl(modId, modelName, "ProfilePage");
 
-        using var response = await SendRequest(modPageApiUrl, cancellationToken).ConfigureAwait(false);
+        using var response = await SendRequest(modPageApiUrl, cancellationToken, allowNotFound: true).ConfigureAwait(false);
+
+        if (response.StatusCode == HttpStatusCode.NotFound)
+            return null;
 
         _logger.Debug("Got response from GameBanana: {response}", response.StatusCode);
         await using var contentStream =
@@ -81,7 +84,7 @@ public sealed class ApiGameBananaClient(
 
         var downloadsApiUrl = GetModelUrl(modId, modelName, "DownloadPage");
 
-        using var response = await SendRequest(downloadsApiUrl, cancellationToken).ConfigureAwait(false);
+        using var response = await SendRequest(downloadsApiUrl, cancellationToken, allowNotFound: true).ConfigureAwait(false);
 
         if (response.StatusCode == HttpStatusCode.NotFound)
             return null;
@@ -261,7 +264,7 @@ public sealed class ApiGameBananaClient(
         return new Uri($"{BaseApiUrl}{modelName}/{modId}/{endpoint}");
     }
 
-    private async Task<HttpResponseMessage> SendRequest(Uri downloadsApiUrl, CancellationToken cancellationToken)
+    private async Task<HttpResponseMessage> SendRequest(Uri downloadsApiUrl, CancellationToken cancellationToken, bool allowNotFound = false)
     {
         HttpResponseMessage response;
         retry:
@@ -295,7 +298,7 @@ public sealed class ApiGameBananaClient(
         }
 
 
-        if (!response.IsSuccessStatusCode)
+        if (!response.IsSuccessStatusCode && !(allowNotFound && response.StatusCode == HttpStatusCode.NotFound))
         {
             _logger.Error("Failed to get mod info from GameBanana: {response} | Url: {Url}", response,
                 downloadsApiUrl);
@@ -385,7 +388,11 @@ public sealed class ApiGameBananaClient(
     {
         var url = new Uri($"{BaseApiUrl}{modelName}/{modId}/Updates?_nPage=1&_nPerpage=10");
 
-        using var response = await SendRequest(url, cancellationToken).ConfigureAwait(false);
+        using var response = await SendRequest(url, cancellationToken, allowNotFound: true).ConfigureAwait(false);
+
+        if (response.StatusCode == HttpStatusCode.NotFound)
+            return new List<ApiModUpdate>();
+
         await using var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
 
         var result = await JsonSerializer.DeserializeAsync(contentStream,

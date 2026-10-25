@@ -117,14 +117,6 @@ public partial class ModUpdateVM : ObservableRecipient
             return;
         }
 
-        if (!await _gameBananaCoreService.HealthCheckAsync(_ct))
-        {
-            await LogErrorAndClose(
-                new InvalidOperationException("Failed to get mod page info, GameBanana Api is not available"),
-                removeNotification: false);
-            return;
-        }
-
         using (var _ = IgnorePollyLimiterScope.Ignore())
         {
             _modPageInfo = await _gameBananaCoreService.GetModProfileAsync(new GbModId(_notification.ModsRetrievedResult.ModId), ct: _ct);
