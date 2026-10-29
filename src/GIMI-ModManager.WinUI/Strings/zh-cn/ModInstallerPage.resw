@@ -120,6 +120,12 @@
   </data>
 
   <!-- Footer -->
+  <data name="EnableModCheckBox.ToolTipService.ToolTip" xml:space="preserve">
+    <value>安装完成后自动启用此模组。</value>
+  </data>
+  <data name="EnableModText.Text" xml:space="preserve">
+    <value>安装后启用此模组?</value>
+  </data>
   <data name="EnableOnlyCheckBox.ToolTipService.ToolTip" xml:space="preserve">
     <value>这将启用此模组并禁用该角色的其他模组。</value>
   </data>
