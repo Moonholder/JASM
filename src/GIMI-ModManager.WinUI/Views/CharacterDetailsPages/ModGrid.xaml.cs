@@ -120,6 +120,8 @@ public sealed partial class ModGrid : UserControl
                 var shiftState = InputKeyboardSource.GetKeyStateForCurrentThread(Windows.System.VirtualKey.Shift);
                 var isShift = (shiftState & Windows.UI.Core.CoreVirtualKeyStates.Down) == Windows.UI.Core.CoreVirtualKeyStates.Down;
 
+                // When Ctrl or Shift is pressed, delegate selection entirely to DataGrid's native UpdateStateOnTapped
+                // to avoid double-toggle cancellation.
                 if (!isCtrl && !isShift)
                 {
                     if (ModListGrid.SelectedItem != row || ModListGrid.SelectedItems.Count != 1)
@@ -130,13 +132,6 @@ public sealed partial class ModGrid : UserControl
                     {
                         ViewModel?.SetSelection(ModListGrid.SelectedItems.OfType<ModRowVM>().ToList(), row);
                     }
-                }
-                else if (isCtrl)
-                {
-                    if (ModListGrid.SelectedItems.Contains(row))
-                        ModListGrid.SelectedItems.Remove(row);
-                    else
-                        ModListGrid.SelectedItems.Add(row);
                 }
             }
         }
