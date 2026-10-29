@@ -170,6 +170,13 @@
     <value>JASM 不支持为同一个角色安装多个模组</value>
   </data>
 
+  <data name="DragDrop_ExtractFailedTitle" xml:space="preserve">
+    <value>解压失败</value>
+  </data>
+  <data name="DragDrop_ExtractFailedMessage" xml:space="preserve">
+    <value>解压压缩包失败，文件可能已损坏或格式不受支持。</value>
+  </data>
+
   <!-- Password Input Dialog -->
   <data name="PasswordDialog.Title" xml:space="preserve">
     <value>输入加密文件的密码</value>

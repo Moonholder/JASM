@@ -1,4 +1,5 @@
 using GIMI_ModManager.Core.Contracts.Entities;
+using GIMI_ModManager.Core.Contracts.Services;
 using GIMI_ModManager.Core.GamesService.Interfaces;
 using GIMI_ModManager.Core.Services;
 using GIMI_ModManager.WinUI.Contracts.Services;
@@ -9,7 +10,6 @@ using Serilog;
 using Windows.Storage;
 using Windows.Win32;
 using Windows.Win32.Media.Audio;
-using GIMI_ModManager.Core.Contracts.Services;
 using static GIMI_ModManager.WinUI.Services.ModHandling.ModDragAndDropService.DragAndDropFinishedArgs;
 
 namespace GIMI_ModManager.WinUI.Services.ModHandling;
@@ -80,16 +80,24 @@ public class ModDragAndDropService
         {
             var scanner = new DragAndDropScanner();
             var extractResult = scanner.ScanAndGetContents(storageItem.Path);
-            if (extractResult.exitedCode == 1 || extractResult.exitedCode == 2)
+            if (extractResult.IsPasswordRequired)
             {
                 extractResult = await ShowPasswordInputDialogAsync(scanner, storageItem.Path);
             }
 
-            if (extractResult != null)
+            if (extractResult != null && extractResult.IsSuccess)
             {
                 installMonitor = await _modInstallerService.StartModInstallationAsync(
                     new DirectoryInfo(extractResult.ExtractedFolder.FullPath), modList, inGameSkin);
                 return installMonitor;
+            }
+            else if (extractResult != null && !extractResult.IsPasswordRequired && !extractResult.IsSuccess)
+            {
+                _notificationManager.ShowNotification(
+                    _localizer.GetLocalizedStringOrDefault("/CharactersPage/DragDrop_ExtractFailedTitle", "Extraction Failed"),
+                    extractResult.ErrorMessage ?? _localizer.GetLocalizedStringOrDefault("/CharactersPage/DragDrop_ExtractFailedMessage", "Failed to extract archive. The file may be corrupted or invalid."),
+                    TimeSpan.FromSeconds(5));
+                return null;
             }
         }
 

@@ -1,30 +1,16 @@
 using System.Diagnostics;
+using System.Text;
 using GIMI_ModManager.Core.Contracts.Entities;
 using GIMI_ModManager.Core.Entities;
 using Serilog;
-using SharpCompress.Archives;
-using SharpCompress.Archives.Rar;
-using SharpCompress.Archives.SevenZip;
-using SharpCompress.Archives.Zip;
-using SharpCompress.Common;
 
 namespace GIMI_ModManager.Core.Services;
-
-// Extract process if archive file:
-// 1. Copy archive to work folder in windows temp folder
-// 2. Extract archive to windows temp folder
-// 3. Move extracted files to work folder
-// 4. Delete copied archive
 
 public sealed class DragAndDropScanner
 {
     private readonly ILogger _logger = Log.ForContext<DragAndDropScanner>();
-    private readonly string _tmpFolder = Path.Combine(Path.GetTempPath(), "JASM_TMP");
-
-    // Extracts files to this folder
-    private string _workFolder = Path.Combine(Path.GetTempPath(), "JASM_TMP", Guid.NewGuid().ToString("N"));
-
-    private ExtractTool _extractTool;
+    private readonly string _baseTmpFolder = Path.Combine(Path.GetTempPath(), "JASM_TMP");
+    private readonly ExtractTool _extractTool;
 
     public DragAndDropScanner()
     {
@@ -33,51 +19,84 @@ public sealed class DragAndDropScanner
 
     public DragAndDropScanResult ScanAndGetContents(string path, string? password = null)
     {
-        PrepareWorkFolder();
+        if (string.IsNullOrWhiteSpace(path))
+            throw new ArgumentException("Path cannot be null or empty", nameof(path));
 
-        _workFolder = Path.Combine(_workFolder, Path.GetFileName(path));
+        Directory.CreateDirectory(_baseTmpFolder);
 
-        var exitCode = 0;
+        // Allocate a dedicated unique session directory per scan to eliminate path collision and retry nesting
+        var sessionFolder = Path.Combine(_baseTmpFolder, Guid.NewGuid().ToString("N"));
+        var targetExtractionFolder = Path.Combine(sessionFolder, Path.GetFileName(path));
 
-        if (IsArchive(path))
-        {
-            var copiedArchive = new FileInfo(path);
-            copiedArchive = copiedArchive.CopyTo(Path.Combine(_tmpFolder, Path.GetFileName(path)), true);
-            if (password is not null)
-            {
-                exitCode = Extract7Z(copiedArchive.FullName, password);
-            }
-            else
-            {
-                var result = Extractor(copiedArchive.FullName);
-                exitCode = result?.Invoke(copiedArchive.FullName) ?? 0;
-            }
-        }
-        else if (Directory.Exists(path)) // ModDragAndDropService handles loose folders, but this added just in case 
+        Directory.CreateDirectory(sessionFolder);
+        Directory.CreateDirectory(targetExtractionFolder);
+
+        if (Directory.Exists(path))
         {
             var modFolder = new Mod(new DirectoryInfo(path));
-            modFolder.CopyTo(_workFolder);
+            modFolder.CopyTo(targetExtractionFolder);
+
+            return new DragAndDropScanResult
+            {
+                ExtractedFolder = new Mod(new DirectoryInfo(targetExtractionFolder).Parent!),
+                exitedCode = 0,
+                IsSuccess = true,
+                IsPasswordRequired = false
+            };
         }
-        else
-            throw new Exception("没有找到有效的压缩文件或文件夹");
 
-
-        return new DragAndDropScanResult()
+        if (!File.Exists(path) || !IsArchive(path))
         {
-            ExtractedFolder = new Mod(new DirectoryInfo(_workFolder).Parent!),
-            exitedCode = exitCode
+            throw new FileNotFoundException("No valid mod archive or folder found", path);
+        }
+
+        var (exitCode, isPasswordRequired, output) = Extract7Z(path, targetExtractionFolder, password);
+
+        bool hasExtractedFiles = Directory.Exists(targetExtractionFolder) &&
+                                 Directory.EnumerateFileSystemEntries(targetExtractionFolder).Any();
+
+        bool isSuccess = false;
+        if (exitCode == 0)
+        {
+            isSuccess = true;
+        }
+        else if (exitCode == 1 && hasExtractedFiles && !isPasswordRequired)
+        {
+            // Exit code 1 indicates non-fatal 7-Zip warning(s) (e.g. file lock during timestamp/attribute setting).
+            // Files were extracted and no password error occurred, so treat as successful extraction.
+            _logger.Warning("7z completed with warning(s) (exit code 1), but files were extracted successfully: {Output}", output);
+            isSuccess = true;
+        }
+
+        if (!isSuccess)
+        {
+            try
+            {
+                if (Directory.Exists(sessionFolder))
+                {
+                    Directory.Delete(sessionFolder, true);
+                    _logger.Information("Cleaned up session folder after failed extraction: {Folder}", sessionFolder);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Warning(ex, "Failed to clean up session folder: {Folder}", sessionFolder);
+            }
+        }
+
+        return new DragAndDropScanResult
+        {
+            ExtractedFolder = new Mod(new DirectoryInfo(targetExtractionFolder).Parent!),
+            exitedCode = exitCode,
+            IsSuccess = isSuccess,
+            IsPasswordRequired = isPasswordRequired,
+            ErrorMessage = isSuccess ? null : GetUserFriendlyErrorMessage(output, exitCode)
         };
     }
 
-    private void PrepareWorkFolder()
+    private static bool IsArchive(string path)
     {
-        Directory.CreateDirectory(_tmpFolder);
-        Directory.CreateDirectory(_workFolder);
-    }
-
-    private bool IsArchive(string path)
-    {
-        return Path.GetExtension(path) switch
+        return Path.GetExtension(path).ToLowerInvariant() switch
         {
             ".zip" => true,
             ".rar" => true,
@@ -86,92 +105,40 @@ public sealed class DragAndDropScanner
         };
     }
 
-    private Func<string, int>? Extractor(string path, string? password = null)
+    private static string? Resolve7ZipPath()
     {
-        Func<string, int>? action = null;
+        var bundledPath = Path.Combine(AppContext.BaseDirectory, @"Assets\7z\7z.exe");
+        if (File.Exists(bundledPath))
+            return bundledPath;
 
-        if (_extractTool == ExtractTool.Bundled7Zip)
-            action = (path) =>
-            {
-                return Extract7Z(path);
-            };
-        else if (_extractTool == ExtractTool.System7Zip) throw new NotImplementedException();
+        var relativeTestPath = Path.Combine(AppContext.BaseDirectory, @"..\..\..\..\GIMI-ModManager.WinUI\Assets\7z\7z.exe");
+        if (File.Exists(relativeTestPath))
+            return Path.GetFullPath(relativeTestPath);
 
-        return action;
-    }
-
-    private void ExtractEntries(IArchive archive)
-    {
-        _logger.Information("Extracting {ArchiveType} archive", archive.Type);
-        foreach (var entry in archive.Entries)
-        {
-            if (string.IsNullOrWhiteSpace(entry.Key))
-                continue;
-
-            ArchiveExtractionGuard.ValidateEntryPath(entry.Key, _workFolder);
-
-            if (entry.IsDirectory)
-                continue;
-
-            _logger.Debug("Extracting {EntryName}", entry.Key);
-            entry.WriteToDirectory(_workFolder, new ExtractionOptions()
-            {
-                ExtractFullPath = true,
-                Overwrite = true,
-                PreserveFileTime = false
-            });
-        }
-    }
-
-    private void SharpExtractZip(string path)
-    {
-        using var archive = ZipArchive.OpenArchive(path);
-        ExtractEntries(archive);
-    }
-
-
-    private void SharpExtractRar(string path)
-    {
-        using var archive = RarArchive.OpenArchive(path);
-        ExtractEntries(archive);
-    }
-
-    // ReSharper disable once InconsistentNaming
-    private void SharpExtract7z(string path)
-    {
-        using var archive = SevenZipArchive.OpenArchive(path);
-        ExtractEntries(archive);
-    }
-
-
-    private enum ExtractTool
-    {
-        Bundled7Zip, // 7zip bundled with JASM
-        SharpCompress, // SharpCompress library
-        System7Zip // 7zip installed on the system
+        return null;
     }
 
     private ExtractTool GetExtractTool()
     {
-        var bundled7ZFolder = Path.Combine(AppContext.BaseDirectory, @"Assets\7z\");
-        if (File.Exists(Path.Combine(bundled7ZFolder, "7z.exe")) &&
-            File.Exists(Path.Combine(bundled7ZFolder, "7-zip.dll")) &&
-            File.Exists(Path.Combine(bundled7ZFolder, "7z.dll")))
+        var sevenZipPath = Resolve7ZipPath();
+        if (sevenZipPath != null &&
+            File.Exists(Path.Combine(Path.GetDirectoryName(sevenZipPath)!, "7-zip.dll")) &&
+            File.Exists(Path.Combine(Path.GetDirectoryName(sevenZipPath)!, "7z.dll")))
         {
-            _logger.Debug("Using bundled 7zip");
+            _logger.Debug("Using bundled 7zip: {Path}", sevenZipPath);
             return ExtractTool.Bundled7Zip;
         }
 
-        _logger.Information("Bundled 7zip not found, using SharpCompress library");
+        _logger.Information("Bundled 7zip not found");
         return ExtractTool.SharpCompress;
     }
 
-    private int Extract7Z(string path, string? password = null)
+    private (int exitCode, bool isPasswordRequired, string output) Extract7Z(string archivePath, string destinationFolder, string? password = null)
     {
-        var sevenZipPath = Path.Combine(AppContext.BaseDirectory, @"Assets\7z\7z.exe");
-        var args = $"x \"{path}\" -o\"{_workFolder}\" -y";
+        var sevenZipPath = Resolve7ZipPath() ?? Path.Combine(AppContext.BaseDirectory, @"Assets\7z\7z.exe");
+        var args = $"x \"{archivePath}\" -o\"{destinationFolder}\" -y";
         args += password is not null ? $" -p\"{password}\"" : " -p-";
-        // 先尝试无密码解压
+
         var process = new Process
         {
             StartInfo =
@@ -180,50 +147,88 @@ public sealed class DragAndDropScanner
                 Arguments = args,
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
-                RedirectStandardInput = true,
+                RedirectStandardError = true,
                 CreateNoWindow = true
             }
         };
 
-        _logger.Information("Extracting 7z archive with command: {Command}", process.StartInfo.Arguments);
-        process.Start();
+        _logger.Information("Extracting archive with command: {Command}", process.StartInfo.Arguments);
 
-        // 读取标准输出
-        var output = new System.Text.StringBuilder();
-        var passwordRequired = false;
-        var passwordProvided = password != null;
+        var outputBuilder = new StringBuilder();
 
         process.OutputDataReceived += (sender, e) =>
         {
             if (e.Data != null)
             {
-                output.AppendLine(e.Data);
-                if (e.Data.Contains("Can't open as archive"))
+                lock (outputBuilder)
                 {
-                    passwordRequired = true;
-                    if (!passwordProvided)
-                    {
-                        // 密码为空，直接返回 exitcode = 1
-                        _logger.Warning("Password is required but not provided");
-                        process.Kill();
-                    }
+                    outputBuilder.AppendLine(e.Data);
                 }
             }
         };
+
+        process.ErrorDataReceived += (sender, e) =>
+        {
+            if (e.Data != null)
+            {
+                lock (outputBuilder)
+                {
+                    outputBuilder.AppendLine(e.Data);
+                }
+            }
+        };
+
+        process.Start();
         process.BeginOutputReadLine();
+        process.BeginErrorReadLine();
         process.WaitForExit();
 
-        // 如果密码为空且密码被要求，返回1
-        int exitCode = (passwordRequired && !passwordProvided) ? 1 : process.ExitCode;
-        _logger.Information("7z extraction finished with exit code {ExitCode}", exitCode);
-        if (exitCode != 0 && Directory.Exists(_workFolder))
+        string fullOutput;
+        lock (outputBuilder)
         {
-            Directory.Delete(_workFolder, true);
-            _logger.Error("Failed to extract 7z archive, deleting work folder");
+            fullOutput = outputBuilder.ToString();
         }
-        return exitCode;
+
+        int exitCode = process.ExitCode;
+        _logger.Information("7z extraction finished with exit code {ExitCode}", exitCode);
+
+        bool isPasswordRequired = IsPasswordRequiredError(fullOutput);
+        return (exitCode, isPasswordRequired, fullOutput);
     }
 
+    public static bool IsPasswordRequiredError(string output)
+    {
+        if (string.IsNullOrWhiteSpace(output))
+            return false;
+
+        return output.Contains("Wrong password", StringComparison.OrdinalIgnoreCase)
+            || output.Contains("Cannot open encrypted archive", StringComparison.OrdinalIgnoreCase)
+            || output.Contains("Data Error in encrypted file", StringComparison.OrdinalIgnoreCase)
+            || output.Contains("encrypted file", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static string GetUserFriendlyErrorMessage(string output, int exitCode)
+    {
+        if (string.IsNullOrWhiteSpace(output))
+            return $"Extraction failed with exit code {exitCode}";
+
+        var lines = output.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        var errorLines = lines.Where(l => l.StartsWith("ERROR:", StringComparison.OrdinalIgnoreCase) ||
+                                          l.Contains("Cannot open", StringComparison.OrdinalIgnoreCase) ||
+                                          l.Contains("Can't open as archive", StringComparison.OrdinalIgnoreCase)).ToList();
+
+        if (errorLines.Count > 0)
+            return string.Join("; ", errorLines.Take(2));
+
+        return $"Extraction failed with exit code {exitCode}";
+    }
+
+    private enum ExtractTool
+    {
+        Bundled7Zip,
+        SharpCompress,
+        System7Zip
+    }
 }
 
 public class DragAndDropScanResult
@@ -231,4 +236,7 @@ public class DragAndDropScanResult
     public IMod ExtractedFolder { get; init; } = null!;
     public string[] IgnoredMods { get; init; } = Array.Empty<string>();
     public int exitedCode { get; init; } = 0;
+    public bool IsPasswordRequired { get; init; }
+    public bool IsSuccess { get; init; }
+    public string? ErrorMessage { get; init; }
 }
