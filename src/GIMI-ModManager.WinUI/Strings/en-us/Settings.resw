@@ -3,6 +3,60 @@
   <data name="3dmigotoFolderSelector.Title" xml:space="preserve">
     <value>Select Mod Loader path</value>
   </data>
+  <!-- Network & Proxy -->
+  <data name="NetworkProxySectionHeader.Text" xml:space="preserve">
+    <value>Network &amp; Proxy</value>
+  </data>
+  <data name="ProxyModeCard.Header" xml:space="preserve">
+    <value>Proxy Mode</value>
+  </data>
+  <data name="ProxyModeCard.Description" xml:space="preserve">
+    <value>Configure outbound proxy for mod downloads, asset sync, and updates</value>
+  </data>
+  <data name="ProxyModeSystem.Content" xml:space="preserve">
+    <value>Follow System Proxy</value>
+  </data>
+  <data name="ProxyModeManual.Content" xml:space="preserve">
+    <value>Manual Proxy (HTTP / SOCKS5)</value>
+  </data>
+  <data name="ProxyModeDirect.Content" xml:space="preserve">
+    <value>Direct (No Proxy)</value>
+  </data>
+  <data name="ProxyProtocolCard.Header" xml:space="preserve">
+    <value>Proxy Protocol</value>
+  </data>
+  <data name="ProxyProtocolCard.Description" xml:space="preserve">
+    <value>Select proxy protocol type</value>
+  </data>
+  <data name="ProxyServerCard.Header" xml:space="preserve">
+    <value>Server Address &amp; Port</value>
+  </data>
+  <data name="ProxyServerCard.Description" xml:space="preserve">
+    <value>Proxy server host IP and port (e.g. 127.0.0.1:7890)</value>
+  </data>
+  <data name="ProxyBypassLocalCard.Header" xml:space="preserve">
+    <value>Bypass Local Addresses</value>
+  </data>
+  <data name="ProxyBypassLocalCard.Description" xml:space="preserve">
+    <value>Do not route intranet or local loopback traffic through proxy</value>
+  </data>
+
+  <data name="ProxyTestCard.Header" xml:space="preserve">
+    <value>Connectivity Test</value>
+  </data>
+  <data name="ProxyTestCard.Description" xml:space="preserve">
+    <value>Send probe request to verify proxy connection and measure latency</value>
+  </data>
+  <data name="ProxyTestButton.Content" xml:space="preserve">
+    <value>Test Connection</value>
+  </data>
+  <data name="ProxyTestSuccess" xml:space="preserve">
+    <value>Connected successfully ({0:F0} ms)</value>
+  </data>
+  <data name="ProxyTestFailed" xml:space="preserve">
+    <value>Connection failed: {0}</value>
+  </data>
+
   <data name="About.Text" xml:space="preserve">
     <value>About this app</value>
   </data>
@@ -414,6 +468,7 @@
   <data name="GameBananaLink.Content" xml:space="preserve">
     <value>Just Another Skin Manager on GameBanana</value>
   </data>
+
   <data name="GameSelectorComboBox.Header" xml:space="preserve">
     <value>Select game:</value>
   </data>

@@ -4,8 +4,23 @@
   <data name="AllCategories" xml:space="preserve">
     <value>全部</value>
   </data>
-  <data name="CancelBtn.ToolTipService.ToolTip" xml:space="preserve">
+  <data name="PauseToolTip.Content" xml:space="preserve">
+    <value>暂停</value>
+  </data>
+  <data name="ResumeToolTip.Content" xml:space="preserve">
+    <value>继续</value>
+  </data>
+  <data name="CancelToolTip.Content" xml:space="preserve">
     <value>取消</value>
+  </data>
+  <data name="CardCancelToolTip.Content" xml:space="preserve">
+    <value>取消下载</value>
+  </data>
+  <data name="ClosePaneToolTip.Content" xml:space="preserve">
+    <value>关闭</value>
+  </data>
+  <data name="DownloadManagerToolTip.Content" xml:space="preserve">
+    <value>下载管理</value>
   </data>
   <data name="CategoriesHdr.Text" xml:space="preserve">
     <value>分类</value>
@@ -27,6 +42,21 @@
   </data>
   <data name="DownloadBtn.ToolTipService.ToolTip" xml:space="preserve">
     <value>下载并安装</value>
+  </data>
+  <data name="DownloadBtnText.Text" xml:space="preserve">
+    <value>下载</value>
+  </data>
+  <data name="InstalledBtn.ToolTipService.ToolTip" xml:space="preserve">
+    <value>已安装 (点击可重新安装)</value>
+  </data>
+  <data name="InstalledBtn.AutomationProperties.Name" xml:space="preserve">
+    <value>已安装 (点击可重新安装)</value>
+  </data>
+  <data name="InstalledBtnText.Text" xml:space="preserve">
+    <value>已安装</value>
+  </data>
+  <data name="StatusInstallingShort.Text" xml:space="preserve">
+    <value>安装中...</value>
   </data>
   <data name="DownloadCompletedCachedMessage" xml:space="preserve">
     <value>模组已下载至暂存区：{0}</value>
@@ -97,6 +127,33 @@
   <data name="NotificationTaskAddedTitle" xml:space="preserve">
     <value>已添加 GameBanana 任务</value>
   </data>
+  <data name="PreferencesBtn.ToolTipService.ToolTip" xml:space="preserve">
+    <value>下载与安装设置</value>
+  </data>
+  <data name="PreferencesBtn.AutomationProperties.Name" xml:space="preserve">
+    <value>下载与安装设置</value>
+  </data>
+  <data name="PreferencesTitle.Text" xml:space="preserve">
+    <value>下载与安装偏好</value>
+  </data>
+  <data name="FallbackToOtherTitle.Text" xml:space="preserve">
+    <value>分类未命中时回退至“其他”</value>
+  </data>
+  <data name="FallbackToOtherDesc.Text" xml:space="preserve">
+    <value>当无法确定目标角色分类时，自动归入“其他”分类静默安装，而非弹出手动安装器</value>
+  </data>
+  <data name="AutoEnableTitle.Text" xml:space="preserve">
+    <value>静默安装后自动启用</value>
+  </data>
+  <data name="AutoEnableDesc.Text" xml:space="preserve">
+    <value>后台静默安装完成后，自动将模组状态设为启用</value>
+  </data>
+  <data name="DeleteArchiveTitle.Text" xml:space="preserve">
+    <value>安装后自动删除文件</value>
+  </data>
+  <data name="DeleteArchiveDesc.Text" xml:space="preserve">
+    <value>安装成功后自动删除缓存中的压缩包文件以节省磁盘空间</value>
+  </data>
   <data name="NsfwBlur" xml:space="preserve">
     <value>模糊 NSFW</value>
   </data>
@@ -118,10 +175,10 @@
   <data name="RawFileOpenDir" xml:space="preserve">
     <value>打开所在目录</value>
   </data>
-  <data name="RemoveBtn.ToolTipService.ToolTip" xml:space="preserve">
+  <data name="RemoveToolTip.Content" xml:space="preserve">
     <value>移除</value>
   </data>
-  <data name="RetryBtn.ToolTipService.ToolTip" xml:space="preserve">
+  <data name="RetryToolTip.Content" xml:space="preserve">
     <value>重新安装重试</value>
   </data>
   <data name="RetryDetailBtn" xml:space="preserve">
@@ -147,6 +204,9 @@
   </data>
   <data name="StatusAllocating" xml:space="preserve">
     <value>分配中...</value>
+  </data>
+  <data name="StatusPaused" xml:space="preserve">
+    <value>已暂停</value>
   </data>
   <data name="StatusCancelled" xml:space="preserve">
     <value>已取消</value>
@@ -183,6 +243,9 @@
   </data>
   <data name="StatusInstallSuccess" xml:space="preserve">
     <value>安装成功</value>
+  </data>
+  <data name="StatusInstallSuccessCleaned" xml:space="preserve">
+    <value>安装成功 (安装包已清理)</value>
   </data>
   <data name="StatusMatching" xml:space="preserve">
     <value>匹配分类中...</value>
@@ -225,5 +288,11 @@
   </data>
   <data name="ViewsLabel.Text" xml:space="preserve">
     <value>浏览</value>
+  </data>
+  <data name="InstallSuccessTitle" xml:space="preserve">
+    <value>安装成功</value>
+  </data>
+  <data name="InstallSuccessMessage" xml:space="preserve">
+    <value>“{0}” 已成功安装至 {1}</value>
   </data>
 </root>

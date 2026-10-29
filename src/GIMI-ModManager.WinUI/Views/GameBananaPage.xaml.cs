@@ -603,11 +603,59 @@ public sealed partial class GameBananaPage : Page
         }
     }
 
+    private void PaneDownloadManagerButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement target && DownloadManagerButton.Flyout != null)
+        {
+            DownloadManagerButton.Flyout.ShowAt(target);
+        }
+    }
+
     private void DownloadButton_Click(object sender, RoutedEventArgs e)
     {
         if (sender is Button { Tag: ModFileInfo fileInfo })
         {
             ViewModel.DownloadAndInstallCommand.Execute(fileInfo);
+        }
+    }
+
+    private void PauseDownloadTask_Click(object sender, RoutedEventArgs e)
+    {
+        if ((sender as FrameworkElement)?.DataContext is GbDownloadTask task)
+        {
+            ViewModel.PauseDownloadTaskCommand.Execute(task);
+        }
+    }
+
+    private void ResumeDownloadTask_Click(object sender, RoutedEventArgs e)
+    {
+        if ((sender as FrameworkElement)?.DataContext is GbDownloadTask task)
+        {
+            ViewModel.ResumeDownloadTaskCommand.Execute(task);
+        }
+    }
+
+    private void PauseDownloadFile_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: ModFileInfo fileInfo })
+        {
+            ViewModel.PauseFileDownload(fileInfo);
+        }
+    }
+
+    private void ResumeDownloadFile_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: ModFileInfo fileInfo })
+        {
+            ViewModel.ResumeFileDownload(fileInfo);
+        }
+    }
+
+    private void CancelDownloadFile_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: ModFileInfo fileInfo })
+        {
+            ViewModel.CancelFileDownload(fileInfo);
         }
     }
 

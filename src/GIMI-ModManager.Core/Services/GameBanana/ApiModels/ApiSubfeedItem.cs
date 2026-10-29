@@ -81,7 +81,7 @@ public record ApiModRecord
     public ApiRootCategory? RootCategory { get; init; }
 
     /// <summary>
-    /// 从第一张预览图计算缩略图 URL。优先使用 530px 变体以提升清晰度。
+    /// Computes thumbnail URL from the primary preview image, preferring the 530px variant for clarity.
     /// </summary>
     public string? ThumbnailUrl
     {
@@ -95,7 +95,7 @@ public record ApiModRecord
     }
 
     /// <summary>
-    /// 预览图数量（从 _aImages 数组长度获取）。
+    /// Number of preview images.
     /// </summary>
     /// <summary>
     /// Safe-for-work (blurred) thumbnail URL provided by GameBanana for content
@@ -122,9 +122,9 @@ public record ApiModRecord
         {
             var img = PreviewContent?.GetValueOrDefault("screenshot");
             if (img is not null && !string.IsNullOrEmpty(img.File530) && img.Height530 > 0)
-                return 530.0 / img.Height530;
+                return 530.0 / img.Height530.Value;
             if (img is not null && !string.IsNullOrEmpty(img.File220) && img.Height220 > 0)
-                return 220.0 / img.Height220;
+                return 220.0 / img.Height220.Value;
             return 16.0 / 9.0;
         }
     }
@@ -169,13 +169,13 @@ public record ApiPreviewImage
     public string? File220Sfw { get; init; }
 
     [JsonPropertyName("_hFile100")]
-    public int Height100 { get; init; }
+    public int? Height100 { get; init; }
 
     [JsonPropertyName("_hFile220")]
-    public int Height220 { get; init; }
+    public int? Height220 { get; init; }
 
     [JsonPropertyName("_hFile530")]
-    public int Height530 { get; init; }
+    public int? Height530 { get; init; }
 
     [JsonPropertyName("_sCaption")]
     public string? Caption { get; init; }

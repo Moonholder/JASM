@@ -4,12 +4,14 @@ using GIMI_ModManager.Core.Contracts.Entities;
 using GIMI_ModManager.Core.Contracts.Services;
 using GIMI_ModManager.Core.Entities.Mods.Contract;
 using GIMI_ModManager.Core.Entities.Mods.SkinMod;
+using GIMI_ModManager.Core.GamesService;
 using GIMI_ModManager.Core.GamesService.Interfaces;
 using GIMI_ModManager.Core.Helpers;
 using GIMI_ModManager.Core.Services;
 using GIMI_ModManager.WinUI.Contracts.Services;
 using GIMI_ModManager.WinUI.Models.Settings;
 using GIMI_ModManager.WinUI.Services.AppManagement;
+using GIMI_ModManager.WinUI.Services;
 using GIMI_ModManager.WinUI.ViewModels;
 using GIMI_ModManager.WinUI.Views;
 using Microsoft.UI.Dispatching;
@@ -18,12 +20,26 @@ using Serilog;
 
 namespace GIMI_ModManager.WinUI.Services.ModHandling;
 
+public record SilentInstallResult(ISkinMod InstalledMod, IReadOnlyList<Guid> DisabledModIds);
+
 public class ModInstallerService(
     IWindowManagerService windowManagerService,
-    ILocalSettingsService localSettingsService)
+    ILocalSettingsService localSettingsService,
+    CharacterSkinService characterSkinService,
+    UserPreferencesService userPreferencesService,
+    ElevatorService elevatorService,
+    IGameService gameService,
+    ModSettingsService modSettingsService,
+    ILogger logger)
 {
     private readonly ILocalSettingsService _localSettingsService = localSettingsService;
     private readonly IWindowManagerService _windowManagerService = windowManagerService;
+    private readonly CharacterSkinService _characterSkinService = characterSkinService;
+    private readonly UserPreferencesService _userPreferencesService = userPreferencesService;
+    private readonly ElevatorService _elevatorService = elevatorService;
+    private readonly IGameService _gameService = gameService;
+    private readonly ModSettingsService _modSettingsService = modSettingsService;
+    private readonly ILogger _logger = logger.ForContext<ModInstallerService>();
 
     public async Task<InstallMonitor> StartModInstallationAsync(DirectoryInfo modFolder, ICharacterModList modList,
         ICharacterSkin? inGameSkin = null, Action<InstallOptions>? setup = null)
@@ -74,6 +90,118 @@ public class ModInstallerService(
         _windowManagerService.CreateWindow(modInstallWindow, modList);
 
         return new InstallMonitor(modInstallPage, modInstallWindow);
+    }
+
+    public async Task<SilentInstallResult> InstallSilentlyAsync(
+        DirectoryInfo modFolder,
+        ICharacterModList modList,
+        AddModOptions? options = null,
+        bool autoEnable = false,
+        ICharacterSkin? inGameSkin = null)
+    {
+        ArgumentNullException.ThrowIfNull(modFolder);
+        ArgumentNullException.ThrowIfNull(modList);
+
+        using var installation = ModInstallation.Start(modFolder, modList);
+        installation.AutoSetModRootFolder();
+        installation.AutoSetShaderFixesFolder();
+
+        var dupeMod = installation.AnyDuplicateName();
+        ISkinMod installedMod;
+
+        if (dupeMod != null)
+        {
+            var baseName = !string.IsNullOrEmpty(options?.NewModFolderName)
+                ? options.NewModFolderName
+                : installation.ModFolder.Name;
+
+            var uniqueFolderName = GenerateUniqueFolderName(modList, baseName);
+            var renameOptions = options != null
+                ? options with { NewModFolderName = uniqueFolderName }
+                : new AddModOptions { NewModFolderName = uniqueFolderName };
+
+            installedMod = await installation.RenameAndAddAsync(renameOptions, dupeMod, dupeMod.Name).ConfigureAwait(false);
+        }
+        else
+        {
+            installedMod = await installation.AddModAsync(options).ConfigureAwait(false);
+        }
+
+        var disabledModIds = new List<Guid>();
+
+        if (autoEnable)
+        {
+            var modsToDisable = new List<ISkinMod>();
+            bool isMultiMod = modList.Character.IsMultiMod;
+
+            if (!isMultiMod)
+            {
+                if (modList.Character is ICharacter character && character.Skins.Count > 1)
+                {
+                    var detectedSkin = await _characterSkinService.GetFirstSkinForModAsync(installedMod, character).ConfigureAwait(false);
+                    var targetSkin = inGameSkin ?? detectedSkin ?? character.Skins.FirstOrDefault(s => s.IsDefault);
+
+                    if (targetSkin != null)
+                    {
+                        await foreach (var skinMod in _characterSkinService.GetModsForSkinAsync(targetSkin).ConfigureAwait(false))
+                        {
+                            if (skinMod.Id != installedMod.Id && modList.IsModEnabled(skinMod))
+                            {
+                                modsToDisable.Add(skinMod);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        modsToDisable.AddRange(modList.Mods
+                            .Where(m => modList.IsModEnabled(m.Mod) && m.Mod.Id != installedMod.Id)
+                            .Select(m => m.Mod));
+                    }
+
+                    if (inGameSkin != null && detectedSkin != null && !detectedSkin.InternalNameEquals(inGameSkin.InternalName))
+                    {
+                        await _modSettingsService.SetCharacterSkinOverrideLegacy(installedMod.Id, inGameSkin.InternalName).ConfigureAwait(false);
+                    }
+                }
+                else
+                {
+                    modsToDisable.AddRange(modList.Mods
+                        .Where(m => modList.IsModEnabled(m.Mod) && m.Mod.Id != installedMod.Id)
+                        .Select(m => m.Mod));
+                }
+            }
+
+            foreach (var mod in modsToDisable)
+            {
+                if (modList.IsModEnabled(mod))
+                {
+                    modList.DisableMod(mod.Id);
+                    disabledModIds.Add(mod.Id);
+                }
+            }
+
+            if (!modList.IsModEnabled(installedMod))
+            {
+                modList.EnableMod(installedMod.Id);
+            }
+        }
+        else
+        {
+            if (modList.IsModEnabled(installedMod))
+            {
+                modList.DisableMod(installedMod.Id);
+            }
+        }
+
+        return new SilentInstallResult(installedMod, disabledModIds);
+    }
+
+    private static string GenerateUniqueFolderName(ICharacterModList modList, string baseName)
+    {
+        return ModFolderHelpers.GenerateUniqueFolderName(
+            baseName,
+            modList.Mods.Select(m => m.Mod.Name),
+            candidate => Directory.Exists(Path.Combine(modList.AbsModsFolderPath, candidate)));
     }
 }
 

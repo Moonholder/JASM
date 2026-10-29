@@ -11,6 +11,7 @@ using Newtonsoft.Json.Converters;
 using Serilog;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 using System.Text.Json;
 using JsonElement = GIMI_ModManager.Core.GamesService.JsonModels.JsonElement;
 using JsonSerializer = System.Text.Json.JsonSerializer;
@@ -701,6 +702,119 @@ public class GameService : IGameService
         }
 
         return searchResult;
+    }
+
+    public IModdableObject? MatchExactModdableObject(string? categoryName)
+    {
+        if (string.IsNullOrWhiteSpace(categoryName))
+            return null;
+
+        var leafCategory = ExtractLeafCategory(categoryName);
+        var normalizedQuery = NormalizeCategoryToken(leafCategory);
+        if (string.IsNullOrEmpty(normalizedQuery))
+            return null;
+
+        var allObjects = GetAllModdableObjects(GetOnly.Both);
+
+        // Phase 1: Direct exact match against DisplayName, InternalName, ModFilesName, or any single Key
+        foreach (var moddableObject in allObjects)
+        {
+            if (NormalizeCategoryToken(moddableObject.DisplayName) == normalizedQuery)
+                return moddableObject;
+
+            if (NormalizeCategoryToken(moddableObject.InternalName.Id) == normalizedQuery)
+                return moddableObject;
+
+            if (!string.IsNullOrEmpty(moddableObject.ModFilesName) &&
+                NormalizeCategoryToken(moddableObject.ModFilesName) == normalizedQuery)
+                return moddableObject;
+
+            if (moddableObject is ICharacter character && character.Keys.Count > 0)
+            {
+                if (character.Keys.Any(k => NormalizeCategoryToken(k) == normalizedQuery))
+                    return moddableObject;
+            }
+        }
+
+        // Phase 2: Concatenated keys exact match (e.g. Keys: ["Jane", "Doe"] -> "janedoe")
+        foreach (var moddableObject in allObjects)
+        {
+            if (moddableObject is ICharacter character && character.Keys.Count > 1)
+            {
+                if (NormalizeCategoryToken(string.Concat(character.Keys)) == normalizedQuery)
+                    return moddableObject;
+
+                var combinedWithDisplayName = character.DisplayName + string.Concat(character.Keys.Where(k => !k.Equals(character.DisplayName, StringComparison.OrdinalIgnoreCase)));
+                if (NormalizeCategoryToken(combinedWithDisplayName) == normalizedQuery)
+                    return moddableObject;
+            }
+        }
+
+        // Phase 3: Token-set matching for multi-word categories (all query words covered by candidate)
+        var queryWords = Regex.Split(leafCategory, @"[\s_\-:·・/\\.,]+")
+            .Select(NormalizeCategoryToken)
+            .Where(w => w.Length > 0)
+            .Distinct()
+            .ToList();
+
+        if (queryWords.Count >= 2)
+        {
+            var matchedCandidates = new List<IModdableObject>();
+
+            foreach (var moddableObject in allObjects)
+            {
+                var candidateTokens = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                AddWordsToTokenSet(candidateTokens, moddableObject.DisplayName);
+                AddWordsToTokenSet(candidateTokens, moddableObject.InternalName.Id);
+                if (!string.IsNullOrEmpty(moddableObject.ModFilesName))
+                    AddWordsToTokenSet(candidateTokens, moddableObject.ModFilesName);
+
+                if (moddableObject is ICharacter character)
+                {
+                    foreach (var key in character.Keys)
+                        AddWordsToTokenSet(candidateTokens, key);
+                }
+
+                if (queryWords.All(qw => candidateTokens.Contains(qw)))
+                {
+                    matchedCandidates.Add(moddableObject);
+                }
+            }
+
+            if (matchedCandidates.Count == 1)
+                return matchedCandidates[0];
+        }
+
+        return null;
+    }
+
+    private static void AddWordsToTokenSet(HashSet<string> tokenSet, string? input)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+            return;
+
+        var words = Regex.Split(input, @"[\s_\-:·・/\\.,]+");
+        foreach (var word in words)
+        {
+            var normalized = NormalizeCategoryToken(word);
+            if (normalized.Length > 0)
+                tokenSet.Add(normalized);
+        }
+    }
+
+    private static string ExtractLeafCategory(string input)
+    {
+        var parts = input.Split(['>', '/', '\\'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var leaf = parts.Length > 0 ? parts[^1] : input;
+        return leaf.Trim(' ', '"', '\'', '`');
+    }
+
+    private static string NormalizeCategoryToken(string? text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+            return string.Empty;
+
+        return Regex.Replace(text, @"[^a-zA-Z0-9\u4e00-\u9fa5]", "").ToLowerInvariant();
     }
 
     private static int CalculateObjectMatchScore(string searchQuery, IModdableObject moddableObject)

@@ -7,6 +7,7 @@ using CommunityToolkit.Mvvm.Input;
 using ErrorOr;
 using GIMI_ModManager.Core.Contracts.Entities;
 using GIMI_ModManager.Core.Contracts.Services;
+using GIMI_ModManager.Core.Services.Network.Models;
 using GIMI_ModManager.Core.GamesService;
 using GIMI_ModManager.Core.GamesService.Interfaces;
 using GIMI_ModManager.Core.Helpers;
@@ -55,6 +56,18 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
     private readonly GameAssetSyncService _gameAssetSyncService;
     public ElevatorService ElevatorService;
     private readonly HotkeyService _hotkeyService;
+    private readonly IProxySettingsService _proxySettingsService;
+
+    [ObservableProperty] private int _selectedProxyModeIndex;
+    [ObservableProperty] private int _selectedProxyProtocolIndex;
+    [ObservableProperty] private string _proxyHost = "127.0.0.1";
+    [ObservableProperty] private string _proxyPort = "7890";
+    [ObservableProperty] private bool _proxyBypassLocal = true;
+    [ObservableProperty] private bool _isManualProxyVisible;
+    [ObservableProperty] private bool _isTestingProxy;
+    [ObservableProperty] private string _proxyTestResult = string.Empty;
+    [ObservableProperty] private bool _hasProxyTestResult;
+    [ObservableProperty] private bool _isProxyTestSuccess;
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ResetGenshinExePathCommand))]
@@ -105,6 +118,9 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
 
     [ObservableProperty] private bool _characterAsSkinsCheckbox = false;
 
+
+
+
     [ObservableProperty] private int _maxCacheLimit;
     [ObservableProperty] private int _maxImageCacheLimit;
     [ObservableProperty] private string _imageCacheSizeString = string.Empty;
@@ -145,11 +161,13 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
         SelectedGameService selectedGameService, ModUpdateAvailableChecker modUpdateAvailableChecker,
         LifeCycleService lifeCycleService, INavigationService navigationService,
         ModArchiveRepository modArchiveRepository, GameAssetSyncService gameAssetSyncService,
-        HotkeyService hotkeyService)
+        HotkeyService hotkeyService, IProxySettingsService proxySettingsService)
     {
         _themeSelectorService = themeSelectorService;
         _localSettingsService = localSettingsService;
         _hotkeyService = hotkeyService;
+        _proxySettingsService = proxySettingsService;
+        InitializeProxySettings();
         ElevatorService = elevatorService;
         _notificationManager = notificationManager;
         _navigationViewService = navigationViewService;
@@ -217,9 +235,17 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
             ?.MaxLocalArchiveCacheSizeGb ?? new ModArchiveSettings().MaxLocalArchiveCacheSizeGb;
         SetCacheString(MaxCacheLimit);
 
+
+
+
+
         MaxImageCacheLimit = localSettingsService.ReadSetting<ImageCacheSettings>(ImageCacheSettings.Key, SettingScope.App)
             ?.MaxImageCacheMb ?? ImageCacheSettings.DefaultMaxImageCacheMb;
         UpdateImageCacheSizeString();
+
+
+
+
 
         var cultures = CultureInfo.GetCultures(CultureTypes.AllCultures);
         cultures = cultures.Append(new CultureInfo("zh-cn")).ToArray();
@@ -981,6 +1007,10 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
     {
         RemoteImageLoader.ClearDiskCache();
         UpdateImageCacheSizeString();
+
+
+
+
     }
 
     private void UpdateImageCacheSizeString()
@@ -1127,6 +1157,10 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
     [ObservableProperty] private string _hotkeyText = "None";
     [ObservableProperty] private bool _isRecordingHotkey = false;
 
+
+
+
+
     partial void OnRestoreFocusAfterSyncChanged(bool value)
     {
         Task.Run(async () =>
@@ -1269,6 +1303,146 @@ public partial class SettingsViewModel : ObservableRecipient, INavigationAware
 
         return string.Join(" + ", parts);
     }
+
+    #region Proxy Settings
+
+    private bool _isInitializingProxySettings = true;
+
+    private void InitializeProxySettings()
+    {
+        _isInitializingProxySettings = true;
+        _ = Task.Run(async () =>
+        {
+            var loaded = await _proxySettingsService.GetConfigurationAsync().ConfigureAwait(false);
+            App.MainWindow.DispatcherQueue.TryEnqueue(() =>
+            {
+                _isInitializingProxySettings = true;
+                try
+                {
+                    SelectedProxyModeIndex = (int)loaded.Mode;
+                    SelectedProxyProtocolIndex = (int)loaded.Protocol;
+                    ProxyHost = loaded.Host;
+                    ProxyPort = loaded.Port.ToString();
+                    ProxyBypassLocal = loaded.BypassLocal;
+                    IsManualProxyVisible = loaded.Mode == ProxyMode.Manual;
+                }
+                finally
+                {
+                    _isInitializingProxySettings = false;
+                }
+            });
+        });
+    }
+
+    partial void OnSelectedProxyModeIndexChanged(int value)
+    {
+        IsManualProxyVisible = value == (int)ProxyMode.Manual;
+        if (_isInitializingProxySettings) return;
+        SaveCurrentProxySettings();
+    }
+
+    partial void OnSelectedProxyProtocolIndexChanged(int value)
+    {
+        if (_isInitializingProxySettings) return;
+        SaveCurrentProxySettings();
+    }
+
+    partial void OnProxyHostChanged(string value)
+    {
+        if (_isInitializingProxySettings) return;
+        SaveCurrentProxySettings();
+    }
+
+    partial void OnProxyPortChanged(string value)
+    {
+        if (_isInitializingProxySettings) return;
+        SaveCurrentProxySettings();
+    }
+
+    partial void OnProxyBypassLocalChanged(bool value)
+    {
+        if (_isInitializingProxySettings) return;
+        SaveCurrentProxySettings();
+    }
+
+    [RelayCommand]
+    private void SaveProxySettings()
+    {
+        SaveCurrentProxySettings();
+    }
+
+    private void SaveCurrentProxySettings()
+    {
+        if (_isInitializingProxySettings) return;
+
+        if (!int.TryParse(ProxyPort, out var port) || port <= 0 || port > 65535)
+        {
+            return;
+        }
+
+        var host = string.IsNullOrWhiteSpace(ProxyHost) ? "127.0.0.1" : ProxyHost.Trim();
+
+        var config = new ProxyConfiguration
+        {
+            Mode = (ProxyMode)SelectedProxyModeIndex,
+            Protocol = (ProxyProtocol)SelectedProxyProtocolIndex,
+            Host = host,
+            Port = port,
+            BypassLocal = ProxyBypassLocal
+        };
+
+        _ = _proxySettingsService.SaveConfigurationAsync(config);
+    }
+
+    [RelayCommand]
+    private async Task TestProxyConnectivityAsync()
+    {
+        if (IsTestingProxy) return;
+
+        IsTestingProxy = true;
+        HasProxyTestResult = false;
+        ProxyTestResult = string.Empty;
+
+        if (!int.TryParse(ProxyPort, out var port) || port <= 0 || port > 65535)
+        {
+            port = 7890;
+        }
+
+        var host = string.IsNullOrWhiteSpace(ProxyHost) ? "127.0.0.1" : ProxyHost.Trim();
+
+        var config = new ProxyConfiguration
+        {
+            Mode = (ProxyMode)SelectedProxyModeIndex,
+            Protocol = (ProxyProtocol)SelectedProxyProtocolIndex,
+            Host = host,
+            Port = port,
+            BypassLocal = ProxyBypassLocal
+        };
+
+        var result = await _proxySettingsService.TestProxyConnectivityAsync(config);
+
+        App.MainWindow.DispatcherQueue.TryEnqueue(() =>
+        {
+            IsTestingProxy = false;
+            HasProxyTestResult = true;
+            IsProxyTestSuccess = result.IsSuccess;
+
+            if (result.IsSuccess)
+            {
+                ProxyTestResult = string.Format(
+                    _localizer.GetLocalizedStringOrDefault("/Settings/ProxyTestSuccess", "Connected successfully ({0:F0} ms)"),
+                    result.LatencyMs);
+            }
+            else
+            {
+                ProxyTestResult = string.Format(
+                    _localizer.GetLocalizedStringOrDefault("/Settings/ProxyTestFailed", "Connection failed: {0}"),
+                    result.ErrorMessage);
+            }
+        });
+    }
+
+    #endregion
 
     public void OnNavigatedFrom()
     {

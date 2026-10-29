@@ -1,2297 +1,1233 @@
 using System.Collections.Concurrent;
-
-using GIMI_ModManager.WinUI.Models.GameBanana;
-
 using System.Collections.ObjectModel;
-
-using System.Diagnostics.CodeAnalysis;
-
 using CommunityToolkit.Mvvm.ComponentModel;
-
 using CommunityToolkit.Mvvm.Input;
-
 using GIMI_ModManager.Core.Contracts.Services;
-
 using GIMI_ModManager.Core.GamesService;
-
 using GIMI_ModManager.Core.GamesService.Interfaces;
-
 using GIMI_ModManager.Core.Services;
-
 using GIMI_ModManager.Core.Services.GameBanana;
-
 using GIMI_ModManager.Core.Services.GameBanana.ApiModels;
-
 using GIMI_ModManager.Core.Services.GameBanana.Models;
-
-using GIMI_ModManager.WinUI.Contracts.ViewModels;
-
 using GIMI_ModManager.WinUI.Contracts.Services;
-
+using GIMI_ModManager.WinUI.Contracts.ViewModels;
+using GIMI_ModManager.WinUI.Models.GameBanana;
 using GIMI_ModManager.WinUI.Models.Settings;
-
 using GIMI_ModManager.WinUI.Services.AppManagement;
-
 using GIMI_ModManager.WinUI.Services.ModHandling;
-
 using GIMI_ModManager.WinUI.Services.Notifications;
-
 using Microsoft.UI.Dispatching;
-
 using Microsoft.UI.Xaml;
-
 using Microsoft.UI.Xaml.Media.Imaging;
-
 using Serilog;
-
-
 
 namespace GIMI_ModManager.WinUI.ViewModels;
 
-
-
 public partial class GameBananaVM : ObservableRecipient, INavigationAware
-
 {
-
     private readonly GameBananaCoreService _gbService = App.GetService<GameBananaCoreService>();
-
     private readonly IGameService _gameService = App.GetService<IGameService>();
-
     private readonly NotificationManager _notificationManager = App.GetService<NotificationManager>();
-
     private readonly ILocalSettingsService _localSettingsService = App.GetService<ILocalSettingsService>();
-
     private readonly ILogger _logger = App.GetService<ILogger>().ForContext<GameBananaVM>();
-
     private readonly ILanguageLocalizer _localizer = App.GetService<ILanguageLocalizer>();
-
     private readonly IGameBananaDownloadSessionService _downloadSessionService = App.GetService<IGameBananaDownloadSessionService>();
-
-
 
     private DispatcherQueue _dispatcherQueue = null!;
 
-
-
     // Static category cache — survives across Transient VM instances
-
     private static readonly ConcurrentDictionary<string, List<GbCategoryDisplayItem>> _categoryCache = new();
 
-
-
     private string? _gameId;
-
     private int _currentPage = 1;
-
     private bool _hasMorePages = true;
-
     private CancellationTokenSource? _loadCts;
-
     private readonly SemaphoreSlim _loadLock = new(1, 1);
-
     private const int MinItemsPerLoad = 10;
-
     private const int MaxBackfillIterations = 5;
-
     private bool _settingsLoaded;
 
-
-
     // Guards against stale detail responses when the user quickly opens A then B.
-
     private int _detailRequestId;
-
     private CancellationTokenSource? _detailLoadCts;
 
-
-
     // Suppresses the search debounce when the query is cleared programmatically
-
     // (category switch / search submit already trigger their own reload).
-
     private bool _suppressSearchDebounce;
-
-
 
     // ── Observable properties ──
 
-
-
     [ObservableProperty] private bool _isLoading;
-
     [ObservableProperty] private bool _isLoadingMore;
-
     [ObservableProperty] private bool _isCategoriesLoading;
-
     [ObservableProperty] private string _searchQuery = string.Empty;
-
     [ObservableProperty] private string _selectedSort = "default";
-
     [ObservableProperty] private string _errorMessage = string.Empty;
-
     [ObservableProperty] private GbNsfwDisplayPolicy _nsfwPolicy = GbNsfwDisplayPolicy.Blur;
-
     [ObservableProperty] private GbModelFilter _modelFilter = GbModelFilter.ModsOnly;
-
     [ObservableProperty] private bool _hasError;
-
     [ObservableProperty] private int _downloadQueueCount;
 
-
+    // Installation preferences
+    [ObservableProperty] private bool _fallbackToOtherCategoryOnUnmatched;
+    [ObservableProperty] private bool _autoEnableAfterSilentInstall = true;
+    [ObservableProperty] private bool _deleteArchiveAfterInstall = true;
 
     // Inverted loading for visibility binding
-
     [ObservableProperty] private Visibility _isNotLoading = Visibility.Visible;
 
-
-
     // Selected category (null = all / home)
-
     [ObservableProperty] private GbCategoryDisplayItem? _selectedCategory;
 
-
-
     // Mod detail pane
-
     [ObservableProperty] private bool _isDetailPaneOpen;
-
     [ObservableProperty] private GbModDisplayItem? _selectedMod;
-
     [ObservableProperty] private ModPageInfo? _selectedModDetail;
-
     [ObservableProperty] private bool _isDetailLoading;
-
     [ObservableProperty] private Visibility _hasModDetail = Visibility.Collapsed;
-
     [ObservableProperty] private bool _hasDetailError;
-
     [ObservableProperty] private string _detailErrorMessage = string.Empty;
 
-
-
     // Detail pane display properties
-
     [ObservableProperty] private string _selectedModName;
-
     [ObservableProperty] private string _selectedModAuthor = string.Empty;
-
     [ObservableProperty] private string _selectedModLikes = string.Empty;
-
     [ObservableProperty] private string _selectedModViews = string.Empty;
-
     [ObservableProperty] private string _selectedModDate = string.Empty;
-
     [ObservableProperty] private string _selectedModDescription = string.Empty;
-
     [ObservableProperty] private string _selectedModUpdateLog = string.Empty;
-
     [ObservableProperty] private Visibility _hasDescription = Visibility.Collapsed;
-
     [ObservableProperty] private Visibility _hasUpdateLog = Visibility.Collapsed;
 
-
-
     [ObservableProperty] private Visibility _hasPreviewImages = Visibility.Collapsed;
-
     [ObservableProperty] private Visibility _hasFiles = Visibility.Collapsed;
-
-
 
     [ObservableProperty] private BitmapImage? _selectedModAuthorAvatar;
 
-
-
     // Detail pane preview images
-
     [ObservableProperty] private int _selectedPreviewIndex;
-
     [ObservableProperty] private BitmapImage? _selectedPreviewFullImage;
 
-
-
     // LightBox carousel
-
     [ObservableProperty] private int _lightBoxSelectedIndex;
-
     [ObservableProperty] private string _lightBoxCounter = string.Empty;
-
-
-
-
 
     [ObservableProperty] private Visibility _hasNoResults = Visibility.Collapsed;
 
-
-
-
-
     [ObservableProperty] private string _categorySearchQuery = string.Empty;
-
-
-
-
 
     public int[] SkeletonPlaceholders { get; } = [1, 2, 3, 4, 5, 6, 7, 8];
 
-
-
     private readonly List<GbCategoryDisplayItem> _allCategories = new();
 
-
-
     partial void OnCategorySearchQueryChanged(string value)
-
     {
-
         ApplyCategoryFilter();
-
     }
-
-
 
     private void ApplyCategoryFilter()
-
     {
-
         var query = CategorySearchQuery?.Trim();
-
         _dispatcherQueue?.TryEnqueue(() =>
-
         {
-
             Categories.Clear();
 
-
-
             if (string.IsNullOrEmpty(query))
-
             {
-
                 foreach (var item in _allCategories)
-
                 {
-
                     Categories.Add(item);
-
                 }
-
             }
-
             else
-
             {
-
                 foreach (var item in _allCategories)
-
                 {
-
                     if (item.CategoryId == null || item.Name.Contains(query, StringComparison.OrdinalIgnoreCase))
-
                     {
-
                         Categories.Add(item);
-
                     }
-
                 }
-
             }
-
         });
-
     }
-
-
 
     public ObservableCollection<GbCategoryDisplayItem> Categories { get; } = new();
-
     public ObservableCollection<GbModDisplayItem> Mods { get; } = new();
-
     public ObservableCollection<GbPreviewImageItem> PreviewImages { get; } = new();
-
     public ObservableCollection<ModFileInfo> ModFiles { get; } = new();
-
     public ObservableCollection<GbDownloadTask> DownloadQueue => _downloadSessionService.DownloadQueue;
-
     public ObservableCollection<SortOption> SortOptions { get; }
-
-
-
     public ObservableCollection<FilterOption<GbModelFilter>> ModelFilterOptions { get; }
-
-
-
     public ObservableCollection<FilterOption<GbNsfwDisplayPolicy>> NsfwPolicyOptions { get; }
 
-
-
     public GameBananaVM()
-
     {
-
         _selectedModName = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/ModDetailTitle", "Mod Detail");
 
-
-
         SortOptions = new ObservableCollection<SortOption>
-
         {
-
             new(_localizer.GetLocalizedStringOrDefault("/GameBananaPage/SortDefault", "Default"), "default"),
-
             new(_localizer.GetLocalizedStringOrDefault("/GameBananaPage/SortNew", "Newest"), "new"),
-
             new(_localizer.GetLocalizedStringOrDefault("/GameBananaPage/SortUpdated", "Updated"), "updated")
-
         };
-
-
 
         ModelFilterOptions = new ObservableCollection<FilterOption<GbModelFilter>>
-
         {
-
             new(_localizer.GetLocalizedStringOrDefault("/GameBananaPage/FilterAll", "All Categories"), GbModelFilter.All),
-
             new(_localizer.GetLocalizedStringOrDefault("/GameBananaPage/FilterModsOnly", "Mods Only"), GbModelFilter.ModsOnly)
-
         };
-
-
 
         NsfwPolicyOptions = new ObservableCollection<FilterOption<GbNsfwDisplayPolicy>>
-
         {
-
             new(_localizer.GetLocalizedStringOrDefault("/GameBananaPage/NsfwRemove", "Hide NSFW"), GbNsfwDisplayPolicy.Remove),
-
             new(_localizer.GetLocalizedStringOrDefault("/GameBananaPage/NsfwBlur", "Blur NSFW"), GbNsfwDisplayPolicy.Blur),
-
             new(_localizer.GetLocalizedStringOrDefault("/GameBananaPage/NsfwShow", "Show NSFW"), GbNsfwDisplayPolicy.Show)
-
         };
-
     }
-
-
 
     // ── Selected ComboBox items (for proper SelectedItem sync) ──
 
-
-
     [ObservableProperty] private SortOption? _selectedSortOption;
-
     [ObservableProperty] private FilterOption<GbModelFilter>? _selectedModelFilterOption;
-
     [ObservableProperty] private FilterOption<GbNsfwDisplayPolicy>? _selectedNsfwPolicyOption;
 
-
-
     partial void OnIsLoadingChanged(bool value)
-
     {
-
         _dispatcherQueue?.TryEnqueue(() =>
-
         {
-
             IsNotLoading = value ? Visibility.Collapsed : Visibility.Visible;
-
             if (value)
-
             {
-
                 HasNoResults = Visibility.Collapsed;
-
             }
-
         });
-
     }
-
-
 
     [ObservableProperty] private int _activeDownloadCount;
-
     [ObservableProperty] private Visibility _hasActiveDownloads = Visibility.Collapsed;
 
-
-
     private void UpdateActiveDownloadCount(object? sender = null, System.Collections.Specialized.NotifyCollectionChangedEventArgs? e = null)
-
     {
-
         _dispatcherQueue?.TryEnqueue(() =>
-
         {
-
             DownloadQueueCount = DownloadQueue.Count;
-
             var count = DownloadQueue.Count(t => !t.IsCompleted && !t.IsError);
-
             ActiveDownloadCount = count;
-
             HasActiveDownloads = count > 0 ? Visibility.Visible : Visibility.Collapsed;
-
         });
-
     }
-
-
 
     private void OnActiveTasksChanged() => UpdateActiveDownloadCount();
 
-
-
     // ── Navigation ──
 
-
-
     public async void OnNavigatedTo(object parameter)
-
     {
-
         _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
 
-
-
         var gameBananaUrl = _gameService.GameBananaUrl;
-
         _gameId = GameBananaCoreService.ExtractGameId(gameBananaUrl);
 
-
-
         if (_gameId == null)
-
         {
-
             ShowError(_localizer.GetLocalizedStringOrDefault("/GameBananaPage/ErrorGameId", "Failed to get GameBanana game ID"));
-
             return;
-
         }
-
-
 
         await LoadSettingsAsync();
 
-
-
         _ = LoadCategoriesAsync();
-
         _ = _downloadSessionService.LoadDownloadHistoryAsync();
-
         _ = LoadModsAsync(reset: true);
 
-
-
         GbDownloadTask.ActiveTasksChanged += OnActiveTasksChanged;
-
         DownloadQueue.CollectionChanged += UpdateActiveDownloadCount;
-
         UpdateActiveDownloadCount();
-
     }
-
-
 
     public void OnNavigatedFrom()
-
     {
-
         CancelLoad();
-
         _ = SaveSettingsAsync();
 
-
-
         GbDownloadTask.ActiveTasksChanged -= OnActiveTasksChanged;
-
         DownloadQueue.CollectionChanged -= UpdateActiveDownloadCount;
-
     }
-
-
 
     private async Task LoadSettingsAsync()
-
     {
-
         try
-
         {
-
             var settings = await _localSettingsService.ReadOrCreateSettingAsync<GameBananaSettings>(
-
                 GameBananaSettings.Key);
-
             if (settings != null)
-
             {
-
                 SelectedSort = settings.SelectedSort;
-
                 NsfwPolicy = (GbNsfwDisplayPolicy)settings.NsfwPolicy;
-
                 ModelFilter = (GbModelFilter)settings.ModelFilter;
-
+                FallbackToOtherCategoryOnUnmatched = settings.FallbackToOtherCategoryOnUnmatched;
+                AutoEnableAfterSilentInstall = settings.AutoEnableAfterSilentInstall;
+                DeleteArchiveAfterInstall = settings.DeleteArchiveAfterInstall;
             }
-
         }
-
         catch (Exception ex)
-
         {
-
             _logger.Warning(ex, "Failed to load GameBanana settings");
-
         }
-
-
 
         // Sync ComboBox selected items
-
         SelectedSortOption = SortOptions.FirstOrDefault(o => o.Value == SelectedSort) ?? SortOptions[0];
-
         SelectedModelFilterOption = ModelFilterOptions.FirstOrDefault(o => o.Value == ModelFilter) ?? ModelFilterOptions[1];
-
         SelectedNsfwPolicyOption = NsfwPolicyOptions.FirstOrDefault(o => o.Value == NsfwPolicy) ?? NsfwPolicyOptions[1];
 
-
-
         _settingsLoaded = true;
-
     }
-
-
 
     private async Task SaveSettingsAsync()
-
     {
-
         try
-
         {
-
-            var settings = new GameBananaSettings
-
-            {
-
-                SelectedSort = SelectedSort,
-
-                NsfwPolicy = (int)NsfwPolicy,
-
-                ModelFilter = (int)ModelFilter,
-
-            };
-
+            var settings = await _localSettingsService.ReadOrCreateSettingAsync<GameBananaSettings>(GameBananaSettings.Key);
+            settings.SelectedSort = SelectedSort;
+            settings.NsfwPolicy = (int)NsfwPolicy;
+            settings.ModelFilter = (int)ModelFilter;
+            settings.FallbackToOtherCategoryOnUnmatched = FallbackToOtherCategoryOnUnmatched;
+            settings.AutoEnableAfterSilentInstall = AutoEnableAfterSilentInstall;
+            settings.DeleteArchiveAfterInstall = DeleteArchiveAfterInstall;
             await _localSettingsService.SaveSettingAsync(GameBananaSettings.Key, settings);
-
         }
-
         catch (Exception ex)
-
         {
-
             _logger.Warning(ex, "Failed to save GameBanana settings");
-
         }
-
     }
 
+    partial void OnFallbackToOtherCategoryOnUnmatchedChanged(bool value)
+    {
+        if (!_settingsLoaded) return;
+        _ = SaveSettingsAsync();
+    }
 
+    partial void OnAutoEnableAfterSilentInstallChanged(bool value)
+    {
+        if (!_settingsLoaded) return;
+        _ = SaveSettingsAsync();
+    }
+
+    partial void OnDeleteArchiveAfterInstallChanged(bool value)
+    {
+        if (!_settingsLoaded) return;
+        _ = SaveSettingsAsync();
+    }
 
     // ── Sort / filter change ──
 
-
-
     partial void OnSelectedSortOptionChanged(SortOption? value)
-
     {
-
         if (value == null) return;
-
         SelectedSort = value.Value;
-
         if (_gameId != null && _settingsLoaded)
-
         {
-
             _ = LoadModsAsync(reset: true);
-
             _ = SaveSettingsAsync();
-
         }
-
     }
-
-
 
     partial void OnSelectedNsfwPolicyOptionChanged(FilterOption<GbNsfwDisplayPolicy>? value)
-
     {
-
         if (value == null) return;
-
         NsfwPolicy = value.Value;
-
         if (_gameId != null && !IsLoading && _settingsLoaded)
-
         {
-
             _ = LoadModsAsync(reset: true);
-
             _ = SaveSettingsAsync();
-
         }
-
     }
-
-
 
     partial void OnSelectedModelFilterOptionChanged(FilterOption<GbModelFilter>? value)
-
     {
-
         if (value == null) return;
-
         ModelFilter = value.Value;
-
         if (_gameId != null && !IsLoading && _settingsLoaded)
-
         {
-
             _ = LoadModsAsync(reset: true);
-
             _ = SaveSettingsAsync();
-
         }
-
     }
-
-
 
     // ── Search with debounce ──
 
-
-
     private DispatcherTimer? _searchDebounceTimer;
 
-
-
     partial void OnSearchQueryChanged(string value)
-
     {
-
         if (_suppressSearchDebounce)
-
         {
-
             _suppressSearchDebounce = false;
-
             return;
-
         }
-
-
 
         if (_gameId == null || !_settingsLoaded) return;
 
-
-
         _searchDebounceTimer?.Stop();
-
         _searchDebounceTimer ??= new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(400) };
-
         _searchDebounceTimer.Tick -= SearchDebounce_Tick;
-
         _searchDebounceTimer.Tick += SearchDebounce_Tick;
-
         _searchDebounceTimer.Start();
-
     }
-
-
 
     private void SearchDebounce_Tick(object? sender, object e)
-
     {
-
         _searchDebounceTimer?.Stop();
 
-
-
         if (!string.IsNullOrWhiteSpace(SearchQuery) && SelectedCategory != null)
-
         {
-
             SelectedCategory = null;
-
         }
-
-
 
         if (_gameId != null)
-
         {
-
             _ = LoadModsAsync(reset: true);
-
         }
-
     }
-
-
 
     [RelayCommand]
-
     public void SubmitSearch(string? queryText)
-
     {
-
         var query = queryText ?? string.Empty;
-
         _searchDebounceTimer?.Stop();
 
-
-
         // Submit triggers its own reload below; don't let the debounce fire a duplicate.
-
         if (!string.Equals(SearchQuery, query, StringComparison.Ordinal))
-
         {
-
             _suppressSearchDebounce = true;
-
             SearchQuery = query;
-
         }
-
         else
-
         {
-
             _suppressSearchDebounce = false;
-
         }
-
-
 
         if (!string.IsNullOrWhiteSpace(SearchQuery) && SelectedCategory != null)
-
         {
-
             // Null out the selected category so we fallback to Game Subfeed search
-
             SelectedCategory = null;
-
         }
-
-
 
         if (_gameId != null)
-
         {
-
             _ = LoadModsAsync(reset: true);
-
         }
-
     }
-
-
 
     public void OnSearchSubmitted(Microsoft.UI.Xaml.Controls.AutoSuggestBox sender, Microsoft.UI.Xaml.Controls.AutoSuggestBoxQuerySubmittedEventArgs args)
-
     {
-
         SubmitSearch(args.QueryText);
-
     }
-
-
 
     // ── Category selection ──
 
-
-
     [RelayCommand]
-
     private async Task SelectCategoryAsync(GbCategoryDisplayItem? category)
-
     {
-
         SelectedCategory = category;
-
         if (!string.IsNullOrEmpty(SearchQuery))
-
         {
-
             _suppressSearchDebounce = true;
-
             SearchQuery = string.Empty;
-
         }
-
         else
-
         {
-
             _suppressSearchDebounce = false;
-
         }
-
         await LoadModsAsync(reset: true);
-
     }
 
-
-
     // ── Load categories ──
-
-
-
-    // ── Load categories ──
-
     // Strategy: Get top-level categories for game, find the "Skins" category (highest item count),
-
     // get its sub-categories, and if any have _nCategoryCount > 0 (like "Characters"), go deeper.
 
-
-
     private async Task LoadCategoriesAsync()
-
     {
-
         if (_gameId == null) return;
 
-
-
         // Use cached categories if available
-
         if (_categoryCache.TryGetValue(_gameId, out var cached))
-
         {
-
             _dispatcherQueue.TryEnqueue(() =>
-
             {
-
                 _allCategories.Clear();
-
                 var allName = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/AllCategories", "All");
-
                 _allCategories.Add(new GbCategoryDisplayItem { Name = allName, CategoryId = null, ItemCount = 0 });
-
                 foreach (var item in cached)
-
                 {
-
                     _allCategories.Add(item);
-
                 }
-
                 ApplyCategoryFilter();
-
             });
-
             return;
-
         }
-
-
 
         IsCategoriesLoading = true;
-
         const int maxRetries = 3;
 
-
-
         for (var attempt = 0; attempt <= maxRetries; attempt++)
-
         {
-
             try
-
             {
-
                 if (attempt > 0)
-
                 {
-
                     // Exponential backoff: 2s, 4s, 8s
-
                     var delay = TimeSpan.FromSeconds(Math.Pow(2, attempt));
-
                     _logger.Information("Retrying categories load (attempt {Attempt}/{Max}) after {Delay}s",
-
                         attempt + 1, maxRetries + 1, delay.TotalSeconds);
-
                     await Task.Delay(delay);
-
                 }
-
-
 
                 var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
-
                 var apiClient = _gbService.CreateApiGameBananaClient();
 
-
-
                 // 1. Get top-level categories for the game (Skins, UI, Objects, etc.)
-
                 var topLevelCategories = await apiClient.GetCategoriesForGameAsync(_gameId, cts.Token);
 
-
-
                 // 2. Find the primary category (highest item count, usually "Skins")
-
                 var primaryCategory = topLevelCategories
-
                     .OrderByDescending(c => c.ItemCount)
-
                     .FirstOrDefault();
 
-
-
                 // 3. Build the final category list
-
                 var finalList = new List<GbCategoryDisplayItem>();
 
-
-
                 // Add top-level sections first
-
                 foreach (var top in topLevelCategories.OrderByDescending(c => c.ItemCount))
-
                 {
-
                     finalList.Add(new GbCategoryDisplayItem
-
                     {
-
                         Name = top.Name,
-
                         CategoryId = top.CategoryId.ToString(),
-
                         IconUrl = top.IconUrl,
-
                         ItemCount = top.ItemCount,
-
                         IsSection = true
-
                     });
-
                 }
-
-
 
                 // 4. Get character-level sub-categories under the primary category
-
                 if (primaryCategory != null)
-
                 {
-
                     var subCategories = await apiClient.GetCategoriesAsync(
-
                         primaryCategory.CategoryId.ToString(), cts.Token);
 
-
-
                     var characterCategories = new List<ApiCategoryItem>();
-
                     var deepCategories = subCategories.Where(c => c.CategoryCount > 0).ToList();
 
-
-
                     if (deepCategories.Count > 0)
-
                     {
-
                         // Go one level deeper (e.g. Skins → Characters → individual characters)
-
                         foreach (var deepCat in deepCategories)
-
                         {
-
                             try
-
                             {
-
                                 var chars = await apiClient.GetCategoriesAsync(
-
                                     deepCat.CategoryId.ToString(), cts.Token);
-
                                 characterCategories.AddRange(chars);
-
                             }
-
                             catch (Exception ex)
-
                             {
-
                                 _logger.Warning(ex, "Failed to load sub-categories for {cat}", deepCat.Name);
-
                             }
-
                         }
-
                     }
-
                     else
-
                     {
-
                         // Sub-categories are already character-level
-
                         characterCategories = subCategories;
-
                     }
-
-
 
                     // Add character categories sorted alphabetically
-
                     foreach (var cat in characterCategories.OrderBy(c => c.Name))
-
                     {
-
                         finalList.Add(new GbCategoryDisplayItem
-
                         {
-
                             Name = cat.Name,
-
                             CategoryId = cat.CategoryId.ToString(),
-
                             IconUrl = cat.IconUrl,
-
                             ItemCount = cat.ItemCount,
-
                             IsSection = false
-
                         });
-
                     }
-
                 }
-
-
 
                 _dispatcherQueue.TryEnqueue(() =>
-
                 {
-
                     _allCategories.Clear();
-
                     var allName = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/AllCategories", "All");
-
                     _allCategories.Add(new GbCategoryDisplayItem { Name = allName, CategoryId = null, ItemCount = 0 });
-
                     foreach (var item in finalList)
-
                     {
-
                         _allCategories.Add(item);
-
                     }
-
                     ApplyCategoryFilter();
-
                 });
 
-
-
                 // Save to cache
-
                 // Keep the static cache bounded: evict the oldest game once it grows.
-
                 if (_categoryCache.Count >= 6)
-
                 {
-
                     _categoryCache.TryRemove(_categoryCache.Keys.First(), out _);
-
                 }
-
                 _categoryCache[_gameId] = finalList;
 
-
-
                 // Success — exit retry loop
-
                 break;
-
             }
-
             catch (HttpRequestException ex) when (attempt < maxRetries)
-
             {
-
                 _logger.Warning(ex, "Categories load failed (attempt {Attempt}/{Max}), will retry",
-
                     attempt + 1, maxRetries + 1);
-
             }
-
             catch (Exception ex)
-
             {
-
                 _logger.Warning(ex, "Failed to load categories");
-
                 break; // Non-retryable or final attempt
-
             }
-
         }
 
-
-
         IsCategoriesLoading = false;
-
     }
-
-
 
     // ── Load mods ──
 
-
-
     private async Task LoadModsAsync(bool reset = false)
-
     {
-
         if (_gameId == null) return;
 
-
-
         if (reset)
-
         {
-
             CancelLoad();
-
             await _loadLock.WaitAsync().ConfigureAwait(false);
-
         }
-
         else
-
         {
-
             if (!await _loadLock.WaitAsync(0).ConfigureAwait(false))
-
                 return;
-
         }
-
-
 
         try
-
         {
-
             CancelLoad();
-
             _loadCts = new CancellationTokenSource();
-
             var ct = _loadCts.Token;
 
-
-
             if (reset)
-
             {
-
                 _currentPage = 1;
-
                 _hasMorePages = true;
-
                 _dispatcherQueue.TryEnqueue(() =>
-
                 {
-
                     Mods.Clear();
-
                     IsLoading = true;
-
                     HasNoResults = Visibility.Collapsed;
-
                 });
-
             }
-
             else
-
             {
-
                 if (!_hasMorePages) return;
-
                 _dispatcherQueue.TryEnqueue(() => IsLoadingMore = true);
-
             }
-
-
 
             _dispatcherQueue.TryEnqueue(() => HasError = false);
 
-
-
             try
-
             {
-
                 // Fetch one page at a time and append immediately so the first
-
                 // visible cards appear as soon as the first page returns.
-
                 var addedCount = 0;
-
                 var iterations = 0;
-
                 var firstPageAdded = false;
-
                 while (addedCount < MinItemsPerLoad && _hasMorePages && iterations < MaxBackfillIterations)
-
                 {
-
                     ct.ThrowIfCancellationRequested();
-
                     iterations++;
-
                     var pageCount = await LoadModsPageAsync(ct);
 
-
-
                     if (pageCount > 0 && !firstPageAdded)
-
                     {
-
                         // First page is on screen: drop the full-screen spinner and
-
                         // let the footer ring indicate the back-fill.
-
                         firstPageAdded = true;
-
                         _dispatcherQueue.TryEnqueue(() =>
-
                         {
-
                             IsLoading = false;
-
                             IsLoadingMore = true;
-
                         });
-
                     }
 
-
-
                     addedCount += pageCount;
-
                 }
-
             }
-
             catch (OperationCanceledException)
-
             {
-
                 // Expected on navigation away or new search
-
             }
-
             catch (Exception ex)
-
             {
-
                 _logger.Error(ex, "Failed to load mods from GameBanana");
-
                 ShowError(_localizer.GetLocalizedStringOrDefault("/GameBananaPage/ErrorLoadMods", "Failed to load mods, please check your network connection"));
-
             }
-
             finally
-
             {
-
                 _dispatcherQueue.TryEnqueue(() =>
-
                 {
-
                     IsLoading = false;
-
                     IsLoadingMore = false;
 
-
-
                     HasNoResults = (!IsLoading && Mods.Count == 0 && !HasError)
-
                         ? Visibility.Visible
-
                         : Visibility.Collapsed;
-
                 });
-
             }
-
         }
-
         finally
-
         {
-
             _loadLock.Release();
-
         }
-
     }
 
-
-
     /// <summary>
-
     /// Fetches a single page, applies client-side filters and appends the results
-
     /// to <see cref="Mods"/> on the UI thread. Returns how many items were added
-
     /// so the caller can back-fill additional pages if filtering removed too many.
-
     /// </summary>
-
     private async Task<int> LoadModsPageAsync(CancellationToken ct)
-
     {
-
         var rawItems = await FetchPageAsync(_currentPage, ct);
 
-
-
         if (rawItems.Count == 0)
-
         {
-
             _hasMorePages = false;
-
             return 0;
-
         }
-
-
 
         _currentPage++;
 
-
-
         // Apply client-side filters
-
         var filtered = ApplyFilters(rawItems);
 
-
-
         // Thumbnails are loaded lazily by the view (ContainerContentChanging),
-
         // so only the realized cards download images.
-
         if (filtered.Count > 0)
-
         {
-
             _dispatcherQueue.TryEnqueue(() =>
-
             {
-
                 foreach (var item in filtered)
-
                 {
-
                     Mods.Add(item);
-
                 }
-
             });
-
         }
-
-
 
         return filtered.Count;
-
     }
 
-
-
     /// <summary>
-
     /// Fetches a single page of raw mod records from the appropriate API endpoint.
-
     /// </summary>
-
     private async Task<List<GbModDisplayItem>> FetchPageAsync(int page, CancellationToken ct)
-
     {
-
         if (!string.IsNullOrWhiteSpace(SearchQuery))
-
         {
-
             string? modelName = ModelFilter == GbModelFilter.ModsOnly ? "Mod" : null;
-
             var results = await _gbService.SearchModsAsync(_gameId!, SearchQuery, modelName, page, ct);
-
             return results.Select(ToDisplayItem).ToList();
-
         }
-
-
 
         if (SelectedCategory?.CategoryId != null)
-
         {
-
             var results = await _gbService.GetModsByCategoryAsync(
-
                 SelectedCategory.CategoryId, page, 15, ct);
-
             return results.Select(ToDisplayItem).ToList();
-
         }
 
-
-
         var subfeed = await _gbService.GetGameSubfeedAsync(_gameId!, SelectedSort, page, ct);
-
         return subfeed.Select(ToDisplayItem).ToList();
-
     }
-
-
 
     /// <summary>
-
     /// Applies NSFW and model-type filters to a list of display items.
-
     /// </summary>
-
     private List<GbModDisplayItem> ApplyFilters(List<GbModDisplayItem> items)
-
     {
-
         IEnumerable<GbModDisplayItem> result = items;
 
-
-
         if (NsfwPolicy == GbNsfwDisplayPolicy.Remove)
-
             result = result.Where(i => !i.IsNsfw);
 
-
-
         if (ModelFilter == GbModelFilter.ModsOnly)
-
             result = result.Where(i => i.ModelName == "Mod");
 
-
-
         return result.ToList();
-
     }
 
-
-
     private GbModDisplayItem ToDisplayItem(ApiModRecord r) => new()
-
     {
-
         ModId = r.ModId,
-
         Name = r.Name,
-
         ModelName = r.ModelName,
-
         ProfileUrl = r.ProfileUrl,
-
         ThumbnailUrl = r.ThumbnailUrl ?? string.Empty,
-
         AuthorName = r.Submitter?.Name ?? "Unknown",
-
         AuthorAvatarUrl = r.Submitter?.AvatarUrl ?? string.Empty,
-
         LikeCount = r.LikeCount,
-
         DownloadCount = r.ViewCount, // API provides ViewCount, not downloads
-
         CommentCount = r.PostCount,
-
         DateAdded = r.DateAdded,
-
         DateUpdated = r.DateModified,
-
         IsNsfw = r.HasContentRatings,
-
         NsfwPolicy = NsfwPolicy,
-
         SfwThumbnailUrl = r.SfwThumbnailUrl ?? string.Empty,
-
     };
-
-
 
     // ── Load more (pagination) ──
 
-
-
     [RelayCommand]
-
     public async Task LoadMoreAsync()
-
     {
-
         if (!_hasMorePages || IsLoading || IsLoadingMore) return;
-
         await LoadModsAsync(reset: false);
-
     }
-
-
 
     /// <summary>
-
     /// Called by the View's ScrollViewer when scroll position changes.
-
     /// Triggers loading more items when approaching the bottom.
-
     /// </summary>
-
     public void NotifyScrollPosition(double verticalOffset, double scrollableHeight, double viewportHeight)
-
     {
-
         if (IsLoading || IsLoadingMore || !_hasMorePages) return;
 
-
-
         // Content doesn't fill the viewport (no scrollbar) — auto-load more to fill
-
         if (scrollableHeight <= 0)
-
         {
-
             _ = LoadMoreAsync();
-
             return;
-
         }
-
-
 
         // Trigger pre-fetch when within 2 viewport-heights of the bottom
-
         var distanceToBottom = scrollableHeight - verticalOffset;
-
         if (distanceToBottom < viewportHeight * 2)
-
         {
-
             _ = LoadMoreAsync();
-
         }
-
     }
-
-
 
     // ── Mod detail ──
 
-
-
     [RelayCommand]
-
     private async Task OpenModDetailAsync(GbModDisplayItem? mod)
-
     {
-
         if (mod == null) return;
 
-
-
         // Invalidate any in-flight detail request so a slow response cannot
-
         // overwrite a newer selection.
-
         var requestId = ++_detailRequestId;
-
         _detailLoadCts?.Cancel();
-
         _detailLoadCts?.Dispose();
-
         _detailLoadCts = new CancellationTokenSource(TimeSpan.FromSeconds(15));
-
         var cts = _detailLoadCts;
 
-
-
         SelectedMod = mod;
-
         SelectedModName = mod.Name;
-
         SelectedModAuthor = mod.AuthorName;
-
         SelectedModLikes = mod.FormattedLikes;
-
         SelectedModViews = "";
-
         SelectedModDate = mod.FormattedDate;
-
         SelectedModDescription = string.Empty;
-
         SelectedModUpdateLog = string.Empty;
-
         SelectedModAuthorAvatar = null;
-
         HasDescription = Visibility.Collapsed;
-
         HasUpdateLog = Visibility.Collapsed;
-
         IsDetailPaneOpen = true;
-
         IsDetailLoading = true;
-
         HasModDetail = Visibility.Collapsed;
-
         HasDetailError = false;
-
         DetailErrorMessage = string.Empty;
-
         PreviewImages.Clear();
-
         ModFiles.Clear();
 
-
-
         try
-
         {
-
             var modId = new GbModId(mod.ModId.ToString());
 
-
-
             var detail = await _gbService.GetModProfileAsync(modId, mod.ModelName, cts.Token)
-
                 .ConfigureAwait(false);
 
-
-
             if (requestId != _detailRequestId || cts.IsCancellationRequested)
-
                 return;
 
-
-
             if (detail != null)
-
             {
-
                 // Keep the raw HTML here; the view wraps it once with the
-
                 // theme-aware template (previously it was double-wrapped).
-
                 var wrappedDescription = !string.IsNullOrWhiteSpace(detail.Description)
-
                     ? detail.Description
-
                     : null;
-
                 var wrappedUpdateLog = detail.Updates is { Count: > 0 }
-
                     ? BuildUpdateLogHtml(detail)
-
                     : null;
-
-
 
                 _dispatcherQueue.TryEnqueue(() =>
-
                 {
-
                     if (requestId != _detailRequestId || cts.IsCancellationRequested)
-
                         return;
-
-
 
                     SelectedModDetail = detail;
 
-
-
                     // Update view count from detail API
-
                     SelectedModViews = detail.ViewCount >= 1000
-
                         ? $"{detail.ViewCount / 1000.0:F1}k"
-
                         : detail.ViewCount.ToString();
 
-
-
                     // Load author avatar
-
                     if (!string.IsNullOrEmpty(detail.AuthorAvatarUrl))
-
                     {
-
                         Helpers.RemoteImageLoader.LoadInto(detail.AuthorAvatarUrl, 36,
-
                             img => SelectedModAuthorAvatar = img);
-
                     }
-
-
 
                     if (detail.PreviewImages != null)
-
                     {
-
                         foreach (var img in detail.PreviewImages)
-
                         {
-
                             var item = new GbPreviewImageItem
-
                             {
-
                                 FullUrl = img.Original.ToString(),
-
                                 Thumbnail100Url = img.Thumb100?.ToString() ?? img.Original.ToString(),
-
                                 Thumbnail530Url = img.Thumb530?.ToString() ?? img.Original.ToString(),
-
                             };
-
                             PreviewImages.Add(item);
-
                             // Navigation strip thumbnails are loaded lazily by ContainerContentChanging
-
                         }
-
                     }
-
-
 
                     // Automatically select first preview for main display
-
                     if (PreviewImages.Count > 0)
-
                     {
-
                         SelectPreviewImage(0);
-
                     }
-
-
 
                     if (detail.Files != null)
-
                     {
-
                         foreach (var f in detail.Files)
-
                         {
+                            var activeTask = _downloadSessionService.DownloadQueue
+                                .FirstOrDefault(t => t.FileInfo?.FileId == f.FileId && !t.IsCompleted);
+                            if (activeTask != null)
+                            {
+                                f.IsDownloading = true;
+                                f.IsInstalling = activeTask.IsInstalling;
+                                f.IsPaused = activeTask.IsPaused;
+                                f.DownloadProgress = (int)activeTask.ProgressPercentage;
+                                f.DownloadStatus = string.IsNullOrWhiteSpace(activeTask.StatusMessage)
+                                    ? $"{f.DownloadProgress}%"
+                                    : activeTask.StatusMessage;
+                                activeTask.FileInfo = f;
+                            }
+                            else
+                            {
+                                var completedTask = _downloadSessionService.DownloadQueue
+                                    .FirstOrDefault(t => t.FileInfo?.FileId == f.FileId && t.IsCompleted && !t.IsError);
+                                if (completedTask != null)
+                                {
+                                    f.IsInstalled = true;
+                                }
+                            }
 
                             ModFiles.Add(f);
-
                         }
-
                     }
-
-
 
                     HasPreviewImages = PreviewImages.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
-
                     HasFiles = ModFiles.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
 
-
-
                     // Description (keep raw HTML for WebView2 rendering)
-
                     if (wrappedDescription != null)
-
                     {
-
                         SelectedModDescription = wrappedDescription;
-
                         HasDescription = Visibility.Visible;
-
                     }
-
-
 
                     // Setup updates
-
                     if (wrappedUpdateLog != null)
-
                     {
-
                         SelectedModUpdateLog = wrappedUpdateLog;
-
                         HasUpdateLog = Visibility.Visible;
-
                     }
 
-
-
                     HasModDetail = Visibility.Visible;
-
                 });
-
             }
-
+            else
+            {
+                _dispatcherQueue.TryEnqueue(() =>
+                {
+                    if (requestId != _detailRequestId || cts.IsCancellationRequested) return;
+                    HasDetailError = true;
+                    DetailErrorMessage = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/ErrorLoadModDetail", "Failed to load mod detail");
+                });
+            }
         }
-
         catch (OperationCanceledException)
-
         {
-
             // Expected when the user opened another mod or closed the pane.
-
         }
-
         catch (Exception ex)
-
         {
-
             if (requestId != _detailRequestId) return;
 
-
-
             _logger.Error(ex, "Failed to load mod detail for {modId}", mod.ModId);
-
             _dispatcherQueue.TryEnqueue(() =>
-
             {
-
                 if (requestId != _detailRequestId) return;
-
                 HasDetailError = true;
-
                 DetailErrorMessage = ex.Message;
-
             });
-
             _notificationManager.ShowNotification(_localizer.GetLocalizedStringOrDefault("/GameBananaPage/ErrorLoadModDetail", "Failed to load mod detail"), ex.Message, TimeSpan.FromSeconds(5));
-
         }
-
         finally
-
         {
-
             if (requestId == _detailRequestId)
-
             {
-
                 _dispatcherQueue.TryEnqueue(() => IsDetailLoading = false);
-
             }
-
         }
-
     }
 
-
-
     [RelayCommand]
-
     private void RetryLoadDetail() => _ = OpenModDetailAsync(SelectedMod);
 
-
-
     private static string BuildUpdateLogHtml(ModPageInfo detail)
-
     {
-
         return string.Join("", detail.Updates!.Select(u =>
-
         {
-
             var title = System.Net.WebUtility.HtmlEncode(u.Title ?? "Update");
-
             var version = !string.IsNullOrEmpty(u.Version) ? $"<span class=\"version\">{System.Net.WebUtility.HtmlEncode(u.Version)}</span>" : "";
 
-
-
             // Relative time approximation using FormaterHelpers
-
             var ts = DateTimeOffset.Now - DateTimeOffset.FromUnixTimeSeconds(u.DateAdded);
-
             string dateStr = Helpers.FormaterHelpers.FormatTimeSinceAdded(ts);
-
-
 
             var text = u.Text ?? string.Empty;
 
-
-
             var changeLogHtml = new System.Text.StringBuilder();
-
             if (u.ChangeLog is { Count: > 0 } changes)
-
             {
-
                 changeLogHtml.Append("<div class=\"changelog-items\">");
-
                 foreach (var cl in changes)
-
                 {
-
                     var cat = cl.Category ?? "";
-
                     var txt = cl.Text ?? "";
 
-
-
                     var catLower = cat.ToLowerInvariant();
-
                     string tagClass = "tag-default";
-
                     if (catLower.Contains("adjustment") || catLower.Contains("tweak") || catLower.Contains("amendment")) tagClass = "tag-adjustment";
-
                     else if (catLower.Contains("addition") || catLower.Contains("feature")) tagClass = "tag-addition";
-
                     else if (catLower.Contains("bugfix")) tagClass = "tag-bugfix";
-
                     else if (catLower.Contains("improvement") || catLower.Contains("suggestion")) tagClass = "tag-improvement";
-
                     else if (catLower.Contains("overhaul") || catLower.Contains("refactor")) tagClass = "tag-overhaul";
-
                     else if (catLower.Contains("optimization")) tagClass = "tag-optimization";
-
                     else if (catLower.Contains("removal")) tagClass = "tag-removal";
 
-
-
                     var tagHtml = string.IsNullOrWhiteSpace(cat)
-
                         ? ""
-
                         : $"<span class=\"tag {tagClass}\">{System.Net.WebUtility.HtmlEncode(cat)}</span> ";
 
-
-
                     changeLogHtml.Append($"<div class=\"cl-item\">{tagHtml}<span class=\"cl-text\">{System.Net.WebUtility.HtmlEncode(txt)}</span></div>");
-
                 }
-
                 changeLogHtml.Append("</div>");
-
             }
-
-
 
             var filesHtml = new System.Text.StringBuilder();
-
             if (u.Files is { Count: > 0 })
-
             {
-
                 filesHtml.Append("<div class=\"update-files\"><div class=\"files-label\">Files</div><ul class=\"file-list\">");
-
                 foreach (var file in u.Files)
-
                 {
-
                     if (!string.IsNullOrEmpty(file.FileName))
-
                     {
-
                         filesHtml.Append($"<li>{System.Net.WebUtility.HtmlEncode(file.FileName)}</li>");
-
                     }
-
                 }
-
                 filesHtml.Append("</ul></div>");
-
             }
 
-
-
             return $@"
-
 <div class=""update-entry"">
-
     <div class=""update-header"">
-
         <span class=""icon"">⊞</span> <span class=""title"">{title}</span> {version}
-
         <span class=""date-right"">{dateStr}</span>
-
     </div>
-
     {changeLogHtml}
-
     <div class=""update-text"">{text}</div>
-
     {filesHtml}
-
 </div>";
-
         }));
-
     }
-
-
-
-
 
     // ── Download and Install ──
 
-
-
     [RelayCommand]
-
     private void DownloadAndInstall(ModFileInfo? fileInfo)
-
     {
-
         if (fileInfo != null && SelectedMod != null && SelectedModDetail != null)
-
         {
-
             _downloadSessionService.DownloadAndInstall(fileInfo, SelectedMod, SelectedModDetail, _gameId);
-
         }
-
     }
 
-
-
     [RelayCommand]
-
     private void CancelDownloadTask(GbDownloadTask? task) => _downloadSessionService.CancelDownloadTask(task);
 
-
+    [RelayCommand]
+    private void PauseDownloadTask(GbDownloadTask? task) => _downloadSessionService.PauseDownloadTask(task);
 
     [RelayCommand]
+    private void ResumeDownloadTask(GbDownloadTask? task) => _downloadSessionService.ResumeDownloadTask(task);
 
+    public void PauseFileDownload(ModFileInfo? fileInfo)
+    {
+        if (fileInfo == null) return;
+        var activeTask = _downloadSessionService.DownloadQueue.FirstOrDefault(t => t.FileInfo?.FileId == fileInfo.FileId && !t.IsCompleted);
+        if (activeTask != null)
+        {
+            _downloadSessionService.PauseDownloadTask(activeTask);
+        }
+    }
+
+    public void ResumeFileDownload(ModFileInfo? fileInfo)
+    {
+        if (fileInfo == null) return;
+        var activeTask = _downloadSessionService.DownloadQueue.FirstOrDefault(t => t.FileInfo?.FileId == fileInfo.FileId && !t.IsCompleted);
+        if (activeTask != null)
+        {
+            _downloadSessionService.ResumeDownloadTask(activeTask);
+        }
+    }
+
+    public void CancelFileDownload(ModFileInfo? fileInfo)
+    {
+        if (fileInfo == null) return;
+        var activeTask = _downloadSessionService.DownloadQueue.FirstOrDefault(t => t.FileInfo?.FileId == fileInfo.FileId && !t.IsCompleted);
+        if (activeTask != null)
+        {
+            _downloadSessionService.CancelDownloadTask(activeTask);
+        }
+    }
+
+    [RelayCommand]
     private void RemoveDownloadTask(GbDownloadTask? task) => _downloadSessionService.RemoveDownloadTask(task);
 
-
-
     [RelayCommand]
-
     private void ClearAllCompletedTasks() => _downloadSessionService.ClearAllCompletedTasks();
 
-
-
     [RelayCommand]
-
     private void RetryDownloadTask(GbDownloadTask? task) => _downloadSessionService.RetryDownloadTask(task);
 
-
-
     [RelayCommand]
-
     private void CloseDetailPane()
-
     {
-
         _detailRequestId++;
-
         _detailLoadCts?.Cancel();
-
         _detailLoadCts?.Dispose();
-
         _detailLoadCts = null;
 
-
-
         IsDetailPaneOpen = false;
-
         SelectedMod = null;
-
         SelectedModDetail = null;
-
         SelectedModDescription = string.Empty;
-
         SelectedModUpdateLog = string.Empty;
-
         SelectedModAuthorAvatar = null;
-
         SelectedModViews = string.Empty;
-
         HasModDetail = Visibility.Collapsed;
-
         HasDetailError = false;
-
         DetailErrorMessage = string.Empty;
-
         PreviewImages.Clear();
-
         ModFiles.Clear();
-
         SelectedPreviewFullImage = null;
-
         SelectedPreviewIndex = 0;
-
     }
 
-
-
     /// <summary>
-
     /// Select preview image at index for main display.
-
     /// </summary>
-
     public void SelectPreviewImage(int index)
-
     {
-
         if (index < 0 || index >= PreviewImages.Count) return;
-
         SelectedPreviewIndex = index;
 
-
-
         // Placeholder with loaded thumbnail to avoid blank flash
-
         SelectedPreviewFullImage = PreviewImages[index].ImageSource;
 
-
-
         // Fetch higher-res preview for main pane
-
         Helpers.RemoteImageLoader.LoadInto(
-
             PreviewImages[index].Thumbnail530Url, 800,
-
             img => SelectedPreviewFullImage = img,
-
             "_530");
-
     }
 
-
-
     /// <summary>
-
     /// Preload full images for the selected index and its adjacent items.
-
     /// </summary>
-
     public void ForceLoadLightBoxImages(int value)
-
     {
-
         if (PreviewImages.Count > 0 && value >= 0 && value < PreviewImages.Count)
-
         {
-
             LightBoxCounter = $"{value + 1} / {PreviewImages.Count}";
 
-
-
             PreviewImages[value].LoadFullImage();
-
             if (value + 1 < PreviewImages.Count) PreviewImages[value + 1].LoadFullImage();
-
             if (value - 1 >= 0) PreviewImages[value - 1].LoadFullImage();
-
         }
-
     }
-
-
 
     /// <summary>
-
     /// Update counter and preload adjacent high-res images on LightBox navigation.
-
     /// </summary>
-
     partial void OnLightBoxSelectedIndexChanged(int value)
-
     {
-
         ForceLoadLightBoxImages(value);
-
     }
-
-
-
-
-
-
 
     [RelayCommand]
-
     private void OpenInBrowser()
-
     {
-
         if (SelectedMod?.ProfileUrl == null) return;
-
         try
-
         {
-
             var psi = new System.Diagnostics.ProcessStartInfo
-
             {
-
                 FileName = SelectedMod.ProfileUrl,
-
                 UseShellExecute = true
-
             };
-
             System.Diagnostics.Process.Start(psi);
-
         }
-
         catch (Exception ex)
-
         {
-
             _logger.Error(ex, "Failed to open mod page in browser");
-
         }
-
     }
-
-
 
     // ── Helpers ──
 
-
-
     private void CancelLoad()
-
     {
-
         _loadCts?.Cancel();
-
         _loadCts?.Dispose();
-
         _loadCts = null;
-
     }
-
-
 
     private void ShowError(string message)
-
     {
-
         ErrorMessage = message;
-
         HasError = true;
-
     }
-
 }

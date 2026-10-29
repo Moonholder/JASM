@@ -10,6 +10,10 @@ public class GameBananaSettings
     public string SelectedSort { get; set; } = "default";
     public int NsfwPolicy { get; set; } = 1; // 0=Remove, 1=Blur, 2=Show
     public int ModelFilter { get; set; } = 1; // 0=All, 1=ModsOnly
+
+    public bool FallbackToOtherCategoryOnUnmatched { get; set; } = false;
+    public bool AutoEnableAfterSilentInstall { get; set; } = true;
+    public bool DeleteArchiveAfterInstall { get; set; } = true;
 }
 
 public class DownloadHistoryEntry
@@ -18,6 +22,7 @@ public class DownloadHistoryEntry
     public string CategoryName { get; set; } = string.Empty;
     public string ModUrl { get; set; } = string.Empty;
     public string ModName { get; set; } = string.Empty;
+    public string AuthorName { get; set; } = string.Empty;
     public string ModelName { get; set; } = "Mod";
     public string DownloadUrl { get; set; } = string.Empty;
     public string Md5Checksum { get; set; } = string.Empty;
@@ -25,6 +30,7 @@ public class DownloadHistoryEntry
     public string FileId { get; set; } = string.Empty;
     public string StatusMessage { get; set; } = string.Empty;
     public string ArchivePath { get; set; } = string.Empty;
+    public string? PreviewImageUrl { get; set; }
     public bool IsError { get; set; }
     public bool IsCompleted { get; set; }
     public double ProgressPercentage { get; set; }

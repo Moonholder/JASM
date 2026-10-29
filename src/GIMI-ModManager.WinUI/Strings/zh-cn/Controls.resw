@@ -12,4 +12,10 @@
   <data name="CustomImage_EditButton.ToolTipService.ToolTip" xml:space="preserve">
     <value>选择图片</value>
   </data>
+  <data name="ToggleSwitch.OnContent" xml:space="preserve">
+    <value>开</value>
+  </data>
+  <data name="ToggleSwitch.OffContent" xml:space="preserve">
+    <value>关</value>
+  </data>
 </root>

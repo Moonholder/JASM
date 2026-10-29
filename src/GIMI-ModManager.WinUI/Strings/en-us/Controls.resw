@@ -13,4 +13,10 @@
   <data name="CustomImage_RemoveItem.Text" xml:space="preserve">
     <value>Remove image</value>
   </data>
+  <data name="ToggleSwitch.OnContent" xml:space="preserve">
+    <value>On</value>
+  </data>
+  <data name="ToggleSwitch.OffContent" xml:space="preserve">
+    <value>Off</value>
+  </data>
 </root>

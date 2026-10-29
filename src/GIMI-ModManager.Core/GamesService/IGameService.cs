@@ -1,4 +1,4 @@
-﻿using GIMI_ModManager.Core.GamesService.Interfaces;
+using GIMI_ModManager.Core.GamesService.Interfaces;
 using GIMI_ModManager.Core.GamesService.Models;
 using GIMI_ModManager.Core.GamesService.Requests;
 
@@ -52,6 +52,8 @@ public interface IGameService
 
     public Dictionary<IModdableObject, int> QueryModdableObjects(string searchQuery,
         ICategory? category = null, int minScore = 100);
+
+    public IModdableObject? MatchExactModdableObject(string? categoryName);
 
     public List<IGameElement> GetElements();
 

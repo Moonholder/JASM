@@ -1,4 +1,7 @@
+using System.Net.Http;
 using System.Reflection;
+using System.Xml.Linq;
+using GIMI_ModManager.Core.Services.Network;
 using GIMI_ModManager.WinUI.Contracts.Services;
 using GIMI_ModManager.WinUI.Models.Options;
 using System.Text.Json;
@@ -20,6 +23,7 @@ public sealed class UpdateChecker
     private readonly ILogger _logger;
     private readonly ILocalSettingsService _localSettingsService;
     private readonly Notifications.NotificationManager _notificationManager;
+    private readonly DynamicAppWebProxy _dynamicProxy;
 
     public Version CurrentVersion { get; private set; }
     public Version? LatestRetrievedVersion { get; private set; }
@@ -40,14 +44,21 @@ public sealed class UpdateChecker
     public event EventHandler<UpdateCheckStatus>? CheckStatusChanged;
 
     private bool _isManualChecking;
-    private const string ReleasesApiUrl = "https://api.github.com/repos/Moonholder/JASM/releases?per_page=2";
+    private const string ReleasesLatestApiUrl = "https://api.github.com/repos/Moonholder/JASM/releases/latest";
+    private const string ReleasesLatestWebUrl = "https://github.com/Moonholder/JASM/releases/latest";
+    private const string ReleasesAtomUrl = "https://github.com/Moonholder/JASM/releases.atom";
 
-    public UpdateChecker(ILogger logger, ILocalSettingsService localSettingsService,
-        Notifications.NotificationManager notificationManager, CancellationToken cancellationToken = default)
+    public UpdateChecker(
+        ILogger logger,
+        ILocalSettingsService localSettingsService,
+        Notifications.NotificationManager notificationManager,
+        DynamicAppWebProxy dynamicProxy,
+        CancellationToken cancellationToken = default)
     {
         _logger = logger.ForContext<UpdateChecker>();
         _localSettingsService = localSettingsService;
         _notificationManager = notificationManager;
+        _dynamicProxy = dynamicProxy;
         _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
         var version = Assembly.GetExecutingAssembly().GetName().Version;
@@ -75,7 +86,6 @@ public sealed class UpdateChecker
             options.IgnoreNewVersion = null;
             await _localSettingsService.SaveSettingAsync(UpdateCheckerOptions.Key, options);
         }
-
 
         InitCheckerLoop(_cancellationTokenSource.Token);
     }
@@ -131,7 +141,6 @@ public sealed class UpdateChecker
         }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
     }
 
-
     private async Task CheckForUpdatesAsync(CancellationToken cancellationToken)
     {
         if (DisableChecker)
@@ -164,16 +173,23 @@ public sealed class UpdateChecker
 
     private async Task<Version?> GetLatestVersionAsync(CancellationToken cancellationToken)
     {
-        // 1. Try direct GitHub API first
-        var version = await TryFetchVersionFromUrl(ReleasesApiUrl, cancellationToken);
+        // 1. Try authoritative direct GitHub /releases/latest endpoint (both API and Web redirect)
+        var version = await TryFetchVersionFromLatestApiUrlAsync(ReleasesLatestApiUrl, cancellationToken);
         if (version is not null)
         {
-            _logger.Debug("Got version via direct GitHub API.");
+            _logger.Debug("Got version via direct GitHub API (/releases/latest).");
             return version;
         }
 
-        // 2. Direct access failed, try mirror fallback (only mirrors that support API forwarding)
-        _logger.Information("GitHub API direct access failed, trying mirror fallback for version check...");
+        version = await TryFetchVersionFromLatestWebUrlAsync(ReleasesLatestWebUrl, cancellationToken);
+        if (version is not null)
+        {
+            _logger.Information("Got version via direct GitHub Web redirect (/releases/latest).");
+            return version;
+        }
+
+        // 2. Direct access failed, try mirror fallback with Web redirect and API
+        _logger.Information("GitHub direct access failed, trying mirror fallback for version check...");
         try
         {
             var mirrors = await MirrorAddressSelector.GetAvailableMirrorsAsync(cancellationToken);
@@ -181,11 +197,21 @@ public sealed class UpdateChecker
             {
                 if (cancellationToken.IsCancellationRequested) break;
 
-                var mirrorUrl = mirror.Address + ReleasesApiUrl;
-                version = await TryFetchVersionFromUrl(mirrorUrl, cancellationToken);
+                // Try mirror Web redirect first
+                var mirrorWebUrl = mirror.Address.TrimEnd('/') + "/" + ReleasesLatestWebUrl;
+                version = await TryFetchVersionFromLatestWebUrlAsync(mirrorWebUrl, cancellationToken);
                 if (version is not null)
                 {
-                    _logger.Information("Got version via mirror {NodeName}.", mirror.NodeName);
+                    _logger.Information("Got version via mirror {NodeName} (Web redirect).", mirror.NodeName);
+                    return version;
+                }
+
+                // Try mirror API
+                var mirrorApiUrl = mirror.Address.TrimEnd('/') + "/" + ReleasesLatestApiUrl;
+                version = await TryFetchVersionFromLatestApiUrlAsync(mirrorApiUrl, cancellationToken);
+                if (version is not null)
+                {
+                    _logger.Information("Got version via mirror {NodeName} (API).", mirror.NodeName);
                     return version;
                 }
             }
@@ -195,56 +221,190 @@ public sealed class UpdateChecker
             _logger.Warning(e, "Mirror fallback for version check failed.");
         }
 
+        // 3. Last-resort fallback: Atom feed
+        version = await TryFetchVersionFromAtomFeedAsync(ReleasesAtomUrl, cancellationToken);
+        if (version is not null)
+        {
+            _logger.Information("Got version via direct GitHub Atom feed.");
+            return version;
+        }
+
         _logger.Warning("All sources (direct + mirrors) failed to fetch version info.");
         return null;
     }
 
-    /// <summary>
-    /// Attempts to fetch the latest non-prerelease version from the specified URL.
-    /// Returns null on any failure.
-    /// </summary>
-    private async Task<Version?> TryFetchVersionFromUrl(string url, CancellationToken cancellationToken)
+    private async Task<Version?> TryFetchVersionFromLatestApiUrlAsync(string url, CancellationToken cancellationToken)
     {
         try
         {
             using var httpClient = CreateHttpClient();
             httpClient.Timeout = TimeSpan.FromSeconds(10);
 
-            var result = await httpClient.GetAsync(url, cancellationToken);
+            var result = await httpClient.GetAsync(url, cancellationToken).ConfigureAwait(false);
             if (!result.IsSuccessStatusCode)
             {
-                _logger.Debug("Failed to get version from {Url}. Status: {StatusCode}", url, result.StatusCode);
+                _logger.Debug("Failed to get version from API {Url}. Status: {StatusCode}", url, result.StatusCode);
                 return null;
             }
 
-            var text = await result.Content.ReadAsStringAsync(cancellationToken);
-            var gitHubReleases =
-                JsonSerializer.Deserialize<GitHubRelease[]>(text, GitHubJsonContext.Default.GitHubReleaseArray) ?? Array.Empty<GitHubRelease>();
+            var text = await result.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            var release = JsonSerializer.Deserialize<GitHubRelease>(text, GitHubJsonContext.Default.GitHubRelease);
+            if (release != null && !release.Prerelease)
+            {
+                var clean = release.TagName?.Trim().TrimStart('v', 'V');
+                if (Version.TryParse(clean, out var parsed))
+                {
+                    return parsed;
+                }
+            }
 
-            var latestReleases = gitHubReleases.Where(r => !r.Prerelease);
-            var latestVersion = latestReleases.Select(r => new Version(r.TagName?.Trim('v') ?? "")).Max();
-            return latestVersion;
+            return null;
         }
         catch (HttpRequestException e)
         {
-            _logger.Debug(e, "Connection error fetching version from {Url}.", url);
+            _logger.Debug(e, "Connection error fetching version from API {Url}.", url);
             return null;
         }
         catch (TaskCanceledException)
         {
-            // Timeout or cancellation - don't log as error
             return null;
         }
         catch (Exception e)
         {
-            _logger.Debug(e, "Error fetching version from {Url}.", url);
+            _logger.Debug(e, "Error fetching version from API {Url}.", url);
             return null;
         }
     }
 
+    private async Task<Version?> TryFetchVersionFromLatestWebUrlAsync(string url, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var httpClient = CreateHttpClient();
+            httpClient.Timeout = TimeSpan.FromSeconds(8);
+
+            using var response = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+            if (!response.IsSuccessStatusCode)
+            {
+                return null;
+            }
+
+            var finalUri = response.RequestMessage?.RequestUri;
+            if (finalUri != null && finalUri.AbsolutePath.Contains("/releases/tag/"))
+            {
+                var tag = finalUri.AbsolutePath.Substring(finalUri.AbsolutePath.LastIndexOf("/releases/tag/", StringComparison.OrdinalIgnoreCase) + "/releases/tag/".Length);
+                tag = tag.Trim('/').TrimStart('v', 'V');
+                if (Version.TryParse(tag, out var parsed))
+                {
+                    return parsed;
+                }
+            }
+
+            return null;
+        }
+        catch (Exception ex)
+        {
+            _logger.Debug(ex, "Failed to fetch version from web URL {Url}", url);
+            return null;
+        }
+    }
+
+    private async Task<Version?> TryFetchVersionFromAtomFeedAsync(string url, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var httpClient = CreateHttpClient();
+            httpClient.Timeout = TimeSpan.FromSeconds(8);
+
+            using var response = await httpClient.GetAsync(url, cancellationToken).ConfigureAwait(false);
+            if (!response.IsSuccessStatusCode)
+            {
+                return null;
+            }
+
+            var xml = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            if (string.IsNullOrWhiteSpace(xml) || !xml.Contains("<feed", StringComparison.OrdinalIgnoreCase))
+            {
+                return null;
+            }
+
+            var doc = XDocument.Parse(xml);
+            XNamespace ns = "http://www.w3.org/2005/Atom";
+
+            var versions = doc.Descendants(ns + "entry")
+                .Where(entry => !IsPrereleaseEntry(entry, ns))
+                .Select(entry => (string?)entry.Element(ns + "title"))
+                .Where(title => !string.IsNullOrWhiteSpace(title))
+                .Select(title =>
+                {
+                    var clean = title!.Trim().TrimStart('v', 'V');
+                    return Version.TryParse(clean, out var parsed) ? parsed : null;
+                })
+                .Where(v => v != null)
+                .Select(v => v!)
+                .ToList();
+
+            return versions.Count > 0 ? versions.Max() : null;
+        }
+        catch (Exception ex)
+        {
+            _logger.Debug(ex, "Failed to parse version from Atom feed at {Url}", url);
+            return null;
+        }
+    }
+
+    private static bool IsPrereleaseEntry(XElement entry, XNamespace ns)
+    {
+        var title = (string?)entry.Element(ns + "title") ?? string.Empty;
+        if (IsPrereleaseString(title)) return true;
+
+        var id = (string?)entry.Element(ns + "id") ?? string.Empty;
+        if (IsPrereleaseString(id)) return true;
+
+        var link = (string?)entry.Element(ns + "link")?.Attribute("href") ?? string.Empty;
+        if (IsPrereleaseString(link)) return true;
+
+        var content = (string?)entry.Element(ns + "content") ?? string.Empty;
+        if (!string.IsNullOrWhiteSpace(content))
+        {
+            var snippet = content.Length > 500 ? content[..500] : content;
+            if (snippet.Contains("pre-release", StringComparison.OrdinalIgnoreCase) ||
+                snippet.Contains("prerelease", StringComparison.OrdinalIgnoreCase) ||
+                snippet.Contains("-pre", StringComparison.OrdinalIgnoreCase) ||
+                snippet.Contains("-beta", StringComparison.OrdinalIgnoreCase) ||
+                snippet.Contains("-alpha", StringComparison.OrdinalIgnoreCase) ||
+                snippet.Contains("-rc", StringComparison.OrdinalIgnoreCase) ||
+                snippet.Contains("-preview", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool IsPrereleaseString(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return false;
+        return text.Contains("beta", StringComparison.OrdinalIgnoreCase) ||
+               text.Contains("alpha", StringComparison.OrdinalIgnoreCase) ||
+               text.Contains("rc", StringComparison.OrdinalIgnoreCase) ||
+               text.Contains("preview", StringComparison.OrdinalIgnoreCase) ||
+               text.Contains("pre-release", StringComparison.OrdinalIgnoreCase) ||
+               text.Contains("prerelease", StringComparison.OrdinalIgnoreCase) ||
+               text.Contains("test build", StringComparison.OrdinalIgnoreCase) ||
+               text.Contains("-pre", StringComparison.OrdinalIgnoreCase);
+    }
+
     private HttpClient CreateHttpClient()
     {
-        var httpClient = new HttpClient();
+        var httpClient = new HttpClient(new SocketsHttpHandler
+        {
+            AllowAutoRedirect = true,
+            MaxAutomaticRedirections = 5,
+            Proxy = _dynamicProxy,
+            UseProxy = true
+        });
         httpClient.DefaultRequestHeaders.Add("X-GitHub-Api-Version", "2022-11-28");
         httpClient.DefaultRequestHeaders.Add("User-Agent", "JASM-Just_Another_Skin_Manager-Update-Checker");
         return httpClient;
@@ -255,7 +415,6 @@ public sealed class UpdateChecker
         CheckStatus = status;
         CheckStatusChanged?.Invoke(this, status);
     }
-
 
     public void CancelAndStop()
     {
@@ -272,7 +431,6 @@ public sealed class UpdateChecker
     {
         NewVersionAvailable?.Invoke(this, new NewVersionEventArgs(e));
     }
-
 
     public class NewVersionEventArgs : EventArgs
     {

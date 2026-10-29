@@ -4,8 +4,23 @@
   <data name="AllCategories" xml:space="preserve">
     <value>All</value>
   </data>
-  <data name="CancelBtn.ToolTipService.ToolTip" xml:space="preserve">
+  <data name="PauseToolTip.Content" xml:space="preserve">
+    <value>Pause</value>
+  </data>
+  <data name="ResumeToolTip.Content" xml:space="preserve">
+    <value>Resume</value>
+  </data>
+  <data name="CancelToolTip.Content" xml:space="preserve">
     <value>Cancel</value>
+  </data>
+  <data name="CardCancelToolTip.Content" xml:space="preserve">
+    <value>Cancel Download</value>
+  </data>
+  <data name="ClosePaneToolTip.Content" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="DownloadManagerToolTip.Content" xml:space="preserve">
+    <value>Download Manager</value>
   </data>
   <data name="CategoriesHdr.Text" xml:space="preserve">
     <value>Categories</value>
@@ -27,6 +42,21 @@
   </data>
   <data name="DownloadBtn.ToolTipService.ToolTip" xml:space="preserve">
     <value>Download and install</value>
+  </data>
+  <data name="DownloadBtnText.Text" xml:space="preserve">
+    <value>Download</value>
+  </data>
+  <data name="InstalledBtn.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Installed (Click to reinstall)</value>
+  </data>
+  <data name="InstalledBtn.AutomationProperties.Name" xml:space="preserve">
+    <value>Installed (Click to reinstall)</value>
+  </data>
+  <data name="InstalledBtnText.Text" xml:space="preserve">
+    <value>Installed</value>
+  </data>
+  <data name="StatusInstallingShort.Text" xml:space="preserve">
+    <value>Installing...</value>
   </data>
   <data name="DownloadCompletedCachedMessage" xml:space="preserve">
     <value>Mod downloaded to cache: {0}</value>
@@ -94,6 +124,33 @@
   <data name="NotificationTaskAddedMessage" xml:space="preserve">
     <value>The target file is about to be downloaded and installed</value>
   </data>
+  <data name="PreferencesBtn.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Download &amp; Installation Settings</value>
+  </data>
+  <data name="PreferencesBtn.AutomationProperties.Name" xml:space="preserve">
+    <value>Download &amp; Installation Settings</value>
+  </data>
+  <data name="PreferencesTitle.Text" xml:space="preserve">
+    <value>Download &amp; Installation Preferences</value>
+  </data>
+  <data name="FallbackToOtherTitle.Text" xml:space="preserve">
+    <value>Fallback to 'Other' Category</value>
+  </data>
+  <data name="FallbackToOtherDesc.Text" xml:space="preserve">
+    <value>Automatically install into 'Other' category when character cannot be identified, instead of prompting manual installer</value>
+  </data>
+  <data name="AutoEnableTitle.Text" xml:space="preserve">
+    <value>Auto-Enable After Installation</value>
+  </data>
+  <data name="AutoEnableDesc.Text" xml:space="preserve">
+    <value>Automatically enable mods after silent installation completes</value>
+  </data>
+  <data name="DeleteArchiveTitle.Text" xml:space="preserve">
+    <value>Delete Archive After Installation</value>
+  </data>
+  <data name="DeleteArchiveDesc.Text" xml:space="preserve">
+    <value>Automatically delete downloaded archive file after successful installation to save disk space</value>
+  </data>
   <data name="NotificationTaskAddedTitle" xml:space="preserve">
     <value>A GameBanana task was added</value>
   </data>
@@ -118,10 +175,10 @@
   <data name="RawFileOpenDir" xml:space="preserve">
     <value>Show in Explorer</value>
   </data>
-  <data name="RemoveBtn.ToolTipService.ToolTip" xml:space="preserve">
+  <data name="RemoveToolTip.Content" xml:space="preserve">
     <value>Remove</value>
   </data>
-  <data name="RetryBtn.ToolTipService.ToolTip" xml:space="preserve">
+  <data name="RetryToolTip.Content" xml:space="preserve">
     <value>Retry installation</value>
   </data>
   <data name="SearchCategoryPlaceholder" xml:space="preserve">
@@ -145,6 +202,9 @@
   <data name="StatusAllocating" xml:space="preserve">
     <value>Allocating...</value>
   </data>
+  <data name="StatusPaused" xml:space="preserve">
+    <value>Paused</value>
+  </data>
   <data name="StatusCancelled" xml:space="preserve">
     <value>Cancelled</value>
   </data>
@@ -155,7 +215,7 @@
     <value>Downloading {0}%</value>
   </data>
   <data name="StatusDownloadToCache" xml:space="preserve">
-    <value>Downloading to cache</value>
+    <value>Downloaded to cache</value>
   </data>
   <data name="StatusErrorPrefix" xml:space="preserve">
     <value>An error occurred: </value>
@@ -180,6 +240,9 @@
   </data>
   <data name="StatusInstallSuccess" xml:space="preserve">
     <value>Installation successful</value>
+  </data>
+  <data name="StatusInstallSuccessCleaned" xml:space="preserve">
+    <value>Installation successful (Archive cleaned)</value>
   </data>
   <data name="StatusMatching" xml:space="preserve">
     <value>Matching category...</value>
@@ -225,5 +288,11 @@
   </data>
   <data name="RetryDetailBtn" xml:space="preserve">
     <value>Retry</value>
+  </data>
+  <data name="InstallSuccessTitle" xml:space="preserve">
+    <value>Installation Successful</value>
+  </data>
+  <data name="InstallSuccessMessage" xml:space="preserve">
+    <value>"{0}" has been installed to {1}</value>
   </data>
 </root>

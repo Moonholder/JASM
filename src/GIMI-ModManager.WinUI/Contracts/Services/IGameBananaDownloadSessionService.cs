@@ -14,6 +14,10 @@ public interface IGameBananaDownloadSessionService
 
     void DownloadAndInstall(ModFileInfo fileInfo, GbModDisplayItem selectedMod, ModPageInfo selectedModDetail, string? gameId);
 
+    void PauseDownloadTask(GbDownloadTask? task);
+
+    void ResumeDownloadTask(GbDownloadTask? task);
+
     void CancelDownloadTask(GbDownloadTask? task);
 
     void RemoveDownloadTask(GbDownloadTask? task);

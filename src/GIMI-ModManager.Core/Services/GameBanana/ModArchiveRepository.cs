@@ -104,6 +104,45 @@ public sealed class ModArchiveRepository
 
 
     public async Task<ModArchiveHandle> CreateAndTrackModArchiveAsync(
+        Func<string, Task<string>> downloadAction, GbModFileIdentifier modIdentifier,
+        CancellationToken cancellationToken = default)
+    {
+        var tempArchiveFilePath = Path.Combine(_modArchiveDirectory.FullName,
+            !string.IsNullOrWhiteSpace(modIdentifier.ModFileId?.ToString())
+                ? $"{DownloadTempPrefix}_{modIdentifier.ModId}_{modIdentifier.ModFileId}.tmp"
+                : $"{DownloadTempPrefix}_{Guid.NewGuid()}.tmp");
+
+        try
+        {
+            var archiveName = await downloadAction(tempArchiveFilePath).ConfigureAwait(false);
+            var archiveHash = await _archiveService.CalculateFileMd5HashAsync(tempArchiveFilePath, cancellationToken).ConfigureAwait(false);
+            var newName = await GetManagedArchiveNameAsync(archiveName, modIdentifier, archiveHash).ConfigureAwait(false);
+            var finalPath = Path.Combine(_modArchiveDirectory.FullName, newName);
+            if (File.Exists(finalPath)) File.Delete(finalPath);
+            File.Move(tempArchiveFilePath, finalPath, true);
+            var archiveHandle = ModArchiveHandle.FromManagedFile(new FileInfo(finalPath));
+            TrackArchive(archiveHandle);
+            return archiveHandle;
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception e)
+        {
+            try
+            {
+                if (File.Exists(tempArchiveFilePath)) File.Delete(tempArchiveFilePath);
+                if (File.Exists(tempArchiveFilePath + ".part")) File.Delete(tempArchiveFilePath + ".part");
+                if (File.Exists(tempArchiveFilePath + ".part.meta")) File.Delete(tempArchiveFilePath + ".part.meta");
+            }
+            catch { }
+            _logger.Error(e, "Failed to download mod archive");
+            throw;
+        }
+    }
+
+    public async Task<ModArchiveHandle> CreateAndTrackModArchiveAsync(
         Func<FileStream, Task<string>> streamToWrite, GbModFileIdentifier modIdentifier,
         CancellationToken cancellationToken = default)
     {
@@ -228,6 +267,40 @@ public sealed class ModArchiveRepository
     }
 
     public double GetTotalCacheSizeInGB() => _modArchives.Sum(x => x.Value.SizeInGb);
+
+    public bool DeleteArchive(string archivePath)
+    {
+        if (string.IsNullOrWhiteSpace(archivePath)) return false;
+        var fullPath = archivePath.ToLowerInvariant();
+        _modArchives.TryRemove(fullPath, out _);
+        try
+        {
+            if (File.Exists(archivePath))
+            {
+                File.Delete(archivePath);
+                return true;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.Warning(ex, "Failed to delete archive: {ArchiveName}", archivePath);
+        }
+        return false;
+    }
+
+    public void DeletePartialDownload(GbModFileIdentifier modIdentifier)
+    {
+        if (string.IsNullOrWhiteSpace(modIdentifier.ModFileId?.ToString())) return;
+        var prefix = $"{DownloadTempPrefix}_{modIdentifier.ModId}_{modIdentifier.ModFileId}";
+        foreach (var suffix in new[] { ".part", ".part.meta", ".tmp", ".tmp.part", ".tmp.part.meta" })
+        {
+            var targetFile = new FileInfo(Path.Combine(_modArchiveDirectory.FullName, prefix + suffix));
+            if (targetFile.Exists)
+            {
+                try { targetFile.Delete(); } catch { }
+            }
+        }
+    }
 
     private void RemoveUntilUnderMaxSize()
     {
