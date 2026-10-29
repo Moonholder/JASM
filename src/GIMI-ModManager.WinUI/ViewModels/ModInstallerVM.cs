@@ -108,6 +108,8 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
     [ObservableProperty] private bool _canExecuteDialogCommand;
 
     [ObservableProperty] private bool _enableThisMod;
+    [ObservableProperty] private string _enableModText = string.Empty;
+    [ObservableProperty] private string _enableModToolTip = string.Empty;
     [ObservableProperty] private bool _alwaysOnTop;
 
     [ObservableProperty] private bool _replaceModToUpdateInPreset;
@@ -175,7 +177,18 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
             .ReadOrCreateSettingAsync<ModInstallerSettings>(ModInstallerSettings.Key);
 
 
-        EnableThisMod = !_characterModList.Character.IsMultiMod && installerSettings.EnableModOnInstall;
+        var isMultiMod = _characterModList.Character.IsMultiMod;
+        EnableThisMod = installerSettings.EnableModOnInstall;
+        if (isMultiMod)
+        {
+            EnableModText = _localizer.GetLocalizedStringOrDefault("/ModInstallerPage/EnableModText", "Enable this mod?");
+            EnableModToolTip = _localizer.GetLocalizedStringOrDefault("/ModInstallerPage/EnableModCheckBox", "This will enable this mod upon installation.");
+        }
+        else
+        {
+            EnableModText = _localizer.GetLocalizedStringOrDefault("/ModInstallerPage/EnableOnlyText", "Enable this mod and disable the others?");
+            EnableModToolTip = _localizer.GetLocalizedStringOrDefault("/ModInstallerPage/EnableOnlyCheckBox", "This will enable this mod and disable the character's other mods.");
+        }
         AlwaysOnTop = installerSettings.ModInstallerWindowOnTop;
 
         var modPresetSetting = await _localSettingsService.ReadOrCreateSettingAsync<ModPresetSettings>(ModPresetSettings.Key);
@@ -336,7 +349,12 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
             TimeSpan.FromSeconds(5));
 
         if (EnableThisMod)
-            Task.Run(() => EnableOnlyMod(newMod));
+        {
+            if (_characterModList.Character.IsMultiMod)
+                Task.Run(() => EnableModAsync(newMod));
+            else
+                Task.Run(() => EnableOnlyMod(newMod));
+        }
         else
         {
             Task.Run(() =>
@@ -1109,6 +1127,27 @@ public partial class ModInstallerVM : ObservableRecipient, INavigationAware, IDi
     {
         if (_characterModList.IsModEnabled(mod))
             _characterModList.DisableMod(mod.Id);
+    }
+
+    private async Task EnableModAsync(ISkinMod installedMod)
+    {
+        EnableMod(installedMod);
+        _logger.Debug("Enabled {enabledMod} for multi-mod category {character}",
+            installedMod.Name, _characterModList.Character.DisplayName);
+
+        if (AutoSync3DMigotoConfig)
+        {
+            try
+            {
+                await Task.Delay(500);
+                await _elevatorService.RefreshGenshinMods();
+
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Failed to refresh mods for 3DMigoto: {message}", ex.Message);
+            }
+        }
     }
 
     private void EnableMod(ISkinMod mod)

@@ -416,9 +416,9 @@
                         Margin="4,0"
                         Command="{x:Bind ViewModel.EnableOnlyToggleCommand}"
                         IsChecked="{x:Bind ViewModel.EnableThisMod, Mode=OneWay}"
-                        ToolTipService.ToolTip="This will enable this mod and disable other mods for this character."
-                        l:Uids.Uid="/ModInstallerPage/EnableOnlyCheckBox">
-                        <TextBlock Text="Enable this mod &amp; disable others?" TextWrapping="NoWrap" l:Uids.Uid="/ModInstallerPage/EnableOnlyText" />
+                        ToolTipService.ToolTip="{x:Bind ViewModel.EnableModToolTip, Mode=OneWay}">
+
+                        <TextBlock Text="{x:Bind ViewModel.EnableModText, Mode=OneWay}" TextWrapping="NoWrap" />
                     </CheckBox>
 
 

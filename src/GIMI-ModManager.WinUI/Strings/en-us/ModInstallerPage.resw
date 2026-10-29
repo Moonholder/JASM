@@ -48,6 +48,12 @@
 Or
 2. You can rename either the new mod or the old mod</value>
   </data>
+  <data name="EnableModCheckBox.ToolTipService.ToolTip" xml:space="preserve">
+    <value>This will enable this mod upon installation.</value>
+  </data>
+  <data name="EnableModText.Text" xml:space="preserve">
+    <value>Enable this mod?</value>
+  </data>
   <data name="EnableOnlyCheckBox.ToolTipService.ToolTip" xml:space="preserve">
     <value>This will enable this mod and disable the character&apos;s other mods.</value>
   </data>
