@@ -7,7 +7,7 @@ DLL_PATH = os.path.join(JASM_OUTPUT, "JASM - Just Another Skin Manager.dll")
 VERIFY_PROJECT = os.path.join("src", "Tools", "VerifyPublish", "VerifyPublish.csproj")
 
 VERIFY_ARGS = [
-    "GIMI_ModManager.WinUI.ViewModels.GbModDisplayItem|get_ThumbnailImage",
+    "GIMI_ModManager.WinUI.Models.GameBanana.GbModDisplayItem|get_ThumbnailImage",
     "GIMI_ModManager.WinUI.Models.PasswordEntry|get_DisplayName",
     "GIMI_ModManager.WinUI.Models.PasswordEntry|get_Password",
     "GIMI_ModManager.WinUI.ViewModels.CharacterDetailsViewModels.SubViewModels.ModRowVM|get_DisplayName",

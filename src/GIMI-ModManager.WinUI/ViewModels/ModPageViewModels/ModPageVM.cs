@@ -54,7 +54,7 @@ public partial class ModPageVM : ObservableRecipient
 
 
     public readonly ObservableCollection<ModFileInfoVm> ModFileInfos = new();
-    private readonly ILogger _logger = App.GetService<ILogger>().ForContext<ModUpdateVM>();
+    private readonly ILogger _logger = App.GetService<ILogger>().ForContext<ModPageVM>();
 
     public ModPageVM(Uri modPage, IModdableObject moddableObject, WindowEx window, CancellationToken ctsToken)
     {
@@ -101,13 +101,6 @@ public partial class ModPageVM : ObservableRecipient
 
 
         _characterModList = _skinManagerService.GetCharacterModList(_moddableObject);
-
-        if (!await _gameBananaCoreService.HealthCheckAsync(_ct))
-        {
-            await LogErrorAndClose(
-                new InvalidOperationException("Failed to get mod page info, GameBanana Api is not available"));
-            return;
-        }
 
         using (var _ = IgnorePollyLimiterScope.Ignore())
         {

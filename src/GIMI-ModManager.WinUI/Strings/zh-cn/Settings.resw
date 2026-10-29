@@ -13,6 +13,59 @@
     <value>需要重新启动应用程序</value>
   </data>
 
+  <!-- Network & Proxy -->
+  <data name="NetworkProxySectionHeader.Text" xml:space="preserve">
+    <value>网络与代理</value>
+  </data>
+  <data name="ProxyModeCard.Header" xml:space="preserve">
+    <value>代理模式</value>
+  </data>
+  <data name="ProxyModeCard.Description" xml:space="preserve">
+    <value>配置模组下载、资产同步及程序更新的统一网络出站代理</value>
+  </data>
+  <data name="ProxyModeSystem.Content" xml:space="preserve">
+    <value>遵循系统代理</value>
+  </data>
+  <data name="ProxyModeManual.Content" xml:space="preserve">
+    <value>自定义代理 (HTTP / SOCKS5)</value>
+  </data>
+  <data name="ProxyModeDirect.Content" xml:space="preserve">
+    <value>直连 (不使用代理)</value>
+  </data>
+  <data name="ProxyProtocolCard.Header" xml:space="preserve">
+    <value>代理协议</value>
+  </data>
+  <data name="ProxyProtocolCard.Description" xml:space="preserve">
+    <value>选择代理客户端监听的协议类型</value>
+  </data>
+  <data name="ProxyServerCard.Header" xml:space="preserve">
+    <value>服务器地址与端口</value>
+  </data>
+  <data name="ProxyServerCard.Description" xml:space="preserve">
+    <value>设置代理服务器主机 IP 及端口号（例如 127.0.0.1:7890）</value>
+  </data>
+  <data name="ProxyBypassLocalCard.Header" xml:space="preserve">
+    <value>绕过本地地址</value>
+  </data>
+  <data name="ProxyBypassLocalCard.Description" xml:space="preserve">
+    <value>局域网及本地回环地址请求不走代理</value>
+  </data>
+  <data name="ProxyTestCard.Header" xml:space="preserve">
+    <value>连通性诊断</value>
+  </data>
+  <data name="ProxyTestCard.Description" xml:space="preserve">
+    <value>向服务端发送探测请求，测试当前代理链路可用性与延迟</value>
+  </data>
+  <data name="ProxyTestButton.Content" xml:space="preserve">
+    <value>测试连接</value>
+  </data>
+  <data name="ProxyTestSuccess" xml:space="preserve">
+    <value>连接成功 (耗时 {0:F0} ms)</value>
+  </data>
+  <data name="ProxyTestFailed" xml:space="preserve">
+    <value>连接失败：{0}</value>
+  </data>
+
   <!-- Page Structure -->
   <data name="Title.Text" xml:space="preserve">
     <value>设置</value>
@@ -147,6 +200,7 @@
   <data name="UpdateProcessUnableToStart" xml:space="preserve">
     <value>无法启动更新进程</value>
   </data>
+
   <!-- Mod Update Checker Notifications -->
   <data name="UpdateChecker_FatalErrorTitle" xml:space="preserve">
     <value>mod 更新后台检查器发生错误</value>

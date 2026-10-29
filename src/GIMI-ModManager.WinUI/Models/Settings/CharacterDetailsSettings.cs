@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace GIMI_ModManager.WinUI.Models.Settings;
 
@@ -11,4 +11,5 @@ public class CharacterDetailsSettings
     public string? SortingMethod { get; set; }
     public bool? SortByDescending { get; set; }
     public bool ModFolderNameColumnVisible { get; set; }
+    public bool ShowHoverPreview { get; set; } = true;
 }

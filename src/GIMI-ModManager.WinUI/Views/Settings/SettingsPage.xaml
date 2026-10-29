@@ -293,6 +293,7 @@
 
                 </StackPanel>
 
+
                 <TextBlock
                     Style="{ThemeResource SubtitleTextBlockStyle}"
                     Text="Commands"
@@ -529,6 +530,92 @@
                         Value="{x:Bind ViewModel.AssetSyncProgress, Mode=OneWay}" />
                 </StackPanel>
 
+
+                <TextBlock
+                    Style="{ThemeResource SubtitleTextBlockStyle}"
+                    Text="Network &amp; Proxy"
+                    l:Uids.Uid="/Settings/NetworkProxySectionHeader" />
+                <StackPanel Margin="{StaticResource SmallTopBottomMargin}" Spacing="4">
+                    <controls1:SettingsCard
+                        Description="Configure outbound proxy for GameBanana downloads, asset sync, and updates"
+                        Header="Proxy Mode"
+                        HeaderIcon="{ui:FontIcon Glyph=&#xE774;}"
+                        l:Uids.Uid="/Settings/ProxyModeCard">
+                        <ComboBox
+                            SelectedIndex="{x:Bind ViewModel.SelectedProxyModeIndex, Mode=TwoWay}"
+                            MinWidth="160">
+                            <ComboBoxItem Content="Follow System" l:Uids.Uid="/Settings/ProxyModeSystem" />
+                            <ComboBoxItem Content="Manual Proxy" l:Uids.Uid="/Settings/ProxyModeManual" />
+                            <ComboBoxItem Content="Direct (No Proxy)" l:Uids.Uid="/Settings/ProxyModeDirect" />
+                        </ComboBox>
+                    </controls1:SettingsCard>
+
+                    <StackPanel
+                        Spacing="4"
+                        Visibility="{x:Bind ViewModel.IsManualProxyVisible, Mode=OneWay, Converter={StaticResource BoolToVisibleConverter}}">
+                        <controls1:SettingsCard
+                            Description="Select proxy protocol"
+                            Header="Protocol"
+                            l:Uids.Uid="/Settings/ProxyProtocolCard">
+                            <ComboBox
+                                SelectedIndex="{x:Bind ViewModel.SelectedProxyProtocolIndex, Mode=TwoWay}"
+                                MinWidth="160">
+                                <ComboBoxItem Content="HTTP / HTTPS" />
+                                <ComboBoxItem Content="SOCKS5" />
+                            </ComboBox>
+                        </controls1:SettingsCard>
+
+                        <controls1:SettingsCard
+                            Description="Proxy server host address and port number"
+                            Header="Server Address &amp; Port"
+                            l:Uids.Uid="/Settings/ProxyServerCard">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBox
+                                    Width="180"
+                                    PlaceholderText="127.0.0.1"
+                                    Text="{x:Bind ViewModel.ProxyHost, Mode=TwoWay}" />
+                                <TextBlock VerticalAlignment="Center" Text=":" />
+                                <TextBox
+                                    Width="80"
+                                    PlaceholderText="7890"
+                                    Text="{x:Bind ViewModel.ProxyPort, Mode=TwoWay}" />
+                            </StackPanel>
+                        </controls1:SettingsCard>
+
+                        <controls1:SettingsCard
+                            Description="Do not route local intranet traffic through proxy"
+                            Header="Bypass Local Addresses"
+                            l:Uids.Uid="/Settings/ProxyBypassLocalCard">
+                            <ToggleSwitch
+                                IsOn="{x:Bind ViewModel.ProxyBypassLocal, Mode=TwoWay}"
+                                l:Uids.Uid="/Controls/ToggleSwitch" />
+                        </controls1:SettingsCard>
+                    </StackPanel>
+
+                    <controls1:SettingsCard
+                        Description="Probe proxy connection latency to GitHub and CDN endpoints"
+                        Header="Connectivity Test"
+                        HeaderIcon="{ui:FontIcon Glyph=&#xE968;}"
+                        l:Uids.Uid="/Settings/ProxyTestCard">
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <ProgressRing
+                                Width="18"
+                                Height="18"
+                                IsActive="{x:Bind ViewModel.IsTestingProxy, Mode=OneWay}"
+                                Visibility="{x:Bind ViewModel.IsTestingProxy, Mode=OneWay, Converter={StaticResource BoolToVisibleConverter}}" />
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                Visibility="{x:Bind ViewModel.HasProxyTestResult, Mode=OneWay, Converter={StaticResource BoolToVisibleConverter}}"
+                                Text="{x:Bind ViewModel.ProxyTestResult, Mode=OneWay}"
+                                Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
+                            <Button
+                                Command="{x:Bind ViewModel.TestProxyConnectivityCommand}"
+                                Content="Test Connection"
+                                IsEnabled="{x:Bind ViewModel.IsTestingProxy, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}"
+                                l:Uids.Uid="/Settings/ProxyTestButton" />
+                        </StackPanel>
+                    </controls1:SettingsCard>
+                </StackPanel>
 
                 <TextBlock
                     Style="{ThemeResource SubtitleTextBlockStyle}"

@@ -31,12 +31,14 @@
             CanUserSortColumns="True"
             CellEditEnded="ModListGrid_OnCellEditEnded"
             CellEditEnding="ModListGrid_OnCellEditEnding"
+            ContextRequested="ModListGrid_OnContextRequested"
             FontSize="13"
             GridLinesVisibility="None"
             HeadersVisibility="Column"
             IsReadOnly="False"
             ItemsSource="{x:Bind ViewModel.GridMods, Mode=OneWay}"
             KeyDown="ModListGrid_OnKeyDown"
+            RightTapped="ModListGrid_OnRightTapped"
             RowBackground="{ThemeResource LayerFillColorDefaultBrush}"
             RowGroupHeaderPropertyNameAlternative="Range"
             SelectionChanged="ModListGrid_OnSelectionChanged"
@@ -187,5 +189,93 @@
 
             </controls:DataGrid.Columns>
         </controls:DataGrid>
+
+        <Popup
+            x:Name="HoverPreviewPopup"
+            IsHitTestVisible="False"
+            IsOpen="False">
+            <Grid
+                x:Name="HoverPreviewCard"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                IsHitTestVisible="False">
+                <Grid.RenderTransform>
+                    <TranslateTransform x:Name="HoverPreviewTransform" />
+                </Grid.RenderTransform>
+
+                <Canvas x:Name="HoverPreviewShadowHost" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+
+                <Border
+                    x:Name="HoverPreviewMainBorder"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    Background="Transparent"
+                    BorderBrush="#59FFFFFF"
+                    BorderThickness="1.2"
+                    CornerRadius="12"
+                    Padding="7">
+                    <Grid CornerRadius="6" Background="Transparent">
+                        <Grid
+                            x:Name="HoverPreviewPlaceholder"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            Background="#33000000"
+                            CornerRadius="6"
+                            Visibility="Collapsed">
+                            <StackPanel
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Opacity="0.45"
+                                Spacing="8">
+                                <FontIcon FontSize="36" Glyph="&#xEB9F;" Foreground="White" />
+                                <TextBlock
+                                    HorizontalAlignment="Center"
+                                    FontSize="11"
+                                    FontWeight="SemiBold"
+                                    Foreground="White"
+                                    Text="No Preview" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Image
+                            x:Name="HoverPreviewImage"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Stretch="Uniform"
+                            ImageOpened="HoverPreviewImage_OnImageOpened" />
+
+                        <Border
+                            x:Name="HoverPreviewMetaBar"
+                            VerticalAlignment="Bottom"
+                            CornerRadius="0,0,6,6"
+                            Padding="12,28,12,10">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                                    <GradientStop Color="#00000000" Offset="0.0" />
+                                    <GradientStop Color="#26000000" Offset="0.25" />
+                                    <GradientStop Color="#8C000000" Offset="0.65" />
+                                    <GradientStop Color="#E6000000" Offset="1.0" />
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <StackPanel Spacing="2">
+                                <TextBlock
+                                    x:Name="HoverPreviewTitle"
+                                    FontSize="12.5"
+                                    FontWeight="SemiBold"
+                                    Foreground="White"
+                                    MaxLines="1"
+                                    TextTrimming="CharacterEllipsis" />
+                                <TextBlock
+                                    x:Name="HoverPreviewAuthor"
+                                    FontSize="10.5"
+                                    Foreground="#B8FFFFFF"
+                                    MaxLines="1"
+                                    TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Popup>
     </Grid>
 </UserControl>

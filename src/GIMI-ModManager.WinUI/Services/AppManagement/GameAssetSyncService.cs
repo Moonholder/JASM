@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.IO.Hashing;
+using GIMI_ModManager.Core.Services.Network;
 using GIMI_ModManager.WinUI.Services.AppManagement.Updating;
 using Serilog;
 
@@ -64,9 +65,11 @@ public class GameAssetSyncService
     /// </summary>
     public event EventHandler<AssetSyncProgressEventArgs>? SyncProgressChanged;
 
-    public GameAssetSyncService(ILogger logger)
+    public GameAssetSyncService(ILogger logger, DynamicAppWebProxy dynamicProxy)
     {
         _logger = logger.ForContext<GameAssetSyncService>();
+        SharedHandler.Proxy = dynamicProxy;
+        SharedHandler.UseProxy = true;
     }
 
     /// <summary>

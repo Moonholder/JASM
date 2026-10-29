@@ -9,6 +9,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="using:GIMI_ModManager.Core.Services.GameBanana.Models"
     xmlns:tkcontrols="using:CommunityToolkit.WinUI.Controls"
+    xmlns:gbmodels="using:GIMI_ModManager.WinUI.Models.GameBanana"
     xmlns:vm="using:GIMI_ModManager.WinUI.ViewModels"
     NavigationCacheMode="Disabled"
     mc:Ignorable="d">
@@ -35,6 +36,7 @@
 
             <helpers:IntToVisibilityInverter x:Key="IntToVisibilityInverter" />
             <helpers:BoolInverterConverter x:Key="BoolInverterConverter" />
+            <helpers:BoolToVisibleConverter x:Key="BoolToVisibleConverter" />
 
             <!--  Skeleton Card Template for Fluid Loading Transition  -->
             <DataTemplate x:Key="SkeletonCardTemplate">
@@ -121,7 +123,7 @@
                 </Grid>
             </DataTemplate>
 
-            <DataTemplate x:Key="ModCardTemplate" x:DataType="vm:GbModDisplayItem">
+            <DataTemplate x:Key="ModCardTemplate" x:DataType="gbmodels:GbModDisplayItem">
                 <Grid Margin="6">
                     <Border
                         AutomationProperties.Name="{x:Bind Name}"
@@ -341,7 +343,7 @@
         </ResourceDictionary>
     </Page.Resources>
 
-    <Grid>
+    <Grid Margin="{StaticResource NegativeNavigationViewPageContentMargin}">
         <SplitView
             x:Name="DetailSplitView"
             DisplayMode="Overlay"
@@ -364,7 +366,7 @@
                         Margin="0,0,0,8"
                         Padding="20,16,20,0">
                         <TextBlock
-                            Margin="0,0,40,0"
+                            Margin="0,0,84,0"
                             MaxLines="2"
                             Style="{ThemeResource SubtitleTextBlockStyle}"
                             Text="{x:Bind ViewModel.SelectedModName, Mode=OneWay}"
@@ -374,8 +376,35 @@
                             HorizontalAlignment="Right"
                             VerticalAlignment="Top"
                             AutomationProperties.Name="Close"
-                            Command="{x:Bind ViewModel.CloseDetailPaneCommand}">
+                            Command="{x:Bind ViewModel.CloseDetailPaneCommand}"
+                            Style="{ThemeResource SubtleButtonStyle}">
+                            <ToolTipService.ToolTip>
+                                <ToolTip Content="Close" l:Uids.Uid="/GameBananaPage/ClosePaneToolTip" />
+                            </ToolTipService.ToolTip>
                             <FontIcon FontSize="12" Glyph="&#xE711;" />
+                        </Button>
+                        <Button
+                            x:Name="PaneDownloadManagerButton"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Top"
+                            Margin="0,0,38,0"
+                            AutomationProperties.Name="Download Manager"
+                            Click="PaneDownloadManagerButton_Click"
+                            Style="{ThemeResource SubtleButtonStyle}"
+
+                            >
+                            <ToolTipService.ToolTip>
+                                <ToolTip Content="Download Manager" l:Uids.Uid="/GameBananaPage/DownloadManagerToolTip" />
+                            </ToolTipService.ToolTip>
+                            <Grid>
+                                <FontIcon FontSize="14" Glyph="&#xE896;" />
+                                <InfoBadge
+                                    Margin="0,-8,-12,0"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Top"
+                                    Visibility="{x:Bind ViewModel.HasActiveDownloads, Mode=OneWay}"
+                                    Value="{x:Bind ViewModel.ActiveDownloadCount, Mode=OneWay}" />
+                            </Grid>
                         </Button>
                     </Grid>
 
@@ -613,7 +642,7 @@
                                             </ItemsPanelTemplate>
                                         </ListView.ItemsPanel>
                                         <ListView.ItemTemplate>
-                                            <DataTemplate x:DataType="vm:GbPreviewImageItem">
+                                            <DataTemplate x:DataType="gbmodels:GbPreviewImageItem">
                                                 <Grid
                                                     Height="60"
                                                     Background="#20808080"
@@ -693,12 +722,21 @@
                                                         <StackPanel
                                                             Margin="0,2,0,0"
                                                             Orientation="Horizontal"
-                                                            Spacing="12">
+                                                            Spacing="10">
+                                                            <TextBlock
+                                                                FontSize="11"
+                                                                FontWeight="SemiBold"
+                                                                Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                                                Text="{x:Bind DownloadStatus, Mode=OneWay}" Margin="0,0,2,0"
+                                                                Visibility="{x:Bind IsDownloading, Mode=OneWay, Converter={StaticResource BoolToVisibleConverter}}" />
                                                             <TextBlock
                                                                 FontSize="10"
                                                                 Foreground="{ThemeResource TextFillColorTertiaryBrush}"
                                                                 Text="{x:Bind FormattedFileSize}" />
-                                                            <StackPanel Orientation="Horizontal" Spacing="3">
+                                                            <StackPanel
+                                                                Orientation="Horizontal"
+                                                                Spacing="3"
+                                                                Visibility="{x:Bind IsDownloading, Mode=OneWay, Converter={StaticResource BoolToVisibleConverter}, ConverterParameter=Inverse}">
                                                                 <FontIcon
                                                                     FontSize="10"
                                                                     Foreground="{ThemeResource TextFillColorTertiaryBrush}"
@@ -713,15 +751,49 @@
                                                     <Button
                                                         Grid.Column="1"
                                                         VerticalAlignment="Center"
+                                                        Width="36"
+                                                        Height="36"
+                                                        Padding="0"
                                                         AutomationProperties.Name="Download &amp; Install"
                                                         Click="DownloadButton_Click"
-                                                        IsEnabled="{x:Bind IsDownloading, Mode=OneWay, Converter={StaticResource BoolInverterConverter}}"
+                                                        Visibility="{x:Bind IsDownloading, Mode=OneWay, Converter={StaticResource BoolToVisibleConverter}, ConverterParameter=Inverse}"
                                                         Style="{ThemeResource AccentButtonStyle}"
                                                         Tag="{x:Bind}"
                                                         ToolTipService.ToolTip="Download &amp; Install"
                                                         l:Uids.Uid="/GameBananaPage/DownloadBtn">
                                                         <FontIcon FontSize="14" Glyph="&#xE896;" />
                                                     </Button>
+                                                    <Grid
+                                                        Grid.Column="1"
+                                                        Width="36"
+                                                        Height="36"
+                                                        VerticalAlignment="Center"
+                                                        Visibility="{x:Bind IsDownloading, Mode=OneWay, Converter={StaticResource BoolToVisibleConverter}}">
+                                                        <ProgressRing
+                                                            Width="34"
+                                                            Height="34"
+                                                            IsIndeterminate="False"
+                                                            Maximum="100"
+                                                            Minimum="0"
+                                                            Value="{x:Bind DownloadProgress, Mode=OneWay}" />
+                                                        <Button
+                                                            Width="28"
+                                                            Height="28"
+                                                            Padding="0"
+                                                            HorizontalAlignment="Center"
+                                                            VerticalAlignment="Center"
+                                                            AutomationProperties.Name="Cancel Download"
+                                                            Click="CancelDownloadFile_Click"
+                                                            CornerRadius="14"
+                                                            Style="{ThemeResource SubtleButtonStyle}"
+                                                            Tag="{x:Bind}"
+                                                            >
+                                                            <ToolTipService.ToolTip>
+                                                                <ToolTip Content="Cancel Download" l:Uids.Uid="/GameBananaPage/CardCancelToolTip" />
+                                                            </ToolTipService.ToolTip>
+                                                            <FontIcon FontSize="10" Glyph="&#xE711;" />
+                                                        </Button>
+                                                    </Grid>
                                                 </Grid>
                                             </DataTemplate>
                                         </ItemsRepeater.ItemTemplate>
@@ -755,7 +827,7 @@
 
             <!--  Main content  -->
             <SplitView.Content>
-                <Grid>
+                <Grid Padding="36,16,24,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition x:Name="CategoryColumn" Width="220" />
                         <ColumnDefinition Width="*" />
@@ -816,7 +888,7 @@
                             SelectionChanged="CategoryList_SelectionChanged"
                             SelectionMode="Single">
                             <ListView.ItemTemplate>
-                                <DataTemplate x:DataType="vm:GbCategoryDisplayItem">
+                                <DataTemplate x:DataType="gbmodels:GbCategoryDisplayItem">
                                     <Grid Padding="4,6" ColumnSpacing="8">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="28" />
@@ -886,6 +958,7 @@
                                 <ColumnDefinition x:Name="TopBarSearchCol" Width="Auto" />
                                 <ColumnDefinition x:Name="TopBarFilterCol" Width="Auto" />
                                 <ColumnDefinition x:Name="TopBarSpacerCol" Width="*" />
+                                <ColumnDefinition x:Name="TopBarPrefsCol" Width="Auto" />
                                 <ColumnDefinition x:Name="TopBarDownloadCol" Width="Auto" />
                             </Grid.ColumnDefinitions>
 
@@ -948,12 +1021,15 @@
                             <Button
                                 x:Name="DownloadManagerButton"
                                 Grid.Row="0"
-                                Grid.Column="3"
+                                Grid.Column="4"
                                 HorizontalAlignment="Right"
                                 VerticalAlignment="Center"
                                 Style="{ThemeResource DefaultButtonStyle}"
-                                ToolTipService.ToolTip="Download Manager"
-                                l:Uids.Uid="/GameBananaPage/DownloadManagerBtn">
+    
+                                >
+                            <ToolTipService.ToolTip>
+                                <ToolTip Content="Download Manager" l:Uids.Uid="/GameBananaPage/DownloadManagerToolTip" />
+                            </ToolTipService.ToolTip>
                                 <Grid>
                                     <FontIcon FontSize="16" Glyph="&#xE896;" />
                                     <InfoBadge
@@ -996,7 +1072,7 @@
                                                 ItemsSource="{x:Bind ViewModel.DownloadQueue}"
                                                 SelectionMode="None">
                                                 <ListView.ItemTemplate>
-                                                    <DataTemplate x:DataType="vm:GbDownloadTask">
+                                                    <DataTemplate x:DataType="gbmodels:GbDownloadTask">
                                                         <Grid Margin="0,4,0,12">
                                                             <Grid.RowDefinitions>
                                                                 <RowDefinition Height="Auto" />
@@ -1025,31 +1101,68 @@
                                                                         Padding="4"
                                                                         AutomationProperties.Name="Retry Installation"
                                                                         Click="RetryDownloadTask_Click"
-                                                                        ToolTipService.ToolTip="Retry Installation"
+
                                                                         Visibility="{x:Bind RetryVisibility, Mode=OneWay}"
-                                                                        l:Uids.Uid="/GameBananaPage/RetryBtn">
-                                                                        <FontIcon FontSize="10" Glyph="&#xE72C;" />
+                                                                        >
+                                                                        <ToolTipService.ToolTip>
+                                                                            <ToolTip Content="Retry Installation" l:Uids.Uid="/GameBananaPage/RetryToolTip" />
+                                                                        </ToolTipService.ToolTip>
+                                                                        <FontIcon FontSize="10" Glyph="&#xE72C;" /></Button>
+
+                                                                    <!--  Pause button  -->
+                                                                    <Button
+                                                                        Padding="4"
+                                                                        AutomationProperties.Name="Pause"
+                                                                        Click="PauseDownloadTask_Click"
+
+                                                                        Visibility="{x:Bind PauseVisibility, Mode=OneWay}"
+                                                                        >
+                                                                        <ToolTipService.ToolTip>
+                                                                            <ToolTip Content="Pause" l:Uids.Uid="/GameBananaPage/PauseToolTip" />
+                                                                        </ToolTipService.ToolTip>
+                                                                        <FontIcon FontSize="10" Glyph="&#xE769;" />
                                                                     </Button>
+
+                                                                    <!--  Resume button  -->
+                                                                    <Button
+                                                                        Padding="4"
+                                                                        AutomationProperties.Name="Resume"
+                                                                        Click="ResumeDownloadTask_Click"
+
+                                                                        Visibility="{x:Bind ResumeVisibility, Mode=OneWay}"
+                                                                        >
+                                                                        <ToolTipService.ToolTip>
+                                                                            <ToolTip Content="Resume" l:Uids.Uid="/GameBananaPage/ResumeToolTip" />
+                                                                        </ToolTipService.ToolTip>
+                                                                        <FontIcon FontSize="10" Glyph="&#xE768;" />
+                                                                    </Button>
+
                                                                     <!--  Cancel button (visible during download)  -->
                                                                     <Button
                                                                         Padding="4"
                                                                         AutomationProperties.Name="Cancel"
                                                                         Click="CancelDownloadTask_Click"
-                                                                        ToolTipService.ToolTip="Cancel"
+
                                                                         Visibility="{x:Bind CancelVisibility, Mode=OneWay}"
-                                                                        l:Uids.Uid="/GameBananaPage/CancelBtn">
-                                                                        <FontIcon FontSize="10" Glyph="&#xE711;" />
-                                                                    </Button>
+                                                                        >
+                                                                        <ToolTipService.ToolTip>
+                                                                            <ToolTip Content="Cancel" l:Uids.Uid="/GameBananaPage/CancelToolTip" />
+                                                                        </ToolTipService.ToolTip>
+                                                                        <FontIcon FontSize="10" Glyph="&#xE711;" /></Button>
+
                                                                     <!--  Remove button (visible after completion)  -->
                                                                     <Button
                                                                         Padding="4"
                                                                         AutomationProperties.Name="Remove"
                                                                         Click="RemoveDownloadTask_Click"
-                                                                        ToolTipService.ToolTip="Remove"
+
                                                                         Visibility="{x:Bind RemoveVisibility, Mode=OneWay}"
-                                                                        l:Uids.Uid="/GameBananaPage/RemoveBtn">
-                                                                        <FontIcon FontSize="10" Glyph="&#xE74D;" />
-                                                                    </Button>
+                                                                        >
+                                                                        <ToolTipService.ToolTip>
+                                                                            <ToolTip Content="Remove" l:Uids.Uid="/GameBananaPage/RemoveToolTip" />
+                                                                        </ToolTipService.ToolTip>
+                                                                        <FontIcon FontSize="10" Glyph="&#xE74D;" /></Button>
+
                                                                 </StackPanel>
                                                             </Grid>
 
@@ -1082,6 +1195,85 @@
                                                 </ListView.Header>
                                             </ListView>
                                         </Grid>
+                                    </Flyout>
+                                </Button.Flyout>
+                            </Button>
+
+                            <Button
+                                x:Name="PreferencesButton"
+                                Grid.Row="0"
+                                Grid.Column="3"
+                                Height="32"
+                                Width="36"
+                                Padding="0"
+                                Margin="0,0,8,0"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
+                                Style="{ThemeResource DefaultButtonStyle}"
+                                ToolTipService.ToolTip="Download &amp; Installation Settings"
+                                l:Uids.Uid="/GameBananaPage/PreferencesBtn">
+                                <FontIcon FontSize="15" Glyph="&#xE713;" />
+                                <Button.Flyout>
+                                    <Flyout Placement="BottomEdgeAlignedRight">
+                                        <StackPanel Width="320" Spacing="16" Padding="6,4">
+                                            <TextBlock
+                                                Text="Download &amp; Installation Preferences"
+                                                FontWeight="SemiBold"
+                                                FontSize="15"
+                                                l:Uids.Uid="/GameBananaPage/PreferencesTitle" />
+
+
+                                            <TextBlock
+                                                FontWeight="SemiBold"
+                                                Text="Fallback to 'Other' Category"
+                                                l:Uids.Uid="/GameBananaPage/FallbackToOtherTitle" />
+
+                                            <ToggleSwitch
+                                                IsOn="{x:Bind ViewModel.FallbackToOtherCategoryOnUnmatched, Mode=TwoWay}"
+                                                l:Uids.Uid="/Controls/ToggleSwitch" />
+                                            <TextBlock
+                                                Margin="0,-8,0,0"
+                                                FontSize="12"
+                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                Text="Save to 'Other' when category is not matched"
+                                                TextWrapping="Wrap"
+                                                l:Uids.Uid="/GameBananaPage/FallbackToOtherDesc" />
+
+
+                                            <TextBlock
+                                                Margin="0,8,0,0"
+                                                FontWeight="SemiBold"
+                                                Text="Auto-Enable After Installation"
+                                                l:Uids.Uid="/GameBananaPage/AutoEnableTitle" />
+
+                                            <ToggleSwitch
+                                                IsOn="{x:Bind ViewModel.AutoEnableAfterSilentInstall, Mode=TwoWay}"
+                                                l:Uids.Uid="/Controls/ToggleSwitch" />
+                                            <TextBlock
+                                                Margin="0,-8,0,0"
+                                                FontSize="12"
+                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                Text="Automatically enable mods after silent install"
+                                                TextWrapping="Wrap"
+                                                l:Uids.Uid="/GameBananaPage/AutoEnableDesc" />
+
+
+                                            <TextBlock
+                                                Margin="0,8,0,0"
+                                                FontWeight="SemiBold"
+                                                Text="Delete Archive After Installation"
+                                                l:Uids.Uid="/GameBananaPage/DeleteArchiveTitle" />
+                                            <ToggleSwitch
+                                                IsOn="{x:Bind ViewModel.DeleteArchiveAfterInstall, Mode=TwoWay}"
+                                                l:Uids.Uid="/Controls/ToggleSwitch" />
+                                            <TextBlock
+                                                Margin="0,-8,0,0"
+                                                FontSize="12"
+                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                Text="Automatically delete downloaded archive file after successful installation to save disk space"
+                                                TextWrapping="Wrap"
+                                                l:Uids.Uid="/GameBananaPage/DeleteArchiveDesc" />
+                                        </StackPanel>
                                     </Flyout>
                                 </Button.Flyout>
                             </Button>
@@ -1253,6 +1445,9 @@
                 Canvas.ZIndex="101"
                 Click="LightBoxClose_Click"
                 CornerRadius="22">
+                <ToolTipService.ToolTip>
+                    <ToolTip Content="Close" l:Uids.Uid="/GameBananaPage/ClosePaneToolTip" />
+                </ToolTipService.ToolTip>
                 <Button.KeyboardAccelerators>
                     <KeyboardAccelerator Key="Escape" />
                 </Button.KeyboardAccelerators>
@@ -1270,7 +1465,7 @@
                 ItemsSource="{x:Bind ViewModel.PreviewImages, Mode=OneWay}"
                 SelectedIndex="{x:Bind ViewModel.LightBoxSelectedIndex, Mode=TwoWay}">
                 <FlipView.ItemTemplate>
-                    <DataTemplate x:DataType="vm:GbPreviewImageItem">
+                    <DataTemplate x:DataType="gbmodels:GbPreviewImageItem">
                         <Grid Background="Transparent" Tapped="LightBoxItem_Tapped">
                             <ProgressRing
                                 Width="36"
@@ -1311,6 +1506,7 @@
                     <VisualState.Setters>
                         <Setter Target="CategoryColumn.Width" Value="170" />
                         <Setter Target="DetailSplitView.DisplayMode" Value="Overlay" />
+
                         <Setter Target="DetailSplitView.OpenPaneLength" Value="400" />
                         <Setter Target="ModsGridView.DesiredWidth" Value="230" />
                         <Setter Target="TopBarSecondRow.Height" Value="Auto" />
@@ -1320,7 +1516,7 @@
                         <Setter Target="SearchBox.(Grid.ColumnSpan)" Value="3" />
                         <Setter Target="FilterControlsContainer.(Grid.Row)" Value="1" />
                         <Setter Target="FilterControlsContainer.(Grid.Column)" Value="0" />
-                        <Setter Target="FilterControlsContainer.(Grid.ColumnSpan)" Value="4" />
+                        <Setter Target="FilterControlsContainer.(Grid.ColumnSpan)" Value="5" />
                         <Setter Target="FilterControlsContainer.Margin" Value="0,8,0,0" />
                     </VisualState.Setters>
                 </VisualState>
@@ -1332,7 +1528,7 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="CategoryColumn.Width" Value="200" />
-                        <Setter Target="DetailSplitView.DisplayMode" Value="Inline" />
+
                         <Setter Target="DetailSplitView.OpenPaneLength" Value="460" />
                         <Setter Target="ModsGridView.DesiredWidth" Value="280" />
                         <Setter Target="SearchBox.Width" Value="220" />
@@ -1346,7 +1542,7 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="CategoryColumn.Width" Value="220" />
-                        <Setter Target="DetailSplitView.DisplayMode" Value="Inline" />
+
                         <Setter Target="DetailSplitView.OpenPaneLength" Value="480" />
                         <Setter Target="ModsGridView.DesiredWidth" Value="340" />
                         <Setter Target="SearchBox.Width" Value="260" />
@@ -1360,7 +1556,7 @@
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="CategoryColumn.Width" Value="240" />
-                        <Setter Target="DetailSplitView.DisplayMode" Value="Inline" />
+
                         <Setter Target="DetailSplitView.OpenPaneLength" Value="520" />
                         <Setter Target="ModsGridView.DesiredWidth" Value="380" />
                         <Setter Target="SearchBox.Width" Value="300" />

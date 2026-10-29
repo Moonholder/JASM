@@ -2,7 +2,7 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using GIMI_ModManager.Core.Services.GameBanana.Models;
 using GIMI_ModManager.Core.Services.GameBanana.ApiModels;
-using GIMI_ModManager.WinUI.ViewModels;
+using GIMI_ModManager.WinUI.Models.GameBanana;
 
 namespace GIMI_ModManager.WinUI.Contracts.Services;
 
@@ -13,6 +13,10 @@ public interface IGameBananaDownloadSessionService
     Task LoadDownloadHistoryAsync();
 
     void DownloadAndInstall(ModFileInfo fileInfo, GbModDisplayItem selectedMod, ModPageInfo selectedModDetail, string? gameId);
+
+    void PauseDownloadTask(GbDownloadTask? task);
+
+    void ResumeDownloadTask(GbDownloadTask? task);
 
     void CancelDownloadTask(GbDownloadTask? task);
 

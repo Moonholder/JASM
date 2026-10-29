@@ -1,15 +1,21 @@
-﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Data;
 
 namespace GIMI_ModManager.WinUI.Helpers.Xaml;
 
-internal class BoolToVisibleConverter : IValueConverter
+public class BoolToVisibleConverter : IValueConverter
 {
-    // https://stackoverflow.com/questions/51542728/uwp-boolean-to-visibility-converter-doesnt-work
     public object Convert(object value, Type targetType, object parameter, string language)
     {
-        if (value is bool && (bool)value)
-            return Visibility.Visible;
+        if (value is bool booleanValue)
+        {
+            if (parameter is string param && param.Equals("Inverse", StringComparison.OrdinalIgnoreCase))
+            {
+                return booleanValue ? Visibility.Collapsed : Visibility.Visible;
+            }
+
+            return booleanValue ? Visibility.Visible : Visibility.Collapsed;
+        }
 
         return Visibility.Collapsed;
     }

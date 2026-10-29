@@ -1,6 +1,7 @@
 using System.Collections.Specialized;
 using GIMI_ModManager.Core.Services.GameBanana.Models;
 using GIMI_ModManager.WinUI.ViewModels;
+using GIMI_ModManager.WinUI.Models.GameBanana;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -44,7 +45,12 @@ public sealed partial class GameBananaPage : Page
 
         try
         {
-            _detailWebView?.Close();
+            if (_detailWebView != null)
+            {
+                _detailWebView.NavigationStarting -= WebView_NavigationStarting;
+                _detailWebView.Close();
+                _detailWebView = null;
+            }
         }
         catch { }
 
@@ -487,7 +493,7 @@ public sealed partial class GameBananaPage : Page
             var index = ViewModel.PreviewImages.IndexOf(imageItem);
             ViewModel.SelectPreviewImage(index);
 
-            // 直接全屏预览
+            // Open full-screen LightBox
             if (ViewModel.LightBoxSelectedIndex == index)
                 ViewModel.ForceLoadLightBoxImages(index);
             else
@@ -502,7 +508,7 @@ public sealed partial class GameBananaPage : Page
     {
         if (ViewModel.PreviewImages.Count > 0)
         {
-            // 如果索引已经是该值，绑定不会触发 setter 里的加载逻辑，需要手动强制触发
+            // Force reload if index did not change
             if (ViewModel.LightBoxSelectedIndex == ViewModel.SelectedPreviewIndex)
             {
                 ViewModel.ForceLoadLightBoxImages(ViewModel.LightBoxSelectedIndex);
@@ -519,7 +525,7 @@ public sealed partial class GameBananaPage : Page
 
     private void LightBoxOverlay_PointerPressed(object sender, PointerRoutedEventArgs e)
     {
-        // 只有点击了最外层半透明背景才关闭（内部 Grid 的点击交由 LightBoxItem_Tapped 处理）
+        // Dismiss when clicking the outer backdrop
         if (ReferenceEquals(e.OriginalSource, LightBoxOverlay))
         {
             CloseLightBox();
@@ -528,7 +534,7 @@ public sealed partial class GameBananaPage : Page
 
     private void LightBoxItem_Tapped(object sender, TappedRoutedEventArgs e)
     {
-        // 如果点击的是图片本身则不关闭，如果是周边透明区域则关闭
+        // Dismiss when tapping outside the image
         if (e.OriginalSource is Image) return;
         CloseLightBox();
     }
@@ -597,11 +603,59 @@ public sealed partial class GameBananaPage : Page
         }
     }
 
+    private void PaneDownloadManagerButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement target && DownloadManagerButton.Flyout != null)
+        {
+            DownloadManagerButton.Flyout.ShowAt(target);
+        }
+    }
+
     private void DownloadButton_Click(object sender, RoutedEventArgs e)
     {
         if (sender is Button { Tag: ModFileInfo fileInfo })
         {
             ViewModel.DownloadAndInstallCommand.Execute(fileInfo);
+        }
+    }
+
+    private void PauseDownloadTask_Click(object sender, RoutedEventArgs e)
+    {
+        if ((sender as FrameworkElement)?.DataContext is GbDownloadTask task)
+        {
+            ViewModel.PauseDownloadTaskCommand.Execute(task);
+        }
+    }
+
+    private void ResumeDownloadTask_Click(object sender, RoutedEventArgs e)
+    {
+        if ((sender as FrameworkElement)?.DataContext is GbDownloadTask task)
+        {
+            ViewModel.ResumeDownloadTaskCommand.Execute(task);
+        }
+    }
+
+    private void PauseDownloadFile_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: ModFileInfo fileInfo })
+        {
+            ViewModel.PauseFileDownload(fileInfo);
+        }
+    }
+
+    private void ResumeDownloadFile_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: ModFileInfo fileInfo })
+        {
+            ViewModel.ResumeFileDownload(fileInfo);
+        }
+    }
+
+    private void CancelDownloadFile_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: ModFileInfo fileInfo })
+        {
+            ViewModel.CancelFileDownload(fileInfo);
         }
     }
 

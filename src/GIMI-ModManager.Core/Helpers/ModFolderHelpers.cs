@@ -1,4 +1,4 @@
-﻿namespace GIMI_ModManager.Core.Helpers;
+namespace GIMI_ModManager.Core.Helpers;
 
 public static class ModFolderHelpers
 {
@@ -14,10 +14,10 @@ public static class ModFolderHelpers
     public static string GetFolderNameWithoutDisabledPrefix(string folderName)
     {
         if (folderName.StartsWith(DISABLED_PREFIX, StringComparison.CurrentCultureIgnoreCase))
-            return folderName.Replace(DISABLED_PREFIX, string.Empty);
+            return folderName[DISABLED_PREFIX.Length..].TrimStart();
 
         if (folderName.StartsWith(ALT_DISABLED_PREFIX, StringComparison.CurrentCultureIgnoreCase))
-            return folderName.Replace(ALT_DISABLED_PREFIX, string.Empty);
+            return folderName[ALT_DISABLED_PREFIX.Length..].TrimStart();
 
         return folderName;
     }
@@ -100,5 +100,55 @@ public static class ModFolderHelpers
     public static bool IsJASMFileEntry(FileSystemInfo entry)
     {
         return entry.Name.StartsWith(".JASM_", StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Generates a collision-free folder name for a mod, accounting for existing active and disabled mods
+    /// both in the in-memory collection and on the physical filesystem.
+    /// </summary>
+    public static string GenerateUniqueFolderName(
+        string baseName,
+        IEnumerable<string> existingFolderNames,
+        Func<string, bool>? diskDirectoryExists = null)
+    {
+        var cleanBaseName = GetFolderNameWithoutDisabledPrefix(baseName).Trim();
+        var existingNormalized = existingFolderNames
+            .Select(n => GetFolderNameWithoutDisabledPrefix(n).Trim())
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        bool NameCollides(string name)
+        {
+            if (existingNormalized.Contains(name))
+                return true;
+
+            if (diskDirectoryExists != null)
+            {
+                if (diskDirectoryExists(name))
+                    return true;
+
+                if (diskDirectoryExists(DISABLED_PREFIX + name))
+                    return true;
+
+                if (diskDirectoryExists("DISABLED " + name))
+                    return true;
+
+                if (diskDirectoryExists(ALT_DISABLED_PREFIX + name))
+                    return true;
+            }
+
+            return false;
+        }
+
+        if (!NameCollides(cleanBaseName))
+            return cleanBaseName;
+
+        int counter = 1;
+        while (true)
+        {
+            var candidate = $"{cleanBaseName} ({counter})";
+            if (!NameCollides(candidate))
+                return candidate;
+            counter++;
+        }
     }
 }

@@ -5,14 +5,12 @@ using CommunityToolkitWrapper;
 using GIMI_ModManager.Core.Contracts.Services;
 using GIMI_ModManager.Core.Entities;
 using GIMI_ModManager.Core.Entities.Mods.Contract;
-using GIMI_ModManager.Core.Entities.Mods.FileModels;
 using GIMI_ModManager.Core.Entities.Mods.Helpers;
 using GIMI_ModManager.Core.Helpers;
 using GIMI_ModManager.WinUI.Services;
 using GIMI_ModManager.WinUI.Services.ModHandling;
 using GIMI_ModManager.WinUI.Services.Notifications;
 using GIMI_ModManager.WinUI.ViewModels.SubVms;
-using GIMI_ModManager.WinUI.Views.CharacterDetailsPages;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.Windows.Storage.Pickers;
@@ -56,10 +54,6 @@ public sealed partial class ModPaneVM(
 
     [ObservableProperty] private bool _isEditingModName;
 
-    // 紧凑显示/编辑切换
-    [ObservableProperty]
-    private bool _isKeySwapsEditMode;
-
     public bool IsNotReadOnly => !IsReadOnly;
 
     private Guid? _loadedModId;
@@ -82,10 +76,16 @@ public sealed partial class ModPaneVM(
         ? _localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/HideDisabledIniFiles", "Hide DISABLED files")
         : _localizer.GetLocalizedStringOrDefault("/CharacterDetailsPage/ShowDisabledIniFiles", "Show DISABLED files");
 
-    public bool QueueLoadMod(Guid? modId, bool force = false) => _channel.Writer.TryWrite(new LoadModMessage { ModId = modId, Force = force });
+    private long _latestRequestedSequence;
+
+    public bool QueueLoadMod(Guid? modId, bool force = false)
+    {
+        var sequence = Interlocked.Increment(ref _latestRequestedSequence);
+        return _channel.Writer.TryWrite(new LoadModMessage { ModId = modId, Force = force, Sequence = sequence });
+    }
 
     private readonly Channel<LoadModMessage> _channel = Channel.CreateBounded<LoadModMessage>(
-        new BoundedChannelOptions(4)
+        new BoundedChannelOptions(1)
         {
             AllowSynchronousContinuations = false,
             FullMode = BoundedChannelFullMode.DropOldest,
@@ -100,12 +100,21 @@ public sealed partial class ModPaneVM(
             if (_cancellationToken.IsCancellationRequested)
                 break;
 
+            if (loadModMessage.Sequence < Volatile.Read(ref _latestRequestedSequence))
+                continue;
+
             try
             {
                 using var _ = await LockAsync().ConfigureAwait(false);
 
+                if (loadModMessage.Sequence < Volatile.Read(ref _latestRequestedSequence))
+                    continue;
+
                 await _dispatcherQueue.EnqueueAsync(() =>
                 {
+                    if (loadModMessage.Sequence < Volatile.Read(ref _latestRequestedSequence))
+                        return;
+
                     IsReadOnly = true;
                     IsEditingModName = false;
                 });
@@ -114,6 +123,9 @@ public sealed partial class ModPaneVM(
                 {
                     await _dispatcherQueue.EnqueueAsync(() =>
                     {
+                        if (loadModMessage.Sequence < Volatile.Read(ref _latestRequestedSequence))
+                            return;
+
                         UnloadMod();
                         NotifyAllCommands();
                         OnPropertyChanged(nameof(IsModLoaded));
@@ -121,7 +133,7 @@ public sealed partial class ModPaneVM(
                     continue;
                 }
 
-                await LoadModAsync(loadModMessage.ModId.Value, loadModMessage.Force);
+                await LoadModAsync(loadModMessage.ModId.Value, loadModMessage.Force, loadModMessage.Sequence);
             }
             catch (OperationCanceledException)
             {
@@ -136,23 +148,32 @@ public sealed partial class ModPaneVM(
             }
             finally
             {
-                await _dispatcherQueue.EnqueueAsync(() =>
+                if (loadModMessage.Sequence >= Volatile.Read(ref _latestRequestedSequence))
                 {
-                    IsReadOnly = false;
-                    NotifyAllCommands();
-                    OnPropertyChanged(nameof(IsModLoaded));
-                });
+                    await _dispatcherQueue.EnqueueAsync(() =>
+                    {
+                        if (loadModMessage.Sequence < Volatile.Read(ref _latestRequestedSequence))
+                            return;
+
+                        IsReadOnly = false;
+                        NotifyAllCommands();
+                        OnPropertyChanged(nameof(IsModLoaded));
+                    });
+                }
             }
         }
     }
 
-    private async Task LoadModAsync(Guid modId, bool force)
+    private async Task LoadModAsync(Guid modId, bool force, long sequence)
     {
         if (modId == _loadedModId && !force)
             return;
 
         var modPaneData = await Task.Run(async () =>
         {
+            if (sequence < Volatile.Read(ref _latestRequestedSequence))
+                return null;
+
             var modEntry = _skinManagerService.GetModEntryById(modId);
             if (modEntry == null)
                 return null;
@@ -160,9 +181,14 @@ public sealed partial class ModPaneVM(
             var mod = modEntry.Mod;
             var modSettings = await mod.Settings.TryReadSettingsAsync(useCache: false, cancellationToken: _cancellationToken);
 
+            if (sequence < Volatile.Read(ref _latestRequestedSequence))
+                return null;
+
             if (modSettings is null)
             {
                 await Task.Delay(60, _cancellationToken).ConfigureAwait(false);
+                if (sequence < Volatile.Read(ref _latestRequestedSequence))
+                    return null;
                 modSettings = await mod.Settings.TryReadSettingsAsync(useCache: false, cancellationToken: _cancellationToken);
             }
 
@@ -176,7 +202,13 @@ public sealed partial class ModPaneVM(
                 );
             }
 
+            if (sequence < Volatile.Read(ref _latestRequestedSequence))
+                return null;
+
             var keySwapResult = await keySwapService.GetAllKeySwapsAsync(modId, ShowDisabledIniFiles);
+
+            if (sequence < Volatile.Read(ref _latestRequestedSequence))
+                return null;
 
             Dictionary<string, List<KeySwapSection>>? allKeySwaps = null;
 
@@ -206,10 +238,16 @@ public sealed partial class ModPaneVM(
             return new { modEntry, modSettings, allKeySwaps };
         }, _cancellationToken);
 
+        if (sequence < Volatile.Read(ref _latestRequestedSequence))
+            return;
+
         if (modPaneData is null)
         {
             await _dispatcherQueue.EnqueueAsync(() =>
             {
+                if (sequence < Volatile.Read(ref _latestRequestedSequence))
+                    return;
+
                 UnloadMod();
                 NotifyAllCommands();
                 OnPropertyChanged(nameof(IsModLoaded));
@@ -219,6 +257,9 @@ public sealed partial class ModPaneVM(
 
         await _dispatcherQueue.EnqueueAsync(() =>
         {
+            if (sequence < Volatile.Read(ref _latestRequestedSequence))
+                return;
+
             if (ModModel.IsLoaded)
             {
                 ModModel.PropertyChanged -= ModModel_PropertyChanged;
@@ -229,7 +270,7 @@ public sealed partial class ModPaneVM(
             ModModel.PropertyChanged += ModModel_PropertyChanged;
             _loadedModId = modId;
             IsReadOnly = false;
-            IsKeySwapsEditMode = false; // 默认进入紧凑展示模式
+
             UpdateIniKeySwapGroups(modPaneData.allKeySwaps);
             NotifyAllCommands();
             OnPropertyChanged(nameof(ModModel));
@@ -239,90 +280,105 @@ public sealed partial class ModPaneVM(
 
     private void UpdateIniKeySwapGroups(Dictionary<string, List<KeySwapSection>>? allKeySwaps)
     {
-        IniKeySwapGroups.Clear();
-        IniKeySwapGroups.CollectionChanged += (s, e) => OnPropertyChanged(nameof(HasAnyKeySwap));
+        var expandedStates = IniKeySwapGroups.ToDictionary(g => g.IniFileName, g => g.IsExpanded);
 
-        if (allKeySwaps == null)
-            return;
+        var newGroups = new List<IniKeySwapGroupVm>();
 
-        foreach (var kv in allKeySwaps)
+        if (allKeySwaps != null)
         {
-            var group = new IniKeySwapGroupVm
+            foreach (var kv in allKeySwaps)
             {
-                IniFileName = kv.Key,
-                ModPath = _loadedMod?.Mod.FullPath
-            };
-
-            foreach (var vm in kv.Value.Select(keySwap => new ModPaneFieldsKeySwapVm
-            {
-                ForwardHotkey = keySwap.ForwardKey,
-                BackwardHotkey = keySwap.BackwardKey,
-                SectionKey = keySwap.SectionName,
-                Type = keySwap.Type,
-                VariationsCount = keySwap.Variants?.ToString() ?? "0"
-            }))
-            {
-                // 监听 SectionNameEditValid 变化
-                vm.PropertyChanged += (s, e) =>
+                var group = new IniKeySwapGroupVm
                 {
-                    if (e.PropertyName == nameof(ModPaneFieldsKeySwapVm.SectionNameEditValid))
-                        OnPropertyChanged(nameof(CanSave));
+                    IniFileName = kv.Key,
+                    ModPath = _loadedMod?.Mod.FullPath,
+                    IsExpanded = expandedStates.TryGetValue(kv.Key, out var wasExpanded) ? wasExpanded : true
                 };
 
-                vm.PropertyChanged += (_, e) =>
+                foreach (var keySwap in kv.Value)
                 {
-                    OnPropertyChanged(nameof(ModModel));
-                    if (e.PropertyName is nameof(ModPaneFieldsKeySwapVm.ForwardHotkey)
-                        or nameof(ModPaneFieldsKeySwapVm.BackwardHotkey)
-                        or nameof(ModPaneFieldsKeySwapVm.IsValid))
+                    var vm = new ModPaneFieldsKeySwapVm
                     {
-                        SaveModSettingsCommand.NotifyCanExecuteChanged();
-                        OnPropertyChanged(nameof(CanSave));
-                        NotifyAreAllKeySwapsValidChanged();
-                    }
-                };
+                        SectionKey = keySwap.SectionName,
+                        Type = keySwap.Type,
+                        VariationsCount = keySwap.Variants?.ToString() ?? "0"
+                    };
 
-                group.KeySwaps.Add(vm);
-            }
+                    var forwardKeys = keySwap.ForwardKeys.Count > 0
+                        ? keySwap.ForwardKeys
+                        : KeyMappingHelpers.SplitMultiKeys(keySwap.ForwardKey);
+                    var backwardKeys = keySwap.BackwardKeys.Count > 0
+                        ? keySwap.BackwardKeys
+                        : KeyMappingHelpers.SplitMultiKeys(keySwap.BackwardKey);
 
-            // 在 keyswap 加载/初始化时赋值 UnchangedValue
-            foreach (var keySwap in group.KeySwaps)
-            {
-                keySwap.UnchangedValue = new ModPaneFieldsKeySwapVm
+                    vm.LoadKeys(forwardKeys, backwardKeys);
+
+                    vm.PropertyChanged += (s, e) =>
+                    {
+                        if (e.PropertyName == nameof(ModPaneFieldsKeySwapVm.SectionNameEditValid))
+                        {
+                            OnPropertyChanged(nameof(CanSave));
+                            NotifyAreAllKeySwapsValidChanged();
+                        }
+                    };
+
+                    vm.PropertyChanged += (_, e) =>
+                    {
+                        OnPropertyChanged(nameof(ModModel));
+                        if (e.PropertyName is nameof(ModPaneFieldsKeySwapVm.ForwardHotkey)
+                            or nameof(ModPaneFieldsKeySwapVm.BackwardHotkey)
+                            or nameof(ModPaneFieldsKeySwapVm.IsValid)
+                            or nameof(ModPaneFieldsKeySwapVm.SectionKey))
+                        {
+                            SaveModSettingsCommand.NotifyCanExecuteChanged();
+                            OnPropertyChanged(nameof(CanSave));
+                            NotifyAreAllKeySwapsValidChanged();
+                            group.NotifyKeySwapsChanged();
+                        }
+                    };
+
+                    group.KeySwaps.Add(vm);
+                }
+
+                // Snapshot initial values for change tracking
+                foreach (var keySwap in group.KeySwaps)
                 {
-                    SectionKey = keySwap.SectionKey,
-                    ForwardHotkey = keySwap.ForwardHotkey,
-                    BackwardHotkey = keySwap.BackwardHotkey,
-                    Type = keySwap.Type,
-                    VariationsCount = keySwap.VariationsCount
-                };
-            }
+                    keySwap.UnchangedValue = keySwap.Clone();
+                }
 
-            IniKeySwapGroups.Add(group);
+                var unchangedGroup = new IniKeySwapGroupVm
+                {
+                    IniFileName = group.IniFileName
+                };
+                foreach (var keySwap in group.KeySwaps)
+                {
+                    unchangedGroup.KeySwaps.Add(keySwap.Clone());
+                }
+                group.UnchangedValue = unchangedGroup;
+
+                newGroups.Add(group);
+            }
         }
 
-        // 设置 UnchangedValue 用于变更检测
-        foreach (var group in IniKeySwapGroups)
+        // Synchronize in-place to avoid a destructive blank frame
+        for (int i = 0; i < newGroups.Count; i++)
         {
-            var unchangedGroup = new IniKeySwapGroupVm
+            if (i < IniKeySwapGroups.Count)
             {
-                IniFileName = group.IniFileName
-            };
-
-            foreach (var keySwap in group.KeySwaps)
-            {
-                unchangedGroup.KeySwaps.Add(new ModPaneFieldsKeySwapVm
-                {
-                    ForwardHotkey = keySwap.ForwardHotkey,
-                    BackwardHotkey = keySwap.BackwardHotkey,
-                    SectionKey = keySwap.SectionKey,
-                    Type = keySwap.Type,
-                    VariationsCount = keySwap.VariationsCount
-                });
+                IniKeySwapGroups[i] = newGroups[i];
             }
-
-            group.UnchangedValue = unchangedGroup;
+            else
+            {
+                IniKeySwapGroups.Add(newGroups[i]);
+            }
         }
+
+        while (IniKeySwapGroups.Count > newGroups.Count)
+        {
+            IniKeySwapGroups.RemoveAt(IniKeySwapGroups.Count - 1);
+        }
+
+        OnPropertyChanged(nameof(HasAnyKeySwap));
     }
 
     private void ModModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -356,6 +412,7 @@ public sealed partial class ModPaneVM(
     {
         public Guid? ModId { get; init; }
         public bool Force { get; init; }
+        public long Sequence { get; init; }
     }
 
     public void Receive(ModChangedMessage message)
@@ -373,9 +430,10 @@ public sealed partial class ModPaneVM(
     {
         _dispatcherQueue = dispatcherQueue;
         _cancellationToken = navigationCt;
-        _ = _dispatcherQueue.EnqueueAsync(ModLoaderLoopAsync);
+        _ = Task.Run(ModLoaderLoopAsync, CancellationToken.None);
         Messenger.RegisterAll(this);
         BusySetter.HardBusyChanged += BusySetter_HardBusyChanged;
+        _localizer.LanguageChanged += OnLanguageChanged;
         IsInitialized = true;
         return Task.CompletedTask;
     }
@@ -385,6 +443,7 @@ public sealed partial class ModPaneVM(
         _channel.Writer.TryComplete();
         Messenger.UnregisterAll(this);
         BusySetter.HardBusyChanged -= BusySetter_HardBusyChanged;
+        _localizer.LanguageChanged -= OnLanguageChanged;
 
         if (ModModel.IsLoaded)
         {
@@ -404,6 +463,20 @@ public sealed partial class ModPaneVM(
         {
             _logger.Warning(e, "Failed to dispose of load mod lock");
         }
+    }
+
+    private void OnLanguageChanged(object? sender, EventArgs e)
+    {
+        _dispatcherQueue?.TryEnqueue(() =>
+        {
+            foreach (var group in IniKeySwapGroups)
+            {
+                foreach (var swap in group.KeySwaps)
+                {
+                    swap.RefreshLanguage();
+                }
+            }
+        });
     }
 
     private bool DefaultCanExecute => IsModLoaded && IsNotReadOnly && BusySetter.IsNotHardBusy;
@@ -482,7 +555,14 @@ public sealed partial class ModPaneVM(
                 return;
             }
 
-            ModModel.ImageUri = imagePath;
+            if (_dispatcherQueue.HasThreadAccess)
+            {
+                ModModel.ImageUri = imagePath;
+            }
+            else
+            {
+                _dispatcherQueue.TryEnqueue(() => ModModel.ImageUri = imagePath);
+            }
         }).ConfigureAwait(false);
     }
 
@@ -543,15 +623,42 @@ public sealed partial class ModPaneVM(
         }
     }
 
+    public bool AreModifiedKeySwapsValid
+    {
+        get
+        {
+            return IniKeySwapGroups.All(g =>
+                g.KeySwaps.Where(k => k.IsKeySwapChanged()).All(k =>
+                    k is { IsValid: true, SectionNameEditValid: true }));
+        }
+    }
+
     private void NotifyAreAllKeySwapsValidChanged()
     {
         OnPropertyChanged(nameof(AreAllKeySwapsValid));
+        OnPropertyChanged(nameof(AreModifiedKeySwapsValid));
         NotifyCanSaveModSettingsChanged();
     }
 
-    public bool CanSaveModSettings => DefaultCanExecute &&
-                                      (ModModel.AnyChanges || HasKeySwapChanges()) &&
-                                      AreAllKeySwapsValid;
+    public bool CanSaveModSettings
+    {
+        get
+        {
+            if (!DefaultCanExecute)
+                return false;
+
+            var hasModChanges = ModModel.AnyChanges;
+            var hasKeyChanges = HasKeySwapChanges();
+
+            if (!hasModChanges && !hasKeyChanges)
+                return false;
+
+            if (hasKeyChanges && !AreModifiedKeySwapsValid)
+                return false;
+
+            return true;
+        }
+    }
 
     private void NotifyCanSaveModSettingsChanged()
     {
@@ -605,18 +712,15 @@ public sealed partial class ModPaneVM(
 
                         foreach (var keySwap in group.KeySwaps.Where(k => k.IsKeySwapChanged()))
                         {
-                            // 解析 ForwardHotkey 和 BackwardHotkey 到列表
-                            var forwardKeys = new List<string>();
-                            var backwardKeys = new List<string>();
-                            if (!string.IsNullOrWhiteSpace(keySwap.ForwardHotkey))
-                            {
-                                forwardKeys.AddRange(ParseKeyString(keySwap.ForwardHotkey));
-                            }
+                            var forwardKeys = keySwap.ForwardKeyItems
+                                .Select(k => k.RawKey.Trim())
+                                .Where(k => !string.IsNullOrEmpty(k))
+                                .ToList();
 
-                            if (!string.IsNullOrWhiteSpace(keySwap.BackwardHotkey))
-                            {
-                                backwardKeys.AddRange(ParseKeyString(keySwap.BackwardHotkey));
-                            }
+                            var backwardKeys = keySwap.BackwardKeyItems
+                                .Select(k => k.RawKey.Trim())
+                                .Where(k => !string.IsNullOrEmpty(k))
+                                .ToList();
 
                             list.Add(new KeySwapSection
                             {
@@ -667,13 +771,7 @@ public sealed partial class ModPaneVM(
         IsEditingModName = !IsEditingModName;
     }
 
-    private bool CanToggleKeySwapsEditMode() => IsNotReadOnly;
 
-    [RelayCommand(CanExecute = nameof(CanToggleKeySwapsEditMode))]
-    private void ToggleKeySwapsEditMode()
-    {
-        IsKeySwapsEditMode = !IsKeySwapsEditMode;
-    }
 
     [RelayCommand]
     private void ToggleShowDisabledIniFiles()
@@ -708,7 +806,15 @@ public sealed partial class ModPaneVM(
         await CommandWrapper(async () =>
         {
             var image = await _imageHandlerService.DownloadImageAsync(uri, _cancellationToken);
-            ModModel.ImageUri = new Uri(image.Path);
+            var imageUri = new Uri(image.Path);
+            if (_dispatcherQueue.HasThreadAccess)
+            {
+                ModModel.ImageUri = imageUri;
+            }
+            else
+            {
+                _dispatcherQueue.TryEnqueue(() => ModModel.ImageUri = imageUri);
+            }
         }, true, useDefaultExceptionHandler: true).ConfigureAwait(false);
     }
 
@@ -734,7 +840,14 @@ public sealed partial class ModPaneVM(
         {
             var file = storageItems.First();
             var filePath = new Uri(file.Path);
-            ModModel.ImageUri = filePath;
+            if (_dispatcherQueue.HasThreadAccess)
+            {
+                ModModel.ImageUri = filePath;
+            }
+            else
+            {
+                _dispatcherQueue.TryEnqueue(() => ModModel.ImageUri = filePath);
+            }
             return Task.CompletedTask;
         }, true, useDefaultExceptionHandler: true).ConfigureAwait(false);
     }
@@ -813,53 +926,6 @@ public sealed partial class ModPaneVM(
     }
 
     public bool HasAnyKeySwap => IniKeySwapGroups?.Any(g => g.KeySwaps.Count > 0) == true;
-
-    private static List<string> ParseKeyString(string value)
-    {
-        var result = new List<string>();
-
-        if (string.IsNullOrWhiteSpace(value))
-            return result;
-
-        var keyText = value.Trim();
-
-        // 使用正则分割"作为分隔符的逗号"（仅前面是非逗号且无空格的逗号）
-        var parts = VirtualKeyToFriendlyTextConverter.SeparatorCommaRegex.Split(keyText)
-            .Select(p => p.Trim())
-            .Where(p => !string.IsNullOrEmpty(p)) // 过滤空项，但保留含逗号的有效部分
-            .ToList();
-
-        foreach (var part in parts)
-        {
-            // 检查是否是 "num X" 格式（如"num 0"到"num 9"）
-            if (VirtualKeyToFriendlyTextConverter.IsNumFormat(part))
-            {
-                result.Add(part);
-            }
-            // 组合按键（含空格分隔，包括包含逗号key的组合）
-            else if (part.Contains(' '))
-            {
-                // 仅分割空格并过滤空项，不再过滤NO_前缀
-                var validSubParts = part.Split([' '], StringSplitOptions.RemoveEmptyEntries)
-                    .Select(p => p.Trim())
-                    .Where(p => !string.IsNullOrEmpty(p))
-                    .ToList();
-
-                if (validSubParts.Count > 0)
-                {
-                    // 重组有效组合键（保留空格分隔）
-                    result.Add(string.Join(" ", validSubParts));
-                }
-            }
-            // 单个按键（包括逗号key）
-            else
-            {
-                result.Add(part);
-            }
-        }
-
-        return result;
-    }
 }
 
 public partial class ModPaneFieldsVm : ObservableObject
@@ -879,15 +945,9 @@ public partial class ModPaneFieldsVm : ObservableObject
     [ObservableProperty] private bool _ignoreMergedIni = true;
     public bool IsIgnoreMergedIniChanged => IgnoreMergedIni != UnchangedValue?.IgnoreMergedIni;
 
-    public ObservableCollection<ModPaneFieldsKeySwapVm> KeySwaps { get; } = [];
-
-    // ini keyswaps 分组
-    public ObservableCollection<IniKeySwapGroupVm> IniKeySwapGroups { get; } = [];
-    public bool IsIniKeySwapGroupsChanged => AnyIniKeySwapGroupsChanges();
-
     public string IsKeySwapManagementEnabled => (!IgnoreMergedIni).ToString().ToLower();
 
-    private ModPaneFieldsVm(CharacterSkinEntry modEntry, ModSettings modSettings, IEnumerable<KeySwapSection> keySwaps)
+    private ModPaneFieldsVm(CharacterSkinEntry modEntry, ModSettings modSettings)
     {
         IsEnabled = modEntry.IsEnabled;
         ImageUri = modSettings.ImagePath ?? ImageHandlerService.StaticPlaceholderImageUri;
@@ -895,20 +955,6 @@ public partial class ModPaneFieldsVm : ObservableObject
         ModUrl = modSettings.ModUrl?.ToString() ?? "";
         ModIniPath = modSettings.MergedIniPath?.ToString();
         IgnoreMergedIni = modSettings.IgnoreMergedIni;
-
-        foreach (var keySwap in keySwaps)
-        {
-            KeySwaps.Add(new ModPaneFieldsKeySwapVm
-            {
-                ForwardHotkey = keySwap.ForwardKey,
-                BackwardHotkey = keySwap.BackwardKey,
-                SectionKey = keySwap.SectionName,
-                Type = keySwap.Type,
-                VariationsCount = keySwap.Variants?.ToString() ?? "无"
-            });
-
-            KeySwaps.Last().PropertyChanged += (_, e) => { OnPropertyChanged(nameof(KeySwaps)); };
-        }
 
         PropertyChanged += (_, e) =>
         {
@@ -921,15 +967,15 @@ public partial class ModPaneFieldsVm : ObservableObject
     {
     }
 
-    public static ModPaneFieldsVm FromModEntry(CharacterSkinEntry modEntry, ModSettings modSettings, ICollection<KeySwapSection> keySwaps)
+    public static ModPaneFieldsVm FromModEntry(CharacterSkinEntry modEntry, ModSettings modSettings, ICollection<KeySwapSection>? keySwaps = null)
     {
-        var unchangedValue = new ModPaneFieldsVm(modEntry, modSettings, keySwaps)
+        var unchangedValue = new ModPaneFieldsVm(modEntry, modSettings)
         {
             IsLoaded = true,
             UnchangedValue = null
         };
 
-        var result = new ModPaneFieldsVm(modEntry, modSettings, keySwaps)
+        var result = new ModPaneFieldsVm(modEntry, modSettings)
         {
             IsLoaded = true,
             UnchangedValue = unchangedValue
@@ -950,44 +996,8 @@ public partial class ModPaneFieldsVm : ObservableObject
                    ModDisplayName != UnchangedValue.ModDisplayName ||
                    ModUrl != UnchangedValue.ModUrl ||
                    ModIniPath != UnchangedValue.ModIniPath ||
-                   IgnoreMergedIni != UnchangedValue.IgnoreMergedIni ||
-                   IsIniKeySwapGroupsChanged;
+                   IgnoreMergedIni != UnchangedValue.IgnoreMergedIni;
         }
-    }
-
-    private bool AnyIniKeySwapGroupsChanges()
-    {
-        if (UnchangedValue is null)
-            return false;
-
-        if (IniKeySwapGroups.Count != UnchangedValue.IniKeySwapGroups.Count)
-            return true;
-
-        for (var i = 0; i < IniKeySwapGroups.Count; i++)
-        {
-            var oldGroup = UnchangedValue.IniKeySwapGroups[i];
-            var newGroup = IniKeySwapGroups[i];
-
-            if ((oldGroup.IniFileName ?? "") != (newGroup.IniFileName ?? ""))
-                return true;
-
-            if (oldGroup.KeySwaps.Count != newGroup.KeySwaps.Count)
-                return true;
-
-            for (var j = 0; j < newGroup.KeySwaps.Count; j++)
-            {
-                var oldKeySwap = oldGroup.KeySwaps[j];
-                var newKeySwap = newGroup.KeySwaps[j];
-
-                if ((oldKeySwap.ForwardHotkey ?? "") != (newKeySwap.ForwardHotkey ?? "") ||
-                    (oldKeySwap.BackwardHotkey ?? "") != (newKeySwap.BackwardHotkey ?? ""))
-                {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 }
 
@@ -996,16 +1006,15 @@ public partial class IniKeySwapGroupVm
     : ObservableObject
 {
     [ObservableProperty] private string _iniFileName = string.Empty;
+    [ObservableProperty] private bool _isExpanded = true;
 
     public ObservableCollection<ModPaneFieldsKeySwapVm> KeySwaps { get; } = [];
 
     // 用于变更检测的原始值
     public IniKeySwapGroupVm? UnchangedValue { get; set; }
 
-    // 模组路径属性
     public string? ModPath { get; set; }
 
-    // 打开ini文件的命令
     [RelayCommand]
     private async Task OpenIniFileAsync()
     {
@@ -1039,13 +1048,57 @@ public partial class IniKeySwapGroupVm
             if (KeySwaps.Count != UnchangedValue.KeySwaps.Count)
                 return true;
 
-            return KeySwaps.Zip(UnchangedValue.KeySwaps, (newKs, oldKs) =>
-                    (newKs.ForwardHotkey ?? "") != (oldKs.ForwardHotkey ?? "") ||
-                    (newKs.BackwardHotkey ?? "") != (oldKs.BackwardHotkey ?? "") ||
-                    (newKs.SectionKey ?? "") != (oldKs.SectionKey ?? ""))
-                .Any(changed => changed);
+            return KeySwaps.Any(ks => ks.IsKeySwapChanged());
         }
     }
+
+    public void NotifyKeySwapsChanged()
+    {
+        OnPropertyChanged(nameof(IsKeySwapsChanged));
+    }
+}
+
+public partial class KeyItemVm : ObservableObject
+{
+    [ObservableProperty] private string _rawKey = string.Empty;
+    [ObservableProperty] private string _friendlyText = string.Empty;
+    [ObservableProperty] private bool _isUnsaved;
+    [ObservableProperty] private bool _isNotLastItem;
+    [ObservableProperty] private bool _canDeleteKey;
+    [ObservableProperty] private bool _canAddReverseKey;
+    [ObservableProperty] private bool _canAddAlternative = true;
+    [ObservableProperty] private bool _isRequestingFocus;
+
+    public ModPaneFieldsKeySwapVm? Parent { get; set; }
+    public bool IsForward { get; set; } = true;
+
+    public KeyItemVm()
+    {
+    }
+
+    public KeyItemVm(string rawKey, bool isUnsaved = false)
+    {
+        _rawKey = rawKey;
+        _friendlyText = KeyMappingHelpers.ConvertToFriendlyText(rawKey, IsCurrentLanguageChinese);
+        _isUnsaved = isUnsaved;
+    }
+
+    partial void OnRawKeyChanged(string value)
+    {
+        FriendlyText = KeyMappingHelpers.ConvertToFriendlyText(value, IsCurrentLanguageChinese);
+    }
+
+    public void RefreshFriendlyText()
+    {
+        FriendlyText = KeyMappingHelpers.ConvertToFriendlyText(RawKey, IsCurrentLanguageChinese);
+        OnPropertyChanged(nameof(OrSeparatorText));
+    }
+
+    public string OrSeparatorText => IsCurrentLanguageChinese ? "或" : "or";
+
+    public static bool IsCurrentLanguageChinese =>
+        (App.GetService<ILanguageLocalizer>()?.CurrentLanguage?.LanguageCode ?? System.Globalization.CultureInfo.CurrentUICulture.Name)
+        .StartsWith("zh", StringComparison.OrdinalIgnoreCase);
 }
 
 public partial class ModPaneFieldsKeySwapVm : ObservableObject
@@ -1057,31 +1110,339 @@ public partial class ModPaneFieldsKeySwapVm : ObservableObject
     [ObservableProperty] private string? _type;
     [ObservableProperty] private string _variationsCount = "0";
 
-    private string? _sectionNamePrefix;
 
-    // 节名称编辑相关
-    [ObservableProperty] private bool _isEditingSectionName = false;
+    public ObservableCollection<KeyItemVm> ForwardKeyItems { get; } = [];
+    public ObservableCollection<KeyItemVm> BackwardKeyItems { get; } = [];
+    private bool _isInternalKeySyncing;
 
-    // 用于保存原始快照
+
     public ModPaneFieldsKeySwapVm? UnchangedValue { get; set; }
 
-    // 添加友好文本属性
-    [ObservableProperty] private string? _forwardHotkeyFriendlyText;
 
+    [ObservableProperty] private string? _forwardHotkeyFriendlyText;
     [ObservableProperty] private string? _backwardHotkeyFriendlyText;
 
-    [RelayCommand]
-    private void ToggleEditingSectionName()
+    public ModPaneFieldsKeySwapVm()
     {
-        IsEditingSectionName = !IsEditingSectionName;
+        ForwardKeyItems.CollectionChanged += (s, e) => NotifyForwardKeysUpdated();
+        BackwardKeyItems.CollectionChanged += (s, e) => NotifyBackwardKeysUpdated();
     }
 
-    // 编辑用属性：去掉前缀和方括号
-    public bool SectionNameEditValid => !string.IsNullOrWhiteSpace(SectionNameForEdit?.Trim()) &&
-                                        !SectionNameForEdit.Contains(' ');
+    public bool HasForwardKeys => ForwardKeyItems.Count > 0;
+    public bool HasBackwardKeys => BackwardKeyItems.Count > 0;
+    public bool IsChanged => IsKeySwapChanged();
 
-    public bool ForwardHotkeyValid => !string.IsNullOrWhiteSpace(ForwardHotkey?.Trim());
-    public bool BackwardHotkeyValid => !string.IsNullOrWhiteSpace(BackwardHotkey?.Trim());
+    public void UpdateKeyItemStates()
+    {
+        var originalForward = UnchangedValue?.ForwardKeyItems.Select(k => k.RawKey).ToList() ?? [];
+        for (int i = 0; i < ForwardKeyItems.Count; i++)
+        {
+            var item = ForwardKeyItems[i];
+            item.Parent = this;
+            item.IsForward = true;
+            item.IsNotLastItem = i < ForwardKeyItems.Count - 1;
+            item.CanDeleteKey = ForwardKeyItems.Count > 1;
+            item.CanAddReverseKey = item.IsForward && IsBackKeySupported && BackwardKeyItems.Count == 0;
+            item.CanAddAlternative = true;
+
+            if (UnchangedValue != null)
+            {
+                item.IsUnsaved = i >= originalForward.Count ||
+                    !string.Equals(item.RawKey.Trim(), originalForward[i].Trim(), StringComparison.OrdinalIgnoreCase);
+            }
+        }
+
+        var originalBackward = UnchangedValue?.BackwardKeyItems.Select(k => k.RawKey).ToList() ?? [];
+        for (int i = 0; i < BackwardKeyItems.Count; i++)
+        {
+            var item = BackwardKeyItems[i];
+            item.Parent = this;
+            item.IsForward = false;
+            item.IsNotLastItem = i < BackwardKeyItems.Count - 1;
+            item.CanDeleteKey = true;
+            item.CanAddReverseKey = false;
+            item.CanAddAlternative = true;
+
+            if (UnchangedValue != null)
+            {
+                item.IsUnsaved = i >= originalBackward.Count ||
+                    !string.Equals(item.RawKey.Trim(), originalBackward[i].Trim(), StringComparison.OrdinalIgnoreCase);
+            }
+        }
+    }
+
+    public void NotifyForwardKeysUpdated()
+    {
+        if (_isInternalKeySyncing) return;
+        _isInternalKeySyncing = true;
+        try
+        {
+            ForwardHotkey = KeyMappingHelpers.FormatKeyList(ForwardKeyItems.Select(k => k.RawKey));
+        }
+        finally
+        {
+            _isInternalKeySyncing = false;
+        }
+        ForwardHotkeyFriendlyText = ConvertToFriendlyText(ForwardHotkey);
+        UpdateKeyItemStates();
+        OnPropertyChanged(nameof(ForwardHotkeyValid));
+        OnPropertyChanged(nameof(HasForwardKeys));
+        OnPropertyChanged(nameof(IsValid));
+        OnPropertyChanged(nameof(IsChanged));
+        OnPropertyChanged(nameof(IsForwardKeyUnsaved));
+    }
+
+    public void NotifyBackwardKeysUpdated()
+    {
+        if (_isInternalKeySyncing) return;
+        _isInternalKeySyncing = true;
+        try
+        {
+            BackwardHotkey = KeyMappingHelpers.FormatKeyList(BackwardKeyItems.Select(k => k.RawKey));
+        }
+        finally
+        {
+            _isInternalKeySyncing = false;
+        }
+        BackwardHotkeyFriendlyText = ConvertToFriendlyText(BackwardHotkey);
+        UpdateKeyItemStates();
+        OnPropertyChanged(nameof(BackwardHotkeyValid));
+        OnPropertyChanged(nameof(HasBackwardKeys));
+        OnPropertyChanged(nameof(IsBackwardKeyVisible));
+        OnPropertyChanged(nameof(IsChanged));
+        OnPropertyChanged(nameof(IsBackwardKeyUnsaved));
+    }
+
+    public bool IsForwardKeyUnsaved => UnchangedValue != null && !KeyMappingHelpers.AreKeyListsEqual(
+        ForwardKeyItems.Select(k => k.RawKey),
+        UnchangedValue.ForwardKeyItems.Select(k => k.RawKey));
+
+    public bool IsBackwardKeyUnsaved => UnchangedValue != null && !KeyMappingHelpers.AreKeyListsEqual(
+        BackwardKeyItems.Select(k => k.RawKey),
+        UnchangedValue.BackwardKeyItems.Select(k => k.RawKey));
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsBackwardKeyVisible))]
+    private bool _isBackwardKeyExpanded;
+
+    public bool IsBackwardKeyVisible => IsBackKeySupported && (BackwardKeyItems.Count > 0 || IsBackwardKeyExpanded);
+
+    public void AddForwardAlternativeKey()
+    {
+        var newItem = new KeyItemVm(string.Empty, isUnsaved: true)
+        {
+            Parent = this,
+            IsForward = true,
+            IsRequestingFocus = true
+        };
+        ForwardKeyItems.Add(newItem);
+        UpdateKeyItemStates();
+        NotifyForwardKeysUpdated();
+    }
+
+    public void AddBackwardAlternativeKey()
+    {
+        var newItem = new KeyItemVm(string.Empty, isUnsaved: true)
+        {
+            Parent = this,
+            IsForward = false,
+            IsRequestingFocus = true
+        };
+        BackwardKeyItems.Add(newItem);
+        UpdateKeyItemStates();
+        NotifyBackwardKeysUpdated();
+    }
+
+    public void ExpandBackwardKeyForRecording()
+    {
+        IsBackwardKeyExpanded = true;
+        if (BackwardKeyItems.Count == 0)
+        {
+            BackwardKeyItems.Add(new KeyItemVm(string.Empty, isUnsaved: true)
+            {
+                Parent = this,
+                IsForward = false,
+                IsRequestingFocus = true
+            });
+            UpdateKeyItemStates();
+            NotifyBackwardKeysUpdated();
+        }
+    }
+
+    public void CollapseBackwardKey()
+    {
+        IsBackwardKeyExpanded = false;
+    }
+
+
+
+    public void ApplyDirectKey(string newRawKey, bool isForward)
+    {
+        var targetList = isForward ? ForwardKeyItems : BackwardKeyItems;
+        if (targetList.Count > 0)
+        {
+            ApplyKeyItemChange(targetList[0], newRawKey, isForward);
+        }
+        else
+        {
+            var newItem = new KeyItemVm(newRawKey, isUnsaved: true) { Parent = this, IsForward = isForward };
+            targetList.Add(newItem);
+            if (isForward)
+                NotifyForwardKeysUpdated();
+            else
+                NotifyBackwardKeysUpdated();
+        }
+    }
+
+    public void ApplyKeyItemChange(KeyItemVm item, string newRawKey, bool isForward)
+    {
+        item.RawKey = newRawKey;
+        if (isForward)
+            NotifyForwardKeysUpdated();
+        else
+            NotifyBackwardKeysUpdated();
+    }
+
+    public void AddAlternativeKey(KeyItemVm currentItem, bool isForward)
+    {
+        var targetList = isForward ? ForwardKeyItems : BackwardKeyItems;
+        var index = targetList.IndexOf(currentItem);
+        var newItem = new KeyItemVm(string.Empty, isUnsaved: true)
+        {
+            Parent = this,
+            IsForward = isForward,
+            IsRequestingFocus = true
+        };
+
+        if (index >= 0 && index < targetList.Count)
+        {
+            targetList.Insert(index + 1, newItem);
+        }
+        else
+        {
+            targetList.Add(newItem);
+        }
+
+        if (isForward)
+            NotifyForwardKeysUpdated();
+        else
+            NotifyBackwardKeysUpdated();
+    }
+
+    public void DeleteKeyItem(KeyItemVm item, bool isForward)
+    {
+        var targetList = isForward ? ForwardKeyItems : BackwardKeyItems;
+        if (isForward)
+        {
+            if (targetList.Count > 1)
+            {
+                targetList.Remove(item);
+            }
+            else
+            {
+                item.RawKey = string.Empty;
+            }
+        }
+        else
+        {
+            targetList.Remove(item);
+            if (targetList.Count == 0)
+            {
+                IsBackwardKeyExpanded = false;
+            }
+        }
+
+        if (isForward)
+            NotifyForwardKeysUpdated();
+        else
+            NotifyBackwardKeysUpdated();
+    }
+
+    public void LoadKeys(IEnumerable<string>? forwardKeys, IEnumerable<string>? backwardKeys)
+    {
+        _isInternalKeySyncing = true;
+        try
+        {
+            ForwardKeyItems.Clear();
+            var normalizedForward = KeyMappingHelpers.NormalizeKeys(forwardKeys);
+            if (normalizedForward.Count == 0)
+            {
+                ForwardKeyItems.Add(new KeyItemVm(string.Empty) { Parent = this, IsForward = true });
+            }
+            else
+            {
+                foreach (var key in normalizedForward)
+                {
+                    ForwardKeyItems.Add(new KeyItemVm(key) { Parent = this, IsForward = true });
+                }
+            }
+            ForwardHotkey = KeyMappingHelpers.FormatKeyList(ForwardKeyItems.Select(k => k.RawKey));
+
+            BackwardKeyItems.Clear();
+            var normalizedBackward = KeyMappingHelpers.NormalizeKeys(backwardKeys);
+            foreach (var key in normalizedBackward)
+            {
+                BackwardKeyItems.Add(new KeyItemVm(key) { Parent = this, IsForward = false });
+            }
+            BackwardHotkey = KeyMappingHelpers.FormatKeyList(BackwardKeyItems.Select(k => k.RawKey));
+        }
+        finally
+        {
+            _isInternalKeySyncing = false;
+        }
+
+        ForwardHotkeyFriendlyText = ConvertToFriendlyText(ForwardHotkey);
+        BackwardHotkeyFriendlyText = ConvertToFriendlyText(BackwardHotkey);
+        UpdateKeyItemStates();
+        OnPropertyChanged(nameof(ForwardHotkeyValid));
+        OnPropertyChanged(nameof(BackwardHotkeyValid));
+        OnPropertyChanged(nameof(HasForwardKeys));
+        OnPropertyChanged(nameof(HasBackwardKeys));
+        OnPropertyChanged(nameof(IsBackKeySupported));
+        OnPropertyChanged(nameof(ActionLabelText));
+        OnPropertyChanged(nameof(BackActionLabelText));
+        OnPropertyChanged(nameof(ModeDisplayText));
+        OnPropertyChanged(nameof(ModeBadgeToolTipText));
+        OnPropertyChanged(nameof(SectionToolTipText));
+        OnPropertyChanged(nameof(IsBackwardKeyVisible));
+        OnPropertyChanged(nameof(IsForwardKeyUnsaved));
+        OnPropertyChanged(nameof(IsBackwardKeyUnsaved));
+        OnPropertyChanged(nameof(IsValid));
+    }
+
+    public ModPaneFieldsKeySwapVm Clone()
+    {
+        var clone = new ModPaneFieldsKeySwapVm
+        {
+            SectionKey = SectionKey,
+            Type = Type,
+            VariationsCount = VariationsCount
+        };
+        clone.LoadKeys(
+            ForwardKeyItems.Select(k => k.RawKey),
+            BackwardKeyItems.Select(k => k.RawKey)
+        );
+        return clone;
+    }
+
+
+    public bool SectionNameEditValid
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(SectionNameForEdit?.Trim()))
+                return false;
+
+            // If the section name was not modified, treat it as valid even if it contains spaces.
+            if (UnchangedValue != null && SectionKey == UnchangedValue.SectionKey)
+                return true;
+
+            return !SectionNameForEdit.Contains(' ');
+        }
+    }
+
+    public bool ForwardHotkeyValid => ForwardKeyItems.Count > 0 || !string.IsNullOrWhiteSpace(ForwardHotkey?.Trim());
+    public bool BackwardHotkeyValid => BackwardKeyItems.Count > 0 || !string.IsNullOrWhiteSpace(BackwardHotkey?.Trim());
 
     public bool IsValid => SectionNameEditValid && ForwardHotkeyValid;
 
@@ -1091,8 +1452,7 @@ public partial class ModPaneFieldsKeySwapVm : ObservableObject
         {
             var sectionName = SectionKey;
             var content = sectionName.TrimStart('[').TrimEnd(']');
-            var displayContent = RemoveKeyPrefixes(content);
-            return $"[{displayContent}]";
+            return RemoveKeyPrefixes(content);
         }
     }
 
@@ -1106,59 +1466,114 @@ public partial class ModPaneFieldsKeySwapVm : ObservableObject
         set
         {
             var trimmedValue = value?.Replace(" ", "") ?? string.Empty;
+            var currentDisplay = SectionNameForEdit;
+
+            // Idempotent guard: avoid updating SectionKey when formatting matches current display.
+            if (string.Equals(trimmedValue, currentDisplay, StringComparison.Ordinal))
+                return;
+
             var sectionName = SectionKey.TrimStart('[').TrimEnd(']');
+            var prefix = IniConfigHelpers.GetSectionPrefix(sectionName, currentDisplay);
 
-            if (_sectionNamePrefix == null)
-            {
-                _sectionNamePrefix = "";
-                if (sectionName.StartsWith(IniKeySwapSection.KeySwapIniSection, StringComparison.OrdinalIgnoreCase))
-                    _sectionNamePrefix = sectionName[..IniKeySwapSection.KeySwapIniSection.Length];
-                else if (sectionName.StartsWith(IniKeySwapSection.CommandListSection, StringComparison.OrdinalIgnoreCase))
-                    _sectionNamePrefix = sectionName[..IniKeySwapSection.CommandListSection.Length];
-                else if (sectionName.StartsWith(IniKeySwapSection.ForwardIniKey, StringComparison.OrdinalIgnoreCase))
-                    _sectionNamePrefix = sectionName[..IniKeySwapSection.ForwardIniKey.Length];
-            }
-
-            var newSectionKey = string.IsNullOrWhiteSpace(trimmedValue) ? "[]" : $"[{_sectionNamePrefix}{trimmedValue}]";
+            var newSectionKey = string.IsNullOrWhiteSpace(trimmedValue) ? "[]" : $"[{prefix}{trimmedValue}]";
             if (SectionKey != newSectionKey)
             {
                 SectionKey = newSectionKey;
                 OnPropertyChanged(nameof(SectionKey));
                 OnPropertyChanged(nameof(DisplaySectionName));
+                OnPropertyChanged(nameof(SectionToolTipText));
                 OnPropertyChanged(nameof(SectionNameForEdit));
                 OnPropertyChanged(nameof(SectionNameEditValid));
                 OnPropertyChanged(nameof(IsValid));
+                OnPropertyChanged(nameof(IsChanged));
             }
         }
     }
 
-    public Visibility VariationsCountVisibility =>
-        Type?.Equals("cycle", StringComparison.OrdinalIgnoreCase) == true ? Visibility.Visible : Visibility.Collapsed;
+    public string SectionPrefix => IniConfigHelpers.GetSectionPrefix(SectionKey.TrimStart('[').TrimEnd(']'), SectionNameForEdit);
 
-    private static string RemoveKeyPrefixes(string name)
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(EditingSectionPreview))]
+    private string _editingSectionSuffix = string.Empty;
+
+    public string EditingSectionPreview
     {
-        if (string.IsNullOrWhiteSpace(name))
-            return name;
-
-        var displayName = name;
-
-        // 移除KeySwap前缀（不区分大小写）
-        if (displayName.StartsWith(IniKeySwapSection.KeySwapIniSection, StringComparison.OrdinalIgnoreCase) &&
-            displayName.Length > IniKeySwapSection.KeySwapIniSection.Length)
+        get
         {
-            displayName = displayName[IniKeySwapSection.KeySwapIniSection.Length..];
+            var clean = EditingSectionSuffix?.Trim().Replace(" ", "") ?? string.Empty;
+            return string.IsNullOrWhiteSpace(clean) ? SectionKey : $"[{SectionPrefix}{clean}]";
         }
-        else if (displayName.StartsWith(IniKeySwapSection.CommandListSection, StringComparison.OrdinalIgnoreCase) &&
-                 displayName.Length > IniKeySwapSection.CommandListSection.Length)
-        {
-            displayName = displayName[IniKeySwapSection.CommandListSection.Length..];
-        }
-        else if (displayName.StartsWith(IniKeySwapSection.ForwardIniKey, StringComparison.OrdinalIgnoreCase))
-        {
-            displayName = displayName[IniKeySwapSection.ForwardIniKey.Length..];
-        }
+    }
 
-        return displayName;
+    public void BeginEditSection()
+    {
+        EditingSectionSuffix = SectionNameForEdit;
+    }
+
+    public void CommitEditSection()
+    {
+        var clean = EditingSectionSuffix?.Trim().Replace(" ", "") ?? string.Empty;
+        if (!string.IsNullOrEmpty(clean))
+        {
+            SectionNameForEdit = clean;
+        }
+    }
+
+    public void CancelEditSection()
+    {
+        EditingSectionSuffix = SectionNameForEdit;
+    }
+
+    public int ParsedVariationsCount => int.TryParse(VariationsCount, out var count) ? count : 0;
+    public bool IsBackKeySupported => IniConfigHelpers.IsBackKeySupported(Type, ParsedVariationsCount);
+
+    public string ActionLabelText => IniConfigHelpers.GetActionLabel(IsBackKeySupported, KeyItemVm.IsCurrentLanguageChinese);
+    public string BackActionLabelText => IniConfigHelpers.GetBackActionLabel(KeyItemVm.IsCurrentLanguageChinese);
+
+    public string ModeDisplayText => IniConfigHelpers.GetModeDisplayText(Type, ParsedVariationsCount, KeyItemVm.IsCurrentLanguageChinese);
+    public string ModeBadgeToolTipText => IniConfigHelpers.GetModeToolTipText(Type, ParsedVariationsCount, KeyItemVm.IsCurrentLanguageChinese);
+
+    public string SectionToolTipText
+    {
+        get
+        {
+            var name = DisplaySectionName;
+            var hint = KeyItemVm.IsCurrentLanguageChinese ? "点击重命名" : "Click to rename";
+            if (ParsedVariationsCount > 1)
+            {
+                return KeyItemVm.IsCurrentLanguageChinese
+                    ? $"{name} ({ParsedVariationsCount}项) · {hint}"
+                    : $"{name} ({ParsedVariationsCount} items) · {hint}";
+            }
+            return $"{name} · {hint}";
+        }
+    }
+
+    public Visibility ModeBadgeVisibility =>
+        !string.IsNullOrWhiteSpace(ModeDisplayText) && !string.Equals(Type?.Trim(), "cycle", StringComparison.OrdinalIgnoreCase) ? Visibility.Visible : Visibility.Collapsed;
+
+    public Visibility VariationsCountVisibility => ModeBadgeVisibility;
+
+    private static string RemoveKeyPrefixes(string name) => IniConfigHelpers.RemoveKeyPrefixes(name);
+
+    public void RefreshLanguage()
+    {
+        OnPropertyChanged(nameof(ActionLabelText));
+        OnPropertyChanged(nameof(BackActionLabelText));
+        OnPropertyChanged(nameof(ModeDisplayText));
+        OnPropertyChanged(nameof(ModeBadgeToolTipText));
+        OnPropertyChanged(nameof(SectionToolTipText));
+        ForwardHotkeyFriendlyText = ConvertToFriendlyText(ForwardHotkey);
+        BackwardHotkeyFriendlyText = ConvertToFriendlyText(BackwardHotkey);
+        foreach (var item in ForwardKeyItems)
+        {
+            item.RefreshFriendlyText();
+        }
+        foreach (var item in BackwardKeyItems)
+        {
+            item.RefreshFriendlyText();
+        }
+        UpdateKeyItemStates();
     }
 
     public bool IsKeySwapChanged()
@@ -1166,14 +1581,47 @@ public partial class ModPaneFieldsKeySwapVm : ObservableObject
         if (UnchangedValue is null)
             return false;
 
-        return (ForwardHotkey ?? "") != (UnchangedValue.ForwardHotkey ?? "") ||
-               (BackwardHotkey ?? "") != (UnchangedValue.BackwardHotkey ?? "") ||
-               (SectionKey ?? "") != (UnchangedValue.SectionKey ?? "");
+        var forwardChanged = !KeyMappingHelpers.AreKeyListsEqual(
+            ForwardKeyItems.Select(k => k.RawKey),
+            UnchangedValue.ForwardKeyItems.Select(k => k.RawKey));
+
+        var backwardChanged = !KeyMappingHelpers.AreKeyListsEqual(
+            BackwardKeyItems.Select(k => k.RawKey),
+            UnchangedValue.BackwardKeyItems.Select(k => k.RawKey));
+
+        var sectionChanged = (SectionKey ?? "") != (UnchangedValue.SectionKey ?? "");
+
+        return forwardChanged || backwardChanged || sectionChanged;
     }
 
     partial void OnForwardHotkeyChanged(string? value)
     {
         ForwardHotkeyFriendlyText = ConvertToFriendlyText(value);
+        if (!_isInternalKeySyncing)
+        {
+            _isInternalKeySyncing = true;
+            try
+            {
+                ForwardKeyItems.Clear();
+                var tokens = KeyMappingHelpers.SplitMultiKeys(value);
+                if (tokens.Count == 0)
+                {
+                    ForwardKeyItems.Add(new KeyItemVm(string.Empty) { Parent = this, IsForward = true });
+                }
+                else
+                {
+                    foreach (var key in tokens)
+                    {
+                        ForwardKeyItems.Add(new KeyItemVm(key) { Parent = this, IsForward = true });
+                    }
+                }
+            }
+            finally
+            {
+                _isInternalKeySyncing = false;
+            }
+            UpdateKeyItemStates();
+        }
         OnPropertyChanged(nameof(ForwardHotkeyValid));
         OnPropertyChanged(nameof(IsValid));
     }
@@ -1181,12 +1629,30 @@ public partial class ModPaneFieldsKeySwapVm : ObservableObject
     partial void OnBackwardHotkeyChanged(string? value)
     {
         BackwardHotkeyFriendlyText = ConvertToFriendlyText(value);
+        if (!_isInternalKeySyncing)
+        {
+            _isInternalKeySyncing = true;
+            try
+            {
+                BackwardKeyItems.Clear();
+                foreach (var key in KeyMappingHelpers.SplitMultiKeys(value))
+                {
+                    BackwardKeyItems.Add(new KeyItemVm(key) { Parent = this, IsForward = false });
+                }
+            }
+            finally
+            {
+                _isInternalKeySyncing = false;
+            }
+            UpdateKeyItemStates();
+        }
+        OnPropertyChanged(nameof(BackwardHotkeyValid));
     }
 
     private static string? ConvertToFriendlyText(string? value)
     {
         return string.IsNullOrWhiteSpace(value)
             ? null
-            : VirtualKeyToFriendlyTextConverter.ConvertToFriendlyText(value);
+            : KeyMappingHelpers.ConvertToFriendlyText(value, KeyItemVm.IsCurrentLanguageChinese);
     }
 }

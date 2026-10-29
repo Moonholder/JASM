@@ -1,0 +1,210 @@
+<UserControl
+    x:Class="GIMI_ModManager.WinUI.Views.Controls.InPlaceKeyCapsule"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid x:Name="RootContainer" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="CapsuleStates">
+                <VisualState x:Name="StandardState">
+                    <VisualState.Setters>
+                        <Setter Target="CapsuleBorder.Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}" />
+                        <Setter Target="CapsuleBorder.BorderBrush" Value="{ThemeResource ControlStrokeColorDefaultBrush}" />
+                        <Setter Target="CapsuleBorder.BorderThickness" Value="1" />
+                        <Setter Target="LabelTextBlock.Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}" />
+                        <Setter Target="KeycapShadowBorder.Visibility" Value="Visible" />
+                        <Setter Target="AddKeyHintIcon.Visibility" Value="Collapsed" />
+                        <Setter Target="RecordingIndicatorIcon.Visibility" Value="Collapsed" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="StandardHoverState">
+                    <VisualState.Setters>
+                        <Setter Target="CapsuleBorder.Background" Value="{ThemeResource CardBackgroundFillColorSecondaryBrush}" />
+                        <Setter Target="CapsuleBorder.BorderBrush" Value="{ThemeResource ControlStrokeColorSecondaryBrush}" />
+                        <Setter Target="CapsuleBorder.BorderThickness" Value="1" />
+                        <Setter Target="LabelTextBlock.Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}" />
+                        <Setter Target="KeycapShadowBorder.Visibility" Value="Visible" />
+                        <Setter Target="AddKeyHintIcon.Visibility" Value="Collapsed" />
+                        <Setter Target="RecordingIndicatorIcon.Visibility" Value="Collapsed" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="StandardPressedState">
+                    <VisualState.Setters>
+                        <Setter Target="CapsuleBorder.Background" Value="{ThemeResource SubtleFillColorTertiaryBrush}" />
+                        <Setter Target="CapsuleBorder.BorderBrush" Value="{ThemeResource ControlStrokeColorDefaultBrush}" />
+                        <Setter Target="CapsuleBorder.BorderThickness" Value="1" />
+                        <Setter Target="LabelTextBlock.Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}" />
+                        <Setter Target="KeycapShadowBorder.Visibility" Value="Collapsed" />
+                        <Setter Target="AddKeyHintIcon.Visibility" Value="Collapsed" />
+                        <Setter Target="RecordingIndicatorIcon.Visibility" Value="Collapsed" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="EmptyState">
+                    <VisualState.Setters>
+                        <Setter Target="CapsuleBorder.Background" Value="Transparent" />
+                        <Setter Target="CapsuleBorder.BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
+                        <Setter Target="CapsuleBorder.BorderThickness" Value="1" />
+                        <Setter Target="LabelTextBlock.Foreground" Value="{ThemeResource TextFillColorTertiaryBrush}" />
+                        <Setter Target="KeycapShadowBorder.Visibility" Value="Collapsed" />
+                        <Setter Target="AddKeyHintIcon.Visibility" Value="Visible" />
+                        <Setter Target="RecordingIndicatorIcon.Visibility" Value="Collapsed" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="EmptyHoverState">
+                    <VisualState.Setters>
+                        <Setter Target="CapsuleBorder.Background" Value="{ThemeResource SubtleFillColorSecondaryBrush}" />
+                        <Setter Target="CapsuleBorder.BorderBrush" Value="{ThemeResource ControlStrokeColorDefaultBrush}" />
+                        <Setter Target="CapsuleBorder.BorderThickness" Value="1" />
+                        <Setter Target="LabelTextBlock.Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}" />
+                        <Setter Target="KeycapShadowBorder.Visibility" Value="Collapsed" />
+                        <Setter Target="AddKeyHintIcon.Visibility" Value="Visible" />
+                        <Setter Target="RecordingIndicatorIcon.Visibility" Value="Collapsed" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="RecordingState">
+                    <VisualState.Setters>
+                        <Setter Target="CapsuleBorder.Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}" />
+                        <Setter Target="CapsuleBorder.BorderBrush" Value="{ThemeResource AccentFillColorDefaultBrush}" />
+                        <Setter Target="CapsuleBorder.BorderThickness" Value="1.5" />
+                        <Setter Target="LabelTextBlock.Foreground" Value="{ThemeResource AccentTextFillColorPrimaryBrush}" />
+                        <Setter Target="KeycapShadowBorder.Visibility" Value="Collapsed" />
+                        <Setter Target="AddKeyHintIcon.Visibility" Value="Collapsed" />
+                        <Setter Target="RecordingIndicatorIcon.Visibility" Value="Visible" />
+                        <Setter Target="UnsavedDot.Visibility" Value="Collapsed" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
+        <Border
+            x:Name="KeycapShadowBorder"
+            Margin="0,1,0,-1"
+            CornerRadius="4"
+            Background="{ThemeResource ControlStrokeColorSecondaryBrush}"
+            Opacity="0.22" />
+
+        <Border
+            x:Name="CapsuleBorder"
+            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+            BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+            BorderThickness="1"
+            CornerRadius="4">
+            <Button
+                x:Name="CapsuleButton"
+                MinHeight="24"
+                MinWidth="28"
+                MaxWidth="150"
+                Padding="6,2,6,2"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                HorizontalContentAlignment="Center"
+                VerticalContentAlignment="Center"
+                Background="Transparent"
+                BorderThickness="0"
+                CornerRadius="4"
+                Click="OnCapsuleClicked"
+                PreviewKeyDown="OnCapsulePreviewKeyDown"
+                PreviewKeyUp="OnCapsulePreviewKeyUp"
+                PointerPressed="OnCapsulePointerPressed"
+                PointerReleased="OnCapsulePointerReleased"
+                PointerWheelChanged="OnCapsulePointerWheelChanged"
+                PointerEntered="OnCapsulePointerEntered"
+                PointerExited="OnCapsulePointerExited"
+                LostFocus="OnCapsuleLostFocus">
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            Background="{TemplateBinding Background}"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch">
+                            <ContentPresenter
+                                Margin="{TemplateBinding Padding}"
+                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        </Border>
+                    </ControlTemplate>
+                </Button.Template>
+
+                <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                    <FontIcon
+                        x:Name="RecordingIndicatorIcon"
+                        Glyph="&#xE765;"
+                        FontSize="11"
+                        Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                        Visibility="Collapsed"
+                        VerticalAlignment="Center" />
+
+                    <FontIcon
+                        x:Name="AddKeyHintIcon"
+                        Glyph="&#xE710;"
+                        FontSize="9"
+                        Opacity="0.55"
+                        Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                        Visibility="Collapsed"
+                        VerticalAlignment="Center" />
+
+                    <TextBlock
+                        x:Name="LabelTextBlock"
+                        VerticalAlignment="Center"
+                        FontSize="11.5"
+                        FontWeight="Medium"
+                        MaxWidth="130"
+                        TextTrimming="CharacterEllipsis"
+                        TextWrapping="NoWrap"
+                        FontFamily="Segoe UI Variable Text, Segoe UI, sans-serif" />
+
+                    <Ellipse
+                        x:Name="UnsavedDot"
+                        Width="5"
+                        Height="5"
+                        Margin="2,0,0,0"
+                        Fill="{ThemeResource SystemFillColorCautionBrush}"
+                        Visibility="Collapsed"
+                        VerticalAlignment="Center" />
+                </StackPanel>
+
+                <Button.ContextFlyout>
+                    <MenuFlyout x:Name="ContextMenu" Opening="ContextMenu_Opening">
+                        <MenuFlyoutItem x:Name="AddAlternativeMenuItem" Text="+ Add Alternative (or)" Click="OnAddAlternativeClicked">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE710;" FontSize="14" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem x:Name="AddReverseKeyMenuItem" Text="+ Add Reverse (⟷)" Click="OnAddReverseKeyClicked" Visibility="Collapsed">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE8AB;" FontSize="14" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutSeparator x:Name="ReverseKeySeparator" />
+
+                        <MenuFlyoutSubItem x:Name="NegativeModifiersSubMenu" Text="Exclusion Rules">
+                            <MenuFlyoutSubItem.Icon>
+                                <FontIcon Glyph="&#xE72E;" FontSize="14" />
+                            </MenuFlyoutSubItem.Icon>
+                            <ToggleMenuFlyoutItem x:Name="NoModifiersToggleItem" Text="Pure Single Key (no_modifiers)" Click="OnToggleNoModifiersClicked" />
+                            <MenuFlyoutSeparator />
+                            <ToggleMenuFlyoutItem x:Name="NoAltToggleItem" Text="Exclude Alt (no_alt)" Click="OnToggleNoAltClicked" />
+                            <ToggleMenuFlyoutItem x:Name="NoCtrlToggleItem" Text="Exclude Ctrl (no_ctrl)" Click="OnToggleNoCtrlClicked" />
+                            <ToggleMenuFlyoutItem x:Name="NoShiftToggleItem" Text="Exclude Shift (no_shift)" Click="OnToggleNoShiftClicked" />
+                        </MenuFlyoutSubItem>
+                        <MenuFlyoutSeparator x:Name="ExclusionSeparator" />
+
+                        <MenuFlyoutItem x:Name="ClearKeyMenuItem" Text="Clear Key" Click="OnClearClicked">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE75C;" FontSize="14" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem x:Name="DeleteKeyMenuItem" Text="Delete Key" Click="OnDeleteClicked">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE74D;" FontSize="14" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                    </MenuFlyout>
+                </Button.ContextFlyout>
+            </Button>
+        </Border>
+    </Grid>
+</UserControl>

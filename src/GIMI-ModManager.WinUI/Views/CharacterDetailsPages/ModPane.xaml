@@ -11,7 +11,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:subViewModels="using:GIMI_ModManager.WinUI.ViewModels.CharacterDetailsViewModels.SubViewModels"
     xmlns:xaml="using:GIMI_ModManager.WinUI.Helpers.Xaml"
-    IsEnabled="{x:Bind ViewModel.IsNotReadOnly, Mode=OneWay}"
     mc:Ignorable="d">
 
     <UserControl.Resources>
@@ -24,8 +23,8 @@
     <Grid Grid.Column="1">
         <Grid
             x:Name="ModDetailsPane"
-        Margin="0,0,0,8"
-        Padding="5,5,5,5"
+            Margin="8,0,0,8"
+            Padding="5,5,5,5"
         Background="{ThemeResource ControlFillColorDefaultBrush}"
         CornerRadius="10">
 
@@ -90,7 +89,7 @@
                         MaxLines="1"
                         Style="{ThemeResource SubtitleTextBlockStyle}"
                         Text="{x:Bind ViewModel.ModModel.ModDisplayName, Mode=TwoWay}"
-                        TextAlignment="Center"
+                        TextAlignment="Left"
                         TextTrimming="CharacterEllipsis"
                         TextWrapping="NoWrap"
                         ToolTipService.ToolTip="{x:Bind ViewModel.ModModel.ModDisplayName, Mode=OneWay}"
@@ -121,17 +120,20 @@
                     </Grid.ColumnDefinitions>
                     <TextBox
                         VerticalAlignment="Center"
-                        Header="Mod Url:"
+                        PlaceholderText="Mod Url..."
                         IsEnabled="{x:Bind ViewModel.IsNotReadOnly, Mode=OneWay}"
                         Text="{x:Bind ViewModel.ModModel.ModUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         l:Uids.Uid="/CharacterDetailsPage/ModLinkTextBox" />
 
                     <HyperlinkButton
                         Grid.Column="1"
-                        VerticalAlignment="Bottom"
+                        Margin="4,0,0,0"
+                        VerticalAlignment="Center"
                         IsEnabled="{x:Bind ViewModel.IsNotReadOnly, Mode=OneWay}"
-                        NavigateUri="{x:Bind ViewModel.ModModel.ModUrl, Mode=OneWay, Converter={StaticResource StringToUri}}">
-                        <FontIcon FontSize="18" Glyph="&#xE8A7;" />
+                        NavigateUri="{x:Bind ViewModel.ModModel.ModUrl, Mode=OneWay, Converter={StaticResource StringToUri}}"
+                        ToolTipService.ToolTip="打开模组网页"
+                        l:Uids.Uid="/CharacterDetailsPage/OpenModUrlButton">
+                        <FontIcon FontSize="16" Glyph="&#xE8A7;" />
                     </HyperlinkButton>
                 </Grid>
             </Grid>
@@ -141,393 +143,274 @@
                 Grid.Row="1"
                 HorizontalScrollBarVisibility="Disabled"
                 VerticalScrollBarVisibility="Auto">
-                <StackPanel Padding="1,0,2,0">
-                    <!--  统一：按键绑定提示 + 右侧面板切换图标（仅在有 keyswap 时显示）  -->
-                    <Grid
-                        x:Name="KeyswapHelpPanel"
-                        Padding="8,4"
-                        CornerRadius="6"
-                        Visibility="{x:Bind ViewModel.HasAnyKeySwap, Mode=OneWay, Converter={StaticResource BoolToVisibleConverter}}">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-                        <Grid Grid.Row="0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <!--  左侧：可点击展开帮助的标题  -->
-                            <HyperlinkButton
-                                Padding="0"
-                                HorizontalContentAlignment="Stretch"
-                                Background="Transparent"
-                                BorderThickness="0"
-                                Click="OnKeyswapHelpToggleClicked">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <FontIcon
-                                        x:Name="InfoIcon"
-                                        Grid.Column="0"
-                                        Margin="0,0,6,0"
-                                        VerticalAlignment="Center"
-                                        FontSize="12"
-                                        Foreground="{ThemeResource TextFillColorTertiaryBrush}"
-                                        Glyph="&#xE946;" />
-                                    <TextBlock
-                                        x:Name="HelpTitle"
-                                        Grid.Column="1"
-                                        VerticalAlignment="Center"
-                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                        Style="{ThemeResource CaptionTextBlockStyle}"
-                                        Text="Key Bindings Help"
-                                        l:Uids.Uid="/CharacterDetailsPage/KeyBindingsHelpTitle" />
-                                    <FontIcon
-                                        x:Name="ExpandIcon"
-                                        Grid.Column="2"
-                                        FontSize="10"
-                                        Foreground="{ThemeResource TextFillColorTertiaryBrush}"
-                                        Glyph="&#xE70D;"
-                                        RenderTransformOrigin="0.5,0.5">
-                                        <FontIcon.RenderTransform>
-                                            <RotateTransform x:Name="ExpandIconTransform" Angle="0" />
-                                        </FontIcon.RenderTransform>
-                                    </FontIcon>
-                                </Grid>
-                            </HyperlinkButton>
-                            <!--  右侧：面板切换图标按钮  -->
-                            <HyperlinkButton
-                                Grid.Column="1"
-                                Command="{x:Bind ViewModel.ToggleKeySwapsEditModeCommand}"
-                                IsEnabled="{x:Bind ViewModel.IsNotReadOnly, Mode=OneWay}"
-                                ToolTipService.ToolTip="Toggle Edit/View"
-                                l:Uids.Uid="/CharacterDetailsPage/ToggleEditViewButton">
-                                <FontIcon FontSize="12" Glyph="&#xE8ab;" />
-                            </HyperlinkButton>
-                        </Grid>
-                        <!--  折叠帮助区  -->
-                        <Grid
-                            x:Name="HelpDetails"
-                            Grid.Row="1"
-                            Height="0"
-                            Margin="0,0,0,0">
-                            <Border
-                                Padding="10"
-                                Background="{ThemeResource ControlFillColorSecondaryBrush}"
-                                BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
-                                BorderThickness="1"
-                                CornerRadius="6">
-                                <TextBlock Style="{ThemeResource CaptionTextBlockStyle}" TextWrapping="WrapWholeWords">
-                                    <Run Text="Separate combo keys with space, e.g.: VK_CTRL VK_UP" l:Uids.Uid="/CharacterDetailsPage/HelpText1"/>
-                                    <LineBreak />
-                                    <Run Text="Supports multiple keys, separated by comma. e.g.: Alt UP,XB_A" l:Uids.Uid="/CharacterDetailsPage/HelpText2"/>
-                                    <LineBreak />
-                                    <Run Text="System automatically parses into multiple Key/Back lines" l:Uids.Uid="/CharacterDetailsPage/HelpText3"/>
-                                    <LineBreak />
-                                    <Run Text="Supports NO_ prefix to exclude keys. e.g.: NO_VK_CTRL ALT UP" l:Uids.Uid="/CharacterDetailsPage/HelpText4"/>
-                                    <LineBreak /><LineBreak />
-                                    <Run Text="For more details:" l:Uids.Uid="/CharacterDetailsPage/HelpTextLinkPrefix"/>
-                                    <Hyperlink NavigateUri="https://leotorrez.github.io/modding/docs/key#key-bindings" ToolTipService.ToolTip="Click to open documentation" l:Uids.Uid="/CharacterDetailsPage/HelpLink">
-                                        <Run Text="Key Bindings Documentation" l:Uids.Uid="/CharacterDetailsPage/HelpLinkText"/>
-                                    </Hyperlink>
-                                </TextBlock>
-                            </Border>
-                        </Grid>
-                    </Grid>
-
+                <StackPanel Padding="2,0,8,16">
                     <!--  KeySwaps 内容区域  -->
-                    <StackPanel Visibility="{x:Bind ViewModel.HasAnyKeySwap, Mode=OneWay, Converter={StaticResource BoolToVisibleConverter}}">
-                        <!--  紧凑只读视图  -->
-                        <StackPanel Visibility="{x:Bind ViewModel.IsKeySwapsEditMode, Mode=OneWay, Converter={StaticResource BoolInverterToVisibilityConverter}}">
-                            <ItemsRepeater ItemsSource="{x:Bind ViewModel.IniKeySwapGroups, Mode=OneWay}" VirtualizingStackPanel.VirtualizationMode="Recycling">
-                                <ItemsRepeater.ItemTemplate>
-                                    <DataTemplate x:DataType="subViewModels:IniKeySwapGroupVm">
-                                        <Border
-                                            Margin="0,0,0,10"
-                                            Padding="16,6"
-                                            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                                            CornerRadius="10">
-                                            <StackPanel>
-                                                <!--  文件头  -->
-                                                <Grid>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="*" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                    </Grid.ColumnDefinitions>
+                    <StackPanel
+                        Margin="0,4,0,0"
+                        Visibility="{x:Bind ViewModel.HasAnyKeySwap, Mode=OneWay, Converter={StaticResource BoolToVisibleConverter}}">
+                        <ItemsRepeater ItemsSource="{x:Bind ViewModel.IniKeySwapGroups, Mode=OneWay}">
+                            <ItemsRepeater.Layout>
+                                <StackLayout Orientation="Vertical" />
+                            </ItemsRepeater.Layout>
+                            <ItemsRepeater.ItemTemplate>
+                                <DataTemplate x:DataType="subViewModels:IniKeySwapGroupVm">
+                                    <Expander
+                                        Margin="0,0,0,12"
+                                        HorizontalAlignment="Stretch"
+                                        HorizontalContentAlignment="Stretch"
+                                        IsExpanded="{x:Bind IsExpanded, Mode=TwoWay}">
+                                        <Expander.Header>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel
+                                                    Grid.Column="0"
+                                                    Orientation="Horizontal"
+                                                    Spacing="8"
+                                                    VerticalAlignment="Center">
                                                     <TextBlock
-                                                        HorizontalAlignment="Left"
+                                                        VerticalAlignment="Center"
                                                         FontWeight="SemiBold"
-                                                        Style="{ThemeResource SubtitleTextBlockStyle}"
+                                                        Style="{ThemeResource BodyStrongTextBlockStyle}"
                                                         Text="{x:Bind IniFileName}"
                                                         TextTrimming="CharacterEllipsis"
                                                         TextWrapping="NoWrap"
                                                         ToolTipService.ToolTip="{x:Bind IniFileName}" />
-                                                    <Button
-                                                        Grid.Column="1"
-                                                        Margin="8,0,0,0"
-                                                        Command="{x:Bind OpenIniFileCommand}"
-                                                        CommandParameter="{x:Bind IniFileName}"
-                                                        ToolTipService.ToolTip="Open Config File"
-                                                        l:Uids.Uid="/CharacterDetailsPage/OpenConfigFileButton">
-                                                        <FontIcon FontSize="14" Glyph="&#xE8A7;" />
-                                                    </Button>
-                                                </Grid>
+                                                    <Border
+                                                        Width="6"
+                                                        Height="6"
+                                                        CornerRadius="3"
+                                                        Background="{ThemeResource SystemFillColorCautionBrush}"
+                                                        ToolTipService.ToolTip="Has unsaved changes"
+                                                        l:Uids.Uid="/CharacterDetailsPage/KeySwap_Unsaved"
+                                                        Visibility="{x:Bind IsKeySwapsChanged, Mode=OneWay, Converter={StaticResource BoolToVisibleConverter}}" />
+                                                </StackPanel>
 
-                                                <!--  按键列表  -->
-                                                <ItemsRepeater ItemsSource="{x:Bind KeySwaps, Mode=OneWay}" VirtualizingStackPanel.VirtualizationMode="Recycling">
-                                                    <ItemsRepeater.ItemTemplate>
-                                                        <DataTemplate x:DataType="subViewModels:ModPaneFieldsKeySwapVm">
-                                                            <Border
-                                                                Margin="0,4,0,4"
-                                                                Padding="8,6"
-                                                                Background="{ThemeResource ControlFillColorTertiaryBrush}"
-                                                                CornerRadius="6">
-                                                                <Grid>
-                                                                    <Grid.ColumnDefinitions>
-                                                                        <ColumnDefinition Width="2*" />
-                                                                        <ColumnDefinition Width="5*" />
-                                                                    </Grid.ColumnDefinitions>
-                                                                    <!--  左侧：DisplaySectionName  -->
-                                                                    <TextBlock
-                                                                        Grid.Column="0"
+                                                <Button
+                                                    Grid.Column="1"
+                                                    Margin="4,0,0,0"
+                                                    Padding="6,4"
+                                                    VerticalAlignment="Center"
+                                                    Background="Transparent"
+                                                    BorderThickness="0"
+                                                    Command="{x:Bind OpenIniFileCommand}"
+                                                    CommandParameter="{x:Bind IniFileName}"
+                                                    ToolTipService.ToolTip="打开配置文件"
+                                                    l:Uids.Uid="/CharacterDetailsPage/OpenConfigFileButton">
+                                                    <FontIcon FontSize="14" Glyph="&#xE8A7;" />
+                                                </Button>
+                                            </Grid>
+                                        </Expander.Header>
+                                        <Expander.Content>
+                                            <ItemsRepeater ItemsSource="{x:Bind KeySwaps, Mode=OneWay}">
+                                                <ItemsRepeater.Layout>
+                                                    <xaml:NonVirtualizingStackLayout />
+                                                </ItemsRepeater.Layout>
+                                                <ItemsRepeater.ItemTemplate>
+                                                    <DataTemplate x:DataType="subViewModels:ModPaneFieldsKeySwapVm">
+                                                        <Border
+                                                            DataContext="{x:Bind}"
+                                                            Margin="0,0,0,4"
+                                                            Padding="10,3"
+                                                            Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                                                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                                            BorderThickness="1"
+                                                            CornerRadius="5">
+                                                            <Grid MinHeight="30">
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="Auto" MaxWidth="110" />
+                                                                    <ColumnDefinition Width="*" />
+                                                                </Grid.ColumnDefinitions>
+
+                                                                <StackPanel
+                                                                    Grid.Column="0"
+                                                                    Orientation="Horizontal"
+                                                                    Spacing="6"
+                                                                    VerticalAlignment="Center">
+                                                                    <Button
+                                                                        Style="{ThemeResource SubtleButtonStyle}"
+                                                                        Padding="6,3"
+                                                                        CornerRadius="4"
                                                                         VerticalAlignment="Center"
-                                                                        FontWeight="SemiBold"
-                                                                        Text="{x:Bind DisplaySectionName}"
-                                                                        TextTrimming="CharacterEllipsis"
-                                                                        TextWrapping="NoWrap"
-                                                                        ToolTipService.ToolTip="{x:Bind DisplaySectionName}" />
-                                                                    <!--  右侧：Forward+Backward  -->
+                                                                        ToolTipService.ToolTip="{x:Bind SectionToolTipText, Mode=OneWay}">
+                                                                        <TextBlock
+                                                                            Text="{x:Bind DisplaySectionName, Mode=OneWay}"
+                                                                            FontWeight="SemiBold"
+                                                                            FontSize="12.5"
+                                                                            Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                                                            VerticalAlignment="Center"
+                                                                            TextTrimming="CharacterEllipsis"
+                                                                            TextWrapping="NoWrap"
+                                                                            MaxWidth="140" />
+                                                                        <Button.Flyout>
+                                                                            <Flyout Opening="OnRenameSectionFlyoutOpening">
+                                                                                <StackPanel Width="240" Spacing="8">
+                                                                                    <TextBlock
+                                                                                        Text="Rename Section"
+                                                                                        FontWeight="SemiBold"
+                                                                                        FontSize="13"
+                                                                                        Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                                                                        l:Uids.Uid="/CharacterDetailsPage/SectionRename_Title" />
+                                                                                    <TextBlock
+                                                                                        Text="Customize section suffix. Prefix is preserved automatically."
+                                                                                        FontSize="11"
+                                                                                        TextWrapping="Wrap"
+                                                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                                                        l:Uids.Uid="/CharacterDetailsPage/SectionRename_Description" />
+                                                                                    <TextBox
+                                                                                        Header="Section Suffix"
+                                                                                        PlaceholderText="Enter new name..."
+                                                                                        Text="{x:Bind EditingSectionSuffix, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                                        KeyDown="OnRenameSectionTextBoxKeyDown"
+                                                                                        l:Uids.Uid="/CharacterDetailsPage/SectionRename_InputBox" />
+                                                                                    <TextBlock
+                                                                                        FontSize="11"
+                                                                                        Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                                                                        TextTrimming="CharacterEllipsis">
+                                                                                        <Run Text="Saved as: " l:Uids.Uid="/CharacterDetailsPage/SectionRename_PreviewPrefix" />
+                                                                                        <Run Text="{x:Bind EditingSectionPreview, Mode=OneWay}" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                                                                    </TextBlock>
+                                                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,6,0,0">
+                                                                                        <Button
+                                                                                            Content="Cancel"
+                                                                                            Click="OnRenameSectionFlyoutCancelClicked"
+                                                                                            l:Uids.Uid="/CharacterDetailsPage/SectionRename_Cancel" />
+                                                                                        <Button
+                                                                                            Content="Confirm"
+                                                                                            Click="OnRenameSectionFlyoutConfirmClicked"
+                                                                                            Style="{ThemeResource AccentButtonStyle}"
+                                                                                            l:Uids.Uid="/CharacterDetailsPage/SectionRename_Confirm" />
+                                                                                    </StackPanel>
+                                                                                </StackPanel>
+                                                                            </Flyout>
+                                                                        </Button.Flyout>
+                                                                    </Button>
+
+                                                                </StackPanel>
+
+
+                                                                <ScrollViewer
+                                                                    Grid.Column="1"
+                                                                    Margin="6,0,0,0"
+                                                                    HorizontalAlignment="Right"
+                                                                    VerticalAlignment="Center"
+                                                                    HorizontalScrollBarVisibility="Hidden"
+                                                                    VerticalScrollBarVisibility="Disabled"
+                                                                    HorizontalScrollMode="Auto"
+                                                                    VerticalScrollMode="Disabled">
                                                                     <StackPanel
-                                                                        Grid.Column="1"
-                                                                        HorizontalAlignment="Center"
-                                                                        VerticalAlignment="Center"
                                                                         Orientation="Horizontal"
-                                                                        Spacing="4">
-                                                                        <Border
-                                                                            Padding="4,2"
-                                                                            Background="{ThemeResource ButtonDisabledForegroundThemeBrush}"
-                                                                            CornerRadius="4"
-                                                                            Visibility="{x:Bind ForwardHotkeyFriendlyText, Converter={StaticResource StringToVisibilityConverter}}">
-                                                                            <TextBlock
-                                                                                Style="{ThemeResource CaptionTextBlockStyle}"
-                                                                                Text="{x:Bind ForwardHotkeyFriendlyText}"
-                                                                                TextTrimming="CharacterEllipsis"
-                                                                                TextWrapping="NoWrap"
-                                                                                ToolTipService.ToolTip="{x:Bind ForwardHotkeyFriendlyText}" />
-                                                                        </Border>
+                                                                        Spacing="6"
+                                                                        VerticalAlignment="Center"
+                                                                        HorizontalAlignment="Right">
+
+                                                                    <ItemsControl ItemsSource="{x:Bind ForwardKeyItems, Mode=OneWay}">
+                                                                        <ItemsControl.ItemsPanel>
+                                                                            <ItemsPanelTemplate>
+                                                                                <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center" />
+                                                                            </ItemsPanelTemplate>
+                                                                        </ItemsControl.ItemsPanel>
+                                                                        <ItemsControl.ItemTemplate>
+                                                                            <DataTemplate x:DataType="subViewModels:KeyItemVm">
+                                                                                <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                                                                                    <controls:InPlaceKeyCapsule
+                                                                                        DataContext="{x:Bind}"
+                                                                                        RawKey="{x:Bind RawKey, Mode=OneWay}"
+                                                                                        IsUnsaved="{x:Bind IsUnsaved, Mode=OneWay}"
+                                                                                        IsForward="True"
+                                                                                        CanDelete="{x:Bind CanDeleteKey, Mode=OneWay}"
+                                                                                        CanAddAlternative="{x:Bind CanAddAlternative, Mode=OneWay}"
+                                                                                        CanAddReverseKey="{x:Bind CanAddReverseKey, Mode=OneWay}"
+                                                                                        AutoStartRecording="{x:Bind IsRequestingFocus, Mode=TwoWay}"
+                                                                                        KeyRecorded="OnKeyItemRecorded"
+                                                                                        DeleteRequested="OnKeyItemDeleteRequested"
+                                                                                        AddAlternativeRequested="OnKeyItemAddAlternativeRequested"
+                                                                                        ReverseKeyRequested="OnReverseKeyRequested" />
+                                                                                    <Border
+                                                                                        Background="{ThemeResource SubtleFillColorTransparentBrush}"
+                                                                                        Padding="2,0"
+                                                                                        Margin="1,0"
+                                                                                        VerticalAlignment="Center"
+                                                                                        Visibility="{x:Bind IsNotLastItem, Mode=OneWay, Converter={StaticResource BoolToVisibleConverter}}">
+                                                                                        <TextBlock
+                                                                                            Text="{x:Bind OrSeparatorText, Mode=OneWay}"
+                                                                                            FontSize="10"
+                                                                                            FontWeight="Normal"
+                                                                                            Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                                                                            VerticalAlignment="Center" />
+                                                                                    </Border>
+                                                                                </StackPanel>
+                                                                            </DataTemplate>
+                                                                        </ItemsControl.ItemTemplate>
+                                                                    </ItemsControl>
+
+                                                                    <StackPanel
+                                                                        Orientation="Horizontal"
+                                                                        Spacing="4"
+                                                                        VerticalAlignment="Center"
+                                                                        Visibility="{x:Bind IsBackwardKeyVisible, Mode=OneWay, Converter={StaticResource BoolToVisibleConverter}}">
                                                                         <TextBlock
-                                                                            Margin="2,0"
-                                                                            VerticalAlignment="Center"
-                                                                            Foreground="{ThemeResource TextFillColorTertiaryBrush}"
-                                                                            Text="⟷"
-                                                                            Visibility="{x:Bind BackwardHotkeyFriendlyText, Converter={StaticResource StringToVisibilityConverter}}" />
-                                                                        <Border
-                                                                            Padding="4,2"
-                                                                            Background="{ThemeResource ButtonDisabledForegroundThemeBrush}"
-                                                                            CornerRadius="4"
-                                                                            Visibility="{x:Bind BackwardHotkeyFriendlyText, Converter={StaticResource StringToVisibilityConverter}}">
-                                                                            <TextBlock
-                                                                                Style="{ThemeResource CaptionTextBlockStyle}"
-                                                                                Text="{x:Bind BackwardHotkeyFriendlyText}"
-                                                                                TextTrimming="CharacterEllipsis"
-                                                                                TextWrapping="NoWrap"
-                                                                                ToolTipService.ToolTip="{x:Bind BackwardHotkeyFriendlyText}" />
-                                                                        </Border>
-                                                                    </StackPanel>
-                                                                </Grid>
-                                                            </Border>
-                                                        </DataTemplate>
-                                                    </ItemsRepeater.ItemTemplate>
-                                                </ItemsRepeater>
-                                            </StackPanel>
-                                        </Border>
-                                    </DataTemplate>
-                                </ItemsRepeater.ItemTemplate>
-                            </ItemsRepeater>
-                        </StackPanel>
-
-                        <!--  详细编辑视图 -->
-                        <StackPanel Visibility="{x:Bind ViewModel.IsKeySwapsEditMode, Mode=OneWay, Converter={StaticResource BoolToVisibleConverter}}">
-                            <!--  显示所有 ini 文件的 keyswaps  -->
-                            <ItemsRepeater ItemsSource="{x:Bind ViewModel.IniKeySwapGroups, Mode=OneWay}" VirtualizingStackPanel.VirtualizationMode="Recycling">
-                                <ItemsRepeater.ItemTemplate>
-                                    <DataTemplate x:DataType="subViewModels:IniKeySwapGroupVm">
-                                        <Border
-                                            Margin="0,0,0,10"
-                                            Padding="16,6"
-                                            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                                            CornerRadius="12">
-                                            <StackPanel>
-                                                <Grid Margin="0,0,0,6">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="*" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                    </Grid.ColumnDefinitions>
-                                                    <TextBlock
-                                                        HorizontalAlignment="Left"
-                                                        FontWeight="SemiBold"
-                                                        Style="{ThemeResource SubtitleTextBlockStyle}"
-                                                        Text="{x:Bind IniFileName}"
-                                                        TextTrimming="CharacterEllipsis"
-                                                        TextWrapping="NoWrap"
-                                                        ToolTipService.ToolTip="{x:Bind IniFileName}" />
-                                                    <Button
-                                                        Grid.Column="1"
-                                                        Margin="8,0,0,0"
-                                                        Command="{x:Bind OpenIniFileCommand}"
-                                                        CommandParameter="{x:Bind IniFileName}"
-                                                        ToolTipService.ToolTip="Open Config File"
-                                                        l:Uids.Uid="/CharacterDetailsPage/OpenConfigFileButton">
-                                                        <FontIcon FontSize="14" Glyph="&#xE8A7;" />
-                                                    </Button>
-                                                </Grid>
-                                                <TextBlock
-                                                    Margin="0,0,0,12"
-                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                    Style="{ThemeResource CaptionTextBlockStyle}"
-                                                    Text="Configuration File"
-                                                    l:Uids.Uid="/CharacterDetailsPage/ConfigFileLabel" />
-                                                <ItemsRepeater ItemsSource="{x:Bind KeySwaps, Mode=OneWay}" VirtualizingStackPanel.VirtualizationMode="Recycling">
-                                                    <ItemsRepeater.ItemTemplate>
-                                                        <DataTemplate x:DataType="subViewModels:ModPaneFieldsKeySwapVm">
-                                                            <!--  节信息区域  -->
-                                                            <Border
-                                                                Margin="0,0,0,10"
-                                                                Padding="12"
-                                                                Background="{ThemeResource ControlFillColorTertiaryBrush}"
-                                                                BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
-                                                                BorderThickness="1"
-                                                                CornerRadius="8">
-                                                                <Grid>
-                                                                    <Grid.RowDefinitions>
-                                                                        <RowDefinition Height="Auto" />
-                                                                        <RowDefinition Height="Auto" />
-                                                                        <RowDefinition Height="Auto" />
-                                                                    </Grid.RowDefinitions>
-
-                                                                    <Grid Grid.Row="0" Margin="0,0,0,8">
-                                                                        <Grid.ColumnDefinitions>
-                                                                            <ColumnDefinition Width="*" />
-                                                                            <ColumnDefinition Width="Auto" />
-                                                                        </Grid.ColumnDefinitions>
-
-                                                                        <Grid Grid.Column="0">
-                                                                            <Grid.ColumnDefinitions>
-                                                                                <ColumnDefinition Width="*" MinWidth="40" />
-                                                                                <ColumnDefinition Width="Auto" />
-                                                                            </Grid.ColumnDefinitions>
-
-                                                                            <TextBlock
-                                                                                FontWeight="SemiBold"
-                                                                                Style="{ThemeResource SubtitleTextBlockStyle}"
-                                                                                Text="{x:Bind DisplaySectionName}"
-                                                                                TextTrimming="CharacterEllipsis"
-                                                                                TextWrapping="NoWrap"
-                                                                                ToolTipService.ToolTip="{x:Bind DisplaySectionName}"
-                                                                                Visibility="{x:Bind IsEditingSectionName, Mode=OneWay, Converter={StaticResource BoolInverterToVisibilityConverter}}" />
-
-                                                                            <TextBox
-                                                                                Grid.Column="0"
-                                                                                FontWeight="SemiBold"
-                                                                                PlaceholderText="Enter Section Name"
-                                                                                Text="{x:Bind SectionNameForEdit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                                                Visibility="{x:Bind IsEditingSectionName, Mode=OneWay}"
-                                                                                l:Uids.Uid="/CharacterDetailsPage/SectionNameTextBox" />
-
-
-                                                                            <Button
-                                                                                Grid.Column="1"
-                                                                                Margin="8,0,0,0"
-                                                                                VerticalAlignment="Center"
-                                                                                Command="{x:Bind ToggleEditingSectionNameCommand}"
-                                                                                ToolTipService.ToolTip="Edit Section Name"
-                                                                                l:Uids.Uid="/CharacterDetailsPage/EditSectionNameButton">
-                                                                                <FontIcon FontSize="12" Glyph="&#xE70F;" />
-                                                                            </Button>
-                                                                        </Grid>
-
-                                                                        <StackPanel
-                                                                            Grid.Column="1"
-                                                                            Margin="4,0,0,0"
-                                                                            VerticalAlignment="Center"
-                                                                            Orientation="Horizontal"
-                                                                            Visibility="{x:Bind VariationsCountVisibility}">
-                                                                            <TextBlock
-                                                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                                                Style="{ThemeResource CaptionTextBlockStyle}"
-                                                                                Text="Variations: " 
-                                                                                TextWrapping="NoWrap"
-                                                                                l:Uids.Uid="/CharacterDetailsPage/VariationsLabel" />
-                                                                            <TextBlock
-                                                                                Margin="2,-1,0,0"
-                                                                                FontWeight="SemiBold"
-                                                                                Text="{x:Bind VariationsCount}"
-                                                                                TextWrapping="NoWrap" />
-                                                                        </StackPanel>
-                                                                    </Grid>
-
-                                                                    <!--  前进键区域  -->
-                                                                    <StackPanel Grid.Row="1" Margin="0,0,0,8">
-                                                                        <TextBlock
-                                                                            Margin="0,0,0,4"
+                                                                            Text="⇄"
+                                                                            FontSize="11"
                                                                             FontWeight="SemiBold"
-                                                                            Style="{ThemeResource CaptionTextBlockStyle}"
-                                                                            Text="Forward Hotkey"
-                                                                            l:Uids.Uid="/CharacterDetailsPage/ForwardHotkeyLabel" />
-
-                                                                        <TextBox
-                                                                            MinWidth="200"
-                                                                            FontFamily="Courier New"
-                                                                            Foreground="{ThemeResource TextFillColorPrimaryBrush}"
-                                                                            Text="{x:Bind ForwardHotkey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                                            ToolTipService.ToolTip="{x:Bind ForwardHotkey}" />
-
-                                                                        <TextBlock
-                                                                            Margin="0,4,0,0"
+                                                                            Opacity="0.65"
+                                                                            Margin="4,0"
                                                                             Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                                            Style="{ThemeResource CaptionTextBlockStyle}"
-                                                                            Text="{x:Bind ForwardHotkeyFriendlyText, Mode=TwoWay}"
-                                                                            TextTrimming="CharacterEllipsis" />
+                                                                            VerticalAlignment="Center" />
+
+                                                                        <ItemsControl ItemsSource="{x:Bind BackwardKeyItems, Mode=OneWay}">
+                                                                            <ItemsControl.ItemsPanel>
+                                                                                <ItemsPanelTemplate>
+                                                                                    <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center" />
+                                                                                </ItemsPanelTemplate>
+                                                                            </ItemsControl.ItemsPanel>
+                                                                            <ItemsControl.ItemTemplate>
+                                                                                <DataTemplate x:DataType="subViewModels:KeyItemVm">
+                                                                                    <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                                                                                        <controls:InPlaceKeyCapsule
+                                                                                            DataContext="{x:Bind}"
+                                                                                            RawKey="{x:Bind RawKey, Mode=OneWay}"
+                                                                                            IsUnsaved="{x:Bind IsUnsaved, Mode=OneWay}"
+                                                                                            IsForward="False"
+                                                                                            CanDelete="{x:Bind CanDeleteKey, Mode=OneWay}"
+                                                                                            CanAddAlternative="{x:Bind CanAddAlternative, Mode=OneWay}"
+                                                                                            CanAddReverseKey="False"
+                                                                                            AutoStartRecording="{x:Bind IsRequestingFocus, Mode=TwoWay}"
+                                                                                            KeyRecorded="OnKeyItemRecorded"
+                                                                                            DeleteRequested="OnKeyItemDeleteRequested"
+                                                                                            AddAlternativeRequested="OnKeyItemAddAlternativeRequested" />
+                                                                                        <Border
+                                                                                            Background="{ThemeResource SubtleFillColorTransparentBrush}"
+                                                                                            Padding="2,0"
+                                                                                            Margin="1,0"
+                                                                                            VerticalAlignment="Center"
+                                                                                            Visibility="{x:Bind IsNotLastItem, Mode=OneWay, Converter={StaticResource BoolToVisibleConverter}}">
+                                                                                            <TextBlock
+                                                                                                Text="{x:Bind OrSeparatorText, Mode=OneWay}"
+                                                                                                FontSize="10"
+                                                                                                FontWeight="Normal"
+                                                                                                Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                                                                                VerticalAlignment="Center" />
+                                                                                        </Border>
+                                                                                    </StackPanel>
+                                                                                </DataTemplate>
+                                                                            </ItemsControl.ItemTemplate>
+                                                                        </ItemsControl>
                                                                     </StackPanel>
-
-                                                                    <!--  后退键区域  -->
-                                                                    <StackPanel Grid.Row="2">
-                                                                        <TextBlock
-                                                                            Margin="0,0,0,4"
-                                                                            FontWeight="SemiBold"
-                                                                            Style="{ThemeResource CaptionTextBlockStyle}"
-                                                                            Text="Backward Hotkey" 
-                                                                            l:Uids.Uid="/CharacterDetailsPage/BackwardHotkeyLabel" />
-
-                                                                        <TextBox
-                                                                            MinWidth="200"
-                                                                            FontFamily="Courier New"
-                                                                            Foreground="{ThemeResource TextFillColorPrimaryBrush}"
-                                                                            Text="{x:Bind BackwardHotkey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                                            ToolTipService.ToolTip="{x:Bind BackwardHotkey}" />
-
-                                                                        <TextBlock
-                                                                            Margin="0,4,0,0"
-                                                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                                            Style="{ThemeResource CaptionTextBlockStyle}"
-                                                                            Text="{x:Bind BackwardHotkeyFriendlyText, Mode=TwoWay}"
-                                                                            TextTrimming="CharacterEllipsis" />
-                                                                    </StackPanel>
-                                                                </Grid>
-                                                            </Border>
-                                                        </DataTemplate>
-                                                    </ItemsRepeater.ItemTemplate>
-                                                </ItemsRepeater>
-                                            </StackPanel>
-                                        </Border>
-                                    </DataTemplate>
-                                </ItemsRepeater.ItemTemplate>
-                            </ItemsRepeater>
-                        </StackPanel>
+                                                                </StackPanel>
+                                                            </ScrollViewer>
+                                                            </Grid>
+                                                        </Border>
+                                                    </DataTemplate>
+                                                </ItemsRepeater.ItemTemplate>
+                                            </ItemsRepeater>
+                                        </Expander.Content>
+                                    </Expander>
+                                </DataTemplate>
+                            </ItemsRepeater.ItemTemplate>
+                        </ItemsRepeater>
                     </StackPanel>
                 </StackPanel>
             </ScrollViewer>
@@ -537,10 +420,11 @@
         <Grid Grid.Row="2" Padding="0,12">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
-                <ColumnDefinition />
+                <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <Button
+                Grid.Column="0"
                 Background="{ThemeResource SystemFillColorAttentionBrush}"
                 Command="{x:Bind ViewModel.SaveModSettingsCommand}"
                 IsEnabled="{x:Bind ViewModel.CanSaveModSettings, Mode=OneWay}">
@@ -555,26 +439,6 @@
                 </Button.KeyboardAccelerators>
             </Button>
 
-            <Grid Grid.Column="1" Visibility="{x:Bind ViewModel.ModModel.IsEnabled, Mode=OneWay}">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-
-                <Border
-                    Grid.Column="1"
-                    Background="{ThemeResource AccentFillColorSelectedTextBackgroundBrush}"
-                    CornerRadius="10">
-                    <TextBlock
-                        Padding="4,0"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Text="Mod Enabled"
-                        l:Uids.Uid="/CharacterDetailsPage/ModEnabledLabel" />
-                </Border>
-            </Grid>
-
             <Button
                 Grid.Column="2"
                 HorizontalAlignment="Right"
@@ -585,32 +449,6 @@
         </Grid>
         </Grid>
         
-        <Popup x:Name="ImagePopup" IsOpen="False">
-            <Grid
-                x:Name="PopupGrid"
-                Background="#D9000000"
-                Tapped="ImageLightbox_Tapped">
-                <Image
-                    Margin="40"
-                    Stretch="Uniform">
-                    <Image.Source>
-                        <BitmapImage CreateOptions="IgnoreImageCache" UriSource="{x:Bind ViewModel.ModModel.ImageUri, Mode=OneWay}" />
-                    </Image.Source>
-                </Image>
-                
-                <StackPanel
-                    Margin="0,0,0,40"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Bottom"
-                    Background="{ThemeResource SystemControlBackgroundAltMediumBrush}"
-                    CornerRadius="8"
-                    Orientation="Horizontal"
-                    Padding="16,10"
-                    Spacing="8">
-                    <FontIcon FontSize="14" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Glyph="&#xE711;" />
-                    <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="Click anywhere to close" l:Uids.Uid="/CharacterDetailsPage/LightboxCloseTip" />
-                </StackPanel>
-            </Grid>
-        </Popup>
+        <controls:ImageLightboxOverlay x:Name="ImageLightbox" />
     </Grid>
 </UserControl>

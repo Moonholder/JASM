@@ -16,6 +16,8 @@ using GIMI_ModManager.WinUI.Services.AppManagement;
 using GIMI_ModManager.WinUI.Services.AppManagement.Updating;
 using GIMI_ModManager.WinUI.Services.ModExport;
 using GIMI_ModManager.WinUI.Services.ModHandling;
+using GIMI_ModManager.Core.Services.Network;
+using GIMI_ModManager.WinUI.Services.Network;
 using GIMI_ModManager.WinUI.Services.Notifications;
 using GIMI_ModManager.WinUI.ViewModels;
 using GIMI_ModManager.WinUI.ViewModels.CharacterDetailsViewModels.SubViewModels;
@@ -128,6 +130,10 @@ public partial class App : Application
                 services.AddSingleton<IThemeSelectorService, ThemeSelectorService>();
                 services.AddSingleton<INavigationViewService, NavigationViewService>();
 
+                services.AddSingleton<IProxySettingsService, ProxySettingsService>();
+                services.AddSingleton<DynamicAppWebProxy>();
+                services.AddSingleton<IMirrorRacingService, MirrorRacingService>();
+                services.AddSingleton<IChunkedDownloadEngine, ChunkedDownloadEngine>();
                 services.AddSingleton<IActivationService, ActivationService>();
                 services.AddSingleton<IPageService, PageService>();
                 services.AddSingleton<INavigationService, NavigationService>();
@@ -188,15 +194,17 @@ public partial class App : Application
                     client.DefaultRequestHeaders.Add("Accept", "application/json");
                     client.Timeout = TimeSpan.FromSeconds(30);
                 })
-                    .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler()
+                    .ConfigurePrimaryHttpMessageHandler(sp => new SocketsHttpHandler
                     {
                         PooledConnectionLifetime = TimeSpan.FromMinutes(2),
                         ConnectTimeout = TimeSpan.FromSeconds(10),
-                        MaxConnectionsPerServer = 10
+                        MaxConnectionsPerServer = 10,
+                        Proxy = sp.GetRequiredService<DynamicAppWebProxy>(),
+                        UseProxy = true
                     })
                     .AddHttpMessageHandler<HttpLoggerHandler>();
 
-                // Resilience Pipeline 配置
+                // Resilience Pipeline configuration
                 services.AddResiliencePipeline(ApiGameBananaClient.HttpClientName, (builder, context) =>
                 {
                     // Rate Limiter
@@ -237,6 +245,14 @@ public partial class App : Application
                     client.DefaultRequestHeaders.Add("Accept", "application/json");
                 })
                     .AddHttpMessageHandler<HttpLoggerHandler>()
+                    .ConfigurePrimaryHttpMessageHandler(sp => new SocketsHttpHandler
+                    {
+                        PooledConnectionLifetime = TimeSpan.FromMinutes(2),
+                        ConnectTimeout = TimeSpan.FromSeconds(10),
+                        MaxConnectionsPerServer = 10,
+                        Proxy = sp.GetRequiredService<DynamicAppWebProxy>(),
+                        UseProxy = true
+                    })
                     .AddResilienceHandler("default-retry", resilienceBuilder =>
                     {
                         resilienceBuilder.AddRetry(new HttpRetryStrategyOptions()
@@ -368,7 +384,7 @@ public partial class App : Application
                         "JASM可能处于不稳定状态，建议重新启动应用.",
                         TimeSpan.FromMinutes(60));
             }
-            catch { /* 忽略通知服务的错误 */ }
+            catch { /* Ignore notification service errors */ }
         }
         catch (Exception ex)
         {
@@ -381,8 +397,9 @@ public partial class App : Application
         MainWindow = new MainWindow();
         Environment.SetEnvironmentVariable("WEBVIEW2_USE_VISUAL_HOSTING_FOR_OWNED_WINDOWS", "1");
         await GetService<ILanguageLocalizer>().InitializeAsync();
+        _ = Task.Run(() => GetService<IProxySettingsService>().GetConfigurationAsync());
         NotImplemented.NotificationManager = GetService<NotificationManager>();
         base.OnLaunched(args);
-        await GetService<IActivationService>().ActivateAsync(args).ConfigureAwait(false);
+        await GetService<IActivationService>().ActivateAsync(args);
     }
 }

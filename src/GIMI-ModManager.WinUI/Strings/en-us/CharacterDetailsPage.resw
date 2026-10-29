@@ -29,7 +29,7 @@
     <value>When enabled, mods are automatically refreshed to the game when switching, and mod toggles are synced to the d3dx_user.ini file</value>
   </data>
   <data name="BackwardHotkeyLabel.Text" xml:space="preserve">
-    <value>Backward hotkey</value>
+    <value>Back</value>
   </data>
   <data name="ConfigFileLabel.Text" xml:space="preserve">
     <value>Config file</value>
@@ -153,7 +153,25 @@
     <value>Folders</value>
   </data>
   <data name="ForwardHotkeyLabel.Text" xml:space="preserve">
-    <value>Forward hotkey</value>
+    <value>Switch</value>
+  </data>
+  <data name="KeySwap_GhostAddBack.Text" xml:space="preserve">
+    <value>+ Back</value>
+  </data>
+  <data name="KeySwap_GhostAddBackToolTip.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Add reverse trigger key</value>
+  </data>
+  <data name="AddForwardKeyButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Add key</value>
+  </data>
+  <data name="AddBackwardKeyButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Add back key</value>
+  </data>
+  <data name="KeySwap_ItemsCount.Text" xml:space="preserve">
+    <value>items</value>
+  </data>
+  <data name="KeySwap_Unsaved.Text" xml:space="preserve">
+    <value>Unsaved</value>
   </data>
   <data name="GoToModsOverviewButton.ToolTipService.ToolTip" xml:space="preserve">
     <value>Go to the mods overview page</value>
@@ -191,6 +209,86 @@
   <data name="KeyBindingsHelpTitle.Text" xml:space="preserve">
     <value>Hotkey binding tips</value>
   </data>
+  <data name="RenameSectionButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Rename section</value>
+  </data>
+  <!-- KeyRecorder Flyout -->
+  <data name="KeyRecorder_Title.Text" xml:space="preserve">
+    <value>Record Hotkey</value>
+  </data>
+  <data name="KeyRecorder_Prompt.Text" xml:space="preserve">
+    <value>Press any key on your keyboard to capture</value>
+  </data>
+  <data name="KeyRecorder_GamepadPresets.Text" xml:space="preserve">
+    <value>Gamepad Presets</value>
+  </data>
+  <data name="KeyRecorder_MousePresets.Text" xml:space="preserve">
+    <value>Mouse Presets</value>
+  </data>
+  <data name="KeyRecorder_MouseLeft.Content" xml:space="preserve">
+    <value>Left</value>
+  </data>
+  <data name="KeyRecorder_MouseRight.Content" xml:space="preserve">
+    <value>Right</value>
+  </data>
+  <data name="KeyRecorder_MouseMiddle.Content" xml:space="preserve">
+    <value>Middle</value>
+  </data>
+  <data name="KeyRecorder_MouseSide1.Content" xml:space="preserve">
+    <value>Side 1</value>
+  </data>
+  <data name="KeyRecorder_MouseSide2.Content" xml:space="preserve">
+    <value>Side 2</value>
+  </data>
+  <data name="KeyRecorder_FuncAndNumpad.Text" xml:space="preserve">
+    <value>Function, Numpad &amp; Symbols</value>
+  </data>
+  <data name="KeyRecorder_ManualInput.Header" xml:space="preserve">
+    <value>Manual Raw Input</value>
+  </data>
+  <data name="KeyRecorder_ManualInput.PlaceholderText" xml:space="preserve">
+    <value>e.g. VK_OEM_3 or XB_A</value>
+  </data>
+  <data name="KeyRecorder_DeleteKey.Content" xml:space="preserve">
+    <value>Remove Key</value>
+  </data>
+  <data name="KeyRecorder_Apply.Content" xml:space="preserve">
+    <value>Apply</value>
+  </data>
+  <data name="KeyRecorder_Cancel.Content" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="KeyRecorder_EmptyPrompt.Text" xml:space="preserve">
+    <value>(Press a key)</value>
+  </data>
+  <data name="KeyRecorder_Clear.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Clear key (Backspace/Delete)</value>
+  </data>
+  <data name="KeyRecorder_KeySpace.Content" xml:space="preserve">
+    <value>Space</value>
+  </data>
+  <!-- Section Rename Flyout -->
+  <data name="SectionRename_Title.Text" xml:space="preserve">
+    <value>Rename Section</value>
+  </data>
+  <data name="SectionRename_Description.Text" xml:space="preserve">
+    <value>Customize section suffix. Prefix is preserved automatically.</value>
+  </data>
+  <data name="SectionRename_InputBox.Header" xml:space="preserve">
+    <value>Section Suffix</value>
+  </data>
+  <data name="SectionRename_InputBox.PlaceholderText" xml:space="preserve">
+    <value>Enter new name...</value>
+  </data>
+  <data name="SectionRename_PreviewPrefix.Text" xml:space="preserve">
+    <value>Saved as: </value>
+  </data>
+  <data name="SectionRename_Confirm.Content" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
+  <data name="SectionRename_Cancel.Content" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
   <data name="LightboxCloseTip.Text" xml:space="preserve">
     <value>Click anywhere to close</value>
   </data>
@@ -203,8 +301,8 @@
   <data name="ModEnabledLabel.Text" xml:space="preserve">
     <value>Mod enabled</value>
   </data>
-  <data name="ModLinkTextBox.Header" xml:space="preserve">
-    <value>Mod link:</value>
+  <data name="ModLinkTextBox.PlaceholderText" xml:space="preserve">
+    <value>Mod Url...</value>
   </data>
   <data name="ModNameColumnHeader" xml:space="preserve">
     <value>Mod name</value>
@@ -287,6 +385,12 @@
   <data name="ShowModFolderColumnMenuItem.Text" xml:space="preserve">
     <value>Show the &apos;Mod folder name&apos; column</value>
   </data>
+  <data name="ShowHoverPreviewMenuItem.Text" xml:space="preserve">
+    <value>Show hover preview</value>
+  </data>
+  <data name="ShowHoverPreviewMenuItem.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Display a floating preview image when hovering over a mod row</value>
+  </data>
   <data name="SingleSelectModeMenuItem.Text" xml:space="preserve">
     <value>Single select mode</value>
   </data>
@@ -313,5 +417,8 @@
   </data>
   <data name="ViewToggleSwitch.OnContent" xml:space="preserve">
     <value>Gallery view</value>
+  </data>
+  <data name="NoKeySwapsTip.Text" xml:space="preserve">
+    <value>No key bindings in this mod</value>
   </data>
 </root>

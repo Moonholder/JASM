@@ -82,6 +82,12 @@
   <data name="ShowModFolderColumnMenuItem.Text" xml:space="preserve">
     <value>显示 '模组文件夹名' 列</value>
   </data>
+  <data name="ShowHoverPreviewMenuItem.Text" xml:space="preserve">
+    <value>显示悬停预览</value>
+  </data>
+  <data name="ShowHoverPreviewMenuItem.ToolTipService.ToolTip" xml:space="preserve">
+    <value>光标悬停在模组列表行上时显示浮动预览图</value>
+  </data>
 
   <!-- Toolbar -->
   <data name="AutoSyncButton.Content" xml:space="preserve">
@@ -173,8 +179,8 @@
   <data name="ShowDisabledIniFilesMenuItem.ToolTipService.ToolTip" xml:space="preserve">
     <value>显示或隐藏 DISABLED 前缀的 .ini 文件</value>
   </data>
-  <data name="ModLinkTextBox.Header" xml:space="preserve">
-    <value>模组链接:</value>
+  <data name="ModLinkTextBox.PlaceholderText" xml:space="preserve">
+    <value>模组链接...</value>
   </data>
 
   <!-- ModPane: Keyswap Help -->
@@ -229,10 +235,108 @@
     <value>变体数: </value>
   </data>
   <data name="ForwardHotkeyLabel.Text" xml:space="preserve">
-    <value>前进键</value>
+    <value>切换</value>
   </data>
   <data name="BackwardHotkeyLabel.Text" xml:space="preserve">
-    <value>后退键</value>
+    <value>反向</value>
+  </data>
+  <data name="KeySwap_GhostAddBack.Text" xml:space="preserve">
+    <value>+ 反向</value>
+  </data>
+  <data name="KeySwap_GhostAddBackToolTip.ToolTipService.ToolTip" xml:space="preserve">
+    <value>添加反向切换键</value>
+  </data>
+  <data name="KeySwap_ItemsCount.Text" xml:space="preserve">
+    <value>项</value>
+  </data>
+  <data name="KeySwap_Unsaved.Text" xml:space="preserve">
+    <value>未保存</value>
+  </data>
+  <data name="RenameSectionButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>重命名节</value>
+  </data>
+  <data name="AddForwardKeyButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>添加按键</value>
+  </data>
+  <data name="AddBackwardKeyButton.ToolTipService.ToolTip" xml:space="preserve">
+    <value>添加反向键</value>
+  </data>
+  <!-- KeyRecorder Flyout -->
+  <data name="KeyRecorder_Title.Text" xml:space="preserve">
+    <value>按键录制</value>
+  </data>
+  <data name="KeyRecorder_Prompt.Text" xml:space="preserve">
+    <value>按下键盘按键即可捕获</value>
+  </data>
+  <data name="KeyRecorder_GamepadPresets.Text" xml:space="preserve">
+    <value>手柄预设</value>
+  </data>
+  <data name="KeyRecorder_MousePresets.Text" xml:space="preserve">
+    <value>鼠标按键</value>
+  </data>
+  <data name="KeyRecorder_MouseLeft.Content" xml:space="preserve">
+    <value>左键</value>
+  </data>
+  <data name="KeyRecorder_MouseRight.Content" xml:space="preserve">
+    <value>右键</value>
+  </data>
+  <data name="KeyRecorder_MouseMiddle.Content" xml:space="preserve">
+    <value>中键</value>
+  </data>
+  <data name="KeyRecorder_MouseSide1.Content" xml:space="preserve">
+    <value>侧键1</value>
+  </data>
+  <data name="KeyRecorder_MouseSide2.Content" xml:space="preserve">
+    <value>侧键2</value>
+  </data>
+  <data name="KeyRecorder_FuncAndNumpad.Text" xml:space="preserve">
+    <value>功能键、小键盘与常用符号</value>
+  </data>
+  <data name="KeyRecorder_ManualInput.Header" xml:space="preserve">
+    <value>手动输入原始键码</value>
+  </data>
+  <data name="KeyRecorder_ManualInput.PlaceholderText" xml:space="preserve">
+    <value>例如: VK_OEM_3 或 XB_A</value>
+  </data>
+  <data name="KeyRecorder_DeleteKey.Content" xml:space="preserve">
+    <value>移除按键</value>
+  </data>
+  <data name="KeyRecorder_Apply.Content" xml:space="preserve">
+    <value>应用</value>
+  </data>
+  <data name="KeyRecorder_Cancel.Content" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  <data name="KeyRecorder_EmptyPrompt.Text" xml:space="preserve">
+    <value>(请按下按键)</value>
+  </data>
+  <data name="KeyRecorder_Clear.ToolTipService.ToolTip" xml:space="preserve">
+    <value>清空按键 (Backspace/Delete)</value>
+  </data>
+  <data name="KeyRecorder_KeySpace.Content" xml:space="preserve">
+    <value>空格</value>
+  </data>
+  <!-- Section Rename Flyout -->
+  <data name="SectionRename_Title.Text" xml:space="preserve">
+    <value>重命名节</value>
+  </data>
+  <data name="SectionRename_Description.Text" xml:space="preserve">
+    <value>自定义节名称后缀，前缀将自动保留。</value>
+  </data>
+  <data name="SectionRename_InputBox.Header" xml:space="preserve">
+    <value>节名后缀</value>
+  </data>
+  <data name="SectionRename_InputBox.PlaceholderText" xml:space="preserve">
+    <value>输入新名称...</value>
+  </data>
+  <data name="SectionRename_PreviewPrefix.Text" xml:space="preserve">
+    <value>保存为: </value>
+  </data>
+  <data name="SectionRename_Confirm.Content" xml:space="preserve">
+    <value>确认</value>
+  </data>
+  <data name="SectionRename_Cancel.Content" xml:space="preserve">
+    <value>取消</value>
   </data>
 
   <!-- ModPane: Footer -->
@@ -360,5 +464,8 @@
   </data>
   <data name="InvalidModUrlError" xml:space="preserve">
     <value>操作失败，因为所选项目不是有效的GameBanana模组链接。</value>
+  </data>
+  <data name="NoKeySwapsTip.Text" xml:space="preserve">
+    <value>未包含快捷键切换项</value>
   </data>
 </root>

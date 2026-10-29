@@ -1,5 +1,5 @@
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
-using System.Diagnostics.CodeAnalysis;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GIMI_ModManager.Core.Contracts.Services;
@@ -9,8 +9,9 @@ using GIMI_ModManager.Core.Services;
 using GIMI_ModManager.Core.Services.GameBanana;
 using GIMI_ModManager.Core.Services.GameBanana.ApiModels;
 using GIMI_ModManager.Core.Services.GameBanana.Models;
-using GIMI_ModManager.WinUI.Contracts.ViewModels;
 using GIMI_ModManager.WinUI.Contracts.Services;
+using GIMI_ModManager.WinUI.Contracts.ViewModels;
+using GIMI_ModManager.WinUI.Models.GameBanana;
 using GIMI_ModManager.WinUI.Models.Settings;
 using GIMI_ModManager.WinUI.Services.AppManagement;
 using GIMI_ModManager.WinUI.Services.ModHandling;
@@ -35,7 +36,7 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
     private DispatcherQueue _dispatcherQueue = null!;
 
     // Static category cache — survives across Transient VM instances
-    private static readonly Dictionary<string, List<GbCategoryDisplayItem>> _categoryCache = [];
+    private static readonly ConcurrentDictionary<string, List<GbCategoryDisplayItem>> _categoryCache = new();
 
     private string? _gameId;
     private int _currentPage = 1;
@@ -66,6 +67,11 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
     [ObservableProperty] private GbModelFilter _modelFilter = GbModelFilter.ModsOnly;
     [ObservableProperty] private bool _hasError;
     [ObservableProperty] private int _downloadQueueCount;
+
+    // Installation preferences
+    [ObservableProperty] private bool _fallbackToOtherCategoryOnUnmatched;
+    [ObservableProperty] private bool _autoEnableAfterSilentInstall = true;
+    [ObservableProperty] private bool _deleteArchiveAfterInstall = true;
 
     // Inverted loading for visibility binding
     [ObservableProperty] private Visibility _isNotLoading = Visibility.Visible;
@@ -98,21 +104,18 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
 
     [ObservableProperty] private BitmapImage? _selectedModAuthorAvatar;
 
-    // 详情面板预览图 — 首图大展示 + 缩略图导航
+    // Detail pane preview images
     [ObservableProperty] private int _selectedPreviewIndex;
     [ObservableProperty] private BitmapImage? _selectedPreviewFullImage;
 
-    // LightBox 轮播
+    // LightBox carousel
     [ObservableProperty] private int _lightBoxSelectedIndex;
     [ObservableProperty] private string _lightBoxCounter = string.Empty;
 
-    // 空状态
     [ObservableProperty] private Visibility _hasNoResults = Visibility.Collapsed;
 
-    // 分类即时搜索
     [ObservableProperty] private string _categorySearchQuery = string.Empty;
 
-    // 骨架屏 8 卡片占位数据源
     public int[] SkeletonPlaceholders { get; } = [1, 2, 3, 4, 5, 6, 7, 8];
 
     private readonly List<GbCategoryDisplayItem> _allCategories = new();
@@ -155,9 +158,7 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
     public ObservableCollection<ModFileInfo> ModFiles { get; } = new();
     public ObservableCollection<GbDownloadTask> DownloadQueue => _downloadSessionService.DownloadQueue;
     public ObservableCollection<SortOption> SortOptions { get; }
-
     public ObservableCollection<FilterOption<GbModelFilter>> ModelFilterOptions { get; }
-
     public ObservableCollection<FilterOption<GbNsfwDisplayPolicy>> NsfwPolicyOptions { get; }
 
     public GameBananaVM()
@@ -265,6 +266,9 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
                 SelectedSort = settings.SelectedSort;
                 NsfwPolicy = (GbNsfwDisplayPolicy)settings.NsfwPolicy;
                 ModelFilter = (GbModelFilter)settings.ModelFilter;
+                FallbackToOtherCategoryOnUnmatched = settings.FallbackToOtherCategoryOnUnmatched;
+                AutoEnableAfterSilentInstall = settings.AutoEnableAfterSilentInstall;
+                DeleteArchiveAfterInstall = settings.DeleteArchiveAfterInstall;
             }
         }
         catch (Exception ex)
@@ -284,18 +288,37 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
     {
         try
         {
-            var settings = new GameBananaSettings
-            {
-                SelectedSort = SelectedSort,
-                NsfwPolicy = (int)NsfwPolicy,
-                ModelFilter = (int)ModelFilter,
-            };
+            var settings = await _localSettingsService.ReadOrCreateSettingAsync<GameBananaSettings>(GameBananaSettings.Key);
+            settings.SelectedSort = SelectedSort;
+            settings.NsfwPolicy = (int)NsfwPolicy;
+            settings.ModelFilter = (int)ModelFilter;
+            settings.FallbackToOtherCategoryOnUnmatched = FallbackToOtherCategoryOnUnmatched;
+            settings.AutoEnableAfterSilentInstall = AutoEnableAfterSilentInstall;
+            settings.DeleteArchiveAfterInstall = DeleteArchiveAfterInstall;
             await _localSettingsService.SaveSettingAsync(GameBananaSettings.Key, settings);
         }
         catch (Exception ex)
         {
             _logger.Warning(ex, "Failed to save GameBanana settings");
         }
+    }
+
+    partial void OnFallbackToOtherCategoryOnUnmatchedChanged(bool value)
+    {
+        if (!_settingsLoaded) return;
+        _ = SaveSettingsAsync();
+    }
+
+    partial void OnAutoEnableAfterSilentInstallChanged(bool value)
+    {
+        if (!_settingsLoaded) return;
+        _ = SaveSettingsAsync();
+    }
+
+    partial void OnDeleteArchiveAfterInstallChanged(bool value)
+    {
+        if (!_settingsLoaded) return;
+        _ = SaveSettingsAsync();
     }
 
     // ── Sort / filter change ──
@@ -369,15 +392,17 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
         }
     }
 
-    public void OnSearchSubmitted(Microsoft.UI.Xaml.Controls.AutoSuggestBox sender, Microsoft.UI.Xaml.Controls.AutoSuggestBoxQuerySubmittedEventArgs args)
+    [RelayCommand]
+    public void SubmitSearch(string? queryText)
     {
+        var query = queryText ?? string.Empty;
         _searchDebounceTimer?.Stop();
 
         // Submit triggers its own reload below; don't let the debounce fire a duplicate.
-        if (!string.Equals(SearchQuery, args.QueryText, StringComparison.Ordinal))
+        if (!string.Equals(SearchQuery, query, StringComparison.Ordinal))
         {
             _suppressSearchDebounce = true;
-            SearchQuery = args.QueryText;
+            SearchQuery = query;
         }
         else
         {
@@ -394,6 +419,11 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
         {
             _ = LoadModsAsync(reset: true);
         }
+    }
+
+    public void OnSearchSubmitted(Microsoft.UI.Xaml.Controls.AutoSuggestBox sender, Microsoft.UI.Xaml.Controls.AutoSuggestBoxQuerySubmittedEventArgs args)
+    {
+        SubmitSearch(args.QueryText);
     }
 
     // ── Category selection ──
@@ -413,8 +443,6 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
         }
         await LoadModsAsync(reset: true);
     }
-
-    // ── Load categories ──
 
     // ── Load categories ──
     // Strategy: Get top-level categories for game, find the "Skins" category (highest item count),
@@ -546,7 +574,7 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
                 // Keep the static cache bounded: evict the oldest game once it grows.
                 if (_categoryCache.Count >= 6)
                 {
-                    _categoryCache.Remove(_categoryCache.Keys.First());
+                    _categoryCache.TryRemove(_categoryCache.Keys.First(), out _);
                 }
                 _categoryCache[_gameId] = finalList;
 
@@ -653,7 +681,7 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
                 {
                     IsLoading = false;
                     IsLoadingMore = false;
-                    // 空状态：加载完成后若无结果则显示引导
+
                     HasNoResults = (!IsLoading && Mods.Count == 0 && !HasError)
                         ? Visibility.Visible
                         : Visibility.Collapsed;
@@ -877,11 +905,11 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
                                 Thumbnail530Url = img.Thumb530?.ToString() ?? img.Original.ToString(),
                             };
                             PreviewImages.Add(item);
-                            // 缩略图导航条中的图片由 XAML ContainerContentChanging 延迟加载
+                            // Navigation strip thumbnails are loaded lazily by ContainerContentChanging
                         }
                     }
 
-                    // 自动选中首张预览图作为大图展示
+                    // Automatically select first preview for main display
                     if (PreviewImages.Count > 0)
                     {
                         SelectPreviewImage(0);
@@ -891,6 +919,29 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
                     {
                         foreach (var f in detail.Files)
                         {
+                            var activeTask = _downloadSessionService.DownloadQueue
+                                .FirstOrDefault(t => t.FileInfo?.FileId == f.FileId && !t.IsCompleted);
+                            if (activeTask != null)
+                            {
+                                f.IsDownloading = true;
+                                f.IsInstalling = activeTask.IsInstalling;
+                                f.IsPaused = activeTask.IsPaused;
+                                f.DownloadProgress = (int)activeTask.ProgressPercentage;
+                                f.DownloadStatus = string.IsNullOrWhiteSpace(activeTask.StatusMessage)
+                                    ? $"{f.DownloadProgress}%"
+                                    : activeTask.StatusMessage;
+                                activeTask.FileInfo = f;
+                            }
+                            else
+                            {
+                                var completedTask = _downloadSessionService.DownloadQueue
+                                    .FirstOrDefault(t => t.FileInfo?.FileId == f.FileId && t.IsCompleted && !t.IsError);
+                                if (completedTask != null)
+                                {
+                                    f.IsInstalled = true;
+                                }
+                            }
+
                             ModFiles.Add(f);
                         }
                     }
@@ -913,6 +964,15 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
                     }
 
                     HasModDetail = Visibility.Visible;
+                });
+            }
+            else
+            {
+                _dispatcherQueue.TryEnqueue(() =>
+                {
+                    if (requestId != _detailRequestId || cts.IsCancellationRequested) return;
+                    HasDetailError = true;
+                    DetailErrorMessage = _localizer.GetLocalizedStringOrDefault("/GameBananaPage/ErrorLoadModDetail", "Failed to load mod detail");
                 });
             }
         }
@@ -1013,7 +1073,6 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
         }));
     }
 
-
     // ── Download and Install ──
 
     [RelayCommand]
@@ -1027,6 +1086,42 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
 
     [RelayCommand]
     private void CancelDownloadTask(GbDownloadTask? task) => _downloadSessionService.CancelDownloadTask(task);
+
+    [RelayCommand]
+    private void PauseDownloadTask(GbDownloadTask? task) => _downloadSessionService.PauseDownloadTask(task);
+
+    [RelayCommand]
+    private void ResumeDownloadTask(GbDownloadTask? task) => _downloadSessionService.ResumeDownloadTask(task);
+
+    public void PauseFileDownload(ModFileInfo? fileInfo)
+    {
+        if (fileInfo == null) return;
+        var activeTask = _downloadSessionService.DownloadQueue.FirstOrDefault(t => t.FileInfo?.FileId == fileInfo.FileId && !t.IsCompleted);
+        if (activeTask != null)
+        {
+            _downloadSessionService.PauseDownloadTask(activeTask);
+        }
+    }
+
+    public void ResumeFileDownload(ModFileInfo? fileInfo)
+    {
+        if (fileInfo == null) return;
+        var activeTask = _downloadSessionService.DownloadQueue.FirstOrDefault(t => t.FileInfo?.FileId == fileInfo.FileId && !t.IsCompleted);
+        if (activeTask != null)
+        {
+            _downloadSessionService.ResumeDownloadTask(activeTask);
+        }
+    }
+
+    public void CancelFileDownload(ModFileInfo? fileInfo)
+    {
+        if (fileInfo == null) return;
+        var activeTask = _downloadSessionService.DownloadQueue.FirstOrDefault(t => t.FileInfo?.FileId == fileInfo.FileId && !t.IsCompleted);
+        if (activeTask != null)
+        {
+            _downloadSessionService.CancelDownloadTask(activeTask);
+        }
+    }
 
     [RelayCommand]
     private void RemoveDownloadTask(GbDownloadTask? task) => _downloadSessionService.RemoveDownloadTask(task);
@@ -1062,17 +1157,17 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
     }
 
     /// <summary>
-    /// 选择指定索引的预览图作为大图展示。
+    /// Select preview image at index for main display.
     /// </summary>
     public void SelectPreviewImage(int index)
     {
         if (index < 0 || index >= PreviewImages.Count) return;
         SelectedPreviewIndex = index;
 
-        // 立即使用已加载的缩略图占位，消除视觉上的卡顿感
+        // Placeholder with loaded thumbnail to avoid blank flash
         SelectedPreviewFullImage = PreviewImages[index].ImageSource;
 
-        // 后台加载 530px 或 800px 版本用于面板大图展示
+        // Fetch higher-res preview for main pane
         Helpers.RemoteImageLoader.LoadInto(
             PreviewImages[index].Thumbnail530Url, 800,
             img => SelectedPreviewFullImage = img,
@@ -1080,7 +1175,7 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
     }
 
     /// <summary>
-    /// 手动强制触发指定索引及其周边图片的加载（用于规避绑定的索引未变化时不触发 setter 的情况）
+    /// Preload full images for the selected index and its adjacent items.
     /// </summary>
     public void ForceLoadLightBoxImages(int value)
     {
@@ -1095,14 +1190,12 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
     }
 
     /// <summary>
-    /// 更新 LightBox 翻页计数器文本并预加载高清图片。
+    /// Update counter and preload adjacent high-res images on LightBox navigation.
     /// </summary>
     partial void OnLightBoxSelectedIndexChanged(int value)
     {
         ForceLoadLightBoxImages(value);
     }
-
-
 
     [RelayCommand]
     private void OpenInBrowser()
@@ -1136,231 +1229,5 @@ public partial class GameBananaVM : ObservableRecipient, INavigationAware
     {
         ErrorMessage = message;
         HasError = true;
-    }
-}
-
-// ── Display Models ──
-
-public partial class GbCategoryDisplayItem : ObservableObject
-{
-    public string Name { get; init; } = string.Empty;
-    public string? CategoryId { get; init; }
-    public string? IconUrl { get; init; }
-    public int ItemCount { get; init; }
-    public bool IsSection { get; init; }
-    public string ItemCountText => ItemCount > 0 ? ItemCount.ToString() : string.Empty;
-    public Visibility HasItemCountText => ItemCount > 0 ? Visibility.Visible : Visibility.Collapsed;
-    public string IconGlyph => CategoryId == null ? "\uE8FD" : IsSection ? "\uE8B7" : "\uE71D";
-    public Windows.UI.Text.FontWeight SectionFontWeight => IsSection
-        ? Microsoft.UI.Text.FontWeights.SemiBold
-        : Microsoft.UI.Text.FontWeights.Normal;
-
-    [ObservableProperty] private BitmapImage? _iconImage;
-
-    public void LoadIcon()
-    {
-        Helpers.RemoteImageLoader.LoadInto(IconUrl, 24, img => IconImage = img);
-    }
-}
-
-public partial class GbModDisplayItem : ObservableObject
-{
-    public int ModId { get; init; }
-    public string Name { get; init; } = string.Empty;
-    public string ModelName { get; init; } = "Mod";
-    public string? ProfileUrl { get; init; }
-    public string ThumbnailUrl { get; init; } = string.Empty;
-    public string SfwThumbnailUrl { get; init; } = string.Empty;
-    public string AuthorName { get; init; } = "Unknown";
-    public string AuthorAvatarUrl { get; init; } = string.Empty;
-    public int LikeCount { get; init; }
-    public int DownloadCount { get; init; }
-    public int CommentCount { get; init; }
-    public long DateAdded { get; init; }
-    public long DateUpdated { get; init; }
-    [ObservableProperty] private bool _isNsfw;
-    [ObservableProperty] private GbNsfwDisplayPolicy _nsfwPolicy;
-
-    /// <summary>
-    /// Small corner badge shown on blurred NSFW cards (Blur display policy).
-    /// </summary>
-    public Visibility NsfwBlurBadgeVisible => IsNsfw && NsfwPolicy == GbNsfwDisplayPolicy.Blur
-        ? Visibility.Visible
-        : Visibility.Collapsed;
-
-    /// <summary>
-    /// 当处于 NSFW 模糊遮罩状态时隐藏右上角角标，只有在全显模式下才保留右上角 NSFW 角标，拒绝信息堆叠冗余。
-    /// </summary>
-    public Visibility IsNsfwBadgeVisible => IsNsfw && NsfwPolicy == GbNsfwDisplayPolicy.Show ? Visibility.Visible : Visibility.Collapsed;
-
-    /// <summary>
-    /// Type label to show on the card (empty for regular Mods).
-    /// </summary>
-    public string TypeLabel => ModelName switch
-    {
-        "Mod" => string.Empty,
-        "Wip" => "WIP",
-        _ => ModelName
-    };
-
-    public Visibility TypeLabelVisibility => string.IsNullOrEmpty(TypeLabel)
-        ? Visibility.Collapsed
-        : Visibility.Visible;
-
-    [ObservableProperty] private BitmapImage? _thumbnailImage;
-    [ObservableProperty] private BitmapImage? _authorAvatarImage;
-
-    [DynamicDependency(DynamicallyAccessedMemberTypes.PublicProperties, typeof(GbModDisplayItem))]
-    public void LoadThumbnail()
-    {
-        // 使用 380px 均衡解码尺寸：大屏高分依然锐利逼真，但滚动显存开销降低 35%
-        // NSFW cards in Blur mode show a genuinely blurred thumbnail instead of
-        // the raw image; everything else uses the normal 380px decode.
-        if (IsNsfw && NsfwPolicy == GbNsfwDisplayPolicy.Blur)
-        {
-            if (!string.IsNullOrEmpty(SfwThumbnailUrl))
-            {
-                Helpers.RemoteImageLoader.LoadInto(SfwThumbnailUrl, 380, img => ThumbnailImage = img, "_sfw");
-            }
-            else
-            {
-                Helpers.RemoteImageLoader.LoadIntoBlurred(ThumbnailUrl, 120, img => ThumbnailImage = img, "_blur");
-            }
-        }
-        else
-        {
-            Helpers.RemoteImageLoader.LoadInto(ThumbnailUrl, 380, img => ThumbnailImage = img);
-        }
-
-        if (!string.IsNullOrEmpty(AuthorAvatarUrl))
-        {
-            Helpers.RemoteImageLoader.LoadInto(AuthorAvatarUrl, 24, img => AuthorAvatarImage = img);
-        }
-
-        // 移除低分辨率解码，不再使用 BlurredThumbnailImage
-        // NSFW 的视觉隐藏现由 UI 层的高清图叠加强黑色遮罩直接实现。
-    }
-
-    /// <summary>
-    /// Drops the loaded bitmaps so a recycled card container does not keep
-    /// decoded images alive. Images reload from the memory/disk cache when
-    /// the card is realized again.
-    /// </summary>
-    public void ReleaseImages()
-    {
-        if (ThumbnailImage != null) ThumbnailImage = null;
-        if (AuthorAvatarImage != null) AuthorAvatarImage = null;
-    }
-
-    public string FormattedDownloads => DownloadCount >= 1000
-        ? $"{DownloadCount / 1000.0:F1}k"
-        : DownloadCount.ToString();
-
-    public string FormattedLikes => LikeCount >= 1000
-        ? $"{LikeCount / 1000.0:F1}k"
-        : LikeCount.ToString();
-
-    public string FormattedComments => CommentCount >= 1000
-        ? $"{CommentCount / 1000.0:F1}k"
-        : CommentCount.ToString();
-
-    public string FormattedDate
-    {
-        get
-        {
-            // Use DateAdded if DateUpdated is 0 or less than DateAdded
-            long ts = DateUpdated > DateAdded ? DateUpdated : DateAdded;
-            if (ts == 0) return string.Empty;
-
-            var dt = DateTimeOffset.FromUnixTimeSeconds(ts).LocalDateTime;
-            var diff = DateTime.Now - dt;
-            return Helpers.FormaterHelpers.FormatTimeSinceAdded(diff);
-        }
-    }
-}
-
-public partial class GbPreviewImageItem : ObservableObject
-{
-    public string FullUrl { get; init; } = string.Empty;
-    public string Thumbnail100Url { get; init; } = string.Empty;
-    public string Thumbnail530Url { get; init; } = string.Empty;
-
-    [ObservableProperty] private BitmapImage? _imageSource;
-    [ObservableProperty] private BitmapImage? _fullImageSource;
-
-    [ObservableProperty] private bool _isFullImageLoading;
-    private bool _hasStartedLoadingFull;
-
-    public void Load()
-    {
-        // 加载 100px 版本作为缩略图导航条
-        Helpers.RemoteImageLoader.LoadInto(Thumbnail100Url, 100, img => ImageSource = img, "_100");
-    }
-
-    public void LoadFullImage()
-    {
-        if (FullImageSource != null || _hasStartedLoadingFull) return;
-        _hasStartedLoadingFull = true;
-        IsFullImageLoading = true;
-        // LightBox 使用原图(FullUrl) 的 1920px 解码保证放大后的清晰度
-        Helpers.RemoteImageLoader.LoadInto(FullUrl, 1920, img =>
-        {
-            FullImageSource = img;
-            IsFullImageLoading = false;
-        }, "_1920");
-    }
-}
-
-public record SortOption(string DisplayName, string Value);
-
-public enum GbNsfwDisplayPolicy
-{
-    Remove,
-    Blur,
-    Show
-}
-
-public enum GbModelFilter
-{
-    All,
-    ModsOnly
-}
-
-public record FilterOption<T>(string DisplayName, T Value);
-
-public partial class GbDownloadTask : ObservableObject
-{
-    public static event Action? ActiveTasksChanged;
-
-    public GbModDisplayItem Mod { get; init; } = null!;
-    public ModFileInfo FileInfo { get; init; } = null!;
-    public string? CategoryName { get; init; }
-    public string? ModUrl { get; set; }
-    public CancellationTokenSource? Cts { get; set; }
-    public string? ArchivePath { get; set; }
-
-    [ObservableProperty] private double _progressPercentage;
-    [ObservableProperty] private string _statusMessage = "等待中...";
-    [ObservableProperty] private bool _isCompleted;
-    [ObservableProperty] private bool _isError;
-
-    public Visibility CancelVisibility => !IsCompleted && !IsError ? Visibility.Visible : Visibility.Collapsed;
-    public Visibility RemoveVisibility => IsCompleted || IsError ? Visibility.Visible : Visibility.Collapsed;
-    public Visibility RetryVisibility => IsCompleted || IsError ? Visibility.Visible : Visibility.Collapsed;
-
-    partial void OnIsCompletedChanged(bool value)
-    {
-        OnPropertyChanged(nameof(CancelVisibility));
-        OnPropertyChanged(nameof(RemoveVisibility));
-        OnPropertyChanged(nameof(RetryVisibility));
-        ActiveTasksChanged?.Invoke();
-    }
-
-    partial void OnIsErrorChanged(bool value)
-    {
-        OnPropertyChanged(nameof(CancelVisibility));
-        OnPropertyChanged(nameof(RemoveVisibility));
-        OnPropertyChanged(nameof(RetryVisibility));
-        ActiveTasksChanged?.Invoke();
     }
 }

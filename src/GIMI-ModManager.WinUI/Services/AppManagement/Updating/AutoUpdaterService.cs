@@ -1,11 +1,16 @@
-﻿using ErrorOr;
-using GIMI_ModManager.Core.Contracts.Services;
-using Microsoft.UI.Xaml;
-using Serilog;
+using System;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
-using static GIMI_ModManager.WinUI.Services.AppManagement.Updating.UpdateDownloadProgressEventArgs;
+using System.Threading;
+using System.Threading.Tasks;
+using ErrorOr;
+using GIMI_ModManager.Core.Contracts.Services;
+using GIMI_ModManager.Core.Services.Network;
+using GIMI_ModManager.Core.Services.Network.Models;
+using Serilog;
 
 namespace GIMI_ModManager.WinUI.Services.AppManagement.Updating;
 
@@ -14,6 +19,9 @@ public class AutoUpdaterService
     private readonly ILogger _logger;
     private readonly UpdateChecker _updateChecker;
     private readonly ILanguageLocalizer _localizer;
+    private readonly DynamicAppWebProxy _dynamicProxy;
+    private readonly IMirrorRacingService _mirrorRacingService;
+    private readonly IChunkedDownloadEngine _chunkedDownloadEngine;
 
     private const string ReleasesApiUrl = "https://api.github.com/repos/Moonholder/JASM/releases?per_page=2";
     private const string SetupFilePrefix = "JASM_v";
@@ -26,11 +34,20 @@ public class AutoUpdaterService
     /// </summary>
     public event EventHandler<UpdateDownloadProgressEventArgs>? DownloadProgressChanged;
 
-    public AutoUpdaterService(ILogger logger, UpdateChecker updateChecker, ILanguageLocalizer localizer)
+    public AutoUpdaterService(
+        ILogger logger,
+        UpdateChecker updateChecker,
+        ILanguageLocalizer localizer,
+        DynamicAppWebProxy dynamicProxy,
+        IMirrorRacingService mirrorRacingService,
+        IChunkedDownloadEngine chunkedDownloadEngine)
     {
         _updateChecker = updateChecker;
         _localizer = localizer;
         _logger = logger.ForContext<AutoUpdaterService>();
+        _dynamicProxy = dynamicProxy;
+        _mirrorRacingService = mirrorRacingService;
+        _chunkedDownloadEngine = chunkedDownloadEngine;
 
         // Clean up leftover update files from previous session
         _ = Task.Run(() =>
@@ -94,7 +111,7 @@ public class AutoUpdaterService
 
             // 4. Test mirrors and download with failover
             _logger.Information("Testing mirrors for faster download...");
-            var availableMirrors = await MirrorAddressSelector.GetAvailableMirrorsAsync(cancellationToken);
+            var availableMirrors = await _mirrorRacingService.GetRankedMirrorsAsync(setupAsset.BrowserDownloadUrl!, cancellationToken: cancellationToken);
             var success = false;
 
             for (int i = 0; i < availableMirrors.Count; i++)
@@ -103,7 +120,9 @@ public class AutoUpdaterService
                 bool isLastMirror = (i == availableMirrors.Count - 1);
 
                 if (cancellationToken.IsCancellationRequested) break;
-                var downloadUrl = mirror.Address + setupAsset.BrowserDownloadUrl!;
+                var downloadUrl = string.IsNullOrEmpty(mirror.Address)
+                    ? setupAsset.BrowserDownloadUrl!
+                    : mirror.Address.TrimEnd('/') + "/" + setupAsset.BrowserDownloadUrl!;
 
                 try
                 {
@@ -229,223 +248,49 @@ public class AutoUpdaterService
     }
 
     /// <summary>
-    /// Downloads a file with retry + resume support for a single mirror.
-    /// Each mirror attempt starts from 0; retries within the same mirror use Range headers.
+    /// Downloads the update package using the universal chunked download engine.
     /// </summary>
-    private async Task DownloadFileAsync(string url, string destinationPath, long expectedSize,
-    string mirrorName, bool isLastMirror, CancellationToken cancellationToken)
+    private async Task DownloadFileAsync(
+        string url,
+        string destinationPath,
+        long expectedSize,
+        string mirrorName,
+        bool isLastMirror,
+        CancellationToken cancellationToken)
     {
-        using var httpClient = CreateDownloadHttpClient();
-        long totalBytes = expectedSize;
-        bool supportsRange = false;
-
-        // 1. Send a test request to detect if the server supports chunk download (Range)
-        try
+        var progress = new Progress<DownloadProgressInfo>(info =>
         {
-            using var testReq = new HttpRequestMessage(HttpMethod.Get, url);
-            testReq.Headers.Range = new System.Net.Http.Headers.RangeHeaderValue(0, 0);
-            using var testRes = await httpClient.SendAsync(testReq, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
-
-            if (testRes.StatusCode == System.Net.HttpStatusCode.PartialContent)
-            {
-                supportsRange = true;
-                if (testRes.Content.Headers.ContentRange?.Length != null)
-                    totalBytes = testRes.Content.Headers.ContentRange.Length.Value;
-            }
-            else if (testRes.IsSuccessStatusCode)
-            {
-                totalBytes = testRes.Content.Headers.ContentLength ?? expectedSize;
-            }
-        }
-        catch { /* Ignore and use single thread */ }
-
-        // 2. Determine the number of threads (4 threads if greater than 5MB and supports chunking)
-        int threads = (supportsRange && totalBytes > 5 * 1024 * 1024) ? 4 : 1;
-        var state = new DownloadState(threads);
-
-        // 3. Pre-create file and allocate size (prevent disk fragmentation during multi-threaded writing)
-        if (File.Exists(destinationPath)) File.Delete(destinationPath); // Delete each time the source is changed, discard cross-source fragments
-        using (var fs = new FileStream(destinationPath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite))
-        {
-            if (threads > 1 && totalBytes > 0) fs.SetLength(totalBytes);
-        }
-
-        using var monitorCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        bool isSlowTimeout = false;
-
-        // 4. Independent task: global speed and progress monitoring
-        var monitorTask = Task.Run(async () =>
-        {
-            int slowSpeedSeconds = 0;
-            var sw = Stopwatch.StartNew();
-
-            while (!monitorCts.Token.IsCancellationRequested)
-            {
-                await Task.Delay(1000, monitorCts.Token);
-                if (monitorCts.Token.IsCancellationRequested) break;
-
-                // Get the download amount in the past 1 second and reset it
-                long bytesThisSecond = Interlocked.Exchange(ref state.SpeedBytes, 0);
-                double currentSpeed = bytesThisSecond / (sw.ElapsedMilliseconds / 1000.0);
-                sw.Restart();
-
-                long received = state.GetTotalReceived();
-
-                // Slow speed escape mechanism: non-last source, total speed is less than 50 KB/s for 10 seconds
-                if (!isLastMirror && currentSpeed < 50 * 1024)
-                {
-                    slowSpeedSeconds++;
-                    if (slowSpeedSeconds >= 10)
-                    {
-                        isSlowTimeout = true;
-                        monitorCts.Cancel();
-                        break;
-                    }
-                }
-                else
-                {
-                    slowSpeedSeconds = 0;
-                }
-
-                int progress = totalBytes > 0 ? (int)(received * 100 / totalBytes) : 0;
-                DownloadProgressChanged?.Invoke(this, new UpdateDownloadProgressEventArgs(
-                    progress, received, totalBytes, mirrorName, currentSpeed));
-            }
+            DownloadProgressChanged?.Invoke(this, new UpdateDownloadProgressEventArgs(
+                info.Percentage ?? 0,
+                info.BytesReceived,
+                info.TotalBytes ?? expectedSize,
+                mirrorName,
+                info.BytesPerSecond));
         });
 
-        // 5. Start multi-threaded chunk download
-        try
+        var options = new ChunkedDownloadOptions
         {
-            long chunkSize = totalBytes / threads;
-            var downloadTasks = new List<Task>();
+            Concurrency = 4,
+            MinFileSizeForChunking = 5 * 1024 * 1024
+        };
 
-            for (int i = 0; i < threads; i++)
-            {
-                long start = i * chunkSize;
-                long? end = (i == threads - 1) ? totalBytes - 1 : start + chunkSize - 1;
-                if (threads == 1) end = null; // Single thread without upper limit
-
-                downloadTasks.Add(DownloadChunkAsync(httpClient, url, destinationPath, start, end, i, state, monitorCts.Token));
-            }
-
-            await Task.WhenAll(downloadTasks);
-        }
-        catch (OperationCanceledException)
-        {
-            if (isSlowTimeout)
-            {
-                _logger.Warning("Download from {MirrorName} is too slow. Forcing mirror switch...", mirrorName);
-                throw new TimeoutException("Mirror download speed is too slow.");
-            }
-            throw;
-        }
-        finally
-        {
-            monitorCts.Cancel();
-            try { await monitorTask; } catch { }
-        }
-
-        // 100% progress notification
-        DownloadProgressChanged?.Invoke(this, new UpdateDownloadProgressEventArgs(
-            100, totalBytes, totalBytes, mirrorName, 0));
-    }
-
-    private async Task DownloadChunkAsync(HttpClient httpClient, string url, string destinationPath,
-    long start, long? end, int threadIndex, DownloadState state, CancellationToken ct)
-    {
-        const int maxRetries = 3;
-        const int bufferSize = 65536;
-
-        long initialStart = start;
-        long currentStart = start;
-        long chunkReceived = 0;
-
-        for (int retry = 0; retry < maxRetries; retry++)
-        {
-            try
-            {
-                using var request = new HttpRequestMessage(HttpMethod.Get, url);
-                if (end.HasValue)
-                    request.Headers.Range = new System.Net.Http.Headers.RangeHeaderValue(currentStart, end.Value);
-                else if (currentStart > 0)
-                    request.Headers.Range = new System.Net.Http.Headers.RangeHeaderValue(currentStart, null);
-
-                using var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
-                response.EnsureSuccessStatusCode();
-
-                // If the server rejects the breakpoint resume (e.g., returns 200 instead of 206 during retry), reset the current chunk's progress
-                bool isPartial = response.StatusCode == System.Net.HttpStatusCode.PartialContent;
-                if (!isPartial && currentStart > initialStart)
-                {
-                    currentStart = initialStart;
-                    chunkReceived = 0;
-                }
-
-                // FileShare.ReadWrite is the core, allowing multiple threads to write to different positions in the same file
-                using var fs = new FileStream(destinationPath, FileMode.Open, FileAccess.Write, FileShare.ReadWrite, bufferSize, true);
-                fs.Position = currentStart;
-
-                using var contentStream = await response.Content.ReadAsStreamAsync(ct);
-                var buffer = new byte[bufferSize];
-                int bytesRead;
-
-                while ((bytesRead = await contentStream.ReadAsync(buffer, ct)) > 0)
-                {
-                    await fs.WriteAsync(buffer.AsMemory(0, bytesRead), ct);
-
-                    chunkReceived += bytesRead;
-                    currentStart += bytesRead; // Advance the pointer, if disconnected, the next retry will start from the new pointer
-
-                    // Synchronize global state
-                    Interlocked.Exchange(ref state.ChunkProgress[threadIndex], chunkReceived);
-                    Interlocked.Add(ref state.SpeedBytes, bytesRead);
-                }
-
-                return; // Successfully downloaded the chunk
-            }
-            catch (OperationCanceledException)
-            {
-                throw; // Monitor thread cancelled or user cancelled, throw directly
-            }
-            catch (Exception ex) when (retry < maxRetries - 1)
-            {
-                _logger.Warning(ex, "Chunk {ThreadIndex} interrupted at offset {CurrentStart}. Retrying {Retry}/{Max}...",
-                    threadIndex, currentStart, retry + 1, maxRetries);
-                await Task.Delay(1500, ct); // Wait a moment and then resume downloading the current chunk
-            }
-        }
-
-        throw new IOException($"Thread {threadIndex} chunk download failed after {maxRetries} retries.");
+        await _chunkedDownloadEngine.DownloadAsync(url, destinationPath, progress, options, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
     /// Creates an HttpClient for API calls (GitHub Release info).
     /// </summary>
-    private static HttpClient CreateHttpClient()
+    private HttpClient CreateHttpClient()
     {
-        var httpClient = new HttpClient(new HttpClientHandler
+        var httpClient = new HttpClient(new SocketsHttpHandler
         {
             AllowAutoRedirect = true,
-            MaxAutomaticRedirections = 5
+            MaxAutomaticRedirections = 5,
+            Proxy = _dynamicProxy,
+            UseProxy = true
         });
         httpClient.DefaultRequestHeaders.Add("X-GitHub-Api-Version", "2022-11-28");
         httpClient.DefaultRequestHeaders.Add("User-Agent", "JASM-Just_Another_Skin_Manager-Update-Checker");
-        return httpClient;
-    }
-
-    /// <summary>
-    /// Creates an HttpClient for large file downloads with no timeout limit.
-    /// </summary>
-    private static HttpClient CreateDownloadHttpClient()
-    {
-        var httpClient = new HttpClient(new HttpClientHandler
-        {
-            AllowAutoRedirect = true,
-            MaxAutomaticRedirections = 10
-        });
-        httpClient.Timeout = System.Threading.Timeout.InfiniteTimeSpan; // Large file, rely on CancellationToken
-        httpClient.DefaultRequestHeaders.Add("User-Agent", "JASM-Just_Another_Skin_Manager-Update-Checker");
-        httpClient.DefaultRequestHeaders.Add("Accept", "application/octet-stream");
         return httpClient;
     }
 }
@@ -466,18 +311,5 @@ public class UpdateDownloadProgressEventArgs : EventArgs
         TotalBytes = totalBytes;
         MirrorName = mirrorName;
         SpeedBytesPerSecond = speedBytesPerSecond;
-    }
-
-    public class DownloadState
-    {
-        public long[] ChunkProgress;
-        public long SpeedBytes;
-
-        public DownloadState(int threads)
-        {
-            ChunkProgress = new long[threads];
-        }
-
-        public long GetTotalReceived() => ChunkProgress.Sum();
     }
 }

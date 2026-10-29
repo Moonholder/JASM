@@ -7,6 +7,8 @@ using CommunityToolkitWrapper;
 using GIMI_ModManager.Core.Contracts.Entities;
 using GIMI_ModManager.Core.Contracts.Services;
 using GIMI_ModManager.Core.Entities;
+using GIMI_ModManager.Core.Entities.Mods.Contract;
+using GIMI_ModManager.Core.Entities.Mods.Helpers;
 using GIMI_ModManager.Core.Helpers;
 using GIMI_ModManager.Core.Services;
 using GIMI_ModManager.Core.Services.ModPresetService;
@@ -82,6 +84,7 @@ public partial class ModGridVM(
     [ObservableProperty] private bool _showMultipleModsActiveWarning;
 
     [ObservableProperty] private bool _autoSync3DMigotoConfig;
+    [ObservableProperty] private bool _isShowHoverPreviewEnabled = true;
 
     public bool IsInitialized { get; private set; }
 
@@ -363,6 +366,21 @@ public partial class ModGridVM(
         });
     }
 
+    private static Uri? ResolvePreviewImageUri(CharacterSkinEntry characterSkinEntry, ModSettings? skinModSettings)
+    {
+        if (skinModSettings?.ImagePath != null)
+            return skinModSettings.ImagePath;
+
+        try
+        {
+            return SkinModHelpers.DetectModPreviewImages(characterSkinEntry.Mod.FullPath).FirstOrDefault();
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
     private async Task<ModRowVM> CreateModRowVM(CharacterSkinEntry characterSkinEntry,
         CancellationToken cancellationToken = default)
     {
@@ -379,7 +397,8 @@ public partial class ModGridVM(
         var variantNames = variants.Select(v => v.Name);
         var activeVariant = await _modVariantHandlerService.GetActiveVariantNameAsync(characterSkinEntry.Id).ConfigureAwait(false) ?? string.Empty;
 
-        return new ModRowVM(characterSkinEntry, skinModSettings, presetNames, modNotifications, variantNames, activeVariant)
+        var previewImageUri = ResolvePreviewImageUri(characterSkinEntry, skinModSettings);
+        return new ModRowVM(characterSkinEntry, skinModSettings, presetNames, modNotifications, variantNames, activeVariant, previewImageUri)
         {
             ToggleEnabledCommand = new AsyncRelayCommand<ModRowVM>(ToggleModAsync),
             UpdateModSettingsCommand = new AsyncRelayCommand<UpdateModSettingsArgument>(UpdateModSettingsAsync)
@@ -405,9 +424,10 @@ public partial class ModGridVM(
         var variantNames = variants.Select(v => v.Name);
         var activeVariant = await _modVariantHandlerService.GetActiveVariantNameAsync(characterSkinEntry.Id) ?? string.Empty;
 
+        var previewImageUri = ResolvePreviewImageUri(characterSkinEntry, skinModSettings);
         void UpdateUi()
         {
-            existingMod.UpdateModel(characterSkinEntry, skinModSettings, presetNames, modNotifications, variantNames, activeVariant);
+            existingMod.UpdateModel(characterSkinEntry, skinModSettings, presetNames, modNotifications, variantNames, activeVariant, previewImageUri);
             existingMod.TriggerPropertyChanged(nameof(existingMod.IsEnabled));
         }
 

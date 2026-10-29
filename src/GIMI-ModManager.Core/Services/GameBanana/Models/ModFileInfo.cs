@@ -97,7 +97,97 @@ public partial class ModFileInfo : INotifyPropertyChanged
             if (_isDownloading != value)
             {
                 _isDownloading = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsDownloading)));
+                NotifyStateProperties();
+            }
+        }
+    }
+
+    private bool _isInstalling;
+    [JsonIgnore]
+    public bool IsInstalling
+    {
+        get => _isInstalling;
+        set
+        {
+            if (_isInstalling != value)
+            {
+                _isInstalling = value;
+                NotifyStateProperties();
+            }
+        }
+    }
+
+    private bool _isInstalled;
+    [JsonIgnore]
+    public bool IsInstalled
+    {
+        get => _isInstalled;
+        set
+        {
+            if (_isInstalled != value)
+            {
+                _isInstalled = value;
+                NotifyStateProperties();
+            }
+        }
+    }
+
+    [JsonIgnore]
+    public bool IsActiveDownload => IsDownloading && !IsInstalling;
+
+    [JsonIgnore]
+    public bool IsIdle => !IsDownloading && !IsInstalling && !IsInstalled;
+
+    private void NotifyStateProperties()
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsDownloading)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsInstalling)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsInstalled)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsActiveDownload)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsIdle)));
+    }
+
+    private int _downloadProgress;
+    [JsonIgnore]
+    public int DownloadProgress
+    {
+        get => _downloadProgress;
+        set
+        {
+            if (_downloadProgress != value)
+            {
+                _downloadProgress = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DownloadProgress)));
+            }
+        }
+    }
+
+    private bool _isPaused;
+    [JsonIgnore]
+    public bool IsPaused
+    {
+        get => _isPaused;
+        set
+        {
+            if (_isPaused != value)
+            {
+                _isPaused = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsPaused)));
+            }
+        }
+    }
+
+    private string _downloadStatus = string.Empty;
+    [JsonIgnore]
+    public string DownloadStatus
+    {
+        get => _downloadStatus;
+        set
+        {
+            if (_downloadStatus != value)
+            {
+                _downloadStatus = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DownloadStatus)));
             }
         }
     }
