@@ -57,7 +57,7 @@ namespace GIMI_ModManager.WinUI.Views.PasswordInputPages
             }
 
             var extractResult = Scanner.ScanAndGetContents(FilePath, password);
-            if (extractResult != null && extractResult.exitedCode != 0)
+            if (extractResult != null && !extractResult.IsSuccess)
             {
                 args.Cancel = true;
                 _notificationManager.ShowNotification(

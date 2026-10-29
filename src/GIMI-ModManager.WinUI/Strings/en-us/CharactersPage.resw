@@ -40,6 +40,12 @@
   <data name="DragDrop_MultiFilesWarningTitle" xml:space="preserve">
     <value>Drag and drop was performed with multiple storage items</value>
   </data>
+  <data name="DragDrop_ExtractFailedTitle" xml:space="preserve">
+    <value>Extraction Failed</value>
+  </data>
+  <data name="DragDrop_ExtractFailedMessage" xml:space="preserve">
+    <value>Failed to extract archive. The file may be corrupted or invalid.</value>
+  </data>
   <data name="FilterAppBarButton.Label" xml:space="preserve">
     <value>Filter</value>
   </data>
