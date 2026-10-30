@@ -5,6 +5,11 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Release tag to build and publish assets for (e.g. v2.30.0). Defaults to latest tag if release-please did not create one.'
+        required: false
+        default: ''
 
 permissions:
   contents: write
@@ -28,7 +33,7 @@ jobs:
   build-and-publish:
     name: Build & Publish Release Assets
     needs: release-please
-    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    if: ${{ needs.release-please.outputs.release_created == 'true' || github.event_name == 'workflow_dispatch' }}
     runs-on: windows-latest
     steps:
       - name: Checkout
@@ -48,11 +53,19 @@ jobs:
 
       - name: Install Inno Setup
         run: |
-          $innoUrl = "https://jrsoftware.org/download.php/is.exe"
+          $innoUrl = "https://github.com/jrsoftware/issrc/releases/download/is-6_7_4/innosetup-6.7.4.exe"
           $innoInstaller = "$env:TEMP\innosetup.exe"
           Invoke-WebRequest -Uri $innoUrl -OutFile $innoInstaller
+          if (-not (Test-Path $innoInstaller) -or (Get-Item $innoInstaller).Length -lt 1000000) {
+              throw "Failed to download Inno Setup installer from $innoUrl"
+          }
           Start-Process -FilePath $innoInstaller -ArgumentList "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-" -Wait
-          echo "ISCC_PATH=C:\Program Files (x86)\Inno Setup 6\ISCC.exe" >> $env:GITHUB_ENV
+          $iscc = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) {
+              throw "ISCC.exe not found at $iscc after installation"
+          }
+          Add-Content -Path $env:GITHUB_ENV -Value "ISCC_PATH=$iscc"
+          Add-Content -Path $env:GITHUB_PATH -Value (Split-Path $iscc)
 
       - name: Run Tests
         run: dotnet test ${{ github.workspace }}\src -c Release
@@ -64,7 +77,25 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          $tag = "${{ needs.release-please.outputs.tag_name }}"
+          $tag = "${{ inputs.tag_name }}"
+          if (-not $tag) {
+              $tag = "${{ needs.release-please.outputs.tag_name }}"
+          }
+          if (-not $tag) {
+              git fetch --tags origin 2>$null
+              $tag = (git describe --tags --abbrev=0 2>$null)
+          }
+          if (-not $tag) {
+              $xml = [xml](Get-Content src/GIMI-ModManager.WinUI/GIMI-ModManager.WinUI.csproj)
+              $ver = $xml.Project.PropertyGroup.VersionPrefix | Where-Object { $_ }
+              if ($ver) {
+                  $tag = "v$ver"
+              }
+          }
+          if (-not $tag) {
+              Write-Error "Unable to determine release tag!"
+              exit 1
+          }
           Write-Host "Uploading release assets for tag $tag..."
           $assets = @()
           $zip = Get-Item JASM_*.7z -ErrorAction SilentlyContinue

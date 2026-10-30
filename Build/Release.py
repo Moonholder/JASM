@@ -15,7 +15,23 @@ JASM_OUTPUT = "src\\GIMI-ModManager.WinUI\\bin\\Release\\Publish"
 
 
 
-INNO_SETUP_COMPILER = os.environ.get("ISCC_PATH", r"C:\Program Files (x86)\Inno Setup 6\ISCC.exe")
+def find_iscc() -> str:
+	if os.environ.get("ISCC_PATH") and os.path.exists(os.environ["ISCC_PATH"]):
+		return os.environ["ISCC_PATH"]
+	which = shutil.which("ISCC.exe") or shutil.which("ISCC")
+	if which:
+		return which
+	candidates = [
+		r"C:\Program Files (x86)\Inno Setup 6\ISCC.exe",
+		r"C:\Program Files\Inno Setup 6\ISCC.exe",
+	]
+	for c in candidates:
+		if os.path.exists(c):
+			return c
+	return r"C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+
+
+INNO_SETUP_COMPILER = find_iscc()
 INSTALLER_DIR = "installer"
 INSTALLER_SCRIPT = os.path.join(INSTALLER_DIR, "setup.iss")
 
