@@ -41,6 +41,15 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Setup MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Disable conflicting GNU link
+        run: |
+          if (Test-Path "C:\Program Files\Git\usr\bin\link.exe") {
+              Rename-Item -Path "C:\Program Files\Git\usr\bin\link.exe" -NewName "link.exe.bak"
+          }
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
