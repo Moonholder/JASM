@@ -24,6 +24,12 @@
         "Image": "BelleSummerSkies.png",
         "InternalName": "BelleSummerSkies",
         "DisplayName": "Belle Summer Skies"
+      },
+      {
+        "ModFilesName": "BelleBrillianceOfStars",
+        "Image": "BelleBrillianceOfStars.png",
+        "InternalName": "BelleBrillianceOfStars",
+        "DisplayName": "Brilliance of Stars"
       }
     ],
     "InternalName": "Belle",
@@ -54,6 +60,12 @@
         "Image": "WisePeacefulWaves.png",
         "InternalName": "WisePeacefulWaves",
         "DisplayName": "Wise Peaceful Waves"
+      },
+      {
+        "ModFilesName": "WiseOathOfSkies",
+        "Image": "WiseOathOfSkies.png",
+        "InternalName": "WiseOathOfSkies",
+        "DisplayName": "Oath of Skies"
       }
     ],
     "InternalName": "Wise",
@@ -62,7 +74,8 @@
   {
     "Keys": [
       "Alexandrina",
-      "Rina"
+      "Rina",
+      "Alexandrina Sebastiane"
     ],
     "ReleaseDate": "2024-07-4T00:10:00",
     "Image": "Rina.webp",
@@ -79,7 +92,8 @@
   },
   {
     "Keys": [
-      "Ellen"
+      "Ellen",
+      "Ellen Joe"
     ],
     "ReleaseDate": "2024-07-4T00:10:00",
     "Image": "Ellen.webp",
@@ -103,13 +117,14 @@
   },
   {
     "Keys": [
-      "Grace"
+      "Grace",
+      "Grace Howard"
     ],
     "ReleaseDate": "2024-07-4T00:10:00",
     "Image": "Grace.webp",
     "Rarity": 5,
     "Element": "Electric",
-    "Class": "Anomoly",
+    "Class": "Anomaly",
     "Region": [
       "Belobog"
     ],
@@ -120,7 +135,8 @@
   },
   {
     "Keys": [
-      "Koleda"
+      "Koleda",
+      "Koleda Belobog"
     ],
     "ReleaseDate": "2024-07-4T00:10:00",
     "Image": "Koleda.webp",
@@ -138,7 +154,8 @@
   {
     "Keys": [
       "Nekomiya",
-      "Nekomata"
+      "Nekomata",
+      "Nekomiya Mana"
     ],
     "ReleaseDate": "2024-07-4T00:10:00",
     "Image": "Nekomata.webp",
@@ -172,7 +189,8 @@
   },
   {
     "Keys": [
-      "Lycaon"
+      "Lycaon",
+      "Von Lycaon"
     ],
     "ReleaseDate": "2024-07-4T00:10:00",
     "Image": "Lycaon.webp",
@@ -206,7 +224,8 @@
   },
   {
     "Keys": [
-      "Anby"
+      "Anby",
+      "Anby Demara"
     ],
     "ReleaseDate": "2024-07-4T00:10:00",
     "Image": "Anby.webp",
@@ -223,7 +242,8 @@
   },
   {
     "Keys": [
-      "Anton"
+      "Anton",
+      "Anton Ivanov"
     ],
     "ReleaseDate": "2024-07-4T00:10:00",
     "Image": "Anton.webp",
@@ -240,7 +260,8 @@
   },
   {
     "Keys": [
-      "Ben"
+      "Ben",
+      "Ben Bigger"
     ],
     "ReleaseDate": "2024-07-4T00:10:00",
     "Image": "Ben.webp",
@@ -257,7 +278,8 @@
   },
   {
     "Keys": [
-      "Billy"
+      "Billy",
+      "Billy Kid"
     ],
     "ReleaseDate": "2024-07-4T00:10:00",
     "Image": "Billy.webp",
@@ -274,7 +296,8 @@
   },
   {
     "Keys": [
-      "Corin"
+      "Corin",
+      "Corin Wickes"
     ],
     "ReleaseDate": "2024-07-4T00:10:00",
     "Image": "Corin.webp",
@@ -292,7 +315,8 @@
   {
     "Keys": [
       "Luciana",
-      "Lucy"
+      "Lucy",
+      "Luciana de Montefio"
     ],
     "ReleaseDate": "2024-07-4T00:10:00",
     "Image": "Lucy.webp",
@@ -303,13 +327,21 @@
       "Calydon"
     ],
     "ModFilesName": "Lucy",
-    "InGameSkins": [],
+    "InGameSkins": [
+      {
+        "ModFilesName": "LucyPrincessOnHoliday",
+        "Image": "LucyPrincessOnHoliday.png",
+        "InternalName": "LucyPrincessOnHoliday",
+        "DisplayName": "Princess on Holiday"
+      }
+    ],
     "InternalName": "Lucy",
     "DisplayName": "Lucy"
   },
   {
     "Keys": [
-      "Nicole"
+      "Nicole",
+      "Nicole Demara"
     ],
     "ReleaseDate": "2024-07-4T00:10:00",
     "Image": "Nicole.webp",
@@ -333,13 +365,14 @@
   },
   {
     "Keys": [
-      "Piper"
+      "Piper",
+      "Piper Wheel"
     ],
     "ReleaseDate": "2024-07-4T00:10:00",
     "Image": "Piper.webp",
     "Rarity": 4,
     "Element": "Physical",
-    "Class": "Anomoly",
+    "Class": "Anomaly",
     "Region": [
       "Calydon"
     ],
@@ -367,7 +400,8 @@
   },
   {
     "Keys": [
-      "Miyabi"
+      "Miyabi",
+      "Hoshimi Miyabi"
     ],
     "ReleaseDate": "2024-12-18T00:10:00",
     "Image": "Miyabi.webp",
@@ -378,7 +412,14 @@
       "Section6"
     ],
     "ModFilesName": "Miyabi",
-    "InGameSkins": [],
+    "InGameSkins": [
+      {
+        "ModFilesName": "MiyabiDignifiedBlossom",
+        "Image": "MiyabiDignifiedBlossom.png",
+        "InternalName": "MiyabiDignifiedBlossom",
+        "DisplayName": "Dignified Blossom"
+      }
+    ],
     "InternalName": "Miyabi",
     "DisplayName": "Miyabi"
   },
@@ -391,7 +432,7 @@
     "Image": "Jane.webp",
     "Rarity": 5,
     "Element": "Physical",
-    "Class": "Anomoly",
+    "Class": "Anomaly",
     "Region": [
       "ResponseTeam"
     ],
@@ -469,7 +510,7 @@
     "Image": "Burnice.webp",
     "Rarity": 5,
     "Element": "Fire",
-    "Class": "Anomoly",
+    "Class": "Anomaly",
     "Region": [
       "Calydon"
     ],
@@ -487,7 +528,7 @@
     "Image": "Yanagi.webp",
     "Rarity": 5,
     "Element": "Electric",
-    "Class": "Anomoly",
+    "Class": "Anomaly",
     "Region": [
       "Section6"
     ],
@@ -594,7 +635,8 @@
   },
   {
     "Keys": [
-      "Silver Soldier"
+      "Silver Soldier",
+      "Soldier 0 Anby"
     ],
     "ReleaseDate": "2025-03-12T00:00:00",
     "Image": "SSAnby.webp",
@@ -628,7 +670,8 @@
   },
   {
     "Keys": [
-      "Vivian"
+      "Vivian",
+      "Vivian Banshee"
     ],
     "ReleaseDate": "2025-04-23T00:00:00",
     "Image": "Vivian.webp",
@@ -652,7 +695,8 @@
   },
   {
     "Keys": [
-      "Hugo"
+      "Hugo",
+      "Hugo Vlad"
     ],
     "ReleaseDate": "2025-05-14T00:00:00",
     "Image": "Hugo.png",
@@ -667,14 +711,14 @@
     "InternalName": "Hugo",
     "DisplayName": "Hugo"
   },
-    {
+  {
     "Keys": [
       "Yixuan"
     ],
     "ReleaseDate": "2025-06-06T00:00:00",
     "Image": "Yixuan.png",
     "Rarity": 5,
-    "Element": "Auric Ink",
+    "Element": "Ether",
     "Class": "Rupture",
     "Region": [
       "Yunkui"
@@ -721,7 +765,14 @@
       "Yunkui"
     ],
     "ModFilesName": "PanYinhu",
-    "InGameSkins": [],
+    "InGameSkins": [
+      {
+        "ModFilesName": "PanYinhuCulinaryJewel",
+        "Image": "PanYinhuCulinaryJewel.png",
+        "InternalName": "PanYinhuCulinaryJewel",
+        "DisplayName": "Culinary Jewel"
+      }
+    ],
     "InternalName": "PanYinhu",
     "DisplayName": "Pan Yinhu"
   },
@@ -794,7 +845,8 @@
   },
   {
     "Keys": [
-      "Orphie"
+      "Orphie",
+      "Orphie Magnusson"
     ],
     "ReleaseDate": "2025-09-06T00:00:00",
     "Image": "OrphieMagnusson.png",
@@ -964,6 +1016,12 @@
         "Image": "AriaDiscordantNote.webp",
         "InternalName": "Aria Discordant Note",
         "DisplayName": "Discordant Note"
+      },
+      {
+        "ModFilesName": "AriaCutenessLoading",
+        "Image": "AriaCutenessLoading.png",
+        "InternalName": "AriaCutenessLoading",
+        "DisplayName": "Cuteness Loading"
       }
     ],
     "InternalName": "Aria",
@@ -988,6 +1046,12 @@
         "Image": "SunnaAfternoonTeaBreak.webp",
         "InternalName": "Sunna Afternoon Tea Break",
         "DisplayName": "Afternoon Tea Break"
+      },
+      {
+        "ModFilesName": "SunnaDelusionsInBusiness",
+        "Image": "SunnaDelusionsInBusiness.png",
+        "InternalName": "SunnaDelusionsInBusiness",
+        "DisplayName": "Delusions in Business"
       }
     ],
     "InternalName": "Sunna",
@@ -995,9 +1059,40 @@
   },
   {
     "Keys": [
+      "Nangong",
+      "Yu"
+    ],
+    "ReleaseDate": "2026-03-24T00:00:00",
+    "Image": "NangongYu.webp",
+    "Rarity": 5,
+    "Element": "Ether",
+    "Class": "Stun",
+    "Region": [
+      "Angels of Delusion"
+    ],
+    "ModFilesName": "NangongYu",
+    "InGameSkins": [
+      {
+        "ModFilesName": "NangongYuRhapsodyMuse",
+        "Image": "NangongYuRhapsodyMuse.png",
+        "InternalName": "NangongYuRhapsodyMuse",
+        "DisplayName": "Rhapsody's Muse"
+      },
+      {
+        "ModFilesName": "NangongYuHeartfeltSupport",
+        "Image": "NangongYuHeartfeltSupport.png",
+        "InternalName": "NangongYuHeartfeltSupport",
+        "DisplayName": "Heartfelt Support"
+      }
+    ],
+    "InternalName": "NangongYu",
+    "DisplayName": "Nangong Yu"
+  },
+  {
+    "Keys": [
       "Cissia"
     ],
-    "ReleaseDate": "2026-03-25T00:00:00",
+    "ReleaseDate": "2026-04-15T00:00:00",
     "Image": "Cissia.webp",
     "Rarity": 5,
     "Element": "Electric",
@@ -1012,20 +1107,275 @@
   },
   {
     "Keys": [
-      "Nangong",
-      "Yu"
+      "Promeia"
     ],
-    "ReleaseDate": "2026-03-26T00:00:00",
-    "Image": "NangongYu.webp",
+    "ReleaseDate": "2026-05-01T00:00:00",
+    "Image": "Promeia.png",
     "Rarity": 5,
-    "Element": "Ether",
+    "Element": "Ice",
+    "Class": "Anomaly",
+    "Region": [
+      "Krampus Compliance Authority"
+    ],
+    "ModFilesName": "Promeia",
+    "InGameSkins": [],
+    "InternalName": "Promeia",
+    "DisplayName": "Promeia"
+  },
+  {
+    "Keys": [
+      "StarlightBilly"
+    ],
+    "ReleaseDate": "2026-05-01T00:00:00",
+    "Image": "StarlightBilly.png",
+    "Rarity": 5,
+    "Element": "Physical",
+    "Class": "Rupture",
+    "Region": [
+      "Cunning Hares"
+    ],
+    "ModFilesName": "StarlightBilly",
+    "InGameSkins": [],
+    "InternalName": "StarlightBilly",
+    "DisplayName": "Starlight - Billy"
+  },
+  {
+    "Keys": [
+      "Norma Hollowell"
+    ],
+    "ReleaseDate": "2026-07-26T00:00:00",
+    "Image": "NormaHollowell.png",
+    "Rarity": 5,
+    "Element": "Fire",
     "Class": "Stun",
     "Region": [
-      "Angels of Delusion"
+      "External Strategy Department"
     ],
-    "ModFilesName": "NangongYu",
+    "ModFilesName": "NormaHollowell",
     "InGameSkins": [],
-    "InternalName": "NangongYu",
-    "DisplayName": "Nangong Yu"
+    "InternalName": "NormaHollowell",
+    "DisplayName": "Norma"
+  },
+  {
+    "Keys": [
+      "Pyrois"
+    ],
+    "ReleaseDate": "2026-06-17T00:00:00",
+    "Image": "Pyrois.png",
+    "Rarity": 5,
+    "Element": "Ether",
+    "Class": "Attack",
+    "Region": [
+      "Phaethon"
+    ],
+    "ModFilesName": "Pyrois",
+    "InGameSkins": [],
+    "InternalName": "Pyrois",
+    "DisplayName": "Pyrois"
+  },
+  {
+    "Keys": [
+      "Velina Airgid"
+    ],
+    "ReleaseDate": "2026-06-17T00:00:00",
+    "Image": "VelinaAirgid.png",
+    "Rarity": 5,
+    "Element": "Wind",
+    "Class": "Anomaly",
+    "Region": [
+      "External Strategy Department"
+    ],
+    "ModFilesName": "VelinaAirgid",
+    "InGameSkins": [
+      {
+        "ModFilesName": "VelinaShadeOfLeisure",
+        "Image": "VelinaShadeOfLeisure.png",
+        "InternalName": "VelinaShadeOfLeisure",
+        "DisplayName": "Shade of Leisure"
+      }
+    ],
+    "InternalName": "VelinaAirgid",
+    "DisplayName": "Velina"
+  },
+  {
+    "Keys": [
+      "Remielle",
+      "Dan"
+    ],
+    "ReleaseDate": "2026-07-29T00:00:00",
+    "Image": "Remielle.png",
+    "Rarity": 5,
+    "Element": "Lumiflux",
+    "Class": "Anomaly",
+    "Region": [
+      "Covenant of Dayat"
+    ],
+    "ModFilesName": "Remielle",
+    "InGameSkins": [
+      {
+        "ModFilesName": "RemielleMoonlightWhispers",
+        "Image": "RemielleMoonlightWhispers.png",
+        "InternalName": "RemielleMoonlightWhispers",
+        "DisplayName": "Moonlight Whispers"
+      },
+      {
+        "ModFilesName": "RemielleSeashadePasSeul",
+        "Image": "RemielleSeashadePasSeul.png",
+        "InternalName": "RemielleSeashadePasSeul",
+        "DisplayName": "Seashade Pas Seul"
+      }
+    ],
+    "InternalName": "Remielle",
+    "DisplayName": "Remielle"
+  },
+  {
+    "Keys": [
+      "Sigrid",
+      "Sigrid de L'Azur"
+    ],
+    "ReleaseDate": "2026-07-30T00:00:00",
+    "Image": "Sigrid.png",
+    "Rarity": 5,
+    "Element": "Ice",
+    "Class": "Attack",
+    "Region": [
+      "Airspace Patrol Department"
+    ],
+    "ModFilesName": "Sigrid",
+    "InGameSkins": [
+      {
+        "ModFilesName": "SigridMajesticWavechaser",
+        "Image": "SigridMajesticWavechaser.png",
+        "InternalName": "SigridMajesticWavechaser",
+        "DisplayName": "Majestic Wavechaser"
+      }
+    ],
+    "InternalName": "Sigrid",
+    "DisplayName": "Sigrid"
+  },
+  {
+    "Keys": [
+      "Claret",
+      "Flint"
+    ],
+    "ReleaseDate": "2026-08-30T00:00:00",
+    "Image": "Claret.png",
+    "Rarity": 5,
+    "Element": "Electric",
+    "Class": "TBA",
+    "Region": [
+      "Flint Workshop"
+    ],
+    "ModFilesName": "Claret",
+    "InGameSkins": [],
+    "InternalName": "Claret",
+    "DisplayName": "Claret"
+  },
+  {
+    "Keys": [
+      "Roxy",
+      "Ifrita",
+      "Pryce",
+      "Roxy Ifrita Pryce"
+    ],
+    "ReleaseDate": "2026-08-30T00:00:00",
+    "Image": "Roxy.png",
+    "Rarity": 5,
+    "Element": "Wind",
+    "Class": "Stun",
+    "Region": [
+      "Flint Workshop"
+    ],
+    "ModFilesName": "Roxy",
+    "InGameSkins": [],
+    "InternalName": "Roxy",
+    "DisplayName": "Roxy"
+  },
+  {
+    "Keys": [
+      "Phoenix",
+      "Reffaella"
+    ],
+    "ReleaseDate": "2026-09-12T00:00:00",
+    "Image": "Phoenix.png",
+    "Rarity": 5,
+    "Element": "Fire",
+    "Class": "Anomaly",
+    "Special": "Krampus Compliance Authority",
+    "ModFilesName": "Phoenix",
+    "InGameSkins": [
+      {
+        "ModFilesName": "PhoenixDaydreamComplex",
+        "Image": "PhoenixDaydreamComplex.png",
+        "InternalName": "PhoenixDaydreamComplex",
+        "DisplayName": "Daydream Complex"
+      },
+      {
+        "ModFilesName": "PhoenixTheIllnessCalledLife",
+        "Image": "PhoenixTheIllnessCalledLife.png",
+        "InternalName": "PhoenixTheIllnessCalledLife",
+        "DisplayName": "The Illness Called Life"
+      }
+    ],
+    "InternalName": "Phoenix",
+    "DisplayName": "Phoenix"
+  },
+  {
+    "Keys": [
+      "Severian",
+      "Lowell"
+    ],
+    "ReleaseDate": "2026-09-12T00:00:00",
+    "Image": "Severian.png",
+    "Rarity": 5,
+    "Element": "Wind",
+    "Class": "Attack",
+    "Special": "Criminal Investigation Special Response Team",
+    "ModFilesName": "Severian",
+    "InGameSkins": [],
+    "InternalName": "Severian",
+    "DisplayName": "Severian"
+  },
+  {
+    "Keys": [
+      "Kafka"
+    ],
+    "ReleaseDate": "2026-10-30T00:00:00",
+    "Image": "Kafka.png",
+    "Rarity": 5,
+    "Element": "Electric",
+    "Class": "Attack",
+    "ModFilesName": "Kafka",
+    "InGameSkins": [],
+    "InternalName": "Kafka",
+    "DisplayName": "Kafka"
+  },
+  {
+    "Keys": [
+      "Robin"
+    ],
+    "ReleaseDate": "2026-10-30T00:00:00",
+    "Image": "Robin.png",
+    "Rarity": 5,
+    "Element": "Electric",
+    "Class": "Attack",
+    "ModFilesName": "Robin",
+    "InGameSkins": [],
+    "InternalName": "Robin",
+    "DisplayName": "Robin"
+  },
+  {
+    "Keys": [
+      "Sunbringer"
+    ],
+    "ReleaseDate": "2026-10-30T00:00:00",
+    "Image": "Sunbringer.png",
+    "Rarity": 5,
+    "Element": "Electric",
+    "Class": "Attack",
+    "ModFilesName": "Sunbringer",
+    "InGameSkins": [],
+    "InternalName": "Sunbringer",
+    "DisplayName": "Sunbringer"
   }
 ]

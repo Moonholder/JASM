@@ -1,32 +1,30 @@
 [
 	{
 		"InternalName": "Fire",
-		"DisplayName": "火",
-		"Image": "Fire.svg"
+		"DisplayName": "火"
 	},
 	{
 		"InternalName": "Electric",
-		"DisplayName": "电",
-		"Image": "Electric.svg"
+		"DisplayName": "电"
 	},
 	{
 		"InternalName": "Ice",
-		"DisplayName": "冰",
-		"Image": "Ice.svg"
+		"DisplayName": "冰"
 	},
 	{
 		"InternalName": "Physical",
-		"DisplayName": "物理",
-		"Image": "Physical.svg"
+		"DisplayName": "物理"
 	},
 	{
 		"InternalName": "Ether",
-		"DisplayName": "以太",
-		"Image": "Ether.svg"
+		"DisplayName": "以太"
 	},
 	{
-		"InternalName": "Auric Ink",
-		"DisplayName": "玄墨",
-		"Image": "Auric_Ink.svg"
+		"InternalName": "Wind",
+		"DisplayName": "风"
+	},
+	{
+		"InternalName": "Lumiflux",
+		"DisplayName": "流明"
 	}
 ]

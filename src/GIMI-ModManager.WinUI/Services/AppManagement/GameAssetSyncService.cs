@@ -169,7 +169,7 @@ public class GameAssetSyncService
                 new ParallelOptions { MaxDegreeOfParallelism = MaxParallelDownloads, CancellationToken = ct },
                 async (fileEntry, token) =>
                 {
-                    var success = await DownloadFileWithFallbackAsync(fileEntry, mirrors, token)
+                    var success = await DownloadFileWithFallbackAsync(fileEntry, remoteManifest.Commit, mirrors, token)
                         .ConfigureAwait(false);
 
                     if (!success)
@@ -358,6 +358,7 @@ public class GameAssetSyncService
     /// </summary>
     private async Task<bool> DownloadFileWithFallbackAsync(
         AssetFileEntry fileEntry,
+        string? commitSha,
         List<MirrorAddressSelector.MirrorInfo> mirrors,
         CancellationToken ct)
     {
@@ -385,7 +386,9 @@ public class GameAssetSyncService
         // Strategy 1: jsDelivr CDN (fast, but may serve cached old version)
         try
         {
-            var cdnUrl = JsDelivrBaseUrl + fileEntry.Path;
+            var cdnUrl = !string.IsNullOrWhiteSpace(commitSha)
+                ? $"https://cdn.jsdelivr.net/gh/{RepoOwner}/{RepoName}@{commitSha}/{fileEntry.Path}"
+                : JsDelivrBaseUrl + fileEntry.Path;
             if (await DownloadAndVerifyAsync(cdnUrl, tmpPath, localPath, fileEntry.Hash, ct)
                     .ConfigureAwait(false))
                 return true;
@@ -468,8 +471,9 @@ public class GameAssetSyncService
                     return true;
                 }
 
-                _logger.Warning("Hash mismatch for {Url}: expected {Expected}, got {Actual}. Retry {Retry}/{Max}",
-                    url, expectedHash, actualHash, retry + 1, MaxRetries);
+                _logger.Warning("Hash mismatch for {Url}: expected {Expected}, got {Actual}.",
+                    url, expectedHash, actualHash);
+                break;
             }
             catch (OperationCanceledException) { throw; }
             catch (Exception ex) when (retry < MaxRetries - 1)
@@ -540,6 +544,9 @@ public class AssetManifest
 {
     [JsonPropertyName("version")]
     public string Version { get; set; } = "";
+
+    [JsonPropertyName("commit")]
+    public string? Commit { get; set; }
 
     [JsonPropertyName("files")]
     public List<AssetFileEntry> Files { get; set; } = [];

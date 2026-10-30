@@ -1,7 +1,9 @@
 [
   {
     "Keys": [
-      "trailblazer"
+      "trailblazer",
+      "Caelus",
+      "Stelle"
     ],
     "ReleaseDate": "2023-04-26T00:00:00",
     "Image": "trailblazer.gif",
@@ -137,7 +139,8 @@
   },
   {
     "Keys": [
-      "danheng-IL"
+      "danheng-IL",
+      "Dan Heng Imbibitor Lunae"
     ],
     "ReleaseDate": "2023-08-30T00:00:00",
     "Image": "DHIL.png",
@@ -154,7 +157,8 @@
   },
   {
     "Keys": [
-      "danheng-PT"
+      "danheng-PT",
+      "Dan Heng Permansor Terrae"
     ],
     "ReleaseDate": "2025-10-15T00:00:00",
     "Image": "DHPT.png",
@@ -1362,5 +1366,155 @@
     "InGameSkins": [],
     "InternalName": "Ashveil",
     "DisplayName": "Ashveil"
+  },
+  {
+    "Keys": [
+      "Evanescia"
+    ],
+    "ReleaseDate": "2026-05-13T00:00:00",
+    "Image": "evanescia.webp",
+    "Rarity": 5,
+    "Element": "Physical",
+    "Class": "Elation",
+    "Region": [
+      "Elixir Seekers"
+    ],
+    "ModFilesName": "Evanescia",
+    "InGameSkins": [],
+    "InternalName": "Evanescia",
+    "DisplayName": "Evanescia"
+  },
+  {
+    "Keys": [
+      "MortenaxBlade"
+    ],
+    "ReleaseDate": "2026-05-13T00:00:00",
+    "Image": "mortenaxblade.webp",
+    "Rarity": 5,
+    "Element": "Fire",
+    "Class": "Nihility",
+    "Region": [
+      "Stellaron Hunters"
+    ],
+    "ModFilesName": "MortenaxBlade",
+    "InGameSkins": [],
+    "InternalName": "MortenaxBlade",
+    "DisplayName": "Mortenax Blade"
+  },
+  {
+    "Keys": [
+      "SilverWolfLV999"
+    ],
+    "ReleaseDate": "2026-05-13T00:00:00",
+    "Image": "silverwolfLV999.webp",
+    "Rarity": 5,
+    "Element": "Imaginary",
+    "Class": "Elation",
+    "Region": [
+      "Stellaron Hunters"
+    ],
+    "ModFilesName": "SilverWolfLV999",
+    "InGameSkins": [],
+    "InternalName": "SilverWolfLV999",
+    "DisplayName": "Silver Wolf LV.999"
+  },
+  {
+    "Keys": [
+      "Gilgamesh"
+    ],
+    "ReleaseDate": "2026-07-24T00:00:00",
+    "Image": "Gilgamesh.webp",
+    "Rarity": 5,
+    "Element": "Lightning",
+    "Class": "Destruction",
+    "Region": [
+      "Another World"
+    ],
+    "ModFilesName": "Gilgamesh",
+    "InGameSkins": [],
+    "InternalName": "Gilgamesh",
+    "DisplayName": "Gilgamesh"
+  },
+  {
+    "Keys": [
+      "Rin Tohsaka"
+    ],
+    "ReleaseDate": "2026-07-24T00:00:00",
+    "Image": "RinTohsaka.webp",
+    "Rarity": 5,
+    "Element": "Quantum",
+    "Class": "Erudition",
+    "Region": [
+      "Another World"
+    ],
+    "ModFilesName": "RinTohsaka",
+    "InGameSkins": [],
+    "InternalName": "RinTohsaka",
+    "DisplayName": "Rin Tohsaka"
+  },
+  {
+    "Keys": [
+      "HimekoNova"
+    ],
+    "ReleaseDate": "2026-07-24T00:00:00",
+    "Image": "HimekoNova.webp",
+    "Rarity": 5,
+    "Element": "Fire",
+    "Class": "Erudition",
+    "Region": [
+      "Astral Express"
+    ],
+    "ModFilesName": "HimekoNova",
+    "InGameSkins": [],
+    "InternalName": "HimekoNova",
+    "DisplayName": "Himeko • Nova"
+  },
+  {
+    "Keys": [
+      "RobinSummeretto"
+    ],
+    "ReleaseDate": "2026-08-24T00:00:00",
+    "Image": "RobinSummeretto.png",
+    "Rarity": 5,
+    "Element": "Wind",
+    "Class": "Remembrance",
+    "Region": [
+      "Penacony"
+    ],
+    "ModFilesName": "RobinSummeretto",
+    "InGameSkins": [],
+    "InternalName": "RobinSummeretto",
+    "DisplayName": "Robin • Summeretto"
+  },
+  {
+    "Keys": [
+      "AventurineWaveflair"
+    ],
+    "ReleaseDate": "2026-08-24T00:00:00",
+    "Image": "AventurineWaveflair.png",
+    "Rarity": 5,
+    "Element": "Quantum",
+    "Class": "Elation",
+    "Region": [
+      "IPC"
+    ],
+    "ModFilesName": "AventurineWaveflair",
+    "InGameSkins": [],
+    "InternalName": "AventurineWaveflair",
+    "DisplayName": "Aventurine • Waveflair"
+  },
+  {
+    "Keys": [
+      "Pearl"
+    ],
+    "ReleaseDate": "2026-09-20T00:00:00",
+    "Image": "Pearl.png",
+    "Rarity": 5,
+    "Element": "Ice",
+    "Class": "Elation",
+    "ModFilesName": "Pearl",
+    "InGameSkins": [],
+    "InternalName": "Pearl",
+    "DisplayName": "Pearl"
   }
 ]
