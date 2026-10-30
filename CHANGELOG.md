@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.30.1](https://github.com/Moonholder/JASM/compare/v2.30.0...v2.30.1) (2026-10-30)
+
+
+### Bug Fixes
+
+* **ci:** fix Inno Setup installer download url and support manual release dispatch ([50440df](https://github.com/Moonholder/JASM/commit/50440dfab60c812cd6cf67a13566e57b8de98c33))
+* **ci:** setup msvc dev cmd for native aot compilation of elevator ([d67a6ce](https://github.com/Moonholder/JASM/commit/d67a6cedf32747f6d9842b670da4fc3cd848a315))
+
 ## [2.30.0](https://github.com/Moonholder/JASM/compare/v2.29.1...v2.30.0) (2026-10-30)
 
 
