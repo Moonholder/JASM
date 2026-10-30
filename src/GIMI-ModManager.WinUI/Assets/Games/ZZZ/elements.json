@@ -25,8 +25,13 @@
 		"Image": "Ether.svg"
 	},
 	{
-		"InternalName": "Auric Ink",
-		"DisplayName": "Auric Ink",
-		"Image": "Auric_Ink.svg"
+		"InternalName": "Wind",
+		"DisplayName": "Wind",
+		"Image": "Wind.svg"
+	},
+	{
+		"InternalName": "Lumiflux",
+		"DisplayName": "Lumiflux",
+		"Image": "Lumiflux.svg"
 	}
 ]

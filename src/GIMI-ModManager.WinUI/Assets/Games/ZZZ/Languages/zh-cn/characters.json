@@ -21,14 +21,18 @@
     ],
     "ModFilesName": "Belle",
     "InGameSkins": [
-        {
-          "InternalName": "BelleDelicateSunlight",
-          "DisplayName": "曦色玲珑"
-        },
-        {
-          "InternalName": "BelleSummerSkies",
-          "DisplayName": "夏日晴空"
-        }
+      {
+        "InternalName": "BelleDelicateSunlight",
+        "DisplayName": "曦色玲珑"
+      },
+      {
+        "InternalName": "BelleSummerSkies",
+        "DisplayName": "夏日晴空"
+      },
+      {
+        "InternalName": "BelleBrillianceOfStars",
+        "DisplayName": "极星澄明"
+      }
     ],
     "InternalName": "Belle",
     "DisplayName": "铃"
@@ -47,13 +51,17 @@
     ],
     "ModFilesName": "Wise",
     "InGameSkins": [
-       {
+      {
         "InternalName": "WiseSoaringCrane",
         "DisplayName": "鹤唳青霄"
       },
       {
         "InternalName": "WisePeacefulWaves",
         "DisplayName": "浪影闲庭"
+      },
+      {
+        "InternalName": "WiseOathOfSkies",
+        "DisplayName": "苍穹执誓"
       }
     ],
     "InternalName": "Wise",
@@ -301,7 +309,12 @@
       "Calydon"
     ],
     "ModFilesName": "Lucy",
-    "InGameSkins": [],
+    "InGameSkins": [
+      {
+        "InternalName": "LucyPrincessOnHoliday",
+        "DisplayName": "公主假日"
+      }
+    ],
     "InternalName": "Lucy",
     "DisplayName": "露西"
   },
@@ -374,7 +387,12 @@
       "Section6"
     ],
     "ModFilesName": "Miyabi",
-    "InGameSkins": [],
+    "InGameSkins": [
+      {
+        "InternalName": "MiyabiDignifiedBlossom",
+        "DisplayName": "银庭花信"
+      }
+    ],
     "InternalName": "Miyabi",
     "DisplayName": "雅"
   },
@@ -595,7 +613,13 @@
   },
   {
     "InternalName": "PanYinhu",
-    "DisplayName": "潘引壶"
+    "DisplayName": "潘引壶",
+    "InGameSkins": [
+      {
+        "InternalName": "PanYinhuCulinaryJewel",
+        "DisplayName": "馔玉烹金"
+      }
+    ]
   },
   {
     "InternalName": "Yuzuha",
@@ -654,7 +678,7 @@
   {
     "InternalName": "YeShunguang",
     "DisplayName": "叶瞬光",
-    "InGameSkins":[
+    "InGameSkins": [
       {
         "InternalName": "YeShunguangTouchOfDawnlight",
         "DisplayName": "暖霞拾光"
@@ -672,6 +696,10 @@
       {
         "InternalName": "Aria Discordant Note",
         "DisplayName": "不协和音"
+      },
+      {
+        "InternalName": "AriaCutenessLoading",
+        "DisplayName": "萌力加载中"
       }
     ]
   },
@@ -682,6 +710,10 @@
       {
         "InternalName": "Sunna Afternoon Tea Break",
         "DisplayName": "午后茶歇"
+      },
+      {
+        "InternalName": "SunnaDelusionsInBusiness",
+        "DisplayName": "梦想营业中"
       }
     ]
   },
@@ -691,6 +723,104 @@
   },
   {
     "InternalName": "NangongYu",
-    "DisplayName": "南宫羽"
+    "DisplayName": "南宫羽",
+    "InGameSkins": [
+      {
+        "InternalName": "NangongYuRhapsodyMuse",
+        "DisplayName": "狂想缪斯"
+      },
+      {
+        "InternalName": "NangongYuHeartfeltSupport",
+        "DisplayName": "心动应援中"
+      }
+    ]
+  },
+  {
+    "InternalName": "Promeia",
+    "DisplayName": "普罗米娅"
+  },
+  {
+    "InternalName": "StarlightBilly",
+    "DisplayName": "星徽・比利"
+  },
+  {
+    "InternalName": "NormaHollowell",
+    "DisplayName": "诺姆"
+  },
+  {
+    "InternalName": "Pyrois",
+    "DisplayName": "佩洛伊斯"
+  },
+  {
+    "InternalName": "VelinaAirgid",
+    "DisplayName": "维琳娜",
+    "InGameSkins": [
+      {
+        "InternalName": "VelinaShadeOfLeisure",
+        "DisplayName": "暇时闲影"
+      }
+    ]
+  },
+  {
+    "InGameSkins": [
+      {
+        "InternalName": "RemielleMoonlightWhispers",
+        "DisplayName": "月夜密语"
+      },
+      {
+        "InternalName": "RemielleSeashadePasSeul",
+        "DisplayName": "影池独舞"
+      }
+    ],
+    "InternalName": "Remielle",
+    "DisplayName": "蕾米埃尔"
+  },
+  {
+    "InGameSkins": [
+      {
+        "InternalName": "SigridMajesticWavechaser",
+        "DisplayName": "惊鸿逐浪"
+      }
+    ],
+    "InternalName": "Sigrid",
+    "DisplayName": "希格莉德"
+  },
+  {
+    "InternalName": "Claret",
+    "DisplayName": "克拉蕾"
+  },
+  {
+    "InternalName": "Roxy",
+    "DisplayName": "洛克茜"
+  },
+  {
+    "InternalName": "Phoenix",
+    "DisplayName": "菲欧妮",
+    "InGameSkins": [
+      {
+        "InternalName": "PhoenixDaydreamComplex",
+        "DisplayName": "空想症候"
+      },
+      {
+        "InternalName": "PhoenixTheIllnessCalledLife",
+        "DisplayName": "病名为生"
+      }
+    ]
+  },
+  {
+    "InternalName": "Severian",
+    "DisplayName": "赛维里安"
+  },
+  {
+    "InternalName": "Kafka",
+    "DisplayName": "卡芙卡"
+  },
+  {
+    "InternalName": "Robin",
+    "DisplayName": "知更鸟"
+  },
+  {
+    "InternalName": "Sunbringer",
+    "DisplayName": "挽昼"
   }
 ]

@@ -130,7 +130,7 @@
   {
     "InternalName": "Camellya",
     "DisplayName": "椿"
-  }, 
+  },
   {
     "InternalName": "Lumi",
     "DisplayName": "灯灯"
@@ -205,7 +205,13 @@
   },
   {
     "InternalName": "Chisa",
-    "DisplayName": "千咲"
+    "DisplayName": "千咲",
+    "InGameSkins": [
+      {
+        "InternalName": "Chisa Peach Parfait",
+        "DisplayName": "蜜桃冰"
+      }
+    ]
   },
   {
     "InternalName": "Buling",
@@ -213,11 +219,23 @@
   },
   {
     "InternalName": "Lynae",
-    "DisplayName": "琳奈"
+    "DisplayName": "琳奈",
+    "InGameSkins": [
+      {
+        "InternalName": "Lynae Peppermint",
+        "DisplayName": "薄荷糖"
+      }
+    ]
   },
   {
     "InternalName": "Mornye",
-    "DisplayName": "莫宁"
+    "DisplayName": "莫宁",
+    "InGameSkins": [
+      {
+        "InternalName": "Mornye Plush Dream",
+        "DisplayName": "呢绒梦"
+      }
+    ]
   },
   {
     "InternalName": "Aemeath",
@@ -234,5 +252,45 @@
   {
     "InternalName": "Sigrika",
     "DisplayName": "西格莉卡"
+  },
+  {
+    "InternalName": "Hiyuki",
+    "DisplayName": "绯雪"
+  },
+  {
+    "InternalName": "Denia",
+    "DisplayName": "达妮娅"
+  },
+  {
+    "InternalName": "Lucy",
+    "DisplayName": "露西"
+  },
+  {
+    "InternalName": "Rebecca",
+    "DisplayName": "丽贝卡"
+  },
+  {
+    "InternalName": "YangyangXuanling",
+    "DisplayName": "秧秧·玄翎"
+  },
+  {
+    "InternalName": "Suisui",
+    "DisplayName": "穗穗"
+  },
+  {
+    "InternalName": "Qingxiao",
+    "DisplayName": "清宵"
+  },
+  {
+    "InternalName": "Jingran",
+    "DisplayName": "景燃"
+  },
+  {
+    "InternalName": "Hsin",
+    "DisplayName": "心"
+  },
+  {
+    "InternalName": "Suoming",
+    "DisplayName": "锁暝"
   }
 ]
